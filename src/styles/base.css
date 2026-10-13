@@ -142,58 +142,9 @@ a {
   margin-bottom: 0.75rem;
 }
 
-/* Wide enough for "Stop" and "Play" alike, so the meter does not move. */
+/* Wide enough for "Stop" and "Play" alike, so it does not change size. */
 #play {
   min-width: 5.5rem;
-}
-
-.meter-row {
-  display: flex;
-  flex: 1;
-  align-items: center;
-  gap: 0.75rem;
-  font-size: 0.85rem;
-}
-
-/* A readout, and made not to look like the sliders below it: square,
-   cut into segments, no thumb. */
-.meter {
-  position: relative;
-  flex: 1;
-  max-width: 14rem;
-  height: 0.875rem;
-  overflow: hidden;
-  background: var(--paper-sunken);
-}
-
-.meter-fill {
-  height: 100%;
-  background: var(--ink);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 60ms linear;
-}
-
-/* Paper-coloured gaps over the bar: twelve segments, 5 dB each. */
-.meter::after {
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    to right,
-    transparent 0 calc(100% / 12 - 2px),
-    var(--paper) calc(100% / 12 - 2px) calc(100% / 12)
-  );
-  content: '';
-}
-
-/* The recent peak: a thin ink line that holds, then falls. */
-.meter-peak {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  margin-left: -2px;
-  background: var(--ink);
 }
 
 /* Label, slider, readout on one line; the readout's width is fixed so the
@@ -289,13 +240,6 @@ a {
     margin-top: 0.5rem;
   }
 }
-
-@media (prefers-reduced-motion: reduce) {
-  .meter-fill {
-    transition: none;
-  }
-}
-
 .footer {
   display: flex;
   justify-content: space-between;

@@ -9,10 +9,9 @@ Vite, vanilla TypeScript (strict) and Canvas 2D; no UI framework. Vitest,
 ESLint. Sound comes from one AudioWorklet phase-modulation engine. Deploys
 as static files to Cloudflare Pages (`DEPLOYMENT.md`).
 
-So far the page is the lab view, not yet chapters: Play / Stop, a level
-meter, sliders for volume, carrier, ratio and index, the theme switch, and
-two live figures, the waveform and the spectrum. One carrier and one
-modulator.
+So far the page is the lab view, not yet chapters: Play / Stop, sliders
+for volume, carrier, ratio and index, the theme switch, and two live
+figures, the waveform and the spectrum. One carrier and one modulator.
 
 ## Commands
 
@@ -68,11 +67,11 @@ figures subscribe to it. Nothing else passes values around.
   (`frequency`, `ratio`, `index`). It is bundled on its own through the
   `?worker&url` import in `engine.ts`, and may import from `src/dsp` only.
   `engine.ts` (`AudioEngine`) follows the store: worklet, master gain,
-  limiter (a `DynamicsCompressorNode`), analyser, speakers. It creates the
+  limiter (a `DynamicsCompressorNode`), speakers. It creates the
   context on the first Play, inside the gesture, glides params (30 ms
   linear ramps), fades the master gain in and out, and suspends the context
   after Stop. `iosUnlock.ts` keeps iOS's ringer switch from muting it;
-  `level.ts` is the meter's maths; `worklet-globals.d.ts` types the
+  `worklet-globals.d.ts` types the
   worklet's globals.
 - `src/viz/` — Canvas 2D drawing. A renderer is a function of
   `(state, canvas)` that repaints from scratch, reading its colours and
@@ -84,7 +83,7 @@ figures subscribe to it. Nothing else passes values around.
   when the canvas is narrow.
 - `src/ui/` — wiring between the markup and the store: `sliders.ts` (a
   table of the sliders: range, step, scale, readout), `transport.ts`
-  (Play / Stop and the level meter with its peak marker), `themeSwitch.ts`, and `figures.ts`, which
+  (Play / Stop), `themeSwitch.ts`, and `figures.ts`, which
   redraws a canvas on patch, size, theme and font changes and keeps its
   `aria-label` describing what it shows.
 - `src/styles/` — `tokens.css` (colours and fonts) and `base.css` (page
@@ -125,18 +124,18 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
   and whoever mounts it must redraw on resize, theme change and
   `document.fonts.ready` (`mountFigure` in `src/ui/figures.ts` does).
   Give every canvas `role="img"` and an `aria-label` saying what it shows.
-- Controls are ink on paper (`.btn`, `.slider`, `.meter` in `base.css`).
-  Give every input a visible `<label>`, and a readout in `.num`. A readout
-  that is not a control must not look like one: the meter is square and
-  segmented where a slider is round with a thumb.
+- Controls are ink on paper (`.btn`, `.slider` in `base.css`). Give every
+  input a visible `<label>`, and a readout in `.num`. Anything that is not
+  a control must not look like one.
 - Show real units beside carrier units wherever a frequency or time
   appears (the ratio's readout adds the modulator's Hz; the axes add Hz
   and ms).
 - The theme switch cycles Auto, Light, Dark and saves the bare word under
   `localStorage["fmlab.theme"]`. The boot script in `index.html` reads the
   same key; keep it in step with `src/model/theme.ts`.
-- Motion: the only animation is the meter. Under `prefers-reduced-motion`
-  it loses its transition and moves four times a second.
+- Motion: nothing animates on its own; the figures only move when a
+  control does. Anything added that does must respect
+  `prefers-reduced-motion`.
 
 ## Testing
 
@@ -146,5 +145,5 @@ environment with globals on; there is no jsdom yet, so add it when the
 first DOM test needs it. Test the maths against published values (Bessel
 tables), identities and each other (the kernel against `fmSample` and
 `fmSpectrum`), not against the code's own output. The engine and the
-worklet need a browser: check sound by pressing Play and watching the
-meter.
+worklet need a browser, and there is no meter on the page: check sound by
+listening, or in a script by tapping the graph with an `AnalyserNode`.

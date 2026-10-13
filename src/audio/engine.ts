@@ -1,6 +1,5 @@
 import type { LabState, LabStore } from '../model/lab';
 import { unlockIosAudio } from './iosUnlock';
-import { peakOf } from './level';
 import { PROCESSOR_NAME } from './processorName';
 // `?worker&url` has Vite compile the worklet and its imports into a file
 // of its own and hand back the address.
@@ -18,16 +17,13 @@ interface Graph {
   context: AudioContext;
   synth: AudioWorkletNode;
   master: GainNode;
-  analyser: AnalyserNode;
-  /** A scratch buffer for `level()`. */
-  block: Float32Array<ArrayBuffer>;
 }
 
 /**
  * Plays the model: it follows `playing` and the patch in the store and
  * owns everything Web Audio.
  *
- *   worklet (PM synth) -> master gain -> limiter -> analyser -> speakers
+ *   worklet (PM synth) -> master gain -> limiter -> speakers
  *
  * Nothing is created until `playing` first turns true, which has to happen
  * inside a click or key press: browsers refuse to start audio otherwise.
@@ -48,17 +44,6 @@ export class AudioEngine {
         this.sendPatch(state, GLIDE_SECONDS);
       }
     });
-  }
-
-  /**
-   * The output's peak over the last few milliseconds, 1 being full scale.
-   * Measured after the limiter, so it is what reaches the speakers.
-   */
-  level(): number {
-    if (!this.graph || !this.store.get().playing) return 0;
-    const { analyser, block } = this.graph;
-    analyser.getFloatTimeDomainData(block);
-    return peakOf(block);
   }
 
   private async start(): Promise<void> {
@@ -112,9 +97,9 @@ export class AudioEngine {
     });
     const master = new GainNode(context, { gain: 0 });
     // A compressor set hard enough to be a limiter: a safety net, not an
-    // effect. At the default volume the signal never reaches it, though
-    // the node's built-in make-up gain still lifts everything by about
-    // 2 dB, which is why the meter reads a little above the volume.
+    // effect. Even at full volume the signal stays under its threshold,
+    // though the node's built-in make-up gain lifts everything by about
+    // 2 dB.
     const limiter = new DynamicsCompressorNode(context, {
       threshold: -3,
       knee: 0,
@@ -122,17 +107,9 @@ export class AudioEngine {
       attack: 0.003,
       release: 0.1,
     });
-    const analyser = new AnalyserNode(context, { fftSize: 1024 });
-    synth.connect(master).connect(limiter).connect(analyser);
-    analyser.connect(context.destination);
+    synth.connect(master).connect(limiter).connect(context.destination);
 
-    this.graph = {
-      context,
-      synth,
-      master,
-      analyser,
-      block: new Float32Array(analyser.fftSize),
-    };
+    this.graph = { context, synth, master };
     return this.graph;
   }
 

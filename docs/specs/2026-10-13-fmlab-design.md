@@ -60,7 +60,7 @@ Hovering or tapping a sideband highlights it in every view, with its formula.
 
 - One AudioWorklet does per-sample phase modulation for up to 6 operators, with feedback. Chapters use the operators they need.
 - The predicted spectrum, the waveform and the sound share one maths module, so they cannot disagree.
-- The AudioContext starts on a user gesture. Parameter changes are smoothed to avoid clicks. A limiter sits on the master bus, the default volume is low, and an output meter is always visible.
+- The AudioContext starts on a user gesture. Parameter changes are smoothed to avoid clicks. A limiter sits on the master bus, the default volume is low, and a Volume slider is always visible. (This first said "an output meter is always visible". Jeremy removed the meter on 2026-10-13 in favour of the Volume slider.)
 - **iOS:** set `navigator.audioSession.type = "playback"` where supported, so sound plays with the ringer switch on silent; otherwise fall back to unlocking with a looping silent audio element on the first tap.
 
 ## Look

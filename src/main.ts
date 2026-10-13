@@ -21,7 +21,7 @@ import { loadTheme } from './model/theme';
 import { mountFigures } from './ui/figures';
 import { mountSliders } from './ui/sliders';
 import { mountThemeSwitch } from './ui/themeSwitch';
-import { mountMeter, mountPlayButton } from './ui/transport';
+import { mountPlayButton } from './ui/transport';
 
 const REPO_URL = 'https://github.com/memestreak/fmlab';
 
@@ -40,16 +40,14 @@ function mountCommitHash(slot: HTMLElement): void {
 // One store; the engine and every control and figure follow it. The boot
 // script in index.html has already applied the saved theme.
 const store = createLabStore({ theme: loadTheme() });
-const engine = new AudioEngine(store);
+// It subscribes itself; nothing here needs to hold on to it.
+new AudioEngine(store);
 
 mountSliders(store);
 mountFigures(store);
 
 const play = document.querySelector<HTMLButtonElement>('#play');
 if (play) mountPlayButton(play, store);
-
-const meter = document.querySelector<HTMLElement>('#meter');
-if (meter) mountMeter(meter, store, engine);
 
 const theme = document.querySelector<HTMLButtonElement>('#theme');
 if (theme) mountThemeSwitch(theme, store);
