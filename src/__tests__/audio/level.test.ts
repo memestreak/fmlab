@@ -1,5 +1,13 @@
 import { silentWav } from '../../audio/iosUnlock';
-import { meterPosition, METER_FLOOR_DB, peakOf, toDb } from '../../audio/level';
+import {
+  holdPeak,
+  meterPosition,
+  METER_FLOOR_DB,
+  PEAK_FALL_PER_SECOND,
+  PEAK_HOLD_MS,
+  peakOf,
+  toDb,
+} from '../../audio/level';
 
 describe('peakOf', () => {
   it('is the largest absolute sample', () => {
@@ -36,6 +44,35 @@ describe('meterPosition', () => {
     expect(meterPosition(10 ** (-30 / 20))).toBeCloseTo(0.5, 10);
     // The default volume, 0.2, is about -14 dB.
     expect(meterPosition(0.2)).toBeCloseTo(1 - 13.979 / 60, 3);
+  });
+});
+
+describe('holdPeak', () => {
+  const start = { position: 0.8, at: 1000 };
+
+  it('rises with the level at once', () => {
+    expect(holdPeak(start, 0.9, 1100, 16)).toEqual({ position: 0.9, at: 1100 });
+  });
+
+  it('holds for a second after the level drops', () => {
+    expect(holdPeak(start, 0.3, 1500, 16)).toBe(start);
+    expect(holdPeak(start, 0.3, 1000 + PEAK_HOLD_MS - 1, 16)).toBe(start);
+  });
+
+  it('then falls at a steady rate', () => {
+    const after = holdPeak(start, 0.3, 2100, 100);
+    expect(after.position).toBeCloseTo(0.8 - PEAK_FALL_PER_SECOND * 0.1, 10);
+    // Still falling on the next frame: the hold is not started again.
+    expect(holdPeak(after, 0.3, 2200, 100).position).toBeLessThan(after.position);
+  });
+
+  it('never falls below the level', () => {
+    expect(holdPeak(start, 0.79, 5000, 1000).position).toBe(0.79);
+  });
+
+  it('holds again once the level has caught it', () => {
+    const caught = holdPeak({ position: 0.5, at: 0 }, 0.5, 4000, 16);
+    expect(holdPeak(caught, 0.2, 4500, 16)).toBe(caught);
   });
 });
 

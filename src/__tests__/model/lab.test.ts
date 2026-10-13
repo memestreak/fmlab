@@ -3,10 +3,13 @@ import {
   CARRIER_SEMITONES,
   clamp,
   createLabStore,
+  DEFAULTS,
   hzToSemitones,
   INDEX,
+  modulatorHz,
   RATIO,
   semitonesToHz,
+  VOLUME,
 } from '../../model/lab';
 import { nextTheme, parseTheme } from '../../model/theme';
 
@@ -33,6 +36,20 @@ describe('the lab store', () => {
     expect(clamp(state.carrierHz, CARRIER_HZ)).toBe(state.carrierHz);
     expect(clamp(state.ratio, RATIO)).toBe(state.ratio);
     expect(clamp(state.index, INDEX)).toBe(state.index);
+  });
+});
+
+describe('modulatorHz', () => {
+  it('is the carrier times the ratio', () => {
+    expect(modulatorHz({ ...DEFAULTS, carrierHz: 220, ratio: 1 })).toBe(220);
+    expect(modulatorHz({ ...DEFAULTS, carrierHz: 110, ratio: 3.5 })).toBe(385);
+  });
+});
+
+describe('volume', () => {
+  it('defaults low, well inside its range', () => {
+    expect(DEFAULTS.volume).toBeLessThan(VOLUME.max / 2);
+    expect(VOLUME.max).toBeLessThan(1);
   });
 });
 

@@ -26,6 +26,8 @@ export interface Range {
 export const CARRIER_HZ: Range = { min: 55, max: 880 };
 export const RATIO: Range = { min: 0.25, max: 8 };
 export const INDEX: Range = { min: 0, max: 10 };
+/** The top is half of full scale: loud enough, and clear of the limiter. */
+export const VOLUME: Range = { min: 0, max: 0.5 };
 
 export const DEFAULTS: LabState = {
   carrierHz: 220,
@@ -39,6 +41,11 @@ export const DEFAULTS: LabState = {
 
 export function createLabStore(initial: Partial<LabState> = {}): LabStore {
   return createStore({ ...DEFAULTS, ...initial });
+}
+
+/** The modulator's frequency in Hz: the carrier's times the ratio. */
+export function modulatorHz({ carrierHz, ratio }: LabState): number {
+  return carrierHz * ratio;
 }
 
 export function clamp(value: number, { min, max }: Range): number {

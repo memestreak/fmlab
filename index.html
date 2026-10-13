@@ -41,7 +41,7 @@
           <div class="transport">
             <button id="play" type="button" class="btn btn-ink">Play</button>
             <div class="meter-row">
-              <span id="meter-label">Output</span>
+              <span id="meter-label">Level</span>
               <div
                 id="meter"
                 class="meter"
@@ -52,8 +52,15 @@
                 aria-valuenow="0"
               >
                 <div class="meter-fill"></div>
+                <div class="meter-peak" hidden></div>
               </div>
             </div>
+          </div>
+
+          <div class="slider-row">
+            <label for="volume">Volume</label>
+            <output id="volume-out" for="volume" class="num"></output>
+            <input id="volume" type="range" class="slider" />
           </div>
 
           <div class="slider-row">

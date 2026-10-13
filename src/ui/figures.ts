@@ -20,11 +20,12 @@ function mountFigure(canvas: HTMLCanvasElement, store: LabStore, draw: Draw): vo
   };
 
   store.subscribe((state, previous) => {
-    // Not for `playing`, nor for the carrier: both axes are in carrier
-    // units, so neither changes anything drawn.
+    // Not for `playing` or `volume`, which change nothing drawn. The
+    // carrier moves no curve, but it does change the Hz and ms labels.
     if (
       state.ratio !== previous.ratio ||
       state.index !== previous.index ||
+      state.carrierHz !== previous.carrierHz ||
       state.theme !== previous.theme
     ) {
       schedule();

@@ -1,6 +1,7 @@
 import { fmSpectrum, type SpectralLine } from '../dsp/fmSpectrum';
 import type { LabState } from '../model/lab';
 import { ampToY, beginPlot, drawFrame } from './plot';
+import { spectrumTicks } from './ticks';
 
 const STEM_WIDTH = 2;
 /** Radius of the hollow marker on a negative stem. */
@@ -22,8 +23,8 @@ export function axisEnd(ratio: number, index: number): number {
 }
 
 /**
- * Draws the patch's line spectrum as stems on a frequency axis in carrier
- * units. A positive line is a --pen-blue stem above the axis; a negative
+ * Draws the patch's line spectrum as stems on a frequency axis numbered in
+ * carrier units and, beneath, in Hz. A positive line is a --pen-blue stem above the axis; a negative
  * one is --pen-red, below it, and ends in a hollow marker so the phase
  * does not rest on colour alone.
  *
@@ -42,12 +43,12 @@ export function drawSpectrum(
   const x = (freq: number) => left + (freq / maxFreq) * (right - left);
   const y = (amp: number) => ampToY(plot, amp);
 
-  // Eight numbers along the axis, whatever its end.
-  const xTicks = [];
-  for (let freq = maxFreq / 8; freq <= maxFreq; freq += maxFreq / 8) {
-    xTicks.push({ label: String(freq), x: x(freq) });
-  }
-  drawFrame(plot, xTicks, 'frequency, in multiples of the carrier');
+  drawFrame(
+    plot,
+    spectrumTicks(maxFreq, state.carrierHz),
+    x,
+    'frequency: multiples of the carrier, and Hz',
+  );
 
   ctx.lineWidth = STEM_WIDTH;
   for (const { freq, amp } of lines) {

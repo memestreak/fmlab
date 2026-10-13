@@ -4,8 +4,10 @@ import {
   INDEX,
   type LabState,
   type LabStore,
+  modulatorHz,
   RATIO,
   semitonesToHz,
+  VOLUME,
 } from '../model/lab';
 
 /** How one slider maps onto one number in the model. */
@@ -23,6 +25,16 @@ interface SliderSpec {
 
 const SLIDERS: SliderSpec[] = [
   {
+    // Shown as a share of the slider, not as the gain it stands for.
+    id: 'volume',
+    min: VOLUME.min,
+    max: VOLUME.max,
+    step: 0.005,
+    read: state => state.volume,
+    write: position => ({ volume: position }),
+    format: state => `${Math.round((state.volume / VOLUME.max) * 100)}%`,
+  },
+  {
     // In semitones, so the scale is logarithmic; see model/lab.ts.
     id: 'carrier',
     min: 0,
@@ -33,14 +45,16 @@ const SLIDERS: SliderSpec[] = [
     format: state => `${state.carrierHz.toFixed(1)} Hz`,
   },
   {
-    // Steps of 0.05 make the whole-number ratios easy to land on.
+    // Steps of 0.05 make the whole-number ratios easy to land on. The
+    // readout adds what the ratio comes to: the modulator's frequency.
     id: 'ratio',
     min: RATIO.min,
     max: RATIO.max,
     step: 0.05,
     read: state => state.ratio,
     write: position => ({ ratio: position }),
-    format: state => state.ratio.toFixed(2),
+    format: state =>
+      `${state.ratio.toFixed(2)} · ${modulatorHz(state).toFixed(1)} Hz`,
   },
   {
     id: 'index',
@@ -54,7 +68,7 @@ const SLIDERS: SliderSpec[] = [
 ];
 
 /**
- * Ties the three range inputs and their readouts to the store, both ways.
+ * Ties the range inputs and their readouts to the store, both ways.
  * The inputs are in index.html; this gives them their ranges.
  */
 export function mountSliders(store: LabStore): void {

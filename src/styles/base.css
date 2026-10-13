@@ -155,13 +155,14 @@ a {
   font-size: 0.85rem;
 }
 
+/* A readout, and made not to look like the sliders below it: square,
+   cut into segments, no thumb. */
 .meter {
+  position: relative;
   flex: 1;
   max-width: 14rem;
-  height: 0.5rem;
+  height: 0.875rem;
   overflow: hidden;
-  border: 1px solid var(--rule);
-  border-radius: 999px;
   background: var(--paper-sunken);
 }
 
@@ -173,11 +174,33 @@ a {
   transition: transform 60ms linear;
 }
 
+/* Paper-coloured gaps over the bar: twelve segments, 5 dB each. */
+.meter::after {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to right,
+    transparent 0 calc(100% / 12 - 2px),
+    var(--paper) calc(100% / 12 - 2px) calc(100% / 12)
+  );
+  content: '';
+}
+
+/* The recent peak: a thin ink line that holds, then falls. */
+.meter-peak {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  margin-left: -2px;
+  background: var(--ink);
+}
+
 /* Label, slider, readout on one line; the readout's width is fixed so the
    slider does not change length as the digits change. */
 .slider-row {
   display: grid;
-  grid-template-columns: 4.5rem 1fr 6.5rem;
+  grid-template-columns: 4.5rem 1fr 9.5rem;
   grid-template-areas: 'label slider value';
   align-items: center;
   gap: 0.75rem;

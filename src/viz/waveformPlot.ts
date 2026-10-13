@@ -1,6 +1,7 @@
 import { fmSample, modulatorSample, sampleCycles } from '../dsp/waveform';
 import type { LabState } from '../model/lab';
 import { ampToY, beginPlot, drawFrame, type Plot } from './plot';
+import { waveformTicks } from './ticks';
 
 /** How much of the signal is shown, in periods of the carrier. */
 export const CYCLES_SHOWN = 2;
@@ -36,14 +37,12 @@ export function drawWaveform(state: LabState, canvas: HTMLCanvasElement): void {
   const { ctx, token, left, right, dpr } = plot;
   const { ratio, index } = state;
 
-  const xTicks = [];
-  for (let cycle = 0; cycle <= CYCLES_SHOWN; cycle++) {
-    xTicks.push({
-      label: String(cycle),
-      x: left + (cycle / CYCLES_SHOWN) * (right - left),
-    });
-  }
-  drawFrame(plot, xTicks, 'time, in cycles of the carrier');
+  drawFrame(
+    plot,
+    waveformTicks(CYCLES_SHOWN, state.carrierHz),
+    cycle => left + (cycle / CYCLES_SHOWN) * (right - left),
+    'time: cycles of the carrier, and ms',
+  );
 
   const count = Math.ceil((right - left) * dpr * SAMPLES_PER_PIXEL);
   ctx.lineJoin = 'round';

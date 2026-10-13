@@ -1,9 +1,13 @@
 // What every plot shares: sizing the bitmap, reading the tokens, and the
 // frame of gridlines and number labels round the plot area.
 
+import { keepsLabel, labelStride, type Tick } from './ticks';
+
 /** Space around the plot area for the axis labels, in CSS pixels. */
-const MARGIN = { top: 12, right: 12, bottom: 44, left: 40 };
+const MARGIN = { top: 12, right: 22, bottom: 62, left: 40 };
 export const LABEL_SIZE = 12;
+/** The least clear space between two labels in the second row. */
+const LABEL_GAP = 8;
 
 /** A canvas ready to draw on, in CSS pixels, with its plot area. */
 export interface Plot {
@@ -61,12 +65,17 @@ export function ampToY({ top, bottom }: Plot, amp: number): number {
  * the halves, a zero axis, mono numbers on both axes and a title under the
  * x axis.
  *
- * @param xTicks where to put a number under the x axis: its text and its
- *   x pixel
+ * The x axis has two rows of numbers: each tick's label in carrier units,
+ * and under it the same place in Hz or ms. The second row's labels are
+ * wider, so on a narrow canvas only every second or third is drawn.
+ *
+ * @param ticks the x axis's ticks, evenly spaced
+ * @param x the x pixel for a tick's position
  */
 export function drawFrame(
   plot: Plot,
-  xTicks: { label: string; x: number }[],
+  ticks: Tick[],
+  x: (at: number) => number,
   xTitle: string,
 ): void {
   const { ctx, token, left, right, bottom } = plot;
@@ -95,7 +104,15 @@ export function drawFrame(
   }
   ctx.textBaseline = 'top';
   ctx.textAlign = 'center';
-  for (const { label, x } of xTicks) ctx.fillText(label, x, bottom + 6);
+  for (const { at, label } of ticks) ctx.fillText(label, x(at), bottom + 6);
+
+  const widest = Math.max(...ticks.map(tick => ctx.measureText(tick.sub).width));
+  const spacing = ticks.length > 1 ? x(ticks[1].at) - x(ticks[0].at) : Infinity;
+  const stride = labelStride(widest, spacing, LABEL_GAP);
+  ticks.forEach(({ at, sub }, i) => {
+    if (keepsLabel(i, ticks.length, stride)) ctx.fillText(sub, x(at), bottom + 23);
+  });
+
   ctx.font = `${LABEL_SIZE}px ${token('--font-sans')}`;
-  ctx.fillText(xTitle, (left + right) / 2, bottom + 26);
+  ctx.fillText(xTitle, (left + right) / 2, bottom + 44);
 }

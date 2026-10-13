@@ -9,9 +9,10 @@ Vite, vanilla TypeScript (strict) and Canvas 2D; no UI framework. Vitest,
 ESLint. Sound comes from one AudioWorklet phase-modulation engine. Deploys
 as static files to Cloudflare Pages (`DEPLOYMENT.md`).
 
-So far the page is the lab view, not yet chapters: Play / Stop, sliders for
-carrier, ratio and index, an output meter, the theme switch, and two live
-figures, the waveform and the spectrum. One carrier and one modulator.
+So far the page is the lab view, not yet chapters: Play / Stop, a level
+meter, sliders for volume, carrier, ratio and index, the theme switch, and
+two live figures, the waveform and the spectrum. One carrier and one
+modulator.
 
 ## Commands
 
@@ -77,10 +78,13 @@ figures subscribe to it. Nothing else passes values around.
   `(state, canvas)` that repaints from scratch, reading its colours and
   fonts from the canvas's CSS variables. `plot.ts` has the shared frame
   (sizing for the device pixel ratio, gridlines, labels);
-  `waveformPlot.ts` and `spectrumPlot.ts` are the two figures.
+  `waveformPlot.ts` and `spectrumPlot.ts` are the two figures. `ticks.ts`
+  (pure) makes the x axes' numbers: every tick is labelled in carrier
+  units (multiples, cycles) and, on a second row, in Hz or ms, thinned
+  when the canvas is narrow.
 - `src/ui/` — wiring between the markup and the store: `sliders.ts` (a
-  table of the three sliders: range, step, scale, readout), `transport.ts`
-  (Play / Stop and the meter), `themeSwitch.ts`, and `figures.ts`, which
+  table of the sliders: range, step, scale, readout), `transport.ts`
+  (Play / Stop and the level meter with its peak marker), `themeSwitch.ts`, and `figures.ts`, which
   redraws a canvas on patch, size, theme and font changes and keeps its
   `aria-label` describing what it shows.
 - `src/styles/` — `tokens.css` (colours and fonts) and `base.css` (page
@@ -89,9 +93,8 @@ figures subscribe to it. Nothing else passes values around.
 - Not there yet: `src/chapters/`, one module per chapter, wiring its text,
   figures and controls to the model.
 
-Known limits: the synth is not band-limited, so a high carrier with a high
-ratio and index aliases; there is no volume control on the page, though
-`volume` is in the store.
+Known limit: the synth is not band-limited, so a high carrier with a high
+ratio and index aliases.
 
 ## Styling
 
@@ -123,7 +126,12 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
   `document.fonts.ready` (`mountFigure` in `src/ui/figures.ts` does).
   Give every canvas `role="img"` and an `aria-label` saying what it shows.
 - Controls are ink on paper (`.btn`, `.slider`, `.meter` in `base.css`).
-  Give every input a visible `<label>`, and a readout in `.num`.
+  Give every input a visible `<label>`, and a readout in `.num`. A readout
+  that is not a control must not look like one: the meter is square and
+  segmented where a slider is round with a thumb.
+- Show real units beside carrier units wherever a frequency or time
+  appears (the ratio's readout adds the modulator's Hz; the axes add Hz
+  and ms).
 - The theme switch cycles Auto, Light, Dark and saves the bare word under
   `localStorage["fmlab.theme"]`. The boot script in `index.html` reads the
   same key; keep it in step with `src/model/theme.ts`.
