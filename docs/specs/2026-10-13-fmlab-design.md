@@ -128,5 +128,5 @@ import, a free-form modulation editor.
   (-80 dB), and drops a sideband that lands on exactly 0 Hz, since a sine at
   0 Hz is silent.
 - **The wordmark is the `h1`.** The placeholder page has no separate title.
-- **No theme switch yet.** The tokens honour `data-theme`, but nothing sets
-  it; the page follows the system setting until the switch is built.
+- **Theme switch.** Not in the scaffold; added with the first playable
+  slice (PR #2).

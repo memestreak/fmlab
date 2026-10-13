@@ -10,30 +10,82 @@
     />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>fmlab</title>
+    <!-- Before the first paint, so a saved Light or Dark never flashes the
+         other. The key and values are those of src/model/theme.ts. -->
+    <script>
+      try {
+        var theme = localStorage.getItem('fmlab.theme');
+        if (theme === 'light' || theme === 'dark') {
+          document.documentElement.dataset.theme = theme;
+        }
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div class="page">
-      <header>
+      <header class="masthead">
         <h1 class="wordmark">fmlab</h1>
+        <button id="theme" type="button" class="btn btn-quiet">
+          Theme: Auto
+        </button>
       </header>
 
       <main>
         <p>
-          An interactive guide to FM synthesis: one sine wave bending the
-          pitch of another is enough to make a whole spectrum, and here you
-          will watch and hear it happen.
+          One sine wave, the modulator, bends the phase of another, the
+          carrier. Press Play, then move the sliders: what you hear is what
+          the two figures draw.
         </p>
 
+        <section class="lab" aria-label="Controls">
+          <div class="transport">
+            <button id="play" type="button" class="btn btn-ink">Play</button>
+            <div class="meter-row">
+              <span id="meter-label">Output</span>
+              <div
+                id="meter"
+                class="meter"
+                role="meter"
+                aria-labelledby="meter-label"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                aria-valuenow="0"
+              >
+                <div class="meter-fill"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="slider-row">
+            <label for="carrier">Carrier</label>
+            <output id="carrier-out" for="carrier" class="num"></output>
+            <input id="carrier" type="range" class="slider" />
+          </div>
+          <div class="slider-row">
+            <label for="ratio">Ratio</label>
+            <output id="ratio-out" for="ratio" class="num"></output>
+            <input id="ratio" type="range" class="slider" />
+          </div>
+          <div class="slider-row">
+            <label for="index">Index</label>
+            <output id="index-out" for="index" class="num"></output>
+            <input id="index" type="range" class="slider" />
+          </div>
+        </section>
+
         <figure class="figure">
-          <canvas
-            id="spectrum"
-            class="plot"
-            role="img"
-            aria-label="Line spectrum for ratio 1, index 2: partials at whole multiples of the carrier, strongest at 2, the one at 1 with negative phase."
-          ></canvas>
+          <canvas id="waveform" class="plot" role="img"></canvas>
           <figcaption>
-            Fig. 1&emsp;Spectrum, ratio 1, index 2. A stem below the axis,
-            with a hollow marker, has negative phase.
+            Fig. 1&emsp;Waveform. Two cycles of the output, with the
+            modulator behind it as the thinner line.
+          </figcaption>
+        </figure>
+
+        <figure class="figure">
+          <canvas id="spectrum" class="plot" role="img"></canvas>
+          <figcaption>
+            Fig. 2&emsp;Spectrum. A stem below the axis, with a hollow
+            marker, has negative phase.
           </figcaption>
         </figure>
       </main>

@@ -1,0 +1,101 @@
+// What every plot shares: sizing the bitmap, reading the tokens, and the
+// frame of gridlines and number labels round the plot area.
+
+/** Space around the plot area for the axis labels, in CSS pixels. */
+const MARGIN = { top: 12, right: 12, bottom: 44, left: 40 };
+export const LABEL_SIZE = 12;
+
+/** A canvas ready to draw on, in CSS pixels, with its plot area. */
+export interface Plot {
+  ctx: CanvasRenderingContext2D;
+  /** Reads a CSS variable, such as `--pen-blue`, from the canvas. */
+  token: (name: string) => string;
+  /** Device pixels per CSS pixel. */
+  dpr: number;
+  left: number;
+  right: number;
+  top: number;
+  bottom: number;
+}
+
+/**
+ * Sizes the bitmap to the canvas's CSS box times the device pixel ratio,
+ * clears it, and scales the context so drawing is in CSS pixels. Colours
+ * and fonts come from the canvas's CSS variables each time, so drawing
+ * again after a theme change repaints in the new theme. Null when the
+ * canvas cannot be drawn on (no 2D context, or not laid out yet).
+ */
+export function beginPlot(canvas: HTMLCanvasElement): Plot | null {
+  const ctx = canvas.getContext('2d');
+  const { width, height } = canvas.getBoundingClientRect();
+  if (!ctx || width === 0 || height === 0) return null;
+
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = Math.round(width * dpr);
+  canvas.height = Math.round(height * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, width, height);
+
+  const style = getComputedStyle(canvas);
+  return {
+    ctx,
+    token: name => style.getPropertyValue(name).trim(),
+    dpr,
+    left: MARGIN.left,
+    right: width - MARGIN.right,
+    top: MARGIN.top,
+    bottom: height - MARGIN.bottom,
+  };
+}
+
+/** A half-pixel centre, which keeps a one-pixel line sharp. */
+const crisp = (v: number) => Math.round(v) + 0.5;
+
+/** The y pixel for an amplitude, the plot area running from -1 to 1. */
+export function ampToY({ top, bottom }: Plot, amp: number): number {
+  return (top + bottom) / 2 - (amp * (bottom - top)) / 2;
+}
+
+/**
+ * The frame both plots stand in: amplitude from -1 to 1 with gridlines at
+ * the halves, a zero axis, mono numbers on both axes and a title under the
+ * x axis.
+ *
+ * @param xTicks where to put a number under the x axis: its text and its
+ *   x pixel
+ */
+export function drawFrame(
+  plot: Plot,
+  xTicks: { label: string; x: number }[],
+  xTitle: string,
+): void {
+  const { ctx, token, left, right, bottom } = plot;
+
+  const hLine = (amp: number, colour: string) => {
+    const y = crisp(ampToY(plot, amp));
+    ctx.strokeStyle = colour;
+    ctx.beginPath();
+    ctx.moveTo(left, y);
+    ctx.lineTo(right, y);
+    ctx.stroke();
+  };
+  ctx.lineWidth = 1;
+  for (const amp of [-1, -0.5, 0.5, 1]) hLine(amp, token('--grid'));
+  hLine(0, token('--rule'));
+
+  // All ink: numbers in mono, the title in sans.
+  ctx.fillStyle = token('--ink');
+  ctx.font = `${LABEL_SIZE}px ${token('--font-mono')}`;
+  ctx.textBaseline = 'middle';
+  ctx.textAlign = 'right';
+  for (const amp of [-1, 0, 1]) {
+    // A real minus sign, as wide as the digits.
+    const label = String(amp).replace('-', '−');
+    ctx.fillText(label, left - 8, ampToY(plot, amp));
+  }
+  ctx.textBaseline = 'top';
+  ctx.textAlign = 'center';
+  for (const { label, x } of xTicks) ctx.fillText(label, x, bottom + 6);
+  ctx.font = `${LABEL_SIZE}px ${token('--font-sans')}`;
+  ctx.fillText(xTitle, (left + right) / 2, bottom + 26);
+}
