@@ -3,6 +3,7 @@ import {
   chapterByNumber,
   CHAPTERS,
   type ControlId,
+  type FigureId,
   FIRST_CHAPTER,
   neighbours,
 } from '../chapters';
@@ -90,9 +91,18 @@ export function mountChapters(store: LabStore): void {
     }
     const motion = document.querySelector<HTMLElement>('#motion-toggle');
     if (motion) motion.hidden = !chapter.hasMotion;
-    for (const figure of ['waveform', 'spectrum'] as const) {
-      const caption = document.querySelector(`#${figure}-caption`);
-      if (caption) caption.textContent = chapter.captions[figure];
+    // The figures the chapter names, numbered from 1 in the order shown.
+    let number = 0;
+    for (const figure of document.querySelectorAll<HTMLElement>('[data-figure]')) {
+      const id = figure.dataset.figure as FigureId;
+      const text = chapter.figures[id];
+      figure.hidden = text === undefined;
+      if (text === undefined) continue;
+      number += 1;
+      const slot = figure.querySelector('.figure-number');
+      if (slot) slot.textContent = String(number);
+      const caption = figure.querySelector(`#${id}-caption`);
+      if (caption) caption.textContent = text;
     }
   };
 
@@ -104,7 +114,13 @@ export function mountChapters(store: LabStore): void {
 
   window.addEventListener('hashchange', () => {
     const chapter = chapterInUrl();
-    store.set({ chapter: chapter.number, ...chapter.patch });
+    // Nothing stays picked out from the chapter before.
+    store.set({
+      chapter: chapter.number,
+      ...chapter.patch,
+      hover: null,
+      pinned: null,
+    });
     // A new chapter starts at its top, and says so to a screen reader.
     window.scrollTo(0, 0);
     narrative

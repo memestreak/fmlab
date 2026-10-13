@@ -12,8 +12,9 @@ export const sandbox: Chapter = {
      the carrier's. Whole numbers give harmonic, pitched sounds; anything
      between gives clangs and bells. <strong>Index</strong> is how hard
      the modulator pushes: more index, more sidebands, a brighter sound.`,
-    `The chapters between the second and this one are still to be
-     written. They will explain what the sliders here are doing.`,
+    `Chapters 5 and 6 are still to be written. They will explain what
+     Ratio does, and what happens when Index changes while a note
+     sounds.`,
   ],
   maths: [
     {
@@ -41,8 +42,9 @@ export const sandbox: Chapter = {
     modHz: 5,
     deviationHz: 20,
     showModulator: true,
+    showBandwidth: false,
   },
-  captions: {
+  figures: {
     waveform:
       'Waveform. Two cycles of the output, with the modulator behind it as the thinner line.',
     spectrum:

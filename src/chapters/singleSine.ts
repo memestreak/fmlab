@@ -54,8 +54,9 @@ export const singleSine: Chapter = {
     modHz: 5,
     deviationHz: 0,
     showModulator: false,
+    showBandwidth: false,
   },
-  captions: {
+  figures: {
     waveform: 'Waveform. Two cycles of the sine wave.',
     spectrum: 'Spectrum. One sine wave is one stem, at its frequency.',
   },

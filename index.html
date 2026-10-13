@@ -83,19 +83,56 @@
             </div>
           </div>
 
-          <figure class="figure">
+          <!-- Every figure there is. A chapter shows the ones it names in
+               `figures`, matched on data-figure, and they are numbered
+               from 1 in the order shown (.figure-number). -->
+          <figure class="figure" data-figure="waveform">
             <canvas id="waveform" class="plot" role="img"></canvas>
             <figcaption>
-              Fig. 1&emsp;<span id="waveform-caption"></span>
+              Fig. <span class="figure-number"></span>&emsp;<span
+                id="waveform-caption"
+              ></span>
               <!-- Says when the figure is moving, and how slowed. -->
               <span id="waveform-note"></span>
             </figcaption>
           </figure>
 
-          <figure class="figure">
+          <figure class="figure" data-figure="spectrum">
             <canvas id="spectrum" class="plot" role="img"></canvas>
             <figcaption>
-              Fig. 2&emsp;<span id="spectrum-caption"></span>
+              Fig. <span class="figure-number"></span>&emsp;<span
+                id="spectrum-caption"
+              ></span>
+            </figcaption>
+          </figure>
+
+          <figure class="figure" data-figure="bessel">
+            <!-- The plot is also the index control: a slider, by pointer
+                 or keyboard. See ui/besselControls.ts. -->
+            <canvas
+              id="bessel"
+              class="plot plot-control"
+              role="slider"
+              tabindex="0"
+              aria-label="Modulation index"
+              aria-orientation="horizontal"
+            ></canvas>
+            <div class="figure-tools">
+              <!-- One button per curve, J0 to J8; filled in by script. -->
+              <div
+                id="bessel-orders"
+                class="chips"
+                role="group"
+                aria-label="Pick out a sideband pair"
+              ></div>
+              <button id="vanish" type="button" class="btn btn-quiet">
+                Make the carrier vanish
+              </button>
+            </div>
+            <figcaption>
+              Fig. <span class="figure-number"></span>&emsp;<span
+                id="bessel-caption"
+              ></span>
             </figcaption>
           </figure>
         </section>

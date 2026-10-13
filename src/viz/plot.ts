@@ -9,17 +9,34 @@ export const LABEL_SIZE = 12;
 /** The least clear space between two labels in the second row. */
 const LABEL_GAP = 8;
 
+/** The part of a canvas the curves are drawn in, in CSS pixels. */
+export interface Area {
+  left: number;
+  right: number;
+  top: number;
+  bottom: number;
+}
+
+/**
+ * The plot area of a canvas of a given size. On its own so that pointer
+ * code can turn a position into a value without a canvas to hand.
+ */
+export function plotArea(width: number, height: number): Area {
+  return {
+    left: MARGIN.left,
+    right: width - MARGIN.right,
+    top: MARGIN.top,
+    bottom: height - MARGIN.bottom,
+  };
+}
+
 /** A canvas ready to draw on, in CSS pixels, with its plot area. */
-export interface Plot {
+export interface Plot extends Area {
   ctx: CanvasRenderingContext2D;
   /** Reads a CSS variable, such as `--pen-blue`, from the canvas. */
   token: (name: string) => string;
   /** Device pixels per CSS pixel. */
   dpr: number;
-  left: number;
-  right: number;
-  top: number;
-  bottom: number;
 }
 
 /**
@@ -49,10 +66,7 @@ export function beginPlot(canvas: HTMLCanvasElement): Plot | null {
     ctx,
     token: name => style.getPropertyValue(name).trim(),
     dpr,
-    left: MARGIN.left,
-    right: width - MARGIN.right,
-    top: MARGIN.top,
-    bottom: height - MARGIN.bottom,
+    ...plotArea(width, height),
   };
 }
 
@@ -60,7 +74,7 @@ export function beginPlot(canvas: HTMLCanvasElement): Plot | null {
 const crisp = (v: number) => Math.round(v) + 0.5;
 
 /** The y pixel for an amplitude, the plot area running from -1 to 1. */
-export function ampToY({ top, bottom }: Plot, amp: number): number {
+export function ampToY({ top, bottom }: Area, amp: number): number {
   return (top + bottom) / 2 - (amp * (bottom - top)) / 2;
 }
 

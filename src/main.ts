@@ -18,6 +18,7 @@ import './styles/base.css';
 import { AudioEngine } from './audio/engine';
 import { createLabStore } from './model/lab';
 import { loadTheme } from './model/theme';
+import { mountBesselControls } from './ui/besselControls';
 import { chapterInUrl, mountChapters } from './ui/chapterView';
 import { mountFigures } from './ui/figures';
 import { mountSliders } from './ui/sliders';
@@ -53,6 +54,7 @@ new AudioEngine(store);
 mountChapters(store);
 mountSliders(store);
 mountFigures(store);
+mountBesselControls(store);
 
 const play = document.querySelector<HTMLButtonElement>('#play');
 if (play) mountPlayButton(play, store);

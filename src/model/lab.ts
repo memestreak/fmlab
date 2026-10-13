@@ -25,6 +25,16 @@ export interface LabState {
   deviationHz: number;
   /** Whether the waveform figure draws the modulator behind the output. */
   showModulator: boolean;
+  /** Whether the spectrum figure brackets the band Carson's rule gives. */
+  showBandwidth: boolean;
+  /**
+   * The sideband order (0 is the carrier, 1 the first pair, ...) being
+   * pointed at or focused just now, in either linked figure; null for
+   * none.
+   */
+  hover: number | null;
+  /** The order held picked out by its chip until it is pressed again. */
+  pinned: number | null;
   /**
    * "Show motion": animate the waveform figure, where it has a moving
    * view, even with no sound playing.
@@ -62,6 +72,9 @@ export const DEFAULTS: LabState = {
   modHz: 5,
   deviationHz: 20,
   showModulator: true,
+  showBandwidth: false,
+  hover: null,
+  pinned: null,
   motion: false,
   // Low on purpose: FM gets bright, and loud, quickly.
   volume: 0.2,
@@ -85,6 +98,28 @@ export function patchOf(state: LabState): { ratio: number; index: number } {
     ratio: state.modHz / state.carrierHz,
     index: state.deviationHz / state.modHz,
   };
+}
+
+/**
+ * The sideband order the linked figures should pick out: the one under
+ * the pointer or focus if there is one, otherwise the pinned one.
+ */
+export function highlightOf(state: LabState): number | null {
+  return state.hover ?? state.pinned;
+}
+
+/**
+ * The band Carson's rule says holds nearly all (about 98%) of the power,
+ * in carrier units: index + 1 modulator frequencies each side of the
+ * carrier. A lower edge that would fall below zero stops there; what lies
+ * beyond has folded back into the band.
+ */
+export function carsonBand(
+  ratio: number,
+  index: number,
+): { low: number; high: number } {
+  const reach = (index + 1) * ratio;
+  return { low: Math.max(0, 1 - reach), high: 1 + reach };
 }
 
 /** The modulator's frequency in Hz. */
