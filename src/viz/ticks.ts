@@ -114,6 +114,44 @@ export function msTicks(seconds: number): Tick[] {
   return ticks;
 }
 
+/** A note's time axis ends at one of these, in seconds. */
+const NOTE_AXIS_ENDS = [0.5, 1, 2, 5, 10];
+
+/**
+ * Where the time axis of a note `seconds` long should end: the next round
+ * length up, so the axis holds still while the envelope's times move a
+ * little, and the envelope and the spectrogram of one note line up.
+ */
+export function noteAxisEnd(seconds: number): number {
+  return (
+    NOTE_AXIS_ENDS.find(end => end >= seconds - 1e-9) ??
+    NOTE_AXIS_ENDS[NOTE_AXIS_ENDS.length - 1]
+  );
+}
+
+/** A time axis in seconds is numbered every this many seconds. */
+const SECOND_STEPS = [0.1, 0.2, 0.5, 1, 2];
+/** With no more than this many numbers after the 0. */
+const MAX_SECOND_TICKS = 5;
+
+/**
+ * Ticks for a note's time axis, `seconds` long: round numbers of seconds,
+ * and an empty second row. Positions are in seconds.
+ */
+export function secondsTicks(seconds: number): Tick[] {
+  const step =
+    SECOND_STEPS.find(size => seconds / size <= MAX_SECOND_TICKS + 1e-9) ??
+    SECOND_STEPS[SECOND_STEPS.length - 1];
+  const ticks: Tick[] = [];
+  const count = Math.round(seconds / step);
+  for (let i = 0; i <= count; i++) {
+    // Tenths, so 3 * 0.1 is labelled 0.3 and not 0.30000000000000004.
+    const at = Math.round(i * step * 10) / 10;
+    ticks.push({ at, label: String(at), sub: '' });
+  }
+  return ticks;
+}
+
 /**
  * Which labels to keep when they are too wide to all fit: every
  * `stride`-th, counted so the last one, the end of the axis, is always

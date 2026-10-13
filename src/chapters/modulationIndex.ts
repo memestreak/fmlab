@@ -1,3 +1,4 @@
+import { BASE_PATCH } from './basePatch';
 import type { Chapter } from './types';
 
 export const modulationIndex: Chapter = {
@@ -66,17 +67,12 @@ export const modulationIndex: Chapter = {
     },
   ],
   controls: ['volume', 'index'],
+  presets: [],
   hasMotion: false,
   patch: {
-    mode: 'pm',
-    carrierHz: 220,
-    ratio: 1,
+    ...BASE_PATCH,
     index: 1,
-    modHz: 5,
-    deviationHz: 20,
-    showModulator: true,
     showBandwidth: true,
-    realUnits: false,
   },
   figures: {
     waveform:

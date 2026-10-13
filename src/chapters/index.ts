@@ -1,5 +1,7 @@
 import { bessel } from './bessel';
+import { envelope } from './envelope';
 import { modulationIndex } from './modulationIndex';
+import { ratio } from './ratio';
 import { sandbox } from './sandbox';
 import { singleSine } from './singleSine';
 import type { Chapter } from './types';
@@ -11,18 +13,21 @@ export type {
   ControlId,
   FigureId,
   MathsPanel,
+  Preset,
 } from './types';
 
 /**
- * The chapters that exist, in order. Their numbers are the design spec's,
- * so there are gaps where chapters are not written yet; previous and next
- * step over the gaps.
+ * The chapters that exist, in order. Their numbers are the design spec's.
+ * Version 1's seven are all here; previous and next would step over any
+ * gap.
  */
 export const CHAPTERS: readonly Chapter[] = [
   singleSine,
   vibrato,
   modulationIndex,
   bessel,
+  ratio,
+  envelope,
   sandbox,
 ];
 

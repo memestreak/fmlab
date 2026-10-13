@@ -17,7 +17,19 @@ import {
 } from '../../model/lab';
 
 const NUMBERS = CHAPTERS.map(chapter => chapter.number);
-const SLIDERS = ['volume', 'carrier', 'ratio', 'index', 'modHz', 'deviation'];
+const SLIDERS = [
+  'volume',
+  'carrier',
+  'ratio',
+  'index',
+  'modHz',
+  'deviation',
+  'attack',
+  'decay',
+  'sustain',
+  'release',
+];
+const FIGURES = ['waveform', 'envelope', 'spectrum', 'spectrogram', 'bessel'];
 
 describe('the chapters', () => {
   it('are in order, each with its own number', () => {
@@ -25,23 +37,40 @@ describe('the chapters', () => {
     expect(FIRST_CHAPTER).toBe(1);
   });
 
-  it('are the first four lessons and the sandbox, numbered as in the spec', () => {
+  it("are version 1's seven, numbered as in the spec", () => {
     expect(CHAPTERS.map(c => [c.number, c.title])).toEqual([
       [1, 'A single sine'],
       [2, 'Vibrato becomes timbre'],
       [3, 'Modulation index'],
       [4, 'Sidebands and Bessel functions'],
+      [5, 'Carrier to modulator ratio'],
+      [6, 'Time-varying index'],
       [7, 'Sandbox'],
     ]);
   });
 
-  it.each(CHAPTERS)('$title shows the spectrum, and captions what it shows', chapter => {
+  it.each(CHAPTERS)('$title shows two figures, and captions what it shows', chapter => {
     const shown = Object.entries(chapter.figures);
-    expect(shown.length).toBeGreaterThanOrEqual(2);
-    expect(chapter.figures.spectrum).toBeDefined();
+    expect(shown).toHaveLength(2);
     for (const [id, caption] of shown) {
-      expect(['waveform', 'spectrum', 'bessel']).toContain(id);
+      expect(FIGURES).toContain(id);
       expect(caption.trim()).not.toBe('');
+    }
+  });
+
+  // A spectrum of some kind: the line spectrum, or for a note that
+  // changes as it sounds, the spectrogram.
+  it.each(CHAPTERS)('$title shows what the sound is made of', chapter => {
+    expect(
+      chapter.figures.spectrum ?? chapter.figures.spectrogram,
+    ).toBeDefined();
+  });
+
+  it.each(CHAPTERS)('$title has presets that say what they are for', chapter => {
+    for (const preset of chapter.presets) {
+      expect(preset.label).not.toBe('');
+      expect(preset.hint).not.toBe('');
+      expect(Object.keys(preset.patch).length).toBeGreaterThan(0);
     }
   });
 
@@ -163,15 +192,16 @@ describe('neighbours', () => {
     expect(neighbours(7).next).toBeUndefined();
   });
 
-  it('steps over the chapters not written yet', () => {
+  it('are the chapters either side', () => {
     expect(neighbours(2).previous?.number).toBe(1);
     expect(neighbours(2).next?.number).toBe(3);
-    expect(neighbours(4).next?.number).toBe(7);
-    expect(neighbours(7).previous?.number).toBe(4);
+    expect(neighbours(4).next?.number).toBe(5);
+    expect(neighbours(7).previous?.number).toBe(6);
   });
 
   it('has none for a chapter that does not exist', () => {
-    expect(neighbours(5)).toEqual({});
+    expect(neighbours(8)).toEqual({});
+    expect(neighbours(0)).toEqual({});
   });
 });
 
@@ -188,7 +218,7 @@ describe('chapterFromHash', () => {
   });
 
   it('falls back for a chapter that is not written yet', () => {
-    expect(chapterFromHash('#5', NUMBERS, 1)).toBe(1);
+    expect(chapterFromHash('#8', NUMBERS, 1)).toBe(1);
     expect(chapterFromHash('#99', NUMBERS, 1)).toBe(1);
   });
 

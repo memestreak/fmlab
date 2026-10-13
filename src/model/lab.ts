@@ -1,3 +1,4 @@
+import { type Envelope, envelopeAt } from '../dsp/envelope';
 import { createStore, type Store } from './store';
 import type { ThemeChoice } from './theme';
 
@@ -36,6 +37,37 @@ export interface LabState {
    */
   realUnits: boolean;
   /**
+   * Whether the spectrum figure rules a line at every whole multiple of
+   * the carrier, to show which partials are harmonics and which fall
+   * between.
+   */
+  showHarmonics: boolean;
+  /**
+   * Whether the chapter plays single notes shaped by the envelope, where
+   * otherwise Play holds one steady sound.
+   */
+  noteMode: boolean;
+  /** The envelope's attack, decay and release in seconds; see dsp/envelope. */
+  attack: number;
+  decay: number;
+  /** The envelope's sustain level, 0 to 1. */
+  sustain: number;
+  release: number;
+  /** Seconds a note is held before it is let go. Set by presets only. */
+  hold: number;
+  /**
+   * Whether the envelope shapes the index as well as the loudness. Off,
+   * the index stays at `index` for the whole note.
+   */
+  indexFollows: boolean;
+  /** Counts the notes asked for. The audio engine plays one per change. */
+  notes: number;
+  /**
+   * When the last note started, in seconds on the page's clock
+   * (performance.now), for the figures' playhead. Null before the first.
+   */
+  noteStartedAt: number | null;
+  /**
    * The sideband order (0 is the carrier, 1 the first pair, ...) being
    * pointed at or focused just now, in either linked figure; null for
    * none.
@@ -70,6 +102,11 @@ export const MOD_HZ: Range = { min: 0.5, max: 880 };
 export const DEVIATION_HZ: Range = { min: 0, max: 200 };
 /** The top is half of full scale: loud enough, and clear of the limiter. */
 export const VOLUME: Range = { min: 0, max: 0.5 };
+/** Never quite 0: a note that starts in no time at all starts with a click. */
+export const ATTACK: Range = { min: 0.005, max: 1 };
+export const DECAY: Range = { min: 0.01, max: 5 };
+export const SUSTAIN: Range = { min: 0, max: 1 };
+export const RELEASE: Range = { min: 0.01, max: 5 };
 
 export const DEFAULTS: LabState = {
   chapter: 1,
@@ -82,6 +119,16 @@ export const DEFAULTS: LabState = {
   showModulator: true,
   showBandwidth: false,
   realUnits: false,
+  showHarmonics: false,
+  noteMode: false,
+  attack: 0.08,
+  decay: 0.15,
+  sustain: 0.7,
+  release: 0.2,
+  hold: 0.6,
+  indexFollows: true,
+  notes: 0,
+  noteStartedAt: null,
   hover: null,
   pinned: null,
   motion: false,
@@ -107,6 +154,22 @@ export function patchOf(state: LabState): { ratio: number; index: number } {
     ratio: state.modHz / state.carrierHz,
     index: state.deviationHz / state.modHz,
   };
+}
+
+/** The state's envelope, as dsp/envelope takes it. */
+export function envelopeOf(state: LabState): Envelope {
+  const { attack, decay, sustain, release, hold } = state;
+  return { attack, decay, sustain, release, hold };
+}
+
+/**
+ * The index `time` seconds into a note: the slider's index shaped by the
+ * envelope, or the slider's index throughout when it does not follow.
+ */
+export function indexAtTime(state: LabState, time: number): number {
+  return state.indexFollows
+    ? state.index * envelopeAt(envelopeOf(state), time)
+    : state.index;
 }
 
 /**

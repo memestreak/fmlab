@@ -1,3 +1,4 @@
+import { BASE_PATCH } from './basePatch';
 import type { Chapter } from './types';
 
 export const sandbox: Chapter = {
@@ -12,9 +13,8 @@ export const sandbox: Chapter = {
      the carrier's. Whole numbers give harmonic, pitched sounds; anything
      between gives clangs and bells. <strong>Index</strong> is how hard
      the modulator pushes: more index, more sidebands, a brighter sound.`,
-    `Chapters 5 and 6 are still to be written. They will explain what
-     Ratio does, and what happens when Index changes while a note
-     sounds.`,
+    `Try the ratios of chapter 5 at other indexes, look for the index
+     where a partial vanishes, or go hunting for a sound of your own.`,
   ],
   maths: [
     {
@@ -33,17 +33,11 @@ export const sandbox: Chapter = {
     },
   ],
   controls: ['volume', 'carrier', 'ratio', 'index'],
+  presets: [],
   hasMotion: false,
   patch: {
-    mode: 'pm',
-    carrierHz: 220,
-    ratio: 1,
+    ...BASE_PATCH,
     index: 2,
-    modHz: 5,
-    deviationHz: 20,
-    showModulator: true,
-    showBandwidth: false,
-    realUnits: false,
   },
   figures: {
     waveform:

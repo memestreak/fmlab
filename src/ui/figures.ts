@@ -1,6 +1,14 @@
+import { noteSeconds } from '../dsp/envelope';
 import type { SpectralLine } from '../dsp/fmSpectrum';
-import { type LabState, type LabStore, patchOf } from '../model/lab';
+import {
+  envelopeOf,
+  type LabState,
+  type LabStore,
+  patchOf,
+} from '../model/lab';
 import { drawBessel } from '../viz/besselPlot';
+import { drawEnvelope } from '../viz/envelopePlot';
+import { drawSpectrogram, sliceAt } from '../viz/spectrogramPlot';
 import { drawSpectrum } from '../viz/spectrumPlot';
 import {
   cyclesShown,
@@ -8,7 +16,7 @@ import {
   motionView,
   REAL_SECONDS,
 } from '../viz/waveformPlot';
-import { formatRate } from './sliders';
+import { formatRate, formatSeconds } from './sliders';
 
 const REDUCED_MOTION = '(prefers-reduced-motion: reduce)';
 
@@ -33,6 +41,15 @@ const DRAWN: (keyof LabState)[] = [
   'showModulator',
   'showBandwidth',
   'realUnits',
+  'showHarmonics',
+  // The envelope, and the note whose playhead the figures show.
+  'attack',
+  'decay',
+  'sustain',
+  'release',
+  'hold',
+  'indexFollows',
+  'noteStartedAt',
   // The sideband order picked out in the linked figures.
   'hover',
   'pinned',
@@ -45,26 +62,31 @@ const DRAWN: (keyof LabState)[] = [
  * its size, the theme or the fonts do. Changes that arrive together (a
  * slider dragged quickly) share one repaint per frame.
  *
- * @param moves whether the figure should be animating for a state. While
- *   it says so the figure is redrawn every frame with the time; otherwise
- *   only when something changes, without one.
+ * @param moves whether the figure should be animating for a state at a
+ *   time, in seconds on the page's clock. While it says so the figure is
+ *   redrawn every frame with the time; when it stops saying so the figure
+ *   is drawn once more without one, and then only when something changes.
  */
 function mountFigure(
   canvas: HTMLCanvasElement,
   store: LabStore,
   draw: Draw,
-  moves: (state: LabState) => boolean = () => false,
+  moves: (state: LabState, time: number) => boolean = () => false,
 ): void {
   let frame = 0;
   const run = (now: number) => {
-    draw(store.get(), canvas, now / 1000);
-    frame = requestAnimationFrame(run);
+    const state = store.get();
+    const time = now / 1000;
+    if (moves(state, time)) {
+      draw(state, canvas, time);
+      frame = requestAnimationFrame(run);
+    } else {
+      draw(state, canvas);
+    }
   };
   const schedule = () => {
     cancelAnimationFrame(frame);
-    frame = requestAnimationFrame(
-      moves(store.get()) ? run : () => draw(store.get(), canvas),
-    );
+    frame = requestAnimationFrame(run);
   };
 
   store.subscribe((state, previous) => {
@@ -169,7 +191,7 @@ export function mountFigures(store: LabStore): void {
         const text = motionNote(state, reduced.matches);
         if (note && note.textContent !== text) note.textContent = text;
       },
-      state => waveformMoves(state, reduced.matches),
+      (state: LabState) => waveformMoves(state, reduced.matches),
     );
   }
 
@@ -184,4 +206,84 @@ export function mountFigures(store: LabStore): void {
   // Its label and value are the slider's, kept by ui/besselControls.ts.
   const bessel = document.querySelector<HTMLCanvasElement>('#bessel');
   if (bessel) mountFigure(bessel, store, drawBessel);
+
+  // The two figures of a note share a playhead while the note sounds.
+  const playheadMoves = (state: LabState, time: number) =>
+    noteHasPlayhead(state, time, reduced.matches);
+  const envelope = document.querySelector<HTMLCanvasElement>('#envelope');
+  if (envelope) {
+    mountFigure(
+      envelope,
+      store,
+      (state, canvas, time) => {
+        drawEnvelope(state, canvas, time);
+        const label = describeEnvelope(state);
+        if (canvas.getAttribute('aria-label') !== label) {
+          canvas.setAttribute('aria-label', label);
+        }
+      },
+      playheadMoves,
+    );
+  }
+  const spectrogram = document.querySelector<HTMLCanvasElement>('#spectrogram');
+  if (spectrogram) {
+    mountFigure(
+      spectrogram,
+      store,
+      (state, canvas, time) => {
+        drawSpectrogram(state, canvas, time);
+        const label = describeSpectrogram(state);
+        if (canvas.getAttribute('aria-label') !== label) {
+          canvas.setAttribute('aria-label', label);
+        }
+      },
+      playheadMoves,
+    );
+  }
+}
+
+/**
+ * Whether the note figures should be redrawing every frame for the
+ * playhead: a note has been asked for and is not over at `time`. That
+ * includes the instant before it starts, when there is no line to draw
+ * yet: the frame a note is asked in carries a time a little before the
+ * note's own start, and stopping there would mean never starting. Never
+ * for someone whose device asks for reduced motion; for them the figures
+ * stay as they are, which loses nothing but the line.
+ */
+export function noteHasPlayhead(
+  state: LabState,
+  time: number,
+  reducedMotion: boolean,
+): boolean {
+  if (reducedMotion || state.noteStartedAt === null) return false;
+  return time <= state.noteStartedAt + noteSeconds(envelopeOf(state));
+}
+
+/** What the envelope figure shows, in words. */
+export function describeEnvelope(state: LabState): string {
+  const { attack, decay, sustain, release, hold } = envelopeOf(state);
+  const index = state.indexFollows
+    ? `the index follows it up to ${state.index.toFixed(2)}`
+    : `the index stays at ${state.index.toFixed(2)}`;
+  return (
+    `Envelope: attack ${formatSeconds(attack)}, decay ${formatSeconds(decay)}, ` +
+    `sustain ${Math.round(sustain * 100)}%, let go after ${formatSeconds(hold)}, ` +
+    `release ${formatSeconds(release)}; ${index}.`
+  );
+}
+
+/** What the spectrogram shows, in words. */
+export function describeSpectrogram(state: LabState): string {
+  const seconds = noteSeconds(envelopeOf(state));
+  // The note at its brightest: when the envelope peaks.
+  const peak = sliceAt(state, Math.min(state.attack, state.hold)).marks.length;
+  const end = sliceAt(state, seconds).marks.length;
+  const partials = (count: number) =>
+    count === 1 ? '1 partial' : `${count} partials`;
+  return (
+    `Spectrogram of a ${formatSeconds(seconds)} note at ratio ` +
+    `${patchOf(state).ratio.toFixed(2)}: ${partials(peak)} at its peak, ` +
+    `${partials(end)} at its end.`
+  );
 }

@@ -25,6 +25,8 @@ const STEM_WIDTH = 2;
 const DIMMED = 0.22;
 /** A pointer within this many pixels of a stem is pointing at it. */
 const HIT_DISTANCE = 8;
+/** Harmonic lines closer than this many pixels are not drawn. */
+const MIN_HARMONIC_SPACING = 6;
 /** How far the ends of a bracket hang down. */
 const BRACKET_DROP = 7;
 /** Stems closer together than this many pixels are drawn thinner. */
@@ -101,7 +103,7 @@ export function drawSpectrum(
   const lines = spectrumOf(state);
   const plot = beginPlot(canvas);
   if (!plot) return lines;
-  const { ctx, token, left, right } = plot;
+  const { ctx, token, left, right, top, bottom } = plot;
   const { ratio, index } = patchOf(state);
 
   const maxFreq = axisSpan(state);
@@ -123,6 +125,24 @@ export function drawSpectrum(
       x,
       'frequency: multiples of the carrier, and Hz',
     );
+  }
+
+  if (state.showHarmonics) {
+    // An upright line at every whole multiple of the carrier: where the
+    // harmonics of a note at the carrier's pitch would be. Left out where
+    // they would be too close together to tell apart from a tint.
+    const spacing = x(1) - x(0);
+    if (spacing >= MIN_HARMONIC_SPACING) {
+      ctx.strokeStyle = token('--grid');
+      ctx.lineWidth = 1;
+      for (let harmonic = 1; harmonic <= maxFreq; harmonic++) {
+        const lineX = Math.round(x(harmonic)) + 0.5;
+        ctx.beginPath();
+        ctx.moveTo(lineX, top);
+        ctx.lineTo(lineX, bottom);
+        ctx.stroke();
+      }
+    }
   }
 
   // A slow vibrato is hundreds of lines a pixel or two apart. Thin stems

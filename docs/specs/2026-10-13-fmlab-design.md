@@ -188,3 +188,35 @@ at "1" and the wave looked the same wherever the slider was. Chapter 1's
 figures are now on fixed axes in real units: the waveform is 20 ms long
 and the spectrum runs from 0 to 1000 Hz. Other chapters keep carrier
 units, where the lesson is ratios and sidebands.
+
+## Decisions made with chapters 5 and 6 (PR #7)
+
+- **Chapter 5 writes ratios carrier first**, "1:2", as FM players do,
+  while the Ratio slider reads the modulator over the carrier, 2.00. Its
+  presets are 1:1, 1:2, 1:3 and 1:1.41. The spectrum rules a line at each
+  whole multiple of the carrier.
+- **One envelope, for loudness and index both.** Chapter 6 has a single
+  ADSR, not one each. Chowning's brass and bell both use one shape for the
+  two, and a checkbox, "Index follows the envelope", turns the index's
+  share off so the difference can be heard. The Index slider is the index
+  at the envelope's peak.
+- **The envelope's decay and release are exponential**, counted to four
+  time constants; the attack is a straight line. That is what Web Audio's
+  `setTargetAtTime` plays, so the figures and the sound are the same
+  curve, and it is what makes the bell ring like one.
+- **A note is one shot.** Play note (or the space bar) plays a note of a
+  fixed held length, 0.6 s for brass and 5 s for the bell, set by the
+  preset and not by a slider. The space bar is also Play / Stop in the
+  other chapters.
+- **The spectrogram is worked out, not recorded**: the line spectrum at
+  each moment's index, scaled by that moment's loudness, magnitudes only.
+  It is there before the note is played. While a note sounds a playhead
+  crosses it and the envelope; under reduced motion there is no playhead
+  and nothing else is lost.
+- **The envelope's dots can be dragged**, and the four sliders set the
+  same numbers from the keyboard. A drag cannot make the note longer than
+  the figure's time axis; the sliders can.
+- **Chapter 6 shows the envelope and the spectrogram**, not the waveform
+  or the line spectrum.
+- **The bell rings for 5 seconds**, not the paper's 15, on a 200 Hz
+  carrier.

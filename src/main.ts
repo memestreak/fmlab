@@ -20,10 +20,15 @@ import { createLabStore } from './model/lab';
 import { loadTheme } from './model/theme';
 import { mountBesselControls } from './ui/besselControls';
 import { chapterInUrl, mountChapters } from './ui/chapterView';
+import { mountEnvelopeControls } from './ui/envelopeControls';
 import { mountFigures } from './ui/figures';
 import { mountSliders } from './ui/sliders';
 import { mountThemeSwitch } from './ui/themeSwitch';
-import { mountMotionToggle, mountPlayButton } from './ui/transport';
+import {
+  mountIndexFollowsToggle,
+  mountMotionToggle,
+  mountPlayButton,
+} from './ui/transport';
 
 const REPO_URL = 'https://github.com/memestreak/fmlab';
 
@@ -55,12 +60,16 @@ mountChapters(store);
 mountSliders(store);
 mountFigures(store);
 mountBesselControls(store);
+mountEnvelopeControls(store);
 
 const play = document.querySelector<HTMLButtonElement>('#play');
 if (play) mountPlayButton(play, store);
 
 const motion = document.querySelector<HTMLInputElement>('#motion');
 if (motion) mountMotionToggle(motion, store);
+
+const follows = document.querySelector<HTMLInputElement>('#index-follows');
+if (follows) mountIndexFollowsToggle(follows, store);
 
 const theme = document.querySelector<HTMLButtonElement>('#theme');
 if (theme) mountThemeSwitch(theme, store);

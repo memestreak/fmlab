@@ -91,6 +91,25 @@ export function mountChapters(store: LabStore): void {
     }
     const motion = document.querySelector<HTMLElement>('#motion-toggle');
     if (motion) motion.hidden = !chapter.hasMotion;
+    const follows = document.querySelector<HTMLElement>('#index-follows-toggle');
+    if (follows) follows.hidden = !chapter.patch.noteMode;
+
+    // The chapter's presets, one button each.
+    const presets = document.querySelector<HTMLElement>('#presets');
+    if (presets) {
+      presets.hidden = chapter.presets.length === 0;
+      presets.replaceChildren(
+        ...chapter.presets.map(preset => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'btn btn-quiet';
+          button.textContent = preset.label;
+          button.setAttribute('aria-label', `${preset.label}: ${preset.hint}`);
+          button.addEventListener('click', () => store.set(preset.patch));
+          return button;
+        }),
+      );
+    }
     // The figures the chapter names, numbered from 1 in the order shown.
     let number = 0;
     for (const figure of document.querySelectorAll<HTMLElement>('[data-figure]')) {
@@ -114,12 +133,16 @@ export function mountChapters(store: LabStore): void {
 
   window.addEventListener('hashchange', () => {
     const chapter = chapterInUrl();
-    // Nothing stays picked out from the chapter before.
+    // Nothing stays picked out from the chapter before, nor its last
+    // note's playhead. A chapter that plays notes has no steady sound to
+    // carry on with, so that stops.
     store.set({
       chapter: chapter.number,
       ...chapter.patch,
       hover: null,
       pinned: null,
+      noteStartedAt: null,
+      ...(chapter.patch.noteMode ? { playing: false } : {}),
     });
     // A new chapter starts at its top, and says so to a screen reader.
     window.scrollTo(0, 0);
