@@ -1,0 +1,95 @@
+/* Page furniture: the column, type, figures and the footer. Every colour is
+   a token from tokens.css, whose header holds the rules for using them. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 17px;
+  line-height: 1.55;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+}
+
+/* One column, as wide as a journal page is comfortable to read. */
+.page {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 2.5rem 1.25rem 2rem;
+}
+
+.wordmark,
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.wordmark {
+  margin: 0 0 1.5rem;
+  font-size: 2.1rem;
+  letter-spacing: -0.01em;
+}
+
+p {
+  margin: 0 0 1rem;
+}
+
+a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* Numbers: Plex Mono with tabular figures, so columns of them line up. */
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* A figure sits between two ink rules, its caption in italics below the
+   plot, the way a paper sets one. */
+.figure {
+  margin: 2rem 0;
+  padding: 1rem 0 0.75rem;
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+}
+
+.figure figcaption {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+/* The canvas takes its size from CSS; the plot code reads it back and
+   sizes the bitmap to match the device's pixels. */
+.plot {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 1;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 3rem;
+  font-size: 0.85rem;
+}

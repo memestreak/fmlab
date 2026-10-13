@@ -1,0 +1,39 @@
+# dependencies
+/node_modules
+
+# testing
+/coverage
+
+# vite
+/dist/
+
+# misc
+.DS_Store
+*.pem
+.claude/settings.local.json
+.playwright-cli/
+.playwright-mcp/
+.worktrees/
+.superpowers/
+
+# debug
+npm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+
+# typescript
+*.tsbuildinfo
+
+# placeholder dotfiles the Claude Code sandbox mounts in the repo root
+/.bash_profile
+/.bashrc
+/.claude/
+/.gitconfig
+/.gitmodules
+/.mcp.json
+/.profile
+/.ripgreprc
+/.vscode
+/.zprofile
+/.zshrc
