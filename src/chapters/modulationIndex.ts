@@ -76,6 +76,7 @@ export const modulationIndex: Chapter = {
     deviationHz: 20,
     showModulator: true,
     showBandwidth: true,
+    realUnits: false,
   },
   figures: {
     waveform:

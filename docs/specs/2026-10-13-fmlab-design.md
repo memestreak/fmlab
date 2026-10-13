@@ -178,3 +178,13 @@ import, a free-form modulation editor.
   only there is a stem a single sideband.
 - **Dots on the index line follow the spectrum's convention**: filled
   blue above zero, hollow red below, where that sideband is inverted.
+
+## Chapter 1's axes (PR #6)
+
+Jeremy reported on 2026-10-13 that in chapter 1 the frequency under the
+spectrum did not change with the Carrier slider. The sound and the Hz row
+did follow it, but both figures were in carrier units, so the stem stood
+at "1" and the wave looked the same wherever the slider was. Chapter 1's
+figures are now on fixed axes in real units: the waveform is 20 ms long
+and the spectrum runs from 0 to 1000 Hz. Other chapters keep carrier
+units, where the lesson is ratios and sidebands.

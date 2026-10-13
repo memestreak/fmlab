@@ -43,6 +43,7 @@ export const sandbox: Chapter = {
     deviationHz: 20,
     showModulator: true,
     showBandwidth: false,
+    realUnits: false,
   },
   figures: {
     waveform:

@@ -72,17 +72,36 @@ export function waveformTicks(cycles: number, carrierHz: number): Tick[] {
   return ticks;
 }
 
-/** A moving time axis is numbered every this many milliseconds. */
-const MS_STEPS = [10, 20, 50, 100, 200, 500];
+/** How many numbers a frequency axis in Hz carries after its 0. */
+const HZ_TICKS = 5;
+
+/**
+ * Ticks for a frequency axis in Hz from 0 to `endHz`: five, evenly
+ * spaced, the last at the end. Positions are in Hz. This axis is real
+ * units only, for where the carrier's own frequency is the lesson: it
+ * does not move when the carrier does, so the stems do.
+ */
+export function hzTicks(endHz: number): Tick[] {
+  const ticks: Tick[] = [];
+  for (let i = 1; i <= HZ_TICKS; i++) {
+    const at = (i * endHz) / HZ_TICKS;
+    ticks.push({ at, label: String(at), sub: '' });
+  }
+  return ticks;
+}
+
+/** A time axis in ms is numbered every this many milliseconds. */
+const MS_STEPS = [5, 10, 20, 50, 100, 200, 500];
 /** With no more than this many numbers after the 0. */
 const MAX_MS_TICKS = 6;
 
 /**
- * Ticks for the moving view's time axis, `seconds` long: round numbers of
- * milliseconds. This axis is real time only (its carrier is slowed, so
- * carrier cycles would mislead), and its second row is empty.
+ * Ticks for a time axis `seconds` long in real time: round numbers of
+ * milliseconds, and an empty second row. Positions are in seconds. For the
+ * moving view (its carrier is slowed, so carrier cycles would mislead) and
+ * for where the carrier's frequency is the lesson.
  */
-export function motionTicks(seconds: number): Tick[] {
+export function msTicks(seconds: number): Tick[] {
   const ms = seconds * 1000;
   const step =
     MS_STEPS.find(size => ms / size <= MAX_MS_TICKS) ??

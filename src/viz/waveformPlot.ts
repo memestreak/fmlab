@@ -7,7 +7,7 @@ import {
 } from '../dsp/waveform';
 import { type LabState, patchOf } from '../model/lab';
 import { ampToY, beginPlot, drawFrame, type Plot } from './plot';
-import { motionTicks, type Tick, waveformTicks } from './ticks';
+import { msTicks, type Tick, waveformTicks } from './ticks';
 
 const TWO_PI = 2 * Math.PI;
 
@@ -132,12 +132,36 @@ function stillScene(state: LabState): Scene {
   };
 }
 
+/**
+ * How much time the figure shows on a fixed axis in real units: 20 ms,
+ * which is one cycle and a bit of the lowest carrier and about eighteen
+ * of the highest.
+ */
+export const REAL_SECONDS = 0.02;
+
+/**
+ * The view on a fixed axis in real time: the signal's first 20 ms. Raise
+ * the carrier and more waves fit, which carrier-cycle axes cannot show.
+ */
+function realScene(state: LabState): Scene {
+  const { ratio, index } = patchOf(state);
+  const { carrierHz } = state;
+  const signal = state.mode === 'fm' ? trueFmSample : fmSample;
+  return {
+    span: REAL_SECONDS,
+    ticks: msTicks(REAL_SECONDS),
+    title: 'time, in ms',
+    output: seconds => signal(seconds * carrierHz, ratio, index),
+    modulator: seconds => modulatorSample(seconds * carrierHz, ratio),
+  };
+}
+
 /** The moving view: the next stretch of signal from `time`, in seconds. */
 function movingScene(state: LabState, view: MotionView, time: number): Scene {
   const { modHz, deviationHz } = state;
   return {
     span: view.seconds,
-    ticks: motionTicks(view.seconds),
+    ticks: msTicks(view.seconds),
     title: 'time, in ms',
     output: offset =>
       fmWindowSample(time, offset, view.shownHz, modHz, deviationHz),
@@ -151,7 +175,8 @@ function movingScene(state: LabState, view: MotionView, time: number): Scene {
  * drawn from the parameters, not from the audio, so it is there before
  * any sound is.
  *
- * Without a `time` it is the still view, the signal from its start. With
+ * Without a `time` it is the still view, the signal from its start: so
+ * many carrier cycles, or with `realUnits` a fixed 20 ms. With
  * one, in seconds, and a patch that has a moving view (see `motionView`),
  * it is that view at that moment: call it every frame and a slow vibrato
  * is seen to squeeze and stretch.
@@ -169,7 +194,9 @@ export function drawWaveform(
   const scene =
     view && time !== undefined
       ? movingScene(state, view, time)
-      : stillScene(state);
+      : state.realUnits
+        ? realScene(state)
+        : stillScene(state);
   const { span } = scene;
 
   drawFrame(

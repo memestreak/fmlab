@@ -28,6 +28,14 @@ export interface LabState {
   /** Whether the spectrum figure brackets the band Carson's rule gives. */
   showBandwidth: boolean;
   /**
+   * Whether the figures' x axes are fixed in real units, ms and Hz, where
+   * otherwise they are in carrier cycles and multiples of the carrier.
+   * For where the carrier's frequency is itself the lesson: on fixed axes
+   * a higher carrier is more waves and a stem further right, where on
+   * carrier axes nothing would move but the small print.
+   */
+  realUnits: boolean;
+  /**
    * The sideband order (0 is the carrier, 1 the first pair, ...) being
    * pointed at or focused just now, in either linked figure; null for
    * none.
@@ -73,6 +81,7 @@ export const DEFAULTS: LabState = {
   deviationHz: 20,
   showModulator: true,
   showBandwidth: false,
+  realUnits: false,
   hover: null,
   pinned: null,
   motion: false,
