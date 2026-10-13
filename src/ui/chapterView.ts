@@ -88,6 +88,8 @@ export function mountChapters(store: LabStore): void {
     for (const row of document.querySelectorAll<HTMLElement>('[data-control]')) {
       row.hidden = !chapter.controls.includes(row.dataset.control as ControlId);
     }
+    const motion = document.querySelector<HTMLElement>('#motion-toggle');
+    if (motion) motion.hidden = !chapter.hasMotion;
     for (const figure of ['waveform', 'spectrum'] as const) {
       const caption = document.querySelector(`#${figure}-caption`);
       if (caption) caption.textContent = chapter.captions[figure];

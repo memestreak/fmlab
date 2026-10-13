@@ -32,6 +32,7 @@ export const sandbox: Chapter = {
     },
   ],
   controls: ['volume', 'carrier', 'ratio', 'index'],
+  hasMotion: false,
   patch: {
     mode: 'pm',
     carrierHz: 220,

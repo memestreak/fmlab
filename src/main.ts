@@ -22,7 +22,7 @@ import { chapterInUrl, mountChapters } from './ui/chapterView';
 import { mountFigures } from './ui/figures';
 import { mountSliders } from './ui/sliders';
 import { mountThemeSwitch } from './ui/themeSwitch';
-import { mountPlayButton } from './ui/transport';
+import { mountMotionToggle, mountPlayButton } from './ui/transport';
 
 const REPO_URL = 'https://github.com/memestreak/fmlab';
 
@@ -56,6 +56,9 @@ mountFigures(store);
 
 const play = document.querySelector<HTMLButtonElement>('#play');
 if (play) mountPlayButton(play, store);
+
+const motion = document.querySelector<HTMLInputElement>('#motion');
+if (motion) mountMotionToggle(motion, store);
 
 const theme = document.querySelector<HTMLButtonElement>('#theme');
 if (theme) mountThemeSwitch(theme, store);

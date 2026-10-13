@@ -10,13 +10,17 @@ export const vibrato: Chapter = {
      second, and what you hear is vibrato: the wobble a violinist makes by
      rocking a finger on the string.`,
     `<strong>Deviation</strong> is how far the pitch is pushed each way,
-     in Hz. At 20 the carrier swings between 200 and 240 Hz. In Fig. 1 the
-     thinner line is the modulator, which here is the pitch: where it is
-     high the carrier's waves crowd together, and where it is low they
-     spread out. Turn Deviation up to make the crowding plain.`,
+     in Hz. At 20 the carrier swings between 200 and 240 Hz. While the
+     sound plays, Fig. 1 moves with it. The thinner line is the modulator,
+     which here is the pitch: where it is high the carrier's waves crowd
+     together, and where it is low they spread out. The carrier is drawn
+     slowed down, so that each of its waves can be seen; the figure's
+     caption says by how much. Tick Show motion to watch it without the
+     sound.`,
     `Now drag <strong>Modulator</strong> slowly to the right. Past about
      20 Hz the wobble is too fast to follow and turns into a roughness, a
-     growl. Keep going into the hundreds and the wobble is gone
+     growl. (The figure stops moving a little before that, and from there
+     shows two whole wobbles standing still, at the carrier's true speed.) Keep going into the hundreds and the wobble is gone
      altogether: you hear one steady note with a new, brighter colour.
      Nothing changed but the speed.`,
     `Fig. 2 shows why. Modulating a sine wave's frequency puts new stems,
@@ -70,6 +74,7 @@ export const vibrato: Chapter = {
     },
   ],
   controls: ['volume', 'modHz', 'deviation'],
+  hasMotion: true,
   patch: {
     mode: 'fm',
     carrierHz: 220,

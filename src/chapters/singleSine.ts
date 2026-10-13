@@ -45,6 +45,7 @@ export const singleSine: Chapter = {
     },
   ],
   controls: ['volume', 'carrier'],
+  hasMotion: false,
   patch: {
     mode: 'pm',
     carrierHz: 220,

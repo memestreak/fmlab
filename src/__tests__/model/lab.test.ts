@@ -29,6 +29,7 @@ describe('the lab store', () => {
       modHz: 5,
       deviationHz: 20,
       showModulator: true,
+      motion: false,
       volume: 0.2,
       playing: false,
       theme: 'auto',
