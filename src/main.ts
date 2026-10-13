@@ -15,28 +15,15 @@ import '@fontsource/ibm-plex-mono/latin-500.css';
 import './styles/tokens.css';
 import './styles/base.css';
 
-import { fmSpectrum } from './dsp/fmSpectrum';
-import { drawSpectrum } from './viz/spectrumPlot';
+import { AudioEngine } from './audio/engine';
+import { createLabStore } from './model/lab';
+import { loadTheme } from './model/theme';
+import { mountFigures } from './ui/figures';
+import { mountSliders } from './ui/sliders';
+import { mountThemeSwitch } from './ui/themeSwitch';
+import { mountPlayButton } from './ui/transport';
 
 const REPO_URL = 'https://github.com/memestreak/fmlab';
-
-/** Fig. 1: the static spectrum the placeholder page shows. */
-function mountSpectrumFigure(canvas: HTMLCanvasElement): void {
-  const lines = fmSpectrum(1, 2);
-  const draw = () => drawSpectrum(canvas, lines, { maxFreq: 8 });
-
-  // The canvas keeps no memory of what was drawn, so repaint whenever its
-  // size, the theme or the fonts change.
-  new ResizeObserver(draw).observe(canvas);
-  window
-    .matchMedia('(prefers-color-scheme: dark)')
-    .addEventListener('change', draw);
-  new MutationObserver(draw).observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: ['data-theme'],
-  });
-  void document.fonts.ready.then(draw);
-}
 
 /** The build's commit, linked to GitHub; plain "dev" without git. */
 function mountCommitHash(slot: HTMLElement): void {
@@ -50,8 +37,20 @@ function mountCommitHash(slot: HTMLElement): void {
   slot.replaceChildren(link);
 }
 
-const canvas = document.querySelector<HTMLCanvasElement>('#spectrum');
-if (canvas) mountSpectrumFigure(canvas);
+// One store; the engine and every control and figure follow it. The boot
+// script in index.html has already applied the saved theme.
+const store = createLabStore({ theme: loadTheme() });
+// It subscribes itself; nothing here needs to hold on to it.
+new AudioEngine(store);
+
+mountSliders(store);
+mountFigures(store);
+
+const play = document.querySelector<HTMLButtonElement>('#play');
+if (play) mountPlayButton(play, store);
+
+const theme = document.querySelector<HTMLButtonElement>('#theme');
+if (theme) mountThemeSwitch(theme, store);
 
 const commit = document.querySelector<HTMLElement>('#commit');
 if (commit) mountCommitHash(commit);

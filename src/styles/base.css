@@ -36,8 +36,16 @@ h3 {
   line-height: 1.15;
 }
 
+.masthead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
 .wordmark {
-  margin: 0 0 1.5rem;
+  margin: 0;
   font-size: 2.1rem;
   letter-spacing: -0.01em;
 }
@@ -84,8 +92,154 @@ a {
   display: block;
   width: 100%;
   aspect-ratio: 2 / 1;
+  /* On a phone 2:1 leaves too little height between the axis labels. */
+  min-height: 13rem;
 }
 
+/* Controls. Everything is ink on paper: colour is kept for the plots, and
+   red for negative phase, so neither marks a control or its focus. */
+
+.btn {
+  min-height: 2.75rem;
+  padding: 0 1.1rem;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-ink {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.btn-quiet {
+  min-height: 2.25rem;
+  padding: 0 0.85rem;
+  border-color: var(--rule);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.btn:hover {
+  border-color: var(--ink);
+  box-shadow: 0 0 0 1px var(--ink);
+}
+
+.lab {
+  display: grid;
+  gap: 0.25rem;
+  margin: 1.5rem 0 2rem;
+}
+
+.transport {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+/* Wide enough for "Stop" and "Play" alike, so it does not change size. */
+#play {
+  min-width: 5.5rem;
+}
+
+/* Label, slider, readout on one line; the readout's width is fixed so the
+   slider does not change length as the digits change. */
+.slider-row {
+  display: grid;
+  grid-template-columns: 4.5rem 1fr 9.5rem;
+  grid-template-areas: 'label slider value';
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.slider-row label {
+  grid-area: label;
+  font-weight: 600;
+}
+
+.slider-row output {
+  grid-area: value;
+  text-align: right;
+  font-size: 0.9rem;
+}
+
+/* A range input redrawn in ink. --filled, set by ui/sliders.ts, is how far
+   along the thumb is. The input is taller than the track it draws so a
+   finger can find it. */
+.slider {
+  grid-area: slider;
+  width: 100%;
+  height: 2.75rem;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.slider::-webkit-slider-runnable-track {
+  height: 0.375rem;
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    var(--ink) var(--filled, 0%),
+    var(--paper-sunken) var(--filled, 0%)
+  );
+  box-shadow: 0 0 0 1px var(--rule);
+}
+
+.slider::-moz-range-track {
+  height: 0.375rem;
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    var(--ink) var(--filled, 0%),
+    var(--paper-sunken) var(--filled, 0%)
+  );
+  box-shadow: 0 0 0 1px var(--rule);
+}
+
+.slider::-webkit-slider-thumb {
+  width: 1.25rem;
+  height: 1.25rem;
+  /* Centres the thumb on the track. */
+  margin-top: -0.4375rem;
+  border: 2px solid var(--paper);
+  border-radius: 50%;
+  background: var(--ink);
+  -webkit-appearance: none;
+}
+
+.slider::-moz-range-thumb {
+  box-sizing: border-box;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid var(--paper);
+  border-radius: 50%;
+  background: var(--ink);
+}
+
+.slider:focus-visible {
+  outline-offset: -2px;
+  border-radius: 999px;
+}
+
+/* Phone width: the slider gets a line to itself. */
+@media (max-width: 30rem) {
+  .slider-row {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      'label value'
+      'slider slider';
+    row-gap: 0;
+    margin-top: 0.5rem;
+  }
+}
 .footer {
   display: flex;
   justify-content: space-between;
