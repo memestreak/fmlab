@@ -1,0 +1,57 @@
+/* fmlab's tokens: the page of a 1973 paper, drawn with three pens.
+
+   The rules for using them:
+   - All text is pure --ink, never a grey. Emphasis comes from weight,
+     size and italics.
+   - Colour appears only in plots, rules and control fills.
+   - --pen-red means negative sideband phase and nothing else, so controls
+     and the focus ring are ink, never red.
+
+   The dark values are written twice (media query and data-theme) because
+   plain CSS cannot share them; keep the two blocks identical. */
+
+:root {
+  color-scheme: light;
+  --paper: #fbfbf7;
+  --paper-sunken: #eef0ea;
+  --grid: #e3e3dc;
+  --rule: #c9c9c0;
+  --ink: #000000;
+  /* Carrier and output traces, positive sidebands. */
+  --pen-blue: #1a3fa8;
+  /* Modulator. */
+  --pen-green: #2e8b3e;
+  /* Negative sideband phase only. */
+  --pen-red: #c8281e;
+
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-sans: 'Figtree', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+}
+
+/* Dark: follows the system unless the viewer picked Light, or forced by
+   picking Dark (data-theme on <html>). */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --paper: #131418;
+    --paper-sunken: #1d1f24;
+    --grid: #2a2c33;
+    --rule: #3d404a;
+    --ink: #ffffff;
+    --pen-blue: #94b2ff;
+    --pen-green: #7fd18a;
+    --pen-red: #ff7a6e;
+  }
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --paper: #131418;
+  --paper-sunken: #1d1f24;
+  --grid: #2a2c33;
+  --rule: #3d404a;
+  --ink: #ffffff;
+  --pen-blue: #94b2ff;
+  --pen-green: #7fd18a;
+  --pen-red: #ff7a6e;
+}

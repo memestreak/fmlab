@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <meta
+      name="description"
+      content="An interactive guide to FM synthesis."
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>fmlab</title>
+  </head>
+  <body>
+    <div class="page">
+      <header>
+        <h1 class="wordmark">fmlab</h1>
+      </header>
+
+      <main>
+        <p>
+          An interactive guide to FM synthesis: one sine wave bending the
+          pitch of another is enough to make a whole spectrum, and here you
+          will watch and hear it happen.
+        </p>
+
+        <figure class="figure">
+          <canvas
+            id="spectrum"
+            class="plot"
+            role="img"
+            aria-label="Line spectrum for ratio 1, index 2: partials at whole multiples of the carrier, strongest at 2, the one at 1 with negative phase."
+          ></canvas>
+          <figcaption>
+            Fig. 1&emsp;Spectrum, ratio 1, index 2. A stem below the axis,
+            with a hollow marker, has negative phase.
+          </figcaption>
+        </figure>
+      </main>
+
+      <footer class="footer">
+        <a href="https://github.com/memestreak/fmlab">Source</a>
+        <span id="commit" class="num"></span>
+      </footer>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- A carrier and its sidebands. The colours are tokens.css's --paper,
+       --ink and --pen-blue, repeated here because a favicon cannot read
+       the page's CSS. -->
+  <style>
+    .paper { fill: #fbfbf7; }
+    .ink { stroke: #000000; }
+    .pen { stroke: #1a3fa8; }
+    @media (prefers-color-scheme: dark) {
+      .paper { fill: #131418; }
+      .ink { stroke: #ffffff; }
+      .pen { stroke: #94b2ff; }
+    }
+  </style>
+  <rect class="paper" width="32" height="32" rx="6" />
+  <g class="pen" stroke-width="3" stroke-linecap="round">
+    <path d="M8 24V17" />
+    <path d="M16 24V7" />
+    <path d="M24 24V13" />
+  </g>
+  <path class="ink" stroke-width="1.5" stroke-linecap="round" d="M5 25.5H27" />
+</svg>
