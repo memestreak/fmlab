@@ -130,3 +130,23 @@ import, a free-form modulation editor.
 - **The wordmark is the `h1`.** The placeholder page has no separate title.
 - **Theme switch.** Not in the scaffold; added with the first playable
   slice (PR #2).
+
+## Decisions made with the chapter framework (PR #3)
+
+- **Two panes.** The chapter's text sits beside the lab on a wide screen
+  and above it on a narrow one. The chapter number is the URL's hash; a
+  hash that names no written chapter opens chapter 1.
+- **Chapters are data** in `src/chapters/`. The sandbox is chapter 7, as
+  numbered above, and previous / next step over chapters not yet written.
+- **Formulas are plain HTML**, not KaTeX: the ones needed so far are short
+  enough to set with `<var>` and `<sub>`.
+- **Chapter 2 is set in Hz.** Its sliders are the modulator's frequency
+  (0.5 to 880 Hz, logarithmic) and the deviation (0 to 200 Hz), with the
+  carrier fixed at 220 Hz. Its spectrum shows magnitudes: true FM's
+  sidebands are not simply upright or inverted, so there are no negative
+  stems there.
+- **Chapter 2's waveform** shows two cycles of the modulator, up to forty
+  carrier cycles, rather than animating. Below about 11 Hz that is only
+  part of one wobble.
+- **Opening a chapter resets the patch** to the chapter's own; volume,
+  Play and the theme are kept.

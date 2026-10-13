@@ -1,10 +1,24 @@
 import type { SpectralLine } from '../dsp/fmSpectrum';
-import type { LabState, LabStore } from '../model/lab';
+import { type LabState, type LabStore, patchOf } from '../model/lab';
 import { drawSpectrum } from '../viz/spectrumPlot';
-import { CYCLES_SHOWN, drawWaveform } from '../viz/waveformPlot';
+import { cyclesShown, drawWaveform } from '../viz/waveformPlot';
+import { formatRate } from './sliders';
 
 /** A renderer: everything a figure shows comes from the state. */
 type Draw = (state: LabState, canvas: HTMLCanvasElement) => void;
+
+/** The parts of the state a figure is drawn from. */
+const DRAWN: (keyof LabState)[] = [
+  'mode',
+  // The carrier moves no curve in `pm`, but it sets the Hz and ms labels.
+  'carrierHz',
+  'ratio',
+  'index',
+  'modHz',
+  'deviationHz',
+  'showModulator',
+  'theme',
+];
 
 /**
  * Keeps a canvas showing the store. A canvas keeps no memory of what was
@@ -20,16 +34,8 @@ function mountFigure(canvas: HTMLCanvasElement, store: LabStore, draw: Draw): vo
   };
 
   store.subscribe((state, previous) => {
-    // Not for `playing` or `volume`, which change nothing drawn. The
-    // carrier moves no curve, but it does change the Hz and ms labels.
-    if (
-      state.ratio !== previous.ratio ||
-      state.index !== previous.index ||
-      state.carrierHz !== previous.carrierHz ||
-      state.theme !== previous.theme
-    ) {
-      schedule();
-    }
+    // Not for `playing` or `volume`, which change nothing drawn.
+    if (DRAWN.some(key => state[key] !== previous[key])) schedule();
   });
   new ResizeObserver(schedule).observe(canvas);
   window
@@ -38,8 +44,17 @@ function mountFigure(canvas: HTMLCanvasElement, store: LabStore, draw: Draw): vo
   void document.fonts.ready.then(schedule);
 }
 
-const patchText = ({ ratio, index }: LabState) =>
-  `ratio ${ratio.toFixed(2)}, index ${index.toFixed(2)}`;
+/** The patch in the words of the sliders that set it. */
+function patchText(state: LabState): string {
+  if (state.mode === 'fm') {
+    return (
+      `a ${state.carrierHz.toFixed(0)} Hz carrier, modulator at ` +
+      `${formatRate(state.modHz)}, deviation ${state.deviationHz.toFixed(0)} Hz`
+    );
+  }
+  const { ratio, index } = patchOf(state);
+  return `ratio ${ratio.toFixed(2)}, index ${index.toFixed(2)}`;
+}
 
 /** What the spectrum shows, in words, for whoever cannot see the canvas. */
 export function describeSpectrum(state: LabState, lines: SpectralLine[]): string {
@@ -56,17 +71,23 @@ export function describeSpectrum(state: LabState, lines: SpectralLine[]): string
   );
 }
 
+/** What the waveform shows, in words. */
+export function describeWaveform(state: LabState): string {
+  const cycles = Number(cyclesShown(state).toFixed(1));
+  const behind = state.showModulator ? ', with the modulator behind it' : '';
+  return (
+    `Waveform: ${cycles} carrier cycles of the output for ` +
+    `${patchText(state)}${behind}.`
+  );
+}
+
 /** Fig. 1 and Fig. 2, each with a text description that follows the patch. */
 export function mountFigures(store: LabStore): void {
   const waveform = document.querySelector<HTMLCanvasElement>('#waveform');
   if (waveform) {
     mountFigure(waveform, store, (state, canvas) => {
       drawWaveform(state, canvas);
-      canvas.setAttribute(
-        'aria-label',
-        `Waveform: ${CYCLES_SHOWN} carrier cycles of the output for ` +
-          `${patchText(state)}, with the modulator behind it.`,
-      );
+      canvas.setAttribute('aria-label', describeWaveform(state));
     });
   }
 
