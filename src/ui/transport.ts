@@ -1,7 +1,10 @@
+import { LANDING } from '../chapters/landing';
 import type { LabState, LabStore } from '../model/lab';
 
 /** What the main button says: its label is its state. */
 export function playLabel(state: LabState): string {
+  // The landing view plays a note, but "Play" is all it needs to say.
+  if (state.chapter === LANDING) return 'Play';
   if (state.noteMode) return 'Play note';
   return state.playing ? 'Stop' : 'Play';
 }
@@ -49,7 +52,8 @@ export function mountPlayButton(button: HTMLButtonElement, store: LabStore): voi
   store.subscribe((state, previous) => {
     if (
       state.playing !== previous.playing ||
-      state.noteMode !== previous.noteMode
+      state.noteMode !== previous.noteMode ||
+      state.chapter !== previous.chapter
     ) {
       show(state);
     }

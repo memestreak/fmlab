@@ -220,3 +220,20 @@ units, where the lesson is ratios and sidebands.
   or the line spectrum.
 - **The bell rings for 5 seconds**, not the paper's 15, on a 200 Hz
   carrier.
+
+## Decisions made with the landing view (PR #8)
+
+- **The site opens on it** whenever the address names no chapter. `#1` to
+  `#7` still open chapters directly; a hash that names nothing is taken
+  out of the address bar. The wordmark leads back to it.
+- **Its sound is one note**: a 220 Hz carrier at 1:1 whose index swells
+  to 6 over 1.6 seconds, holds, and sinks again, about four and a half
+  seconds in all, the loudness following the same shape.
+- **The waveform and spectrum follow the sound**, drawn from the same
+  envelope the audio is scheduled from. Before it is played, after it,
+  and under reduced motion they show the sound at its fullest and stay
+  still; the sound plays all the same.
+- **The ways on appear after the first press**: "Start with chapter 1",
+  "Go to the sandbox" and the chapter list. The contents in the masthead
+  are there from the start, so nobody is stuck behind the button.
+- **It keeps a Volume slider**, the one control besides Play.

@@ -9,7 +9,7 @@ import {
 import { drawBessel } from '../viz/besselPlot';
 import { drawEnvelope } from '../viz/envelopePlot';
 import { drawSpectrogram, sliceAt } from '../viz/spectrogramPlot';
-import { drawSpectrum } from '../viz/spectrumPlot';
+import { drawSpectrum, spectrumOf } from '../viz/spectrumPlot';
 import {
   cyclesShown,
   drawWaveform,
@@ -177,6 +177,9 @@ export function mountFigures(store: LabStore): void {
   const waveform = document.querySelector<HTMLCanvasElement>('#waveform');
   const note = document.querySelector<HTMLElement>('#waveform-note');
   const reduced = window.matchMedia(REDUCED_MOTION);
+  /** Whether a figure should be following a note that is sounding. */
+  const noteMoves = (state: LabState, time: number) =>
+    noteHasPlayhead(state, time, reduced.matches);
   if (waveform) {
     mountFigure(
       waveform,
@@ -191,16 +194,28 @@ export function mountFigures(store: LabStore): void {
         const text = motionNote(state, reduced.matches);
         if (note && note.textContent !== text) note.textContent = text;
       },
-      (state: LabState) => waveformMoves(state, reduced.matches),
+      // A slow vibrato squeezing and stretching, or a note sounding.
+      (state: LabState, time: number) =>
+        waveformMoves(state, reduced.matches) || noteMoves(state, time),
     );
   }
 
   const spectrum = document.querySelector<HTMLCanvasElement>('#spectrum');
   if (spectrum) {
-    mountFigure(spectrum, store, (state, canvas) => {
-      const lines = drawSpectrum(state, canvas);
-      canvas.setAttribute('aria-label', describeSpectrum(state, lines));
-    });
+    mountFigure(
+      spectrum,
+      store,
+      (state, canvas, time) => {
+        drawSpectrum(state, canvas, time);
+        // The description is of the patch as set, not of each moment of a
+        // note: a screen reader has no use for sixty of them a second.
+        const label = describeSpectrum(state, spectrumOf(state));
+        if (canvas.getAttribute('aria-label') !== label) {
+          canvas.setAttribute('aria-label', label);
+        }
+      },
+      (state: LabState, time: number) => noteMoves(state, time),
+    );
   }
 
   // Its label and value are the slider's, kept by ui/besselControls.ts.
@@ -208,8 +223,7 @@ export function mountFigures(store: LabStore): void {
   if (bessel) mountFigure(bessel, store, drawBessel);
 
   // The two figures of a note share a playhead while the note sounds.
-  const playheadMoves = (state: LabState, time: number) =>
-    noteHasPlayhead(state, time, reduced.matches);
+  const playheadMoves = noteMoves;
   const envelope = document.querySelector<HTMLCanvasElement>('#envelope');
   if (envelope) {
     mountFigure(

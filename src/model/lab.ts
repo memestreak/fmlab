@@ -1,4 +1,4 @@
-import { type Envelope, envelopeAt } from '../dsp/envelope';
+import { type Envelope, envelopeAt, noteSeconds } from '../dsp/envelope';
 import { createStore, type Store } from './store';
 import type { ThemeChoice } from './theme';
 
@@ -170,6 +170,41 @@ export function indexAtTime(state: LabState, time: number): number {
   return state.indexFollows
     ? state.index * envelopeAt(envelopeOf(state), time)
     : state.index;
+}
+
+/**
+ * How many seconds into the last note the moment `time` is, on the page's
+ * clock; null when no note is sounding then (none yet, not started, or
+ * over).
+ */
+export function noteProgress(
+  state: LabState,
+  time: number | undefined,
+): number | null {
+  if (time === undefined || state.noteStartedAt === null) return null;
+  const into = time - state.noteStartedAt;
+  if (into < 0 || into > noteSeconds(envelopeOf(state))) return null;
+  return into;
+}
+
+/**
+ * What a figure should draw of a patch at a moment: its index, and how
+ * loud it is, 0 to 1. Outside `noteMode`, and whenever no note is
+ * sounding, that is the patch as set and at full height. While a note
+ * sounds it is the note at that moment, so the waveform and spectrum
+ * move with what is heard.
+ */
+export function momentOf(
+  state: LabState,
+  time: number | undefined,
+): { index: number; level: number } {
+  const { index } = patchOf(state);
+  const into = state.noteMode ? noteProgress(state, time) : null;
+  if (into === null) return { index, level: 1 };
+  return {
+    index: indexAtTime(state, into),
+    level: envelopeAt(envelopeOf(state), into),
+  };
 }
 
 /**

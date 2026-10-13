@@ -7,6 +7,7 @@ import {
   INDEX,
   indexAtTime,
   type LabState,
+  noteProgress,
   RELEASE,
   SUSTAIN,
 } from '../model/lab';
@@ -231,19 +232,4 @@ export function drawPlayhead(
   ctx.moveTo(lineX, top);
   ctx.lineTo(lineX, bottom);
   ctx.stroke();
-}
-
-/**
- * How many seconds into the last note the moment `time` is, on the page's
- * clock; null when no note is sounding then (none yet, not started, or
- * over).
- */
-export function noteProgress(
-  state: LabState,
-  time: number | undefined,
-): number | null {
-  if (time === undefined || state.noteStartedAt === null) return null;
-  const into = time - state.noteStartedAt;
-  if (into < 0 || into > noteSeconds(envelopeOf(state))) return null;
-  return into;
 }
