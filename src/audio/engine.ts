@@ -3,7 +3,7 @@ import { unlockIosAudio } from './iosUnlock';
 import { PROCESSOR_NAME } from './processorName';
 // `?worker&url` has Vite compile the worklet and its imports into a file
 // of its own and hand back the address.
-import processorUrl from './pmProcessor.ts?worker&url';
+import processorUrl from './synthProcessor.ts?worker&url';
 
 /** A parameter glides to a new value over this long: no zipper noise. */
 const GLIDE_SECONDS = 0.03;
@@ -11,6 +11,8 @@ const GLIDE_SECONDS = 0.03;
 const FADE_SECONDS = 0.02;
 /** After Stop, the fade gets this long before the context is suspended. */
 const SUSPEND_AFTER_MS = 250;
+/** Between chapters, the fade-out gets this long before the patch jumps. */
+const SCENE_GAP_MS = 100;
 
 /** The nodes, once there is a context. */
 interface Graph {
@@ -23,7 +25,7 @@ interface Graph {
  * Plays the model: it follows `playing` and the patch in the store and
  * owns everything Web Audio.
  *
- *   worklet (PM synth) -> master gain -> limiter -> speakers
+ *   worklet (the synth) -> master gain -> limiter -> speakers
  *
  * Nothing is created until `playing` first turns true, which has to happen
  * inside a click or key press: browsers refuse to start audio otherwise.
@@ -34,6 +36,9 @@ export class AudioEngine {
   /** Looping silence that keeps iOS from muting us; see iosUnlock.ts. */
   private silence: HTMLAudioElement | null = null;
   private suspendTimer: number | undefined;
+  private sceneTimer: number | undefined;
+  /** True while faded out between two chapters' patches. */
+  private changingScene = false;
 
   constructor(private readonly store: LabStore) {
     store.subscribe((state, previous) => {
@@ -41,9 +46,31 @@ export class AudioEngine {
         if (state.playing) void this.start();
         else this.stop();
       } else if (state.playing) {
-        this.sendPatch(state, GLIDE_SECONDS);
+        if (state.chapter !== previous.chapter) this.changeScene();
+        else if (!this.changingScene) this.sendPatch(state, GLIDE_SECONDS);
       }
     });
+  }
+
+  /**
+   * A new chapter is a new patch, perhaps in the other mode: gliding there
+   * would be a swoop, and jumping a click. So fade out, jump while silent,
+   * and fade back in.
+   */
+  private changeScene(): void {
+    const graph = this.graph;
+    if (!graph) return;
+    const { context, master } = graph;
+    master.gain.setTargetAtTime(0, context.currentTime, FADE_SECONDS);
+    window.clearTimeout(this.sceneTimer);
+    this.changingScene = true;
+    this.sceneTimer = window.setTimeout(() => {
+      this.changingScene = false;
+      const state = this.store.get();
+      if (!state.playing) return;
+      this.sendPatch(state, 0);
+      master.gain.setTargetAtTime(state.volume, context.currentTime, FADE_SECONDS);
+    }, SCENE_GAP_MS);
   }
 
   private async start(): Promise<void> {
@@ -75,6 +102,8 @@ export class AudioEngine {
   }
 
   private stop(): void {
+    window.clearTimeout(this.sceneTimer);
+    this.changingScene = false;
     this.silence?.pause();
     const graph = this.graph;
     if (!graph) return;
@@ -134,6 +163,10 @@ export class AudioEngine {
     glide('frequency', state.carrierHz);
     glide('ratio', state.ratio);
     glide('index', state.index);
+    glide('modFrequency', state.modHz);
+    glide('deviation', state.deviationHz);
+    // Never glided: it only changes between chapters, in the silence.
+    synth.parameters.get('mode')?.setValueAtTime(state.mode === 'fm' ? 1 : 0, now);
     if (seconds > 0) {
       master.gain.setTargetAtTime(state.volume, now, FADE_SECONDS);
     }

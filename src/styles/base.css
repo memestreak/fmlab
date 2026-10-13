@@ -20,11 +20,137 @@ body {
   margin: 0;
 }
 
-/* One column, as wide as a journal page is comfortable to read. */
+/* Wide enough for the two panes side by side. */
 .page {
-  max-width: 42rem;
+  max-width: 74rem;
   margin: 0 auto;
   padding: 2.5rem 1.25rem 2rem;
+}
+
+/* The chapter: its text, then the lab. One column, the text first, until
+   there is room for both; then the text beside the lab. */
+.chapter {
+  display: grid;
+  gap: 2rem;
+}
+
+/* Let a pane be narrower than its widest line (a formula, which scrolls)
+   instead of pushing the page wider than the screen. */
+.chapter > * {
+  min-width: 0;
+}
+
+/* A column of text no wider than a journal page is comfortable to read. */
+.narrative {
+  max-width: 38rem;
+}
+
+@media (min-width: 62rem) {
+  .chapter {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: 3.5rem;
+    align-items: start;
+  }
+}
+
+.chapter-kicker {
+  margin: 0 0 0.25rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.chapter-title {
+  margin: 0 0 1.25rem;
+  font-size: 1.9rem;
+  text-wrap: balance;
+}
+
+/* Focused by script when a chapter opens, for screen readers; it is not a
+   control, so it shows no ring. */
+.chapter-title:focus {
+  outline: none;
+}
+
+/* "The maths": closed until asked for. */
+.maths {
+  padding: 0.6rem 0;
+  border-top: 1px solid var(--rule);
+}
+
+.maths:last-of-type {
+  border-bottom: 1px solid var(--rule);
+}
+
+.maths summary {
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.maths[open] summary {
+  margin-bottom: 0.75rem;
+}
+
+/* A formula on a line of its own. It scrolls sideways on a phone rather
+   than wrapping in the middle of an expression. */
+.formula {
+  overflow-x: auto;
+  padding: 0.25rem 0;
+  font-size: 1.05rem;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.chapter-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  font-weight: 600;
+}
+
+/* The contents list in the masthead. */
+.contents {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.1rem;
+  margin-left: 1rem;
+  font-size: 0.95rem;
+}
+
+.contents a {
+  /* A finger-sized target for a one-character link. */
+  min-width: 1.5rem;
+  padding: 0.4rem 0;
+  text-align: center;
+  text-decoration: none;
+}
+
+.contents a:hover {
+  text-decoration: underline;
+}
+
+.contents a[aria-current] {
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+}
+
+/* Phone width: no room between the wordmark and the theme button, so the
+   contents list takes a line of its own beneath them. */
+@media (max-width: 30rem) {
+  .masthead {
+    flex-wrap: wrap;
+    row-gap: 0.25rem;
+  }
+
+  .contents {
+    flex-basis: 100%;
+    order: 1;
+    margin-left: 0;
+  }
 }
 
 .wordmark,
@@ -129,10 +255,22 @@ a {
   box-shadow: 0 0 0 1px var(--ink);
 }
 
-.lab {
+.controls {
   display: grid;
   gap: 0.25rem;
-  margin: 1.5rem 0 2rem;
+}
+
+/* `display: grid` above would otherwise show a row a chapter has hidden. */
+.slider-row[hidden] {
+  display: none;
+}
+
+.lab .figure:first-of-type {
+  margin-top: 1.5rem;
+}
+
+.lab .figure:last-of-type {
+  margin-bottom: 0;
 }
 
 .transport {

@@ -3,7 +3,7 @@
 This project builds to static files with Vite (`dist/`) and deploys to
 Cloudflare Pages.
 
-Production: TBD (set once the Pages project exists)
+Production: <https://fmlab.pages.dev>
 
 ## Connecting to Cloudflare Pages
 
@@ -97,10 +97,10 @@ gitignored.
 
 ## Verifying a Deployment
 
-Check the deployed origin (replace the URL once it is known):
+Check the deployed origin:
 
 ```bash
-curl -s -o /dev/null -w "%{http_code}\n" https://TBD.pages.dev/
+curl -s -o /dev/null -w "%{http_code}\n" https://fmlab.pages.dev/
 ```
 
 Expected: `200`. The footer of the page shows the short hash of the commit

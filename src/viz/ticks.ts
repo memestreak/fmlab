@@ -26,10 +26,11 @@ export function formatHz(hz: number): string {
   return `${(hz / 1000).toFixed(0)}k`;
 }
 
-/** A time in milliseconds to three significant figures: 0, 2.27, 18.2. */
+/** A time in milliseconds to three significant figures: 0, 2.27, 18.2, 182. */
 export function formatMs(ms: number): string {
   if (ms === 0) return '0';
-  return ms < 9.995 ? ms.toFixed(2) : ms.toFixed(1);
+  if (ms < 9.995) return ms.toFixed(2);
+  return ms < 99.95 ? ms.toFixed(1) : ms.toFixed(0);
 }
 
 /**
@@ -46,10 +47,22 @@ export function spectrumTicks(maxFreq: number, carrierHz: number): Tick[] {
   return ticks;
 }
 
-/** Ticks for a time axis: one at the start of each carrier cycle. */
+/** A time axis is numbered every this many carrier cycles. */
+const CYCLE_STEPS = [1, 2, 5, 10];
+/** With no more than this many numbers after the 0. */
+const MAX_CYCLE_TICKS = 8;
+
+/**
+ * Ticks for a time axis `cycles` carrier periods long: at the start of
+ * every cycle when there are few, every second, fifth or tenth when there
+ * are many. The axis need not end on one.
+ */
 export function waveformTicks(cycles: number, carrierHz: number): Tick[] {
+  const step =
+    CYCLE_STEPS.find(size => cycles / size <= MAX_CYCLE_TICKS) ??
+    CYCLE_STEPS[CYCLE_STEPS.length - 1];
   const ticks: Tick[] = [];
-  for (let cycle = 0; cycle <= cycles; cycle++) {
+  for (let cycle = 0; cycle <= cycles; cycle += step) {
     ticks.push({
       at: cycle,
       label: String(cycle),

@@ -42,3 +42,59 @@ export function besselJ(n: number, x: number): number {
   }
   return sum;
 }
+
+/** Miller's recurrence starts this far past the point where J_n dies. */
+const MILLER_ACCURACY = 160;
+/** Rescale the recurrence before it overflows a double. */
+const HUGE = 1e250;
+
+/**
+ * J_0(x) to J_nMax(x) in one go, for any size of x.
+ *
+ * The power series above loses its accuracy as |x| grows, and a slow
+ * vibrato is a very large index (a 20 Hz deviation at 0.5 Hz is 40). This
+ * is Miller's algorithm instead: start well above both nMax and |x| with a
+ * made-up tiny value, run the recurrence
+ *
+ *   J_(k-1)(x) = (2k / x) J_k(x) - J_(k+1)(x)
+ *
+ * downwards, where it is stable, and then scale everything so that
+ * J_0 + 2 (J_2 + J_4 + ...) = 1, which the true values satisfy.
+ */
+export function besselJSeries(nMax: number, x: number): Float64Array {
+  const result = new Float64Array(nMax + 1);
+  if (x === 0) {
+    result[0] = 1;
+    return result;
+  }
+  const ax = Math.abs(x);
+  const top = Math.max(nMax, Math.ceil(ax));
+  // An even order to start from, comfortably past the last one that
+  // matters.
+  const start = 2 * Math.ceil((top + Math.sqrt(MILLER_ACCURACY * top) + 2) / 2);
+
+  let above = 0;
+  let current = 1e-30;
+  let sum = 0;
+  for (let k = start; k > 0; k--) {
+    const below = ((2 * k) / ax) * current - above;
+    above = current;
+    current = below;
+    if (Math.abs(current) > HUGE) {
+      above /= HUGE;
+      current /= HUGE;
+      sum /= HUGE;
+      for (let n = 0; n <= nMax; n++) result[n] /= HUGE;
+    }
+    // `current` is now J_(k-1), still unscaled.
+    if (k - 1 <= nMax) result[k - 1] = current;
+    if ((k - 1) % 2 === 0) sum += k - 1 === 0 ? current : 2 * current;
+  }
+
+  for (let n = 0; n <= nMax; n++) {
+    result[n] /= sum;
+    // J_n(-x) = (-1)^n J_n(x)
+    if (x < 0 && n % 2 === 1) result[n] = -result[n];
+  }
+  return result;
+}

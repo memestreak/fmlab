@@ -25,61 +25,73 @@
     <div class="page">
       <header class="masthead">
         <h1 class="wordmark">fmlab</h1>
+        <!-- The chapters that exist; filled in by ui/chapterView.ts. -->
+        <nav id="contents" class="contents" aria-label="Chapters"></nav>
         <button id="theme" type="button" class="btn btn-quiet">
           Theme: Auto
         </button>
       </header>
 
-      <main>
-        <p>
-          One sine wave, the modulator, bends the phase of another, the
-          carrier. Press Play, then move the sliders: what you hear is what
-          the two figures draw.
-        </p>
+      <!-- Two panes: the chapter's text, and the lab it talks about. Side
+           by side on a wide screen, the text first on a narrow one. -->
+      <main class="chapter">
+        <!-- The chapter's title, lesson and maths, from src/chapters. -->
+        <article id="narrative" class="narrative"></article>
 
-        <section class="lab" aria-label="Controls">
-          <div class="transport">
-            <button id="play" type="button" class="btn btn-ink">Play</button>
+        <section class="lab" aria-label="Lab">
+          <div class="controls">
+            <div class="transport">
+              <button id="play" type="button" class="btn btn-ink">Play</button>
+            </div>
+
+            <!-- Every slider there is. A chapter shows the ones it names
+                 in `controls`, matched on data-control. -->
+            <div class="slider-row" data-control="volume">
+              <label for="volume">Volume</label>
+              <output id="volume-out" for="volume" class="num"></output>
+              <input id="volume" type="range" class="slider" />
+            </div>
+            <div class="slider-row" data-control="carrier">
+              <label for="carrier">Carrier</label>
+              <output id="carrier-out" for="carrier" class="num"></output>
+              <input id="carrier" type="range" class="slider" />
+            </div>
+            <div class="slider-row" data-control="ratio">
+              <label for="ratio">Ratio</label>
+              <output id="ratio-out" for="ratio" class="num"></output>
+              <input id="ratio" type="range" class="slider" />
+            </div>
+            <div class="slider-row" data-control="index">
+              <label for="index">Index</label>
+              <output id="index-out" for="index" class="num"></output>
+              <input id="index" type="range" class="slider" />
+            </div>
+            <div class="slider-row" data-control="modHz">
+              <label for="modHz">Modulator</label>
+              <output id="modHz-out" for="modHz" class="num"></output>
+              <input id="modHz" type="range" class="slider" />
+            </div>
+            <div class="slider-row" data-control="deviation">
+              <label for="deviation">Deviation</label>
+              <output id="deviation-out" for="deviation" class="num"></output>
+              <input id="deviation" type="range" class="slider" />
+            </div>
           </div>
 
-          <div class="slider-row">
-            <label for="volume">Volume</label>
-            <output id="volume-out" for="volume" class="num"></output>
-            <input id="volume" type="range" class="slider" />
-          </div>
+          <figure class="figure">
+            <canvas id="waveform" class="plot" role="img"></canvas>
+            <figcaption>
+              Fig. 1&emsp;<span id="waveform-caption"></span>
+            </figcaption>
+          </figure>
 
-          <div class="slider-row">
-            <label for="carrier">Carrier</label>
-            <output id="carrier-out" for="carrier" class="num"></output>
-            <input id="carrier" type="range" class="slider" />
-          </div>
-          <div class="slider-row">
-            <label for="ratio">Ratio</label>
-            <output id="ratio-out" for="ratio" class="num"></output>
-            <input id="ratio" type="range" class="slider" />
-          </div>
-          <div class="slider-row">
-            <label for="index">Index</label>
-            <output id="index-out" for="index" class="num"></output>
-            <input id="index" type="range" class="slider" />
-          </div>
+          <figure class="figure">
+            <canvas id="spectrum" class="plot" role="img"></canvas>
+            <figcaption>
+              Fig. 2&emsp;<span id="spectrum-caption"></span>
+            </figcaption>
+          </figure>
         </section>
-
-        <figure class="figure">
-          <canvas id="waveform" class="plot" role="img"></canvas>
-          <figcaption>
-            Fig. 1&emsp;Waveform. Two cycles of the output, with the
-            modulator behind it as the thinner line.
-          </figcaption>
-        </figure>
-
-        <figure class="figure">
-          <canvas id="spectrum" class="plot" role="img"></canvas>
-          <figcaption>
-            Fig. 2&emsp;Spectrum. A stem below the axis, with a hollow
-            marker, has negative phase.
-          </figcaption>
-        </figure>
       </main>
 
       <footer class="footer">

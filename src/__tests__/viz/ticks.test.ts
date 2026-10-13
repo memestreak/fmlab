@@ -37,6 +37,7 @@ describe('formatMs', () => {
     expect(formatMs(1000 / 880)).toBe('1.14');
     expect(formatMs(1000 / 220)).toBe('4.55');
     expect(formatMs(2000 / 55)).toBe('36.4');
+    expect(formatMs(40000 / 220)).toBe('182');
   });
 });
 

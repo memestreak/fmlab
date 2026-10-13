@@ -1,10 +1,15 @@
+import type { ControlId } from '../chapters';
 import {
   CARRIER_SEMITONES,
+  DEVIATION_HZ,
   hzToSemitones,
   INDEX,
   type LabState,
   type LabStore,
+  MOD_OCTAVES,
+  modHzToOctaves,
   modulatorHz,
+  octavesToModHz,
   RATIO,
   semitonesToHz,
   VOLUME,
@@ -12,7 +17,7 @@ import {
 
 /** How one slider maps onto one number in the model. */
 interface SliderSpec {
-  id: string;
+  id: ControlId;
   min: number;
   max: number;
   step: number;
@@ -21,6 +26,13 @@ interface SliderSpec {
   write: (position: number) => Partial<LabState>;
   /** The readout beside the slider, also what a screen reader says. */
   format: (state: LabState) => string;
+}
+
+/** A slow rate needs its decimals; a fast one does not: 0.50, 12.5, 440. */
+export function formatRate(hz: number): string {
+  if (hz < 9.995) return `${hz.toFixed(2)} Hz`;
+  if (hz < 99.95) return `${hz.toFixed(1)} Hz`;
+  return `${hz.toFixed(0)} Hz`;
 }
 
 const SLIDERS: SliderSpec[] = [
@@ -65,11 +77,32 @@ const SLIDERS: SliderSpec[] = [
     write: position => ({ index: position }),
     format: state => state.index.toFixed(2),
   },
+  {
+    // In octaves, so the slow end, where vibrato lives, gets as much of
+    // the slider as the fast end.
+    id: 'modHz',
+    min: 0,
+    max: MOD_OCTAVES,
+    step: 0.01,
+    read: state => modHzToOctaves(state.modHz),
+    write: position => ({ modHz: octavesToModHz(position) }),
+    format: state => formatRate(state.modHz),
+  },
+  {
+    id: 'deviation',
+    min: DEVIATION_HZ.min,
+    max: DEVIATION_HZ.max,
+    step: 1,
+    read: state => state.deviationHz,
+    write: position => ({ deviationHz: position }),
+    format: state => `${state.deviationHz.toFixed(0)} Hz`,
+  },
 ];
 
 /**
- * Ties the range inputs and their readouts to the store, both ways.
- * The inputs are in index.html; this gives them their ranges.
+ * Ties the range inputs and their readouts to the store, both ways. The
+ * inputs are in index.html; this gives them their ranges. Which of them a
+ * chapter shows is the chapter view's business.
  */
 export function mountSliders(store: LabStore): void {
   for (const spec of SLIDERS) {

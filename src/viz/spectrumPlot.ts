@@ -1,13 +1,19 @@
-import { fmSpectrum, type SpectralLine } from '../dsp/fmSpectrum';
-import type { LabState } from '../model/lab';
+import {
+  fmSpectrum,
+  type SpectralLine,
+  trueFmSpectrum,
+} from '../dsp/fmSpectrum';
+import { type LabState, patchOf } from '../model/lab';
 import { ampToY, beginPlot, drawFrame } from './plot';
 import { spectrumTicks } from './ticks';
 
 const STEM_WIDTH = 2;
+/** Stems closer together than this many pixels are drawn thinner. */
+const CROWDED_SPACING = 4;
 /** Radius of the hollow marker on a negative stem. */
 const MARKER_RADIUS = 4;
 /** The frequency axis ends at one of these, in carrier units. */
-const AXIS_ENDS = [8, 16, 32, 64, 128];
+const AXIS_ENDS = [2, 4, 8, 16, 32, 64, 128];
 /** A stem shorter than this many CSS pixels is not drawn. */
 const MIN_STEM = 0.5;
 
@@ -22,11 +28,20 @@ export function axisEnd(ratio: number, index: number): number {
   return AXIS_ENDS.find(end => end >= needed) ?? AXIS_ENDS[AXIS_ENDS.length - 1];
 }
 
+/** The patch's line spectrum, by whichever kind of modulation it uses. */
+export function spectrumOf(state: LabState): SpectralLine[] {
+  const { ratio, index } = patchOf(state);
+  return state.mode === 'fm'
+    ? trueFmSpectrum(ratio, index)
+    : fmSpectrum(ratio, index);
+}
+
 /**
  * Draws the patch's line spectrum as stems on a frequency axis numbered in
- * carrier units and, beneath, in Hz. A positive line is a --pen-blue stem above the axis; a negative
- * one is --pen-red, below it, and ends in a hollow marker so the phase
- * does not rest on colour alone.
+ * carrier units and, beneath, in Hz. A positive line is a --pen-blue stem
+ * above the axis; a negative one is --pen-red, below it, and ends in a
+ * hollow marker so the phase does not rest on colour alone. (True FM's
+ * lines are magnitudes, so all of its stems stand above the axis.)
  *
  * Returns the lines drawn, for the figure's text description.
  */
@@ -34,12 +49,13 @@ export function drawSpectrum(
   state: LabState,
   canvas: HTMLCanvasElement,
 ): SpectralLine[] {
-  const lines = fmSpectrum(state.ratio, state.index);
+  const lines = spectrumOf(state);
   const plot = beginPlot(canvas);
   if (!plot) return lines;
   const { ctx, token, left, right } = plot;
+  const { ratio, index } = patchOf(state);
 
-  const maxFreq = axisEnd(state.ratio, state.index);
+  const maxFreq = axisEnd(ratio, index);
   const x = (freq: number) => left + (freq / maxFreq) * (right - left);
   const y = (amp: number) => ampToY(plot, amp);
 
@@ -50,7 +66,10 @@ export function drawSpectrum(
     'frequency: multiples of the carrier, and Hz',
   );
 
-  ctx.lineWidth = STEM_WIDTH;
+  // A slow vibrato is hundreds of lines a pixel or two apart. Thin stems
+  // keep them a row of lines rather than a block.
+  const crowded = x(ratio) - x(0) < CROWDED_SPACING;
+  ctx.lineWidth = crowded ? 1 : STEM_WIDTH;
   for (const { freq, amp } of lines) {
     if (freq > maxFreq || Math.abs(y(amp) - y(0)) < MIN_STEM) continue;
     const negative = amp < 0;

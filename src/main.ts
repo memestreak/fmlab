@@ -18,6 +18,7 @@ import './styles/base.css';
 import { AudioEngine } from './audio/engine';
 import { createLabStore } from './model/lab';
 import { loadTheme } from './model/theme';
+import { chapterInUrl, mountChapters } from './ui/chapterView';
 import { mountFigures } from './ui/figures';
 import { mountSliders } from './ui/sliders';
 import { mountThemeSwitch } from './ui/themeSwitch';
@@ -37,12 +38,19 @@ function mountCommitHash(slot: HTMLElement): void {
   slot.replaceChildren(link);
 }
 
-// One store; the engine and every control and figure follow it. The boot
-// script in index.html has already applied the saved theme.
-const store = createLabStore({ theme: loadTheme() });
+// One store; the engine and every control and figure follow it. It starts
+// on the chapter the URL names, with that chapter's patch. The boot script
+// in index.html has already applied the saved theme.
+const opening = chapterInUrl();
+const store = createLabStore({
+  theme: loadTheme(),
+  chapter: opening.number,
+  ...opening.patch,
+});
 // It subscribes itself; nothing here needs to hold on to it.
 new AudioEngine(store);
 
+mountChapters(store);
 mountSliders(store);
 mountFigures(store);
 

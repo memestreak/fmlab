@@ -11,6 +11,18 @@ export function fmSample(cycles: number, ratio: number, index: number): number {
   );
 }
 
+/**
+ * True FM at one instant: the carrier's frequency, not its phase, follows
+ * the modulator, fc + deviation * sin(wm t). Its phase is that added up
+ * from t = 0, which is wc t + I (1 - cos(wm t)) with I = deviation / fm.
+ * The signal trueFmSpectrum takes apart and FmKernel plays.
+ */
+export function trueFmSample(cycles: number, ratio: number, index: number): number {
+  return Math.sin(
+    TWO_PI * cycles + index * (1 - Math.cos(TWO_PI * ratio * cycles)),
+  );
+}
+
 /** The modulator on its own at the same instant, at an amplitude of 1. */
 export function modulatorSample(cycles: number, ratio: number): number {
   return Math.sin(TWO_PI * ratio * cycles);
