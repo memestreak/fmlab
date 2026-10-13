@@ -28,6 +28,7 @@ export type ChapterPatch = Pick<
   | 'deviationHz'
   | 'showModulator'
   | 'showBandwidth'
+  | 'realUnits'
 >;
 
 /** An expandable panel: the formulas, for whoever wants them. */

@@ -2,7 +2,7 @@ import { fmWindowSample, trueFmSample } from '../../dsp/waveform';
 import { CHAPTERS } from '../../chapters';
 import { DEFAULTS, type LabState } from '../../model/lab';
 import { motionNote, waveformMoves } from '../../ui/figures';
-import { motionTicks } from '../../viz/ticks';
+import { msTicks } from '../../viz/ticks';
 import { motionView } from '../../viz/waveformPlot';
 
 const fm = (modHz: number, deviationHz = 20, more: Partial<LabState> = {}): LabState => ({
@@ -111,19 +111,19 @@ describe('motionView', () => {
   });
 });
 
-describe('motionTicks', () => {
+describe('msTicks', () => {
   it('numbers one 5 Hz wobble every 50 ms, in ms only', () => {
-    const ticks = motionTicks(0.2);
+    const ticks = msTicks(0.2);
     expect(ticks.map(tick => tick.label)).toEqual(['0', '50', '100', '150', '200']);
     expect(ticks.every(tick => tick.sub === '')).toBe(true);
     expect(ticks[4].at).toBeCloseTo(0.2, 12);
   });
 
   it('uses bigger steps for a longer window', () => {
-    expect(motionTicks(2).map(tick => tick.label)).toEqual(
+    expect(msTicks(2).map(tick => tick.label)).toEqual(
       ['0', '500', '1000', '1500', '2000'],
     );
-    expect(motionTicks(0.11).map(tick => tick.label)).toEqual(
+    expect(msTicks(0.11).map(tick => tick.label)).toEqual(
       ['0', '20', '40', '60', '80', '100'],
     );
   });

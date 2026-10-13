@@ -108,7 +108,10 @@ figures subscribe to it. Nothing else passes values around.
   third argument it draws the moving view instead, where the patch has one
   (`motionView`: true FM with a modulator under about 11 Hz): the next
   stretch of signal from that moment, with the carrier slowed by a round
-  factor so its waves can be seen squeezing and stretching. The spectrum
+  factor so its waves can be seen squeezing and stretching. With
+  `realUnits` (chapter 1) both figures are on fixed axes in real units
+  instead, 20 ms and 0 to 1000 Hz, so that moving the carrier moves what
+  is drawn: more waves, and a stem further along. The spectrum
   can bracket Carson's band (`showBandwidth`). `besselPlot.ts` draws J_0
   to J_8 against the index, with an ink line at the patch's index and a
   dot where it crosses each curve. The spectrum and the Bessel plot are
@@ -184,6 +187,11 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
 - Show real units beside carrier units wherever a frequency or time
   appears (the ratio's readout adds the modulator's Hz; the axes add Hz
   and ms).
+- An axis in carrier units does not move when the carrier does: only its
+  second row of numbers changes, which reads as nothing happening. Where
+  a chapter's lesson is the carrier's own frequency, set `realUnits` so
+  the axes are fixed in ms and Hz. Keep carrier units where the lesson is
+  ratios and sidebands.
 - The theme switch cycles Auto, Light, Dark and saves the bare word under
   `localStorage["fmlab.theme"]`. The boot script in `index.html` reads the
   same key; keep it in step with `src/model/theme.ts`.

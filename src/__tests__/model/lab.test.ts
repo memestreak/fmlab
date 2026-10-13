@@ -30,6 +30,7 @@ describe('the lab store', () => {
       deviationHz: 20,
       showModulator: true,
       showBandwidth: false,
+      realUnits: false,
       hover: null,
       pinned: null,
       motion: false,

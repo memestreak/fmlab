@@ -4,6 +4,7 @@ import {
   trueFmSpectrum,
 } from '../dsp/fmSpectrum';
 import {
+  CARRIER_HZ,
   carsonBand,
   highlightOf,
   type LabState,
@@ -17,7 +18,7 @@ import {
   type Plot,
   plotArea,
 } from './plot';
-import { spectrumTicks } from './ticks';
+import { hzTicks, spectrumTicks } from './ticks';
 
 const STEM_WIDTH = 2;
 /** How faint the other stems go when one order is picked out. */
@@ -46,6 +47,35 @@ export function axisEnd(ratio: number, index: number): number {
   return AXIS_ENDS.find(end => end >= needed) ?? AXIS_ENDS[AXIS_ENDS.length - 1];
 }
 
+/** A frequency axis fixed in Hz ends at one of these. */
+const HZ_AXIS_ENDS = [1000, 2000, 5000, 10000, 20000, 50000, 100000];
+
+/**
+ * Where a frequency axis fixed in Hz should end: far enough for the
+ * highest carrier there is, with the same allowance for sidebands as
+ * `axisEnd`. It does not depend on where the carrier is now; that is the
+ * point of it. A bare sine (index 0) needs no allowance, and gets 1000 Hz.
+ */
+export function hzAxisEnd(ratio: number, index: number): number {
+  const multiples = index === 0 ? 1 : 1 + ratio * (index + 2);
+  const needed = CARRIER_HZ.max * multiples;
+  return (
+    HZ_AXIS_ENDS.find(end => end >= needed) ??
+    HZ_AXIS_ENDS[HZ_AXIS_ENDS.length - 1]
+  );
+}
+
+/**
+ * The right-hand end of the state's frequency axis, in carrier units,
+ * whichever units the axis is numbered in.
+ */
+export function axisSpan(state: LabState): number {
+  const { ratio, index } = patchOf(state);
+  return state.realUnits
+    ? hzAxisEnd(ratio, index) / state.carrierHz
+    : axisEnd(ratio, index);
+}
+
 /** The patch's line spectrum, by whichever kind of modulation it uses. */
 export function spectrumOf(state: LabState): SpectralLine[] {
   const { ratio, index } = patchOf(state);
@@ -56,7 +86,8 @@ export function spectrumOf(state: LabState): SpectralLine[] {
 
 /**
  * Draws the patch's line spectrum as stems on a frequency axis numbered in
- * carrier units and, beneath, in Hz. A positive line is a --pen-blue stem
+ * carrier units and, beneath, in Hz; or, with `realUnits`, on an axis
+ * fixed in Hz. A positive line is a --pen-blue stem
  * above the axis; a negative one is --pen-red, below it, and ends in a
  * hollow marker so the phase does not rest on colour alone. (True FM's
  * lines are magnitudes, so all of its stems stand above the axis.)
@@ -73,16 +104,26 @@ export function drawSpectrum(
   const { ctx, token, left, right } = plot;
   const { ratio, index } = patchOf(state);
 
-  const maxFreq = axisEnd(ratio, index);
+  const maxFreq = axisSpan(state);
   const x = (freq: number) => left + (freq / maxFreq) * (right - left);
   const y = (amp: number) => ampToY(plot, amp);
 
-  drawFrame(
-    plot,
-    spectrumTicks(maxFreq, state.carrierHz),
-    x,
-    'frequency: multiples of the carrier, and Hz',
-  );
+  if (state.realUnits) {
+    // Numbered in Hz and fixed, so a stem moves when the carrier does.
+    drawFrame(
+      plot,
+      hzTicks(hzAxisEnd(ratio, index)),
+      hz => x(hz / state.carrierHz),
+      'frequency, in Hz',
+    );
+  } else {
+    drawFrame(
+      plot,
+      spectrumTicks(maxFreq, state.carrierHz),
+      x,
+      'frequency: multiples of the carrier, and Hz',
+    );
+  }
 
   // A slow vibrato is hundreds of lines a pixel or two apart. Thin stems
   // keep them a row of lines rather than a block.
@@ -165,9 +206,9 @@ export function orderAtX(
   px: number,
   maxOrder: number,
 ): number | null {
-  const { ratio, index } = patchOf(state);
+  const { ratio } = patchOf(state);
   const { left, right } = plotArea(width, 0);
-  const maxFreq = axisEnd(ratio, index);
+  const maxFreq = axisSpan(state);
   const freq = ((px - left) / (right - left)) * maxFreq;
   const order = sidebandOrder(freq, ratio);
   if (order > maxOrder) return null;

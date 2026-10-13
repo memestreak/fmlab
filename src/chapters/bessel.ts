@@ -80,6 +80,7 @@ export const bessel: Chapter = {
     deviationHz: 20,
     showModulator: true,
     showBandwidth: false,
+    realUnits: false,
   },
   figures: {
     spectrum:
