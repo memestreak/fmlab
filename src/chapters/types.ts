@@ -9,6 +9,9 @@ export type ControlId =
   | 'modHz'
   | 'deviation';
 
+/** A figure on the page, by the id of its canvas in index.html. */
+export type FigureId = 'waveform' | 'spectrum' | 'bessel';
+
 /**
  * The part of the state a chapter sets when it opens. All of it, every
  * time, so a chapter always starts the same way whatever was left behind
@@ -24,6 +27,7 @@ export type ChapterPatch = Pick<
   | 'modHz'
   | 'deviationHz'
   | 'showModulator'
+  | 'showBandwidth'
 >;
 
 /** An expandable panel: the formulas, for whoever wants them. */
@@ -55,6 +59,10 @@ export interface Chapter {
    */
   hasMotion: boolean;
   patch: ChapterPatch;
-  /** What follows "Fig. n" under each figure. */
-  captions: { waveform: string; spectrum: string };
+  /**
+   * The figures shown, each with what follows "Fig. n" under it. They
+   * appear in the page's order (waveform, spectrum, Bessel plot) and are
+   * numbered from 1 as shown.
+   */
+  figures: Partial<Record<FigureId, string>>;
 }

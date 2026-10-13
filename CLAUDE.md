@@ -12,7 +12,8 @@ as static files to Cloudflare Pages (`DEPLOYMENT.md`).
 The page is a chapter at a time: its text in a narrative pane, and the lab
 (Play / Stop, sliders, the waveform and spectrum figures) beside it, or
 under it on a narrow screen. The chapter is in the URL's hash (`#2`).
-Written so far: 1 "A single sine", 2 "Vibrato becomes timbre" and 7, the
+Written so far: 1 "A single sine", 2 "Vibrato becomes timbre",
+3 "Modulation index", 4 "Sidebands and Bessel functions" and 7, the
 Sandbox; numbers are the spec's, and previous / next step over the gaps.
 One carrier and one modulator throughout.
 
@@ -63,7 +64,9 @@ figures subscribe to it. Nothing else passes values around.
 - `src/chapters/` — a chapter is data (`types.ts`): number, title, lesson
   text and "The maths" panels (HTML strings, trusted because they are
   written here), the sliders it shows, the patch it starts from (all of
-  it, so a chapter always opens the same way) and the figures' captions.
+  it, so a chapter always opens the same way) and the figures it shows,
+  each with its caption (they are numbered from 1 in the order shown, so
+  text that says "Fig. 2" must match the chapter's own list).
   `index.ts` lists them (`CHAPTERS`, `neighbours`); `route.ts` reads the
   hash. A new chapter is a file here and an entry in `CHAPTERS`. Lesson
   text is plain language for musicians; formulas go in the panels, as
@@ -105,15 +108,28 @@ figures subscribe to it. Nothing else passes values around.
   third argument it draws the moving view instead, where the patch has one
   (`motionView`: true FM with a modulator under about 11 Hz): the next
   stretch of signal from that moment, with the carrier slowed by a round
-  factor so its waves can be seen squeezing and stretching. `ticks.ts` (pure) makes
+  factor so its waves can be seen squeezing and stretching. The spectrum
+  can bracket Carson's band (`showBandwidth`). `besselPlot.ts` draws J_0
+  to J_8 against the index, with an ink line at the patch's index and a
+  dot where it crosses each curve. The spectrum and the Bessel plot are
+  linked: `highlightOf(state)` is a sideband order to pick out, and both
+  draw it heavier and the rest fainter. Each has pure hit-testing
+  (`orderAt`, `indexAt`, `orderAtX`) that works from a canvas size, built
+  on `plotArea`. `ticks.ts` (pure) makes
   the x axes' numbers: every tick is labelled in carrier units (multiples,
   cycles) and, on a second row, in Hz or ms, thinned when the canvas is
   narrow.
 - `src/ui/` — wiring between the markup and the store. `chapterView.ts`
   turns the hash into the store's chapter and patch, and draws what a
   chapter owns: the narrative pane, the contents list in the masthead,
-  which slider rows show (`data-control`) and the captions. `sliders.ts`
+  which slider rows (`data-control`) and figures (`data-figure`) show, the
+  figures' numbers and their captions. `sliders.ts`
   is a table of every slider (range, step, scale, readout);
+  `besselControls.ts` makes the Bessel plot a control: the canvas is a
+  `role="slider"` for the index (drag, or arrows, Page Up / Down, Home,
+  End), pointing at a curve, a spectrum stem or a J button sets `hover`,
+  pressing a J button sets `pinned`, and one button sets the index where
+  the carrier vanishes;
   `transport.ts` is Play / Stop and the "Show motion" checkbox;
   `themeSwitch.ts`; and `figures.ts` redraws a canvas on patch, size,
   theme and font changes, keeps its `aria-label` describing what it shows,
@@ -158,6 +174,10 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
   and whoever mounts it must redraw on resize, theme change and
   `document.fonts.ready` (`mountFigure` in `src/ui/figures.ts` does).
   Give every canvas `role="img"` and an `aria-label` saying what it shows.
+  A canvas that is a control (the Bessel plot) is a `role="slider"`
+  instead, focusable, with its value kept in `aria-valuenow` and
+  `aria-valuetext`; anything it offers by hover must also be reachable by
+  keyboard and touch (the J buttons).
 - Controls are ink on paper (`.btn`, `.slider` in `base.css`). Give every
   input a visible `<label>`, and a readout in `.num`. Anything that is not
   a control must not look like one.

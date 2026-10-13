@@ -1,5 +1,6 @@
 import type { SpectralLine } from '../dsp/fmSpectrum';
 import { type LabState, type LabStore, patchOf } from '../model/lab';
+import { drawBessel } from '../viz/besselPlot';
 import { drawSpectrum } from '../viz/spectrumPlot';
 import { cyclesShown, drawWaveform, motionView } from '../viz/waveformPlot';
 import { formatRate } from './sliders';
@@ -25,6 +26,10 @@ const DRAWN: (keyof LabState)[] = [
   'modHz',
   'deviationHz',
   'showModulator',
+  'showBandwidth',
+  // The sideband order picked out in the linked figures.
+  'hover',
+  'pinned',
   'theme',
 ];
 
@@ -161,4 +166,8 @@ export function mountFigures(store: LabStore): void {
       canvas.setAttribute('aria-label', describeSpectrum(state, lines));
     });
   }
+
+  // Its label and value are the slider's, kept by ui/besselControls.ts.
+  const bessel = document.querySelector<HTMLCanvasElement>('#bessel');
+  if (bessel) mountFigure(bessel, store, drawBessel);
 }

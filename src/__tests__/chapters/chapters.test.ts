@@ -5,6 +5,8 @@ import {
   neighbours,
 } from '../../chapters';
 import { chapterFromHash, hashForChapter } from '../../chapters/route';
+import { besselJ } from '../../dsp/bessel';
+import { fmSpectrum } from '../../dsp/fmSpectrum';
 import {
   CARRIER_HZ,
   clamp,
@@ -23,20 +25,30 @@ describe('the chapters', () => {
     expect(FIRST_CHAPTER).toBe(1);
   });
 
-  it('are the first two lessons and the sandbox, numbered as in the spec', () => {
+  it('are the first four lessons and the sandbox, numbered as in the spec', () => {
     expect(CHAPTERS.map(c => [c.number, c.title])).toEqual([
       [1, 'A single sine'],
       [2, 'Vibrato becomes timbre'],
+      [3, 'Modulation index'],
+      [4, 'Sidebands and Bessel functions'],
       [7, 'Sandbox'],
     ]);
   });
 
-  it.each(CHAPTERS)('$title has text, captions and a contents label', chapter => {
+  it.each(CHAPTERS)('$title shows the spectrum, and captions what it shows', chapter => {
+    const shown = Object.entries(chapter.figures);
+    expect(shown.length).toBeGreaterThanOrEqual(2);
+    expect(chapter.figures.spectrum).toBeDefined();
+    for (const [id, caption] of shown) {
+      expect(['waveform', 'spectrum', 'bessel']).toContain(id);
+      expect(caption.trim()).not.toBe('');
+    }
+  });
+
+  it.each(CHAPTERS)('$title has text and a contents label', chapter => {
     expect(chapter.body.length).toBeGreaterThan(0);
     expect(chapter.body.every(text => text.trim().length > 0)).toBe(true);
     expect(chapter.navLabel).not.toBe('');
-    expect(chapter.captions.waveform).not.toBe('');
-    expect(chapter.captions.spectrum).not.toBe('');
     for (const panel of chapter.maths) {
       expect(panel.title).not.toBe('');
       expect(panel.body.length).toBeGreaterThan(0);
@@ -49,12 +61,25 @@ describe('the chapters', () => {
     expect(chapter.controls).toContain('volume');
   });
 
-  it.each(CHAPTERS)('$title starts inside every slider range', ({ patch }) => {
-    expect(clamp(patch.carrierHz, CARRIER_HZ)).toBe(patch.carrierHz);
-    expect(clamp(patch.ratio, RATIO)).toBe(patch.ratio);
+  // A slider can only show a value inside its range. A chapter may hold a
+  // value outside one it does not show: chapter 4's ratio of 1/16 is
+  // below the Ratio slider's bottom, and has no Ratio slider.
+  it.each(CHAPTERS)('$title starts inside the range of every slider it shows', chapter => {
+    const { patch, controls } = chapter;
+    const ranged = [
+      ['carrier', patch.carrierHz, CARRIER_HZ],
+      ['ratio', patch.ratio, RATIO],
+      ['index', patch.index, INDEX],
+      ['modHz', patch.modHz, MOD_HZ],
+      ['deviation', patch.deviationHz, DEVIATION_HZ],
+    ] as const;
+    for (const [id, value, range] of ranged) {
+      if (controls.includes(id)) expect(clamp(value, range)).toBe(value);
+    }
+    // The index is also the Bessel plot's line, and the carrier is always
+    // heard, slider or not.
     expect(clamp(patch.index, INDEX)).toBe(patch.index);
-    expect(clamp(patch.modHz, MOD_HZ)).toBe(patch.modHz);
-    expect(clamp(patch.deviationHz, DEVIATION_HZ)).toBe(patch.deviationHz);
+    expect(clamp(patch.carrierHz, CARRIER_HZ)).toBe(patch.carrierHz);
   });
 
   it.each(CHAPTERS)('$title only shows sliders its mode listens to', chapter => {
@@ -84,6 +109,54 @@ describe('the chapters', () => {
   });
 });
 
+describe('chapter 3, modulation index', () => {
+  const chapter = chapterByNumber(3)!;
+
+  it('holds the ratio at 1 and offers only the index', () => {
+    expect(chapter.patch.mode).toBe('pm');
+    expect(chapter.patch.ratio).toBe(1);
+    expect(chapter.controls).toEqual(['volume', 'index']);
+  });
+
+  it("brackets Carson's rule on its spectrum, and is the only one to", () => {
+    expect(chapter.patch.showBandwidth).toBe(true);
+    expect(CHAPTERS.filter(c => c.patch.showBandwidth).map(c => c.number)).toEqual([3]);
+  });
+});
+
+describe('chapter 4, Bessel functions', () => {
+  const chapter = chapterByNumber(4)!;
+
+  it('is the only chapter with the Bessel plot, beside the spectrum', () => {
+    expect(Object.keys(chapter.figures)).toEqual(['spectrum', 'bessel']);
+    expect(CHAPTERS.filter(c => c.figures.bessel).map(c => c.number)).toEqual([4]);
+  });
+
+  it('leaves the index to the plot: no index slider', () => {
+    expect(chapter.controls).toEqual(['volume']);
+  });
+
+  it('keeps every sideband that can be picked out clear of zero', () => {
+    // So each stem is one sideband, J_n tall: no folding among the eight
+    // orders the plot draws, or the few beyond them that still show.
+    const { ratio, carrierHz } = chapter.patch;
+    expect(1 - 12 * ratio).toBeGreaterThan(0);
+    expect(carrierHz * ratio).toBeCloseTo(55, 9);
+  });
+
+  it('has a spectrum whose stems are the Bessel values themselves', () => {
+    const { ratio } = chapter.patch;
+    const lines = fmSpectrum(ratio, 2.405);
+    const ampAt = (freq: number) =>
+      lines.find(line => Math.abs(line.freq - freq) < 1e-9)?.amp ?? 0;
+    // The carrier has vanished, and the first pair points opposite ways.
+    expect(Math.abs(ampAt(1))).toBeLessThan(1e-3);
+    expect(ampAt(1 + ratio)).toBeCloseTo(besselJ(1, 2.405), 9);
+    expect(ampAt(1 - ratio)).toBeCloseTo(-besselJ(1, 2.405), 9);
+    expect(ampAt(1 + 2 * ratio)).toBeCloseTo(ampAt(1 - 2 * ratio), 9);
+  });
+});
+
 describe('neighbours', () => {
   it('has nothing before the first or after the last', () => {
     expect(neighbours(1).previous).toBeUndefined();
@@ -92,12 +165,13 @@ describe('neighbours', () => {
 
   it('steps over the chapters not written yet', () => {
     expect(neighbours(2).previous?.number).toBe(1);
-    expect(neighbours(2).next?.number).toBe(7);
-    expect(neighbours(7).previous?.number).toBe(2);
+    expect(neighbours(2).next?.number).toBe(3);
+    expect(neighbours(4).next?.number).toBe(7);
+    expect(neighbours(7).previous?.number).toBe(4);
   });
 
   it('has none for a chapter that does not exist', () => {
-    expect(neighbours(4)).toEqual({});
+    expect(neighbours(5)).toEqual({});
   });
 });
 
@@ -114,7 +188,7 @@ describe('chapterFromHash', () => {
   });
 
   it('falls back for a chapter that is not written yet', () => {
-    expect(chapterFromHash('#4', NUMBERS, 1)).toBe(1);
+    expect(chapterFromHash('#5', NUMBERS, 1)).toBe(1);
     expect(chapterFromHash('#99', NUMBERS, 1)).toBe(1);
   });
 

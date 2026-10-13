@@ -155,3 +155,26 @@ import, a free-form modulation editor.
   states the factor.
 - **Opening a chapter resets the patch** to the chapter's own; volume,
   Play and the theme are kept.
+
+## Decisions made with chapters 3 and 4 (PR #5)
+
+- **Chapter 3 holds the ratio at 1:1** and offers only the index. At 1:1
+  the lower sidebands fold back on to the harmonics, so its spectrum has
+  red, inverted stems before chapter 5 explains them; the text says so in
+  a sentence and defers the rest. Carson's bracket stops at zero on the
+  left for the same reason.
+- **Chapter 4 moves the waves apart**: carrier 880 Hz, modulator 55 Hz
+  (ratio 1/16). Nothing folds, so each stem is one sideband exactly
+  J_n(I) tall, and the carrier really does vanish at 2.405. At 1:1 neither
+  would be true.
+- **Chapter 4 shows the spectrum and the Bessel plot**, not the waveform,
+  so the two linked figures can be seen together. Figures are numbered
+  per chapter in the order shown.
+- **The Bessel plot is the index control** (a slider: drag or keys), so
+  chapter 4 has no Index slider. Its curves are J_0 to J_8.
+- **Linking is by sideband order.** Pointing at a curve, a stem or a J
+  button picks out that order in both figures; pressing a J button keeps
+  it, which is how touch and keyboard reach it. Only chapter 4 links, as
+  only there is a stem a single sideband.
+- **Dots on the index line follow the spectrum's convention**: filled
+  blue above zero, hollow red below, where that sideband is inverted.

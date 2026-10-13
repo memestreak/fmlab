@@ -1,16 +1,30 @@
+import { bessel } from './bessel';
+import { modulationIndex } from './modulationIndex';
 import { sandbox } from './sandbox';
 import { singleSine } from './singleSine';
 import type { Chapter } from './types';
 import { vibrato } from './vibrato';
 
-export type { Chapter, ChapterPatch, ControlId, MathsPanel } from './types';
+export type {
+  Chapter,
+  ChapterPatch,
+  ControlId,
+  FigureId,
+  MathsPanel,
+} from './types';
 
 /**
  * The chapters that exist, in order. Their numbers are the design spec's,
  * so there are gaps where chapters are not written yet; previous and next
  * step over the gaps.
  */
-export const CHAPTERS: readonly Chapter[] = [singleSine, vibrato, sandbox];
+export const CHAPTERS: readonly Chapter[] = [
+  singleSine,
+  vibrato,
+  modulationIndex,
+  bessel,
+  sandbox,
+];
 
 /** Where the guide opens. */
 export const FIRST_CHAPTER = CHAPTERS[0].number;

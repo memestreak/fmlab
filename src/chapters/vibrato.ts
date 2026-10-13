@@ -83,8 +83,9 @@ export const vibrato: Chapter = {
     modHz: 5,
     deviationHz: 20,
     showModulator: true,
+    showBandwidth: false,
   },
-  captions: {
+  figures: {
     waveform:
       'Waveform. The output, and behind it as the thinner line the modulator, which is the pitch rising and falling.',
     spectrum:
