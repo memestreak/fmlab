@@ -101,7 +101,11 @@ figures subscribe to it. Nothing else passes values around.
   (sizing for the device pixel ratio, gridlines, labels);
   `waveformPlot.ts` and `spectrumPlot.ts` are the two figures. The
   waveform shows two carrier cycles in `pm` and two modulator cycles, up
-  to forty carrier cycles, in `fm` (`cyclesShown`). `ticks.ts` (pure) makes
+  to forty carrier cycles, in `fm` (`cyclesShown`). Given a time as its
+  third argument it draws the moving view instead, where the patch has one
+  (`motionView`: true FM with a modulator under about 11 Hz): the next
+  stretch of signal from that moment, with the carrier slowed by a round
+  factor so its waves can be seen squeezing and stretching. `ticks.ts` (pure) makes
   the x axes' numbers: every tick is labelled in carrier units (multiples,
   cycles) and, on a second row, in Hz or ms, thinned when the canvas is
   narrow.
@@ -110,17 +114,20 @@ figures subscribe to it. Nothing else passes values around.
   chapter owns: the narrative pane, the contents list in the masthead,
   which slider rows show (`data-control`) and the captions. `sliders.ts`
   is a table of every slider (range, step, scale, readout);
-  `transport.ts` is Play / Stop; `themeSwitch.ts`; and `figures.ts`
-  redraws a canvas on patch, size, theme and font changes and keeps its
-  `aria-label` describing what it shows.
+  `transport.ts` is Play / Stop and the "Show motion" checkbox;
+  `themeSwitch.ts`; and `figures.ts` redraws a canvas on patch, size,
+  theme and font changes, keeps its `aria-label` describing what it shows,
+  and runs the waveform's animation loop while it should move
+  (`waveformMoves`: sound playing or "Show motion" on, a moving view, and
+  no `prefers-reduced-motion`).
 - `src/styles/` — `tokens.css` (colours and fonts) and `base.css` (the two
   panes, type, figures and the controls).
 - `public/` — files copied to `dist/` as they are (`favicon.svg`).
 
 Known limits: the synth is not band-limited, so a high carrier with a high
-ratio and index aliases. In chapter 2 the waveform figure shows only part
-of a wobble below about 11 Hz, and at the default deviation the crowding
-of the waves is slight.
+ratio and index aliases. Chapter 2's moving waveform runs on the page's
+clock, not the audio's, so its wobble has the sound's rate but not
+necessarily its phase.
 
 ## Styling
 
@@ -160,9 +167,10 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
 - The theme switch cycles Auto, Light, Dark and saves the bare word under
   `localStorage["fmlab.theme"]`. The boot script in `index.html` reads the
   same key; keep it in step with `src/model/theme.ts`.
-- Motion: nothing animates on its own; the figures only move when a
-  control does. Anything added that does must respect
-  `prefers-reduced-motion`.
+- Motion: the one thing that animates is chapter 2's waveform, while sound
+  plays or "Show motion" is ticked. Under `prefers-reduced-motion` it
+  stays still, the checkbox is hidden and the caption says why. Anything
+  else that moves must do the same.
 
 ## Testing
 

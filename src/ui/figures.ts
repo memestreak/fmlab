@@ -1,14 +1,22 @@
 import type { SpectralLine } from '../dsp/fmSpectrum';
 import { type LabState, type LabStore, patchOf } from '../model/lab';
 import { drawSpectrum } from '../viz/spectrumPlot';
-import { cyclesShown, drawWaveform } from '../viz/waveformPlot';
+import { cyclesShown, drawWaveform, motionView } from '../viz/waveformPlot';
 import { formatRate } from './sliders';
 
-/** A renderer: everything a figure shows comes from the state. */
-type Draw = (state: LabState, canvas: HTMLCanvasElement) => void;
+const REDUCED_MOTION = '(prefers-reduced-motion: reduce)';
+
+/**
+ * A renderer: everything a figure shows comes from the state and, for a
+ * figure that moves, the time in seconds.
+ */
+type Draw = (state: LabState, canvas: HTMLCanvasElement, time?: number) => void;
 
 /** The parts of the state a figure is drawn from. */
 const DRAWN: (keyof LabState)[] = [
+  // Whether sound is on, and "Show motion", decide if a figure moves.
+  'playing',
+  'motion',
   'mode',
   // The carrier moves no curve in `pm`, but it sets the Hz and ms labels.
   'carrierHz',
@@ -25,18 +33,34 @@ const DRAWN: (keyof LabState)[] = [
  * drawn on it, so it is repainted when the patch changes, and also when
  * its size, the theme or the fonts do. Changes that arrive together (a
  * slider dragged quickly) share one repaint per frame.
+ *
+ * @param moves whether the figure should be animating for a state. While
+ *   it says so the figure is redrawn every frame with the time; otherwise
+ *   only when something changes, without one.
  */
-function mountFigure(canvas: HTMLCanvasElement, store: LabStore, draw: Draw): void {
+function mountFigure(
+  canvas: HTMLCanvasElement,
+  store: LabStore,
+  draw: Draw,
+  moves: (state: LabState) => boolean = () => false,
+): void {
   let frame = 0;
+  const run = (now: number) => {
+    draw(store.get(), canvas, now / 1000);
+    frame = requestAnimationFrame(run);
+  };
   const schedule = () => {
     cancelAnimationFrame(frame);
-    frame = requestAnimationFrame(() => draw(store.get(), canvas));
+    frame = requestAnimationFrame(
+      moves(store.get()) ? run : () => draw(store.get(), canvas),
+    );
   };
 
   store.subscribe((state, previous) => {
-    // Not for `playing` or `volume`, which change nothing drawn.
+    // Not for `volume`, which changes nothing drawn.
     if (DRAWN.some(key => state[key] !== previous[key])) schedule();
   });
+  window.matchMedia(REDUCED_MOTION).addEventListener('change', schedule);
   new ResizeObserver(schedule).observe(canvas);
   window
     .matchMedia('(prefers-color-scheme: dark)')
@@ -81,14 +105,53 @@ export function describeWaveform(state: LabState): string {
   );
 }
 
+/**
+ * Whether the waveform figure should be moving: the patch has a moving
+ * view, and either sound is playing or "Show motion" is on. Never for
+ * someone whose device asks for reduced motion.
+ */
+export function waveformMoves(state: LabState, reducedMotion: boolean): boolean {
+  if (reducedMotion || motionView(state) === null) return false;
+  return state.playing || state.motion;
+}
+
+/**
+ * What to add to the waveform's caption about its motion: how much the
+ * carrier is slowed while it moves, or that it is being held still.
+ */
+export function motionNote(state: LabState, reducedMotion: boolean): string {
+  const view = motionView(state);
+  if (!view) return '';
+  if (reducedMotion) {
+    return 'Shown still, because this device asks for reduced motion.';
+  }
+  if (!waveformMoves(state, false)) return '';
+  return view.slow === 1
+    ? 'In motion, with the carrier at its true speed.'
+    : `In motion, with the carrier drawn ${view.slow} times slower than it sounds.`;
+}
+
 /** Fig. 1 and Fig. 2, each with a text description that follows the patch. */
 export function mountFigures(store: LabStore): void {
   const waveform = document.querySelector<HTMLCanvasElement>('#waveform');
+  const note = document.querySelector<HTMLElement>('#waveform-note');
+  const reduced = window.matchMedia(REDUCED_MOTION);
   if (waveform) {
-    mountFigure(waveform, store, (state, canvas) => {
-      drawWaveform(state, canvas);
-      canvas.setAttribute('aria-label', describeWaveform(state));
-    });
+    mountFigure(
+      waveform,
+      store,
+      (state, canvas, time) => {
+        drawWaveform(state, canvas, time);
+        // Every frame while it moves, so only touch the page on a change.
+        const label = describeWaveform(state);
+        if (canvas.getAttribute('aria-label') !== label) {
+          canvas.setAttribute('aria-label', label);
+        }
+        const text = motionNote(state, reduced.matches);
+        if (note && note.textContent !== text) note.textContent = text;
+      },
+      state => waveformMoves(state, reduced.matches),
+    );
   }
 
   const spectrum = document.querySelector<HTMLCanvasElement>('#spectrum');

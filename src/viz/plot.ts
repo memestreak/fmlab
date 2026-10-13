@@ -35,8 +35,12 @@ export function beginPlot(canvas: HTMLCanvasElement): Plot | null {
   if (!ctx || width === 0 || height === 0) return null;
 
   const dpr = window.devicePixelRatio || 1;
-  canvas.width = Math.round(width * dpr);
-  canvas.height = Math.round(height * dpr);
+  // Only when it has changed: setting a canvas's size throws its bitmap
+  // away, which an animated figure would otherwise do sixty times a second.
+  const pixelWidth = Math.round(width * dpr);
+  const pixelHeight = Math.round(height * dpr);
+  if (canvas.width !== pixelWidth) canvas.width = pixelWidth;
+  if (canvas.height !== pixelHeight) canvas.height = pixelHeight;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, width, height);
 

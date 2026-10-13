@@ -49,6 +49,11 @@ export interface Chapter {
   maths: MathsPanel[];
   /** The sliders shown, in the page's order. */
   controls: ControlId[];
+  /**
+   * Whether to offer "Show motion", for a chapter whose waveform figure
+   * has a moving view.
+   */
+  hasMotion: boolean;
   patch: ChapterPatch;
   /** What follows "Fig. n" under each figure. */
   captions: { waveform: string; spectrum: string };

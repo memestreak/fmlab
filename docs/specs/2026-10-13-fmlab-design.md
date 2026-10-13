@@ -146,7 +146,12 @@ import, a free-form modulation editor.
   sidebands are not simply upright or inverted, so there are no negative
   stems there.
 - **Chapter 2's waveform** shows two cycles of the modulator, up to forty
-  carrier cycles, rather than animating. Below about 11 Hz that is only
-  part of one wobble.
+  carrier cycles. Below about 11 Hz that is only part of one wobble, so
+  there it moves instead (PR #4): while sound plays or "Show motion" is
+  ticked it shows up to one wobble from the present moment, with the
+  carrier drawn slowed by a round factor (5 for the default patch) so its
+  waves can be seen squeezing and stretching. The modulator and deviation
+  are not slowed, which is what makes the squeeze plain; the caption
+  states the factor.
 - **Opening a chapter resets the patch** to the chapter's own; volume,
   Play and the theme are kept.

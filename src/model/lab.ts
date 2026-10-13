@@ -25,6 +25,11 @@ export interface LabState {
   deviationHz: number;
   /** Whether the waveform figure draws the modulator behind the output. */
   showModulator: boolean;
+  /**
+   * "Show motion": animate the waveform figure, where it has a moving
+   * view, even with no sound playing.
+   */
+  motion: boolean;
   /** Master gain. */
   volume: number;
   /** Whether sound is wanted. The audio engine follows it. */
@@ -57,6 +62,7 @@ export const DEFAULTS: LabState = {
   modHz: 5,
   deviationHz: 20,
   showModulator: true,
+  motion: false,
   // Low on purpose: FM gets bright, and loud, quickly.
   volume: 0.2,
   playing: false,

@@ -23,6 +23,34 @@ export function trueFmSample(cycles: number, ratio: number, index: number): numb
   );
 }
 
+/**
+ * True FM seen through a window that opens at time `start`: the signal
+ * `offset` seconds into the window, with the carrier's phase counted from
+ * the window's left edge, so the wave always starts there at zero, rising.
+ *
+ * Its phase is the frequency fc + deviation * sin(wm t) added up from
+ * `start` to `start + offset`. As `start` moves on, the left edge stays
+ * put and the waves to its right squeeze and stretch: a picture of the
+ * pitch moving, that stands still when there is no modulation. All in
+ * seconds and Hz; `carrierHz` may be a slowed-down stand-in for the real
+ * carrier.
+ */
+export function fmWindowSample(
+  start: number,
+  offset: number,
+  carrierHz: number,
+  modHz: number,
+  deviationHz: number,
+): number {
+  const index = deviationHz / modHz;
+  return Math.sin(
+    TWO_PI * carrierHz * offset +
+      index *
+        (Math.cos(TWO_PI * modHz * start) -
+          Math.cos(TWO_PI * modHz * (start + offset))),
+  );
+}
+
 /** The modulator on its own at the same instant, at an amplitude of 1. */
 export function modulatorSample(cycles: number, ratio: number): number {
   return Math.sin(TWO_PI * ratio * cycles);

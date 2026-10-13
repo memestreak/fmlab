@@ -280,6 +280,35 @@ a {
   margin-bottom: 0.75rem;
 }
 
+/* A checkbox with its label, in ink. Tall enough for a finger. */
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  cursor: pointer;
+}
+
+.check input {
+  width: 1.15rem;
+  height: 1.15rem;
+  margin: 0;
+  accent-color: var(--ink);
+}
+
+/* `display: inline-flex` above would otherwise show it when hidden. And
+   it is no use to someone whose device asks for no motion: for them the
+   figure stays still and its caption says why. */
+.check[hidden] {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #motion-toggle {
+    display: none;
+  }
+}
+
 /* Wide enough for "Stop" and "Play" alike, so it does not change size. */
 #play {
   min-width: 5.5rem;

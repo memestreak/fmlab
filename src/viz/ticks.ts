@@ -72,6 +72,29 @@ export function waveformTicks(cycles: number, carrierHz: number): Tick[] {
   return ticks;
 }
 
+/** A moving time axis is numbered every this many milliseconds. */
+const MS_STEPS = [10, 20, 50, 100, 200, 500];
+/** With no more than this many numbers after the 0. */
+const MAX_MS_TICKS = 6;
+
+/**
+ * Ticks for the moving view's time axis, `seconds` long: round numbers of
+ * milliseconds. This axis is real time only (its carrier is slowed, so
+ * carrier cycles would mislead), and its second row is empty.
+ */
+export function motionTicks(seconds: number): Tick[] {
+  const ms = seconds * 1000;
+  const step =
+    MS_STEPS.find(size => ms / size <= MAX_MS_TICKS) ??
+    MS_STEPS[MS_STEPS.length - 1];
+  const ticks: Tick[] = [];
+  // A hair of slack, so a window of exactly 200 ms keeps its last tick.
+  for (let at = 0; at <= ms + 1e-9; at += step) {
+    ticks.push({ at: at / 1000, label: String(at), sub: '' });
+  }
+  return ticks;
+}
+
 /**
  * Which labels to keep when they are too wide to all fit: every
  * `stride`-th, counted so the last one, the end of the axis, is always

@@ -42,6 +42,11 @@
           <div class="controls">
             <div class="transport">
               <button id="play" type="button" class="btn btn-ink">Play</button>
+              <!-- Shown by chapters whose waveform has a moving view. -->
+              <label id="motion-toggle" class="check" hidden>
+                <input id="motion" type="checkbox" />
+                Show motion
+              </label>
             </div>
 
             <!-- Every slider there is. A chapter shows the ones it names
@@ -82,6 +87,8 @@
             <canvas id="waveform" class="plot" role="img"></canvas>
             <figcaption>
               Fig. 1&emsp;<span id="waveform-caption"></span>
+              <!-- Says when the figure is moving, and how slowed. -->
+              <span id="waveform-note"></span>
             </figcaption>
           </figure>
 
