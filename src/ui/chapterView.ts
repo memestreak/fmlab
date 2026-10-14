@@ -178,11 +178,14 @@ function glossaryHtml(): string {
 
 function narrativeHtml(chapter: Chapter): string {
   if (chapter.id === GLOSSARY) return glossaryHtml();
-  // The landing view is one line: no heading but the wordmark.
-  if (chapter.id === LANDING) {
-    return `<div class="landing-line">${chapter.body.map(paragraph).join('')}</div>`;
-  }
-  const { previous, next } = neighbours(chapter.id);
+  // The landing view comes before the first section, and after it in
+  // reverse: Previous and Next run through it as through any section.
+  const isLanding = chapter.id === LANDING;
+  const { previous, next } = isLanding
+    ? { previous: undefined, next: CHAPTERS[0] }
+    : chapter === CHAPTERS[0]
+      ? { previous: landing, next: neighbours(chapter.id).next }
+      : neighbours(chapter.id);
   const maths = chapter.maths
     .map(
       panel => `
@@ -212,10 +215,11 @@ function narrativeHtml(chapter: Chapter): string {
     .join('');
 
   return `
-    <p class="chapter-kicker">${groupOf(chapter.id as SectionId)}</p>
+    <p class="chapter-kicker">${isLanding ? INTRODUCTION : groupOf(chapter.id as SectionId)}</p>
     <h2 class="chapter-title" tabindex="-1">${chapter.title}</h2>
     ${chapter.showsPair ? PAIR_DIAGRAM : ''}
     ${chapter.body.map(paragraph).join('')}
+    ${isLanding ? landingNextHtml() : ''}
     ${steps}
     ${maths}
     <nav class="chapter-nav" aria-label="Previous and next section">
@@ -224,9 +228,12 @@ function narrativeHtml(chapter: Chapter): string {
     </nav>`;
 }
 
+/** The landing view's group, as the kicker above its title. */
+const INTRODUCTION = 'Introduction';
+
 /**
- * What the landing view offers once its sound has been heard: the two
- * ways on, and every section by name, in its group.
+ * The rest of the landing view's text: the two ways on, and every section
+ * by name, in its group.
  */
 function landingNextHtml(): string {
   const first = CHAPTERS[0];
@@ -260,23 +267,14 @@ function landingNextHtml(): string {
 export function mountChapters(store: LabStore): void {
   const narrative = document.querySelector<HTMLElement>('#narrative');
 
-  const next = document.querySelector<HTMLElement>('#landing-next');
-  if (next) next.innerHTML = landingNextHtml();
-
   const show = (chapter: Chapter) => {
     const isLanding = chapter.id === LANDING;
     if (narrative) narrative.innerHTML = narrativeHtml(chapter);
     document.title = isLanding ? 'fmlab' : `${chapter.title} · fmlab`;
-    // For the stylesheet: the landing view is one centred column, and so
-    // is the glossary, with no lab.
-    document.body.dataset.view = isLanding
-      ? 'landing'
-      : chapter.id === GLOSSARY
-        ? 'glossary'
-        : 'chapter';
-    // The ways on appear once the landing view's sound has been heard,
-    // and stay if it is come back to.
-    if (next) next.hidden = !isLanding || store.get().notes === 0;
+    // For the stylesheet: the glossary is one centred column with no lab;
+    // the landing view is laid out as a section, so going on to the first
+    // one changes what is on the page and not where it is.
+    document.body.dataset.view = chapter.id === GLOSSARY ? 'glossary' : 'chapter';
     showLab(labViewOf(chapter, store.get()));
   };
 
@@ -371,9 +369,6 @@ export function mountChapters(store: LabStore): void {
     } else if (state.mode !== previous.mode) {
       const chapter = chapterById(state.chapter);
       if (chapter?.sixOperators) showLab(labViewOf(chapter, state));
-    } else if (state.notes !== previous.notes && state.chapter === LANDING) {
-      // The first press on the landing view: now offer the ways on.
-      if (next) next.hidden = false;
     }
   });
 

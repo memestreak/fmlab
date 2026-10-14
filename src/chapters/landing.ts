@@ -13,7 +13,7 @@ export { LANDING };
  */
 export const landing: Chapter = {
   id: LANDING,
-  title: 'fmlab',
+  title: 'Hearing FM',
   body: [
     `An interactive guide to FM (frequency modulation) synthesis: how two
      sine waves, one bending

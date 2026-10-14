@@ -18,8 +18,11 @@ modulation index `#/index`, Sidebands and Bessel functions `#/sidebands`,
 Carrier and modulator ratio `#/ratio`, Sounds that change over time
 `#/envelopes`), The DX7 (Operators and algorithms `#/algorithms`, FM
 versus PM `#/fm-vs-pm`) and Play (the Sandbox `#/sandbox`, last). `#/`
-(or no hash) is the landing view, one line and a Play button whose sound
-the two figures move with, and then the ways on; `#/glossary` is the
+(or no hash) is the landing view, "Hearing FM" under the kicker
+Introduction: laid out exactly as a section (its lab a Play button whose
+note the two figures move with), its text the pitch, the two ways on and
+the guide's contents, its Next the first section and that section's
+Previous it; `#/glossary` is the
 glossary, outside the sequence. The header's Contents button opens a panel
 of every group and section (`ui/contents.ts`); each section ends with
 Previous and Next by name. In the code a section is still a "chapter".
@@ -98,8 +101,8 @@ figures subscribe to it. Nothing else passes values around.
   written as `BASE_PATCH` (`basePatch.ts`) with its own differences.
   `landing.ts` is the landing view, written as a chapter with the id
   `LANDING` so that everything following the store's chapter needs no
-  special case. It is not in `CHAPTERS`, is at `#/` and plays one long
-  note. `glossary.ts` is the glossary, the same way: `GLOSSARY`, at
+  special case. It is not in `CHAPTERS` (Previous and Next reach it in
+  `chapterView.ts`), is at `#/` and plays one long note. `glossary.ts` is the glossary, the same way: `GLOSSARY`, at
   `#/glossary` (an entry: `#/glossary?t=index`), drawn from the terms,
   with no lab and nothing to play. `route.ts` reads and writes addresses,
   and `upgradeHash` turns a link from before the sections had names
@@ -277,7 +280,8 @@ the piano, sets them in two columns there. Below 62rem the lab moves above the t
 sticks to the top of the window, compact: figures a fifth of the window
 high, captions for screen readers only, sliders and presets folded behind
 a Sliders button. The text keeps at least two fifths of a phone's height.
-The landing view is neither: one centred column. Check every chapter at
+The landing view is laid out the same way, so going on from it moves
+nothing; only the glossary is one centred column. Check every chapter at
 both sizes after adding controls or figures.
 
 ## Styling

@@ -1,4 +1,4 @@
-import { chapterById, GLOSSARY } from '../chapters';
+import { chapterById, GLOSSARY, landing, LANDING } from '../chapters';
 import { groupOf, OUTLINE, type SectionId } from '../chapters/outline';
 import { hashFor } from '../chapters/route';
 import type { LabStore, LabState } from '../model/lab';
@@ -20,6 +20,8 @@ export function mountContents(store: LabStore): void {
   if (!open || !panel || !list) return;
 
   list.innerHTML =
+    `<h3 class="contents-group">Introduction</h3>
+     <ol><li><a href="${hashFor(LANDING)}" data-id="${LANDING}">${landing.title}</a></li></ol>` +
     OUTLINE.map(
       ({ group, sections }) => `
         <h3 class="contents-group">${group}</h3>
@@ -39,7 +41,11 @@ export function mountContents(store: LabStore): void {
       const section = chapter && OUTLINE.some(g => g.sections.some(s => s.id === chapter.id));
       where.textContent = section
         ? `${groupOf(chapter.id as SectionId)} · ${chapter.title}`
-        : (chapter?.id === GLOSSARY ? 'Glossary' : '');
+        : chapter?.id === GLOSSARY
+          ? 'Glossary'
+          : chapter?.id === LANDING
+            ? `Introduction · ${landing.title}`
+            : '';
     }
   };
 
