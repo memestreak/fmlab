@@ -278,3 +278,19 @@ while the text scrolls, and for the space bar to start and stop the sound.
   Clarinet (2, 2.5), Bell (1.41, 5), Gong (1.73, 9) and Bass (0.5, 2).
 - **On a phone the keyboard folds away with the sliders**, behind the
   Sliders button.
+
+## The sandbox's sound in the URL (PR #11)
+
+- **The sandbox keeps its carrier, ratio and index in the hash**, after the
+  chapter: `#7?c=220&r=1.41&i=5`. Opening that link brings the same sound
+  back. Volume is left out; it is the listener's.
+- **The address follows the sound** once it has rested for 300 ms, and
+  replaces the history entry instead of adding one, so Back leaves the
+  sandbox rather than undoing slider moves.
+- **A Copy link button** in the sandbox copies the address as it is.
+- **Whatever a link carries is checked**: each value must be a number, is
+  held inside its slider's range, and the carrier is put on the Carrier
+  slider's nearest quarter semitone. Anything else is ignored.
+- **Other chapters keep no sound in the URL**; parameters on their hash are
+  taken out of the address. The contents link to the sandbox opens it
+  fresh.
