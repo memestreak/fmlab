@@ -12,8 +12,14 @@ import {
   chapterFromHash,
   hashForChapter,
   isStrayHash,
+  paramsFromHash,
+  soundFromParams,
+  soundParams,
 } from '../chapters/route';
-import type { LabStore } from '../model/lab';
+import type { LabState, LabStore } from '../model/lab';
+
+/** How long the sound must rest before the address is brought up to date. */
+const URL_DELAY_MS = 300;
 
 const NUMBERS = CHAPTERS.map(chapter => chapter.number);
 /** More sliders than this and they go in two columns on a wide screen. */
@@ -33,6 +39,77 @@ export function chapterInUrl(): Chapter {
   }
   // chapterFromHash only returns LANDING or a number from NUMBERS.
   return chapterByNumber(number) ?? landing;
+}
+
+/**
+ * What the URL says a chapter should open with: its own patch, and for a
+ * chapter that keeps its sound in the URL, the sound the link carries.
+ * For any other chapter, parameters in the hash mean nothing, so they are
+ * taken out of the address.
+ */
+export function openingFromUrl(chapter: Chapter): Partial<LabState> {
+  const { hash, pathname, search } = window.location;
+  const params = paramsFromHash(hash);
+  if (!chapter.sharesSound) {
+    if ([...params].length > 0) {
+      window.history.replaceState(null, '', pathname + search + hashForChapter(chapter.number));
+    }
+    return chapter.patch;
+  }
+  return { ...chapter.patch, ...soundFromParams(params) };
+}
+
+/**
+ * Keeps the address in step with the sound, in a chapter that keeps its
+ * sound there, once it has stopped changing for a moment. It replaces the
+ * history entry rather than adding one, so Back still goes to the page
+ * before, not to every turn of a slider.
+ */
+function mountSoundInUrl(store: LabStore): void {
+  let timer: number | undefined;
+  const write = () => {
+    const state = store.get();
+    const chapter = chapterByNumber(state.chapter);
+    if (!chapter?.sharesSound) return;
+    const hash = hashForChapter(chapter.number, soundParams(state));
+    if (window.location.hash === hash) return;
+    const { pathname, search } = window.location;
+    window.history.replaceState(null, '', pathname + search + hash);
+  };
+  store.subscribe((state, previous) => {
+    if (
+      state.chapter === previous.chapter &&
+      (state.carrierHz !== previous.carrierHz ||
+        state.ratio !== previous.ratio ||
+        state.index !== previous.index)
+    ) {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(write, URL_DELAY_MS);
+    }
+  });
+
+  // Copy link: the address as it is now, sound and all.
+  const share = document.querySelector<HTMLButtonElement>('#share');
+  if (!share) return;
+  share.addEventListener('click', () => {
+    window.clearTimeout(timer);
+    write();
+    const link = window.location.href;
+    const done = (text: string) => {
+      share.textContent = text;
+      window.setTimeout(() => {
+        share.textContent = 'Copy link';
+      }, 2000);
+    };
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(link).then(
+        () => done('Copied'),
+        () => window.prompt('Copy this link:', link),
+      );
+    } else {
+      window.prompt('Copy this link:', link);
+    }
+  });
 }
 
 /** A paragraph of chapter text. A formula brings its own <p>. */
@@ -142,6 +219,8 @@ export function mountChapters(store: LabStore): void {
     if (lab) lab.dataset.manySliders = String(many);
     const piano = document.querySelector<HTMLElement>('#piano');
     if (piano) piano.hidden = !chapter.hasPiano;
+    const share = document.querySelector<HTMLElement>('#share');
+    if (share) share.hidden = !chapter.sharesSound;
     const motion = document.querySelector<HTMLElement>('#motion-toggle');
     if (motion) motion.hidden = !chapter.hasMotion;
     const follows = document.querySelector<HTMLElement>('#index-follows-toggle');
@@ -196,7 +275,7 @@ export function mountChapters(store: LabStore): void {
     // carry on with, so that stops.
     store.set({
       chapter: chapter.number,
-      ...chapter.patch,
+      ...openingFromUrl(chapter),
       hover: null,
       pinned: null,
       noteStartedAt: null,
@@ -210,6 +289,8 @@ export function mountChapters(store: LabStore): void {
       ?.querySelector<HTMLElement>('.chapter-title')
       ?.focus({ preventScroll: true });
   });
+
+  mountSoundInUrl(store);
 
   const first = chapterByNumber(store.get().chapter);
   if (first) show(first);

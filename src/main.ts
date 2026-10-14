@@ -20,7 +20,7 @@ import { chapterByNumber } from './chapters';
 import { createLabStore } from './model/lab';
 import { loadTheme } from './model/theme';
 import { mountBesselControls } from './ui/besselControls';
-import { chapterInUrl, mountChapters } from './ui/chapterView';
+import { chapterInUrl, mountChapters, openingFromUrl } from './ui/chapterView';
 import { mountEnvelopeControls } from './ui/envelopeControls';
 import { mountFigures } from './ui/figures';
 import { mountPiano } from './ui/piano';
@@ -54,7 +54,8 @@ const opening = chapterInUrl();
 const store = createLabStore({
   theme: loadTheme(),
   chapter: opening.number,
-  ...opening.patch,
+  // The chapter's patch, and in the sandbox the sound a link carries.
+  ...openingFromUrl(opening),
 });
 // It subscribes itself; nothing here needs to hold on to it.
 new AudioEngine(store);

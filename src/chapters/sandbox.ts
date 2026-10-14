@@ -20,6 +20,8 @@ export const sandbox: Chapter = {
     `The buttons are places to start: a flute, brass, a clarinet, a bell,
      a gong and a bass, each a single ratio and index. Change them and
      listen to what each slider does.`,
+    `The page's address keeps the sound as you change it. Copy link, or
+     the address itself, and whoever opens it hears the same sound.`,
   ],
   maths: [
     {
@@ -48,6 +50,7 @@ export const sandbox: Chapter = {
   ],
   hasMotion: false,
   hasPiano: true,
+  sharesSound: true,
   patch: {
     ...BASE_PATCH,
     index: 2,

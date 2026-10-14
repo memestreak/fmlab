@@ -91,6 +91,11 @@ export interface Chapter {
   hasMotion: boolean;
   /** Whether to show the piano keyboard, to play the patch at pitches. */
   hasPiano?: boolean;
+  /**
+   * Whether the chapter keeps its sound (carrier, ratio, index) in the
+   * URL, so that a link brings the same sound back.
+   */
+  sharesSound?: boolean;
   patch: ChapterPatch;
   /**
    * The figures shown, each with what follows "Fig. n" under it. They
