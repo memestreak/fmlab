@@ -1,4 +1,5 @@
 import type { LabState } from '../model/lab';
+import type { ViewId } from './outline';
 
 /** A slider on the page, by the id of its input in index.html. */
 export type ControlId =
@@ -95,11 +96,10 @@ export interface Step {
  * trusted and put on the page as it is.
  */
 export interface Chapter {
-  /** Its number in the design spec. The URL hash, and the order. */
-  number: number;
+  /** Its address (#/index), and its id in the store. */
+  id: ViewId;
+  /** Its title, from outline.ts. */
   title: string;
-  /** What the contents list in the masthead calls it: short. */
-  navLabel: string;
   /** The lesson, in plain language: paragraphs of HTML. */
   body: string[];
   maths: MathsPanel[];

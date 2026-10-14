@@ -1,14 +1,14 @@
 import { BASE_PATCH } from './basePatch';
 import { define, formula } from './terms';
+import { sectionLink, titleOf } from './outline';
 import type { Chapter } from './types';
 
 export const vibrato: Chapter = {
-  number: 2,
-  title: 'Vibrato becomes timbre',
-  navLabel: '2',
+  id: 'vibrato',
+  title: titleOf('vibrato'),
   body: [
     `Now there are two sine waves. ${define('modulator')} ${define('fm')}
-     That is what this chapter does. Press Play. The modulator runs at 5 Hz, five times a second, and what you
+     That is what this section does. Press Play. The modulator runs at 5 Hz, five times a second, and what you
      hear is the wobble a violinist makes by rocking a finger on the
      string. ${define('vibrato')}`,
     `${define('deviation')} At 20 the carrier swings between 200 and
@@ -57,16 +57,16 @@ export const vibrato: Chapter = {
       ],
     },
     {
-      title: 'Why this chapter is different under the bonnet',
+      title: 'Why this section is different under the bonnet',
       body: [
-        `Every other chapter pushes the carrier a slightly different way,
-         the way the DX7 does, which chapter 3 describes. The two make the
+        `Every other section pushes the carrier a slightly different way,
+         the way the DX7 does, which ${sectionLink('index')} describes. The two make the
          same family of sounds.`,
         `The difference is what stays put when the modulator's speed
          changes. Here the deviation in Hz is fixed, as it is for a
          violinist's finger, so a slower modulator makes a denser clump.
          The other way, a slow modulator would barely move the pitch at
-         all. Chapter 9 puts the two side by side.`,
+         all. ${sectionLink('fm-vs-pm')} puts the two side by side.`,
       ],
     },
   ],

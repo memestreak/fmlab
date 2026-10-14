@@ -1,11 +1,8 @@
 import { BASE_PATCH } from './basePatch';
+import { LANDING } from './outline';
 import type { Chapter } from './types';
 
-/**
- * The number the landing view goes by in the store. It is not a chapter
- * of the guide: it has no hash, and is not in CHAPTERS or the contents.
- */
-export const LANDING = 0;
+export { LANDING };
 
 /**
  * Where the site opens: one line of what this is and one button. It is
@@ -15,9 +12,8 @@ export const LANDING = 0;
  * swelling and sinking, while the two figures move with the sound.
  */
 export const landing: Chapter = {
-  number: LANDING,
+  id: LANDING,
   title: 'fmlab',
-  navLabel: 'fmlab',
   body: [
     `An interactive guide to FM (frequency modulation) synthesis: how two
      sine waves, one bending

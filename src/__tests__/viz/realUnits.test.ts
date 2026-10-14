@@ -1,4 +1,4 @@
-import { chapterByNumber, CHAPTERS } from '../../chapters';
+import { chapterById, CHAPTERS } from '../../chapters';
 import { DEFAULTS, type LabState } from '../../model/lab';
 import { describeSpectrum, describeWaveform } from '../../ui/figures';
 import { plotArea } from '../../viz/plot';
@@ -14,7 +14,7 @@ import { REAL_SECONDS } from '../../viz/waveformPlot';
 /** Chapter 1 as it opens, with the carrier wherever the test puts it. */
 const chapter1 = (carrierHz: number): LabState => ({
   ...DEFAULTS,
-  ...chapterByNumber(1)!.patch,
+  ...chapterById('sine')!.patch,
   carrierHz,
 });
 
@@ -32,7 +32,7 @@ describe('chapter 1 follows the Carrier slider', () => {
   };
 
   it('is in real units, and is the only chapter that is', () => {
-    expect(CHAPTERS.filter(c => c.patch.realUnits).map(c => c.number)).toEqual([1]);
+    expect(CHAPTERS.filter(c => c.patch.realUnits).map(c => c.id)).toEqual(['sine']);
   });
 
   it('moves the stem when the carrier moves', () => {

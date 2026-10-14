@@ -1,10 +1,11 @@
-import { chapterByNumber, CHAPTERS, type Chapter, GLOSSARY } from '../../chapters';
+import { chapterById, CHAPTERS, type Chapter, GLOSSARY } from '../../chapters';
 import {
-  chapterFromHash,
-  hashForChapter,
+  viewFromHash,
+  hashFor,
   isStrayHash,
   paramsFromHash,
 } from '../../chapters/route';
+import { orderOf, type SectionId } from '../../chapters/outline';
 import {
   define,
   formula,
@@ -29,17 +30,20 @@ const allHtml = (chapter: Chapter) =>
     ...Object.values(chapter.figures),
   ].join(' ');
 
+// A link to another section is named by its title, which may say a term
+// ("The modulation index") without using it: such links are left out.
 const text = (html: string) =>
   html
+    .replace(/<a href="#\/(?!glossary)[^"]*">[^<]*<\/a>/g, ' ')
     .replace(/<[^>]+>/g, '')
     .replace(/&[a-z]+;/g, ' ')
     .replace(/\s+/g, ' ');
 
 describe('the terms', () => {
-  it.each(TERM_IDS)('%s names itself in its definition, in a chapter that exists', id => {
-    const { name, plain, chapter } = term(id);
+  it.each(TERM_IDS)('%s names itself in its definition, in a section that exists', id => {
+    const { name, plain, section } = term(id);
     expect(plain.toLowerCase()).toContain(name.toLowerCase());
-    expect(chapterByNumber(chapter)).toBeDefined();
+    expect(chapterById(section)).toBeDefined();
     expect(plainText(id)).not.toMatch(/[<>]/);
     // One sentence.
     expect(plainText(id).replace(/\.$/, '')).not.toMatch(/\.\s/);
@@ -50,26 +54,27 @@ describe('the terms', () => {
     expect(new Set(names).size).toBe(names.length);
   });
 
-  it.each(TERM_IDS)('%s is defined in its own chapter, once, and nowhere else', id => {
+  it.each(TERM_IDS)('%s is defined in its own section, once, and nowhere else', id => {
     const marker = `data-defines="${id}"`;
     for (const chapter of CHAPTERS) {
       const count = allHtml(chapter).split(marker).length - 1;
-      expect(count, `chapter ${chapter.number}`).toBe(chapter.number === term(id).chapter ? 1 : 0);
+      expect(count, chapter.id).toBe(chapter.id === term(id).section ? 1 : 0);
     }
     // In the lesson itself, not a caption or a panel, and as written here.
-    expect(lessonHtml(chapterByNumber(term(id).chapter)!)).toContain(define(id));
+    expect(lessonHtml(chapterById(term(id).section)!)).toContain(define(id));
   });
 
-  it.each(TERM_IDS)('%s is not used before the chapter that defines it', id => {
-    const { chapter: home, match } = term(id) as Term;
-    for (const chapter of CHAPTERS.filter(c => c.number < home)) {
-      expect(text(allHtml(chapter)), `chapter ${chapter.number}`).not.toMatch(match);
+  // In reading order, which outline.ts sets: not by any number.
+  it.each(TERM_IDS)('%s is not used before the section that defines it', id => {
+    const { section: home, match } = term(id) as Term;
+    for (const chapter of CHAPTERS.filter(c => orderOf(c.id as SectionId) < orderOf(home))) {
+      expect(text(allHtml(chapter)), chapter.id).not.toMatch(match);
     }
   });
 
-  it.each(TERM_IDS)('%s is defined at its first use in its chapter', id => {
-    const { chapter: home, match } = term(id) as Term;
-    const lesson = text(lessonHtml(chapterByNumber(home)!));
+  it.each(TERM_IDS)('%s is defined at its first use in its section', id => {
+    const { section: home, match } = term(id) as Term;
+    const lesson = text(lessonHtml(chapterById(home)!));
     const definedAt = lesson.indexOf(text(define(id)).trim());
     expect(definedAt).toBeGreaterThanOrEqual(0);
     const firstUse = lesson.search(match);
@@ -77,25 +82,26 @@ describe('the terms', () => {
   });
 
   it.each(TERM_IDS.filter(id => (TERMS[id] as Term).formula))(
-    '%s has its formula in its chapter\'s maths',
+    '%s has its formula in its section\'s maths',
     id => {
-      const maths = chapterByNumber(term(id).chapter)!.maths.flatMap(panel => panel.body);
+      const maths = chapterById(term(id).section)!.maths.flatMap(panel => panel.body);
       expect(maths).toContain(formula(id));
     },
   );
 
-  it('marks only terms that exist, in chapters that come after them', () => {
+  it('marks only terms that exist, in sections that come after them', () => {
     for (const chapter of CHAPTERS) {
       for (const [, id] of allHtml(chapter).matchAll(/data-term="(\w+)"/g)) {
         expect(TERM_IDS).toContain(id);
-        expect(term(id as keyof typeof TERMS).chapter).toBeLessThanOrEqual(chapter.number);
+        const home = term(id as keyof typeof TERMS).section;
+        expect(orderOf(home)).toBeLessThanOrEqual(orderOf(chapter.id as SectionId));
       }
     }
   });
 });
 
 describe('the glossary', () => {
-  const NUMBERS = CHAPTERS.map(chapter => chapter.number);
+  const IDS = CHAPTERS.map(chapter => chapter.id);
 
   it('lists every term once, alphabetically', () => {
     const order = glossaryOrder();
@@ -105,14 +111,15 @@ describe('the glossary', () => {
     expect(names[0]).toBe('adsr');
   });
 
-  it('is at #glossary, an entry at #glossary?t=', () => {
-    expect(chapterFromHash('#glossary', NUMBERS, 0)).toBe(GLOSSARY);
-    expect(chapterFromHash(glossaryHash('index'), NUMBERS, 0)).toBe(GLOSSARY);
+  it('is at #/glossary, an entry at #/glossary?t=', () => {
+    expect(viewFromHash('#/glossary', IDS, 'landing')).toBe(GLOSSARY);
+    expect(viewFromHash(glossaryHash('index'), IDS, 'landing')).toBe(GLOSSARY);
+    expect(glossaryHash('index')).toBe('#/glossary?t=index');
     expect(paramsFromHash(glossaryHash('index')).get('t')).toBe('index');
-    expect(hashForChapter(GLOSSARY)).toBe('#glossary');
-    expect(isStrayHash('#glossary', NUMBERS)).toBe(false);
-    expect(isStrayHash('#glossaries', NUMBERS)).toBe(true);
-    expect(chapterByNumber(GLOSSARY)?.title).toBe('Glossary');
+    expect(hashFor(GLOSSARY)).toBe('#/glossary');
+    expect(isStrayHash('#/glossary', IDS)).toBe(false);
+    expect(isStrayHash('#/glossaries', IDS)).toBe(true);
+    expect(chapterById(GLOSSARY)?.title).toBe('Glossary');
   });
 
   it('links each term in the text to its entry, described by its definition', () => {

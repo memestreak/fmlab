@@ -1,19 +1,19 @@
 import { BASE_PATCH } from './basePatch';
 import { define, formula } from './terms';
+import { sectionLink, titleOf } from './outline';
 import type { Chapter } from './types';
 
 export const modulationIndex: Chapter = {
-  number: 3,
-  title: 'Modulation index',
-  navLabel: '3',
+  id: 'index',
+  title: titleOf('index'),
   body: [
-    `The last chapter ended with the modulator fast enough to make a tone
+    `The last section ended with the modulator fast enough to make a tone
      colour. Here it runs at the carrier's own frequency, 220 Hz, and
      stays there, and it pushes the carrier a slightly different way.
      ${define('phase')} ${define('radian')} ${define('pm')} The DX7 does
-     the same, and so does the rest of this guide; chapter 9 says why.`,
+     the same, and so does the rest of this guide; ${sectionLink('fm-vs-pm')} says why.`,
     `There is one thing to change here. ${define('index')} Press Play and drag Index down to 0. That is the
-     bare sine wave of chapter 1, one stem in Fig. 2. Now bring it up
+     bare sine wave of ${sectionLink('sine')}, one stem in Fig. 2. Now bring it up
      slowly. New stems grow to the right of the carrier, first one, then
      another, and the sound gets steadily brighter, like a brass player
      blowing harder. More index, more sidebands.`,
@@ -24,7 +24,7 @@ export const modulationIndex: Chapter = {
     `Sidebands grow below the carrier as well as above it. Here there is
      no room for them: one step down from 220 Hz is zero, and anything
      that goes further bounces back up and lands on the stems already
-     there. Chapter 5 is about that bounce. For now, notice only that some
+     there. ${sectionLink('ratio')} is about that bounce. For now, notice only that some
      stems hang below the axis, in red with a hollow marker. Those
      partials are upside down. On its own that cannot be heard, but it
      changes what happens when two of them land in the same place.`,
@@ -42,7 +42,7 @@ export const modulationIndex: Chapter = {
         `<var>I</var> is the index: the furthest the phase is pushed, in
          radians, where`,
         formula('radian'),
-        `It is the same number as in chapter 2, where the modulator moved
+        `It is the same number as in ${sectionLink('vibrato')}, where the modulator moved
          the frequency by up to Δ<var>f</var>:`,
         formula('index'),
         `So at an index of 2 with a 220 Hz modulator, the pitch is being
@@ -68,7 +68,7 @@ export const modulationIndex: Chapter = {
          <var>f</var><sub>c</sub> − (<var>I</var> + 1) <var>f</var><sub>m</sub>
          to
          <var>f</var><sub>c</sub> + (<var>I</var> + 1) <var>f</var><sub>m</sub>,
-         stopping at zero on the left; chapter 5 says what becomes of the
+         stopping at zero on the left; ${sectionLink('ratio')} says what becomes of the
          sidebands beyond it.`,
       ],
     },

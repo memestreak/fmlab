@@ -1,12 +1,8 @@
 import { BASE_PATCH } from './basePatch';
+import { GLOSSARY } from './outline';
 import type { Chapter } from './types';
 
-/**
- * The number the glossary goes by in the store. Like the landing view it
- * is not a chapter of the guide: it is at "#glossary", not a number, and
- * is drawn from src/chapters/terms.ts rather than from text of its own.
- */
-export const GLOSSARY = -1;
+export { GLOSSARY };
 
 /**
  * The glossary, written as a chapter for the same reason as the landing
@@ -14,9 +10,8 @@ export const GLOSSARY = -1;
  * case for it. It shows no lab, and plays nothing.
  */
 export const glossary: Chapter = {
-  number: GLOSSARY,
+  id: GLOSSARY,
   title: 'Glossary',
-  navLabel: 'Glossary',
   body: [],
   maths: [],
   controls: ['volume'],

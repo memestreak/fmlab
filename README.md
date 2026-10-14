@@ -1,6 +1,8 @@
 # fmlab
 
-An interactive guide to FM synthesis.
+An interactive guide to FM synthesis, at https://fmlab.pages.dev: nine
+named sections in four groups (Basics, Two operators, The DX7, Play),
+each with a lab to play with and hear, and a glossary.
 
 A single page, built with Vite, vanilla TypeScript and Canvas 2D; no UI
 framework. `CLAUDE.md` describes the layout and the styling rules,

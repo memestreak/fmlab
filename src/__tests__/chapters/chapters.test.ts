@@ -1,10 +1,11 @@
 import {
-  chapterByNumber,
+  chapterById,
   CHAPTERS,
   FIRST_CHAPTER,
   neighbours,
 } from '../../chapters';
-import { chapterFromHash, hashForChapter } from '../../chapters/route';
+import { OUTLINE, SECTION_IDS } from '../../chapters/outline';
+import { hashFor, upgradeHash, viewFromHash } from '../../chapters/route';
 import { besselJ } from '../../dsp/bessel';
 import { fmSpectrum } from '../../dsp/fmSpectrum';
 import {
@@ -16,7 +17,7 @@ import {
   RATIO,
 } from '../../model/lab';
 
-const NUMBERS = CHAPTERS.map(chapter => chapter.number);
+const IDS = CHAPTERS.map(chapter => chapter.id);
 const SLIDERS = [
   'volume',
   'carrier',
@@ -33,23 +34,41 @@ const SLIDERS = [
 const FIGURES = ['algorithm', 'compare', 'waveform', 'envelope', 'spectrum', 'spectrogram', 'bessel'];
 
 describe('the chapters', () => {
-  it('are in order, each with its own number', () => {
-    expect(NUMBERS).toEqual([...new Set(NUMBERS)].sort((a, b) => a - b));
-    expect(FIRST_CHAPTER).toBe(1);
+  it('are in the outline\'s order, each with its own address', () => {
+    expect(IDS).toEqual(SECTION_IDS);
+    expect(new Set(IDS).size).toBe(IDS.length);
+    expect(FIRST_CHAPTER).toBe('sine');
+    for (const id of IDS) expect(id).toMatch(/^[a-z0-9-]+$/);
   });
 
-  it("are version 1's seven and chapters 8 and 9, numbered as in the spec", () => {
-    expect(CHAPTERS.map(c => [c.number, c.title])).toEqual([
-      [1, 'A single sine'],
-      [2, 'Vibrato becomes timbre'],
-      [3, 'Modulation index'],
-      [4, 'Sidebands and Bessel functions'],
-      [5, 'Carrier to modulator ratio'],
-      [6, 'Time-varying index'],
-      [7, 'Sandbox'],
-      [8, 'Operators and algorithms'],
-      [9, 'FM versus PM'],
+  it('are in four named groups, the sandbox last', () => {
+    expect(OUTLINE.map(g => [g.group, g.sections.map(s => s.id)])).toEqual([
+      ['Basics', ['sine', 'vibrato']],
+      ['Two operators', ['index', 'sidebands', 'ratio', 'envelopes']],
+      ['The DX7', ['algorithms', 'fm-vs-pm']],
+      ['Play', ['sandbox']],
     ]);
+    expect(CHAPTERS.map(c => c.title)).toEqual([
+      'A single sine',
+      'Vibrato becomes tone',
+      'The modulation index',
+      'Sidebands and Bessel functions',
+      'Carrier and modulator ratio',
+      'Sounds that change over time',
+      'Operators and algorithms',
+      'FM versus PM',
+      'Sandbox',
+    ]);
+  });
+
+  it.each(CHAPTERS)('$title says no chapter numbers', chapter => {
+    const text = [
+      ...chapter.body,
+      ...(chapter.steps ?? []).flatMap(step => [step.title, ...step.body]),
+      ...chapter.maths.flatMap(panel => [panel.title, ...panel.body]),
+      ...Object.values(chapter.figures),
+    ].join(' ');
+    expect(text).not.toMatch(/\bchapters?\s+\d/i);
   });
 
   it.each(CHAPTERS)('$title shows two figures, and captions what it shows', chapter => {
@@ -77,10 +96,10 @@ describe('the chapters', () => {
     }
   });
 
-  it.each(CHAPTERS)('$title has text and a contents label', chapter => {
+  it.each(CHAPTERS)('$title has text and a title', chapter => {
     expect(chapter.body.length).toBeGreaterThan(0);
     expect(chapter.body.every(text => text.trim().length > 0)).toBe(true);
-    expect(chapter.navLabel).not.toBe('');
+    expect(chapter.title).not.toBe('');
     for (const panel of chapter.maths) {
       expect(panel.title).not.toBe('');
       expect(panel.body.length).toBeGreaterThan(0);
@@ -129,7 +148,7 @@ describe('the chapters', () => {
   });
 
   it('plays chapter 2 as true FM, starting as a vibrato', () => {
-    const { patch, controls } = chapterByNumber(2)!;
+    const { patch, controls } = chapterById('vibrato')!;
     expect(patch.mode).toBe('fm');
     expect(patch.modHz).toBeLessThan(10);
     expect(patch.deviationHz).toBeGreaterThan(0);
@@ -137,12 +156,12 @@ describe('the chapters', () => {
   });
 
   it('is the only chapter in true FM', () => {
-    expect(CHAPTERS.filter(c => c.patch.mode === 'fm').map(c => c.number)).toEqual([2]);
+    expect(CHAPTERS.filter(c => c.patch.mode === 'fm').map(c => c.id)).toEqual(['vibrato']);
   });
 });
 
 describe('chapter 3, modulation index', () => {
-  const chapter = chapterByNumber(3)!;
+  const chapter = chapterById('index')!;
 
   it('holds the ratio at 1 and offers only the index', () => {
     expect(chapter.patch.mode).toBe('pm');
@@ -152,16 +171,16 @@ describe('chapter 3, modulation index', () => {
 
   it("brackets Carson's rule on its spectrum, and is the only one to", () => {
     expect(chapter.patch.showBandwidth).toBe(true);
-    expect(CHAPTERS.filter(c => c.patch.showBandwidth).map(c => c.number)).toEqual([3]);
+    expect(CHAPTERS.filter(c => c.patch.showBandwidth).map(c => c.id)).toEqual(['index']);
   });
 });
 
 describe('chapter 4, Bessel functions', () => {
-  const chapter = chapterByNumber(4)!;
+  const chapter = chapterById('sidebands')!;
 
   it('is the only chapter with the Bessel plot, beside the spectrum', () => {
     expect(Object.keys(chapter.figures)).toEqual(['spectrum', 'bessel']);
-    expect(CHAPTERS.filter(c => c.figures.bessel).map(c => c.number)).toEqual([4]);
+    expect(CHAPTERS.filter(c => c.figures.bessel).map(c => c.id)).toEqual(['sidebands']);
   });
 
   it('leaves the index to the plot: no index slider', () => {
@@ -191,49 +210,68 @@ describe('chapter 4, Bessel functions', () => {
 
 describe('neighbours', () => {
   it('has nothing before the first or after the last', () => {
-    expect(neighbours(1).previous).toBeUndefined();
-    expect(neighbours(9).next).toBeUndefined();
+    expect(neighbours('sine').previous).toBeUndefined();
+    expect(neighbours('sandbox').next).toBeUndefined();
   });
 
-  it('are the chapters either side', () => {
-    expect(neighbours(2).previous?.number).toBe(1);
-    expect(neighbours(2).next?.number).toBe(3);
-    expect(neighbours(4).next?.number).toBe(5);
-    expect(neighbours(7).previous?.number).toBe(6);
+  it('are the sections either side, across groups', () => {
+    expect(neighbours('vibrato').previous?.id).toBe('sine');
+    expect(neighbours('vibrato').next?.id).toBe('index');
+    expect(neighbours('envelopes').next?.id).toBe('algorithms');
+    expect(neighbours('sandbox').previous?.id).toBe('fm-vs-pm');
   });
 
-  it('has none for a chapter that does not exist', () => {
-    expect(neighbours(10)).toEqual({});
-    expect(neighbours(0)).toEqual({});
+  it('has none for what is not a section', () => {
+    expect(neighbours('landing')).toEqual({});
+    expect(neighbours('glossary')).toEqual({});
+    expect(neighbours('nowhere')).toEqual({});
   });
 });
 
-describe('chapterFromHash', () => {
-  it('reads the chapter number', () => {
-    expect(chapterFromHash('#1', NUMBERS, 1)).toBe(1);
-    expect(chapterFromHash('#2', NUMBERS, 1)).toBe(2);
-    expect(chapterFromHash('#7', NUMBERS, 1)).toBe(7);
+describe('viewFromHash', () => {
+  it('reads a section\'s address', () => {
+    expect(viewFromHash('#/sine', IDS, 'landing')).toBe('sine');
+    expect(viewFromHash('#/fm-vs-pm', IDS, 'landing')).toBe('fm-vs-pm');
+    expect(viewFromHash('#/sandbox?c=220', IDS, 'landing')).toBe('sandbox');
   });
 
-  it('falls back when there is no hash', () => {
-    expect(chapterFromHash('', NUMBERS, 1)).toBe(1);
-    expect(chapterFromHash('#', NUMBERS, 1)).toBe(1);
+  it('is the landing view at "#/", and the glossary at its own', () => {
+    expect(viewFromHash('#/', IDS, 'x')).toBe('landing');
+    expect(viewFromHash('#/glossary?t=index', IDS, 'x')).toBe('glossary');
   });
 
-  it('falls back for a chapter that is not written yet', () => {
-    expect(chapterFromHash('#10', NUMBERS, 1)).toBe(1);
-    expect(chapterFromHash('#99', NUMBERS, 1)).toBe(1);
-  });
-
-  it('falls back for anything that is not a plain number', () => {
-    for (const hash of ['#two', '#2a', '#-2', '#2.5', '# 2', '#/2']) {
-      expect(chapterFromHash(hash, NUMBERS, 1)).toBe(1);
+  it('falls back when there is no hash, or one that names nothing', () => {
+    for (const hash of ['', '#', '#/nowhere', '#sine', '#/Sine', '#//sine', '#/sine/2']) {
+      expect(viewFromHash(hash, IDS, 'fallback')).toBe('fallback');
     }
   });
 
-  it('reads back what hashForChapter writes', () => {
-    for (const number of NUMBERS) {
-      expect(chapterFromHash(hashForChapter(number), NUMBERS, 1)).toBe(number);
+  it('reads back what hashFor writes', () => {
+    for (const id of IDS) {
+      expect(viewFromHash(hashFor(id), IDS, 'x')).toBe(id);
+    }
+    expect(hashFor('landing')).toBe('#/');
+    expect(hashFor('sandbox', 'c=220')).toBe('#/sandbox?c=220');
+  });
+});
+
+describe('old links', () => {
+  it('go to the section their number meant, keeping what follows', () => {
+    expect(upgradeHash('#1')).toBe('#/sine');
+    expect(upgradeHash('#4')).toBe('#/sidebands');
+    expect(upgradeHash('#6')).toBe('#/envelopes');
+    expect(upgradeHash('#8')).toBe('#/algorithms');
+    expect(upgradeHash('#9')).toBe('#/fm-vs-pm');
+    expect(upgradeHash('#7?c=220&r=1.41&i=5')).toBe('#/sandbox?c=220&r=1.41&i=5');
+    expect(upgradeHash('#7?m=6&a=5')).toBe('#/sandbox?m=6&a=5');
+    expect(upgradeHash('#glossary')).toBe('#/glossary');
+    expect(upgradeHash('#glossary?t=index')).toBe('#/glossary?t=index');
+    expect(upgradeHash('#0')).toBe('#/');
+  });
+
+  it('leave everything else alone', () => {
+    for (const hash of ['', '#', '#10', '#99', '#/sine', '#two', '#2a']) {
+      expect(upgradeHash(hash)).toBeNull();
     }
   });
 });

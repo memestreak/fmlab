@@ -9,18 +9,22 @@ Vite, vanilla TypeScript (strict) and Canvas 2D; no UI framework. Vitest,
 ESLint. Sound comes from one AudioWorklet phase-modulation engine. Deploys
 as static files to Cloudflare Pages (`DEPLOYMENT.md`).
 
-The page is a chapter at a time: its text in a narrative pane, and the lab
-(Play / Stop, sliders and two figures) beside it, or under it on a narrow
-screen. The chapter is in the URL's hash (`#2`); with no hash the site
-opens on the landing view, one line and a Play button whose sound the two
-figures move with, and then the ways on. Version 1's seven
-chapters are all written: 1 "A single sine", 2 "Vibrato becomes timbre",
-3 "Modulation index", 4 "Sidebands and Bessel functions", 5 "Carrier to
-modulator ratio", 6 "Time-varying index" and 7, the Sandbox; numbers are
-the spec's. They use one carrier and one modulator. Version 2 has 8
-"Operators and algorithms", six operators wired by the DX7's 32
-algorithms, and 9 "FM versus PM", the same patch as phase and as true
-frequency modulation side by side.
+The page is a section at a time: its text in a narrative pane, and the
+lab (Play / Stop, sliders and two figures) beside it, or under it on a
+narrow screen. Sections have names, not numbers, and come in groups; the
+sequence and every name are in `src/chapters/outline.ts`: Basics (A single
+sine `#/sine`, Vibrato becomes tone `#/vibrato`), Two operators (The
+modulation index `#/index`, Sidebands and Bessel functions `#/sidebands`,
+Carrier and modulator ratio `#/ratio`, Sounds that change over time
+`#/envelopes`), The DX7 (Operators and algorithms `#/algorithms`, FM
+versus PM `#/fm-vs-pm`) and Play (the Sandbox `#/sandbox`, last). `#/`
+(or no hash) is the landing view, one line and a Play button whose sound
+the two figures move with, and then the ways on; `#/glossary` is the
+glossary, outside the sequence. The header's Contents button opens a panel
+of every group and section (`ui/contents.ts`); each section ends with
+Previous and Next by name. In the code a section is still a "chapter".
+Never write a section's number in its copy: link to it by name with
+`sectionLink(id)`.
 
 ## Commands
 
@@ -60,46 +64,53 @@ figures subscribe to it. Nothing else passes values around.
   `set` and get the previous state too), `lab.ts` (`LabState`; the ranges
   and defaults; the log scales of the carrier and modulator sliders) and
   `theme.ts` (the choice, its storage key, `applyTheme`). The URL holds
-  the chapter and, for a chapter with `sharesSound` (the sandbox), its
-  carrier, ratio and index: `#7?c=220&r=1.41&i=5`.
-  The patch is held two ways, by `mode`. `pm` (everywhere but chapter 2):
-  `ratio` and `index`. `fm` (chapter 2): `modHz` and `deviationHz`.
-  Chapter 9 (`compare`) shows both: Fig. 1 draws `asPm(state)`, Fig. 2
+  the section and, for one with `sharesSound` (the sandbox), its
+  carrier, ratio and index: `#/sandbox?c=220&r=1.41&i=5`. `state.chapter`
+  is a section's id, or `landing` or `glossary`.
+  The patch is held two ways, by `mode`. `pm` (everywhere but `vibrato`):
+  `ratio` and `index`. `fm` (`vibrato`): `modHz` and `deviationHz`.
+  `fm-vs-pm` (`compare`) shows both: Fig. 1 draws `asPm(state)`, Fig. 2
   (`#compare`) `asFm(state)`, FM matched at ratio 1 (Δf = index × fc, so
   its index is index / ratio); `mode` is only what is heard.
   `patchOf(state)` gives a ratio and an index for either, which is what the
   figures and spectrum maths take; never read `state.ratio` or
   `state.index` directly outside `pm`-only code.
   There are two ways of playing. Most chapters hold a steady sound while
-  `playing` is true. A chapter with `noteMode` (chapter 6) plays one note
+  `playing` is true. A chapter with `noteMode` (`envelopes`) plays one note
   each time `notes` goes up, shaped by the envelope (`attack`, `decay`,
   `sustain`, `release`, `hold`; `envelopeOf(state)`), and
   `indexAtTime(state, t)` is the index at a moment of it.
   `momentOf(state, time)` is what a figure should draw at a time on the
   page's clock: the patch as set, or, while a note sounds, that moment's
   index and loudness.
-- `src/chapters/` — a chapter is data (`types.ts`): number, title, lesson
+- `src/chapters/` — a chapter (a section) is data (`types.ts`): its id
+  and title (from `outline.ts`, which also sets the order and the
+  groups; `index.ts` joins each id to its file), lesson
   text and "The maths" panels (HTML strings, trusted because they are
   written here), the sliders it shows, the patch it starts from (all of
   it, so a chapter always opens the same way), optional `steps` (sections
-  with a sound each, chapter 8), `showsPair` (chapters 3 to 7 draw their
-  two operators small beside the text) and the figures it shows,
+  with a sound each, `algorithms`), `showsPair` (the two-operator
+  sections and the sandbox draw their two operators small beside the
+  text) and the figures it shows,
   each with its caption (they are numbered from 1 in the order shown, so
   text that says "Fig. 2" must match the chapter's own list). A chapter
   may have presets, buttons that set several fields at once. Its patch is
   written as `BASE_PATCH` (`basePatch.ts`) with its own differences.
-  `landing.ts` is the landing view, written as a chapter numbered
-  `LANDING` (0) so that everything following the store's chapter needs no
-  special case. It is not in `CHAPTERS`, has no hash and plays one long
-  note. `glossary.ts` is the glossary, the same way: `GLOSSARY` (−1), at
-  `#glossary` (an entry: `#glossary?t=index`), drawn from the terms, with
-  no lab and nothing to play.
-  `sandbox.ts` has a second lab, `sixOperators`: chapter 8's (algorithm
+  `landing.ts` is the landing view, written as a chapter with the id
+  `LANDING` so that everything following the store's chapter needs no
+  special case. It is not in `CHAPTERS`, is at `#/` and plays one long
+  note. `glossary.ts` is the glossary, the same way: `GLOSSARY`, at
+  `#/glossary` (an entry: `#/glossary?t=index`), drawn from the terms,
+  with no lab and nothing to play. `route.ts` reads and writes addresses,
+  and `upgradeHash` turns a link from before the sections had names
+  (`#4`, `#7?c=…`, `#glossary`) into the address it meant, keeping its
+  parameters.
+  `sandbox.ts` has a second lab, `sixOperators`: `algorithms`'s (algorithm
   list, operator table, feedback, its presets from `dx7Presets.ts`) with
   the keyboard and Copy link, shown while the sandbox's Two | Six switch
   has `mode` at `ops`. `labViewOf(chapter, state)` says which lab to
   show; the text stays the same. Its link is
-  `#7?m=6&c=&a=&f=&o=ratio_level%_decay-…` (six operators joined by
+  `#/sandbox?m=6&c=&a=&f=&o=ratio_level%_decay-…` (six operators joined by
   "-"), validated and clamped by `soundFromParams`; a link without
   `m=6` is the two-operator one, unchanged.
   `terms.ts` holds every defined term: its name, a one-sentence plain
@@ -129,12 +140,12 @@ figures subscribe to it. Nothing else passes values around.
   `Algorithm`, now `TWO_OPERATORS`; no feedback yet) keeps each operator's
   phase locked to its ratio of the base frequency, easing it back after a
   ratio moves, so the sound stays the signal the figures draw.
-  `fmKernel.ts` (`FmKernel`) is true FM for chapter 2 only, with no lock.
+  `fmKernel.ts` (`FmKernel`) is true FM for `vibrato` only, with no lock.
   `PmKernel` also takes an algorithm's feedback loop (the mean of the
   source's last two samples, as the DX7 does) and can be rewired between
   notes (`setAlgorithm`). `algorithms.ts` is the DX7's 32 algorithms,
   written in DX7 numbering and tested against the table in Dexed's msfa
-  engine. `operators.ts` is chapter 8's maths: an `Operator` (ratio,
+  engine. `operators.ts` is `algorithms`'s maths: an `Operator` (ratio,
   level, decay), `kernelLevels` (a modulator's level is its index times
   `MOD_INDEX`; the carriers share the output), each operator's envelope,
   and `operatorSpectrum`, the predicted spectrum worked out by running the
@@ -174,7 +185,7 @@ figures subscribe to it. Nothing else passes values around.
   (`motionView`: true FM with a modulator under about 11 Hz): the next
   stretch of signal from that moment, with the carrier slowed by a round
   factor so its waves can be seen squeezing and stretching. With
-  `realUnits` (chapter 1) both figures are on fixed axes in real units
+  `realUnits` (`sine`) both figures are on fixed axes in real units
   instead, 20 ms and 0 to 1000 Hz, so that moving the carrier moves what
   is drawn: more waves, and a stem further along. The spectrum
   can bracket Carson's band (`showBandwidth`) and rule a line at each of
@@ -205,14 +216,14 @@ figures subscribe to it. Nothing else passes values around.
   which slider rows (`data-control`) and figures (`data-figure`) show, the
   figures' numbers and their captions. `sliders.ts`
   is a table of every slider (range, step, scale, readout);
-  `operators.ts` is chapter 8's algorithm list (grouped by carriers) and
+  `operators.ts` is `algorithms`'s algorithm list (grouped by carriers) and
   operator table (two operators to a row, number boxes, an operator its
   wiring leaves out blanked);
-  `steps.ts` is a chapter's steps (`Chapter.steps`, chapter 8): the row
+  `steps.ts` is a chapter's steps (`Chapter.steps`, `algorithms`): the row
   of step buttons, the buttons heading the text's sections, and what
   shows at which step (the step is `currentStep(steps, algorithm)` in
   `src/chapters/steps.ts`, never stored);
-  `compare.ts` is chapter 9's Hear PM / FM switch (it sets `mode`), and
+  `compare.ts` is `fm-vs-pm`'s Hear PM / FM switch (it sets `mode`), and
   keeps `modHz` and `deviationHz` at `asFm(state)`'s while the chapter has
   `compare`, so the FM sound follows Ratio and Index;
   `envelopeControls.ts` drags the envelope's dots; `piano.ts` is the
@@ -245,7 +256,7 @@ figures subscribe to it. Nothing else passes values around.
   one.
 
 Known limits: the synth is not band-limited, so a high carrier with a high
-ratio and index aliases. Chapter 2's moving waveform runs on the page's
+ratio and index aliases. `vibrato`'s moving waveform runs on the page's
 clock, not the audio's, so its wobble has the sound's rate but not
 necessarily its phase.
 
@@ -316,11 +327,11 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
   panel or anything typed into; on a slider, where space means nothing,
   it plays and stops. A "Space: play / stop" hint shows where there is a
   pointer that hovers.
-- Motion: chapter 6's two figures show a playhead while a note sounds,
+- Motion: `envelopes`'s two figures show a playhead while a note sounds,
   and the landing view's follow its sound; under
   `prefers-reduced-motion` they simply stay as they are, and the sound
   still plays. The other
-  thing that animates is chapter 2's waveform, while sound
+  thing that animates is `vibrato`'s waveform, while sound
   plays or "Show motion" is ticked. Under `prefers-reduced-motion` it
   stays still, the checkbox is hidden and the caption says why. Anything
   else that moves must do the same.

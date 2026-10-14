@@ -1,3 +1,4 @@
+import type { ViewId } from '../chapters/outline';
 import { type Envelope, envelopeAt } from '../dsp/envelope';
 import { noteHold, type Operator, operatorEnvelope } from '../dsp/operators';
 import { createStore, type Store } from './store';
@@ -7,14 +8,15 @@ import type { ThemeChoice } from './theme';
  * How the sound is made. `pm`: one modulator added to one carrier's phase,
  * as the lab (and a DX7) does. `fm`: the modulator moves the carrier's
  * frequency, which only the vibrato chapter uses. `ops`: six operators
- * wired by one of the DX7's algorithms, in chapter 8.
+ * wired by one of the DX7's algorithms (Operators and algorithms, and
+ * the sandbox).
  */
 export type SynthMode = 'pm' | 'fm' | 'ops';
 
 /** Everything the page shows and plays: one carrier, one modulator. */
 export interface LabState {
-  /** The chapter on screen, by its number. */
-  chapter: number;
+  /** What is on screen: a section, the landing view or the glossary. */
+  chapter: ViewId;
   mode: SynthMode;
   /** Carrier frequency in Hz. */
   carrierHz: number;
@@ -141,7 +143,7 @@ export const SUSTAIN: Range = { min: 0, max: 1 };
 export const RELEASE: Range = { min: 0.01, max: 5 };
 
 export const DEFAULTS: LabState = {
-  chapter: 1,
+  chapter: 'sine',
   mode: 'pm',
   carrierHz: 220,
   ratio: 1,

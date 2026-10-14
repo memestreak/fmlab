@@ -1,5 +1,6 @@
 import { BASE_PATCH } from './basePatch';
 import { define, formula } from './terms';
+import { sectionLink, titleOf } from './outline';
 import type { Chapter, ChapterPatch } from './types';
 
 /** Chowning's brass: 1:1, the index swelling and fading with the note. */
@@ -27,9 +28,8 @@ const BELL: Partial<ChapterPatch> = {
 };
 
 export const envelope: Chapter = {
-  number: 6,
-  title: 'Time-varying index',
-  navLabel: '6',
+  id: 'envelopes',
+  title: titleOf('envelopes'),
   body: [
     `Every sound so far has been frozen: one index, one spectrum, held for
      as long as you like. No instrument does that. A trumpet note starts
@@ -42,8 +42,7 @@ export const envelope: Chapter = {
      the three dots, or use the sliders. The heavier line is the
      loudness. The thinner one is the index, the modulator's push; here
      the two move together.`,
-    `${define('spectrogram')} Fig. 2 is this note's: the spectrum of the
-     earlier chapters turned on its side and stretched out along it. Watch the upper partials arrive as the envelope
+    `${define('spectrogram')} Fig. 2 is this note's: the spectrum of the earlier sections turned on its side and stretched out along it. Watch the upper partials arrive as the envelope
      rises and leave as it falls.`,
     `Untick <strong>Index follows the envelope</strong> and play again.
      Now only the loudness changes. The colour stands still, and the note
@@ -61,8 +60,7 @@ export const envelope: Chapter = {
       title: 'The envelope',
       body: [
         `Write <var>e</var>(<var>t</var>) for the envelope, a number
-         between 0 and 1 that changes over the note. The signal is the one
-         from chapter 3 with both its loudness and its index following
+         between 0 and 1 that changes over the note. The signal is the one from ${sectionLink('index')} with both its loudness and its index following
          it:`,
         formula('envelope'),
         `<var>I</var> is the Index slider: the index at the envelope's

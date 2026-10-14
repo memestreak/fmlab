@@ -109,17 +109,23 @@ a.btn {
 .landing-chapters a {
   display: inline-block;
   padding: 0.3rem 0;
-  text-decoration: none;
-}
-
-.landing-title {
-  text-decoration: underline;
   text-underline-offset: 0.15em;
 }
 
-.landing-chapters .num {
-  display: inline-block;
-  min-width: 1.5rem;
+.landing-chapters ul {
+  margin: 0 0 0.75rem;
+  padding: 0;
+  list-style: none;
+}
+
+/* A group's name over its sections. */
+.landing-group {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .chapter-kicker {
@@ -179,46 +185,126 @@ a.btn {
   font-weight: 600;
 }
 
-/* The contents list in the masthead. */
-.contents {
+/* The way round the guide, in the masthead: Contents, where the reader
+   is, and the glossary. */
+.guide-nav {
   display: flex;
   flex: 1;
   flex-wrap: wrap;
-  gap: 0.25rem 1.1rem;
-  margin-left: 1rem;
-  font-size: 0.95rem;
+  align-items: center;
+  gap: 0.25rem 1rem;
+  margin-left: 1.25rem;
+  min-width: 0;
 }
 
-.contents a {
-  /* A finger-sized target for a one-character link. */
-  min-width: 1.5rem;
+.where {
+  overflow: hidden;
+  font-size: 0.9rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.guide-link {
+  margin-left: auto;
   padding: 0.4rem 0;
-  text-align: center;
-  text-decoration: none;
 }
 
-.contents a:hover {
-  text-decoration: underline;
-}
-
-.contents a[aria-current] {
-  font-weight: 700;
-  text-decoration: underline;
-  text-decoration-thickness: 2px;
-}
-
-/* Phone width: no room between the wordmark and the theme button, so the
-   contents list takes a line of its own beneath them. */
+/* Phone width: no room beside the wordmark, so the way round takes a line
+   of its own beneath it, without the "where" text (the section's own
+   heading says that). */
 @media (max-width: 30rem) {
   .masthead {
     flex-wrap: wrap;
     row-gap: 0.25rem;
   }
 
-  .contents {
+  .guide-nav {
     flex-basis: 100%;
     order: 1;
     margin-left: 0;
+  }
+
+  .where {
+    display: none;
+  }
+}
+
+/* The contents panel: a sheet of paper over the page, ruled off in ink,
+   below the masthead on a wide screen and filling a phone's. */
+.contents-panel {
+  width: min(26rem, calc(100vw - 2rem));
+  max-height: calc(100vh - 6rem);
+  margin: 4.5rem auto auto 1.5rem;
+  padding: 1rem 1.5rem 1.5rem;
+  border: 1px solid var(--ink);
+  border-radius: 6px;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.contents-panel::backdrop {
+  background: color-mix(in srgb, var(--paper) 70%, transparent);
+}
+
+.contents-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.contents-head h2 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.contents-group {
+  margin: 1rem 0 0.25rem;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+#contents-list ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+#contents-list a {
+  display: block;
+  padding: 0.35rem 0 0.35rem 0.75rem;
+  border-left: 3px solid transparent;
+  text-decoration: none;
+}
+
+#contents-list a:hover {
+  text-decoration: underline;
+}
+
+/* The section on screen: an ink rule beside it, in bold. */
+#contents-list a[aria-current] {
+  border-left-color: var(--ink);
+  font-weight: 700;
+}
+
+.contents-glossary {
+  margin: 1rem 0 0;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--rule);
+}
+
+@media (max-width: 30rem) {
+  .contents-panel {
+    width: 100vw;
+    max-width: 100vw;
+    height: 100dvh;
+    max-height: 100dvh;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
   }
 }
 

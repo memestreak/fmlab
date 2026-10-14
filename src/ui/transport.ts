@@ -1,5 +1,4 @@
-import { GLOSSARY } from '../chapters/glossary';
-import { LANDING } from '../chapters/landing';
+import { GLOSSARY, LANDING } from '../chapters/outline';
 import { type LabState, type LabStore, noteSounding } from '../model/lab';
 
 /** The page's clock in seconds, the one notes are timed on. */

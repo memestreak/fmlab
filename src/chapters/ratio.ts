@@ -1,11 +1,11 @@
 import { BASE_PATCH } from './basePatch';
 import { define, formula } from './terms';
+import { sectionLink, titleOf } from './outline';
 import type { Chapter } from './types';
 
 export const ratio: Chapter = {
-  number: 5,
-  title: 'Carrier to modulator ratio',
-  navLabel: '5',
+  id: 'ratio',
+  title: titleOf('ratio'),
   body: [
     `${define('ratio')} Where the index decides how strong each partial is,
      the ratio decides which partials there can be at all. FM players
@@ -27,7 +27,7 @@ export const ratio: Chapter = {
      ${define('inharmonic')} Drag
      Ratio slowly and listen for the sound snapping into focus each time
      it passes a simple ratio.`,
-    `Chapter 3 left a question open: where do the lower sidebands go?
+    `${sectionLink('index')} left a question open: where do the lower sidebands go?
      Counting down from the carrier in steps of the modulator, you soon
      pass zero. ${define('negativeFrequency')} A wave at a frequency below
      zero is the same wave running backwards, and a sine wave running
@@ -36,7 +36,7 @@ export const ratio: Chapter = {
     `With a whole-number ratio the folded sidebands land back on the
      harmonics. At 1:1 they land on the very ones the upper sidebands
      already occupy, where the two add together or cancel, which is why
-     the stems here are not simply the curves of chapter 4. At 1:1.41 they
+     the stems here are not simply the curves of ${sectionLink('sidebands')}. At 1:1.41 they
      land in fresh places between the others and thicken the clang.`,
   ],
   maths: [
