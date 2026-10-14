@@ -294,3 +294,21 @@ while the text scrolls, and for the space bar to start and stop the sound.
 - **Other chapters keep no sound in the URL**; parameters on their hash are
   taken out of the address. The contents link to the sandbox opens it
   fresh.
+
+## The live spectrum (PR #12)
+
+- **A Predicted / Live switch** at the end of every spectrum figure's
+  caption, Predicted to begin with. It holds for the visit, across
+  chapters; it is not saved and not in the URL.
+- **Live draws the measured FFT** as a filled --pen-blue curve on the same
+  frequency axis and the same linear scale as the predicted stems, which
+  stay underneath, faint, for comparison. A measured spectrum has no
+  phase, so the curve never goes below the axis and is never red.
+- **The measurement is taken before the volume**, not after the limiter.
+  The limiter never acts at the lab's levels, so the shape is what is
+  heard; tapping before the volume keeps the curve's heights on the
+  predicted stems' scale at any volume. A full-height sine reads 1.
+- **With nothing playing** the curve lies flat and the caption says "Press
+  Play to hear it."
+- **Under reduced motion** the live view is redrawn twice a second rather
+  than every frame.
