@@ -76,6 +76,12 @@ export function hzAxisEnd(ratio: number, index: number): number {
  */
 export function axisSpan(state: LabState): number {
   if (state.mode === 'ops') return operatorsAxisEnd(state);
+  if (state.compare) {
+    // Chapter 9's two spectra share one axis, wide enough for either: the
+    // frequency-modulated one's index is index / ratio.
+    const { ratio, index } = state;
+    return Math.max(axisEnd(ratio, index), axisEnd(ratio, index / ratio));
+  }
   const { ratio, index } = patchOf(state);
   return state.realUnits
     ? hzAxisEnd(ratio, index) / state.carrierHz

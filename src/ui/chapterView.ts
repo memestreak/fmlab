@@ -257,6 +257,12 @@ export function mountChapters(store: LabStore): void {
     if (piano) piano.hidden = !chapter.hasPiano;
     const operators = document.querySelector<HTMLElement>('#operators-panel');
     if (operators) operators.hidden = chapter.patch.mode !== 'ops';
+    // Chapter 9 has a switch for what is heard, and draws both spectra
+    // predicted, so no live view there.
+    const hear = document.querySelector<HTMLElement>('#hear-switch');
+    if (hear) hear.hidden = !chapter.patch.compare;
+    const live = document.querySelector<HTMLElement>('#live-switch');
+    if (live) live.hidden = chapter.patch.compare;
     const picker = document.querySelector<HTMLElement>('#algorithm-picker');
     if (picker) picker.hidden = chapter.patch.mode !== 'ops';
     const share = document.querySelector<HTMLElement>('#share');

@@ -82,7 +82,11 @@ export class AudioEngine {
         if (state.playing) void this.start();
         else this.stop();
       } else if (state.playing) {
-        if (state.chapter !== previous.chapter) this.changeScene();
+        // A new chapter, or switching chapter 9 between PM and FM: fade
+        // through the change rather than click.
+        if (state.chapter !== previous.chapter || state.mode !== previous.mode) {
+          this.changeScene();
+        }
         else if (!this.changingScene) this.sendPatch(state, GLIDE_SECONDS);
       } else if (state.chapter !== previous.chapter) {
         // A note may still be ringing from the chapter left behind.

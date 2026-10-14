@@ -17,9 +17,10 @@ figures move with, and then the ways on. Version 1's seven
 chapters are all written: 1 "A single sine", 2 "Vibrato becomes timbre",
 3 "Modulation index", 4 "Sidebands and Bessel functions", 5 "Carrier to
 modulator ratio", 6 "Time-varying index" and 7, the Sandbox; numbers are
-the spec's. They use one carrier and one modulator. Version 2 has begun
-with 8 "Operators and algorithms": six operators wired by the DX7's 32
-algorithms.
+the spec's. They use one carrier and one modulator. Version 2 has 8
+"Operators and algorithms", six operators wired by the DX7's 32
+algorithms, and 9 "FM versus PM", the same patch as phase and as true
+frequency modulation side by side.
 
 ## Commands
 
@@ -63,6 +64,9 @@ figures subscribe to it. Nothing else passes values around.
   carrier, ratio and index: `#7?c=220&r=1.41&i=5`.
   The patch is held two ways, by `mode`. `pm` (everywhere but chapter 2):
   `ratio` and `index`. `fm` (chapter 2): `modHz` and `deviationHz`.
+  Chapter 9 (`compare`) shows both: Fig. 1 draws `asPm(state)`, Fig. 2
+  (`#compare`) `asFm(state)`, FM matched at ratio 1 (Δf = index × fc, so
+  its index is index / ratio); `mode` is only what is heard.
   `patchOf(state)` gives a ratio and an index for either, which is what the
   figures and spectrum maths take; never read `state.ratio` or
   `state.index` directly outside `pm`-only code.
@@ -189,6 +193,9 @@ figures subscribe to it. Nothing else passes values around.
   of step buttons, the buttons heading the text's sections, and what
   shows at which step (the step is `currentStep(steps, algorithm)` in
   `src/chapters/steps.ts`, never stored);
+  `compare.ts` is chapter 9's Hear PM / FM switch (it sets `mode`), and
+  keeps `modHz` and `deviationHz` at `asFm(state)`'s while the chapter has
+  `compare`, so the FM sound follows Ratio and Index;
   `envelopeControls.ts` drags the envelope's dots; `piano.ts` is the
   sandbox's one-voice keyboard, on screen and on the computer's keys
   (by `KeyboardEvent.code`: A to K the white notes, W E T Y U O P the

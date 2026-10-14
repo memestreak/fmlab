@@ -369,3 +369,26 @@ while the text scrolls, and for the space bar to start and stop the sound.
   preset with longer decays after a note had ended made it look still
   sounding, so Play stopped instead of playing; this was true of chapter 6
   too.
+
+## Chapter 9, FM versus PM (PR #14)
+
+- **Two spectra, one patch.** Fig. 1 is the patch as phase modulation,
+  Fig. 2 as true frequency modulation, on one shared axis wide enough for
+  either. The only sliders are Ratio and Index, so the comparison is the
+  one the text makes: how each responds to the ratio.
+- **Matched at ratio 1.** FM's deviation is Index times the carrier
+  (Δf = I·fc), so its index is I / ratio: the two agree at ratio 1 and FM
+  thins as the modulator speeds up, grows dense below 1. Even at ratio 1
+  the heights differ a little, since the folded sidebands combine with
+  different phases (FM's modulator is a quarter cycle on); the text says
+  "much the same", not "the same".
+- **Hear PM / FM** beside Play sets which one sounds, crossfading if it is
+  playing. It is not saved and the chapter always opens on PM. The live
+  spectrum switch is hidden here: both figures are predictions.
+- **Why the DX7 is PM:** the text gives two reasons, carefully: with PM
+  brightness does not move when a modulator is retuned, and an offset in a
+  modulated or fed-back modulator is a harmless phase shift in PM but a
+  pitch drift in FM. A maths panel shows FM as PM with index Δf / fm and
+  the modulator a quarter cycle on.
+- **Not built:** a demonstration of the FM drift, which would need FM
+  stacks or feedback in the engine; the panel shows it in symbols instead.

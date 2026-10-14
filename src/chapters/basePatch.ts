@@ -28,4 +28,5 @@ export const BASE_PATCH: ChapterPatch = {
   algorithm: DEFAULTS.algorithm,
   operators: DEFAULTS.operators,
   feedback: 0,
+  compare: false,
 };

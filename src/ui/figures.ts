@@ -4,6 +4,8 @@ import {
   envelopeOf,
   type LabState,
   type LabStore,
+  asFm,
+  asPm,
   noteSounding,
   patchOf,
 } from '../model/lab';
@@ -47,6 +49,7 @@ const DRAWN: (keyof LabState)[] = [
   'realUnits',
   'showHarmonics',
   'liveSpectrum',
+  'compare',
   'algorithm',
   'operators',
   'feedback',
@@ -218,7 +221,10 @@ export function mountFigures(store: LabStore, engine: AudioEngine): void {
       store,
       (state, canvas, time) => {
         const now = time ?? performance.now() / 1000;
-        if (state.liveSpectrum) {
+        if (state.compare) {
+          // Chapter 9: always the phase-modulated one, whichever is heard.
+          drawSpectrum(asPm(state), canvas);
+        } else if (state.liveSpectrum) {
           // Under reduced motion the live view moves only a few times a
           // second; each time is a still picture of the sound.
           if (time !== undefined && reduced.matches && now - lastLive < CALM_SECONDS) return;
@@ -257,6 +263,16 @@ export function mountFigures(store: LabStore, engine: AudioEngine): void {
   live?.addEventListener('click', () => store.set({ liveSpectrum: true }));
   store.subscribe(showSwitch);
   showSwitch(store.get());
+
+  // Chapter 9's second spectrum: the patch as true frequency modulation.
+  const compare = document.querySelector<HTMLCanvasElement>('#compare');
+  if (compare) {
+    mountFigure(compare, store, (state, canvas) => {
+      const fm = asFm(state);
+      const lines = drawSpectrum(fm, canvas);
+      canvas.setAttribute('aria-label', describeSpectrum(fm, lines));
+    });
+  }
 
   // Chapter 8's algorithm, as the DX7 draws it.
   const diagram = document.querySelector<HTMLCanvasElement>('#algorithm-plot');

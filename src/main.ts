@@ -22,6 +22,7 @@ import { loadTheme } from './model/theme';
 import { mountBesselControls } from './ui/besselControls';
 import { chapterInUrl, mountChapters, openingFromUrl } from './ui/chapterView';
 import { mountEnvelopeControls } from './ui/envelopeControls';
+import { mountCompare } from './ui/compare';
 import { mountFigures } from './ui/figures';
 import { mountOperators } from './ui/operators';
 import { mountPiano } from './ui/piano';
@@ -68,6 +69,7 @@ mountFigures(store, engine);
 mountBesselControls(store);
 mountOperators(store);
 mountSteps(store);
+mountCompare(store);
 mountEnvelopeControls(store);
 
 const play = document.querySelector<HTMLButtonElement>('#play');

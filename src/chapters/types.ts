@@ -17,6 +17,7 @@ export type ControlId =
 /** A figure on the page, by the id of its canvas in index.html. */
 export type FigureId =
   | 'algorithm'
+  | 'compare'
   | 'waveform'
   | 'envelope'
   | 'spectrum'
@@ -52,6 +53,7 @@ export type ChapterPatch = Pick<
   | 'algorithm'
   | 'operators'
   | 'feedback'
+  | 'compare'
 >;
 
 /** An expandable panel: the formulas, for whoever wants them. */

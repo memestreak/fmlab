@@ -72,6 +72,10 @@
                 <input id="motion" type="checkbox" />
                 Show motion
               </label>
+              <!-- Chapter 9: which of its two sounds Play plays. -->
+              <span id="hear-switch" class="switch" role="group" aria-label="Hear" hidden>
+                <button id="hear-pm" type="button" class="switch-option" aria-pressed="true">Hear PM</button><button id="hear-fm" type="button" class="switch-option" aria-pressed="false">Hear FM</button>
+              </span>
               <!-- Chapter 8's algorithm, beside Play. -->
               <label id="algorithm-picker" class="op-algorithm" hidden>
                 Algorithm
@@ -240,9 +244,20 @@
               <span id="spectrum-note"></span>
               <!-- The spectrum predicted from the patch, or measured from
                    the sound. See ui/figures.ts. -->
-              <span class="switch" role="group" aria-label="Spectrum">
+              <span id="live-switch" class="switch" role="group" aria-label="Spectrum">
                 <button id="spectrum-predicted" type="button" class="switch-option" aria-pressed="true">Predicted</button><button id="spectrum-live" type="button" class="switch-option" aria-pressed="false">Live</button>
               </span>
+            </figcaption>
+          </figure>
+
+          <figure class="figure" data-figure="compare">
+            <div class="plot-frame">
+              <canvas id="compare" class="plot" role="img"></canvas>
+            </div>
+            <figcaption>
+              Fig. <span class="figure-number"></span>&emsp;<span
+                id="compare-caption"
+              ></span>
             </figcaption>
           </figure>
 

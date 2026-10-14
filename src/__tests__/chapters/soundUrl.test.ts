@@ -22,7 +22,7 @@ describe('a hash with a sound in it', () => {
   it('still names its chapter', () => {
     expect(chapterFromHash('#7?c=220&r=1&i=2', NUMBERS, 0)).toBe(7);
     expect(isStrayHash('#7?c=220&r=1&i=2', NUMBERS)).toBe(false);
-    expect(isStrayHash('#9?c=220', NUMBERS)).toBe(true);
+    expect(isStrayHash('#10?c=220', NUMBERS)).toBe(true);
   });
 
   it('gives up its parameters', () => {
