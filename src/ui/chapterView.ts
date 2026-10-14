@@ -1,9 +1,11 @@
 import {
   type Chapter,
   chapterByNumber,
+  glossary,
   CHAPTERS,
   type ControlId,
   type FigureId,
+  GLOSSARY,
   landing,
   LANDING,
   neighbours,
@@ -16,6 +18,7 @@ import {
   soundFromParams,
   soundParams,
 } from '../chapters/route';
+import { glossaryOrder, term, type TermId, TERMS } from '../chapters/terms';
 import type { LabState, LabStore } from '../model/lab';
 
 /** How long the sound must rest before the address is brought up to date. */
@@ -51,7 +54,8 @@ export function openingFromUrl(chapter: Chapter): Partial<LabState> {
   const { hash, pathname, search } = window.location;
   const params = paramsFromHash(hash);
   if (!chapter.sharesSound) {
-    if ([...params].length > 0) {
+    // The glossary's parameter names an entry, not a sound: it stays.
+    if ([...params].length > 0 && chapter.number !== GLOSSARY) {
       window.history.replaceState(null, '', pathname + search + hashForChapter(chapter.number));
     }
     return chapter.patch;
@@ -134,7 +138,37 @@ const PAIR_DIAGRAM = `
 const paragraph = (html: string) =>
   html.trimStart().startsWith('<p') ? html : `<p>${html}</p>`;
 
+/**
+ * The glossary: every defined term, alphabetically, each with its
+ * definition, its formula if it has one, and the chapter that defines it.
+ */
+function glossaryHtml(): string {
+  const entries = glossaryOrder()
+    .map(id => {
+      const { name, plain, formula, chapter } = term(id);
+      const home = chapterByNumber(chapter)!;
+      return `
+        <div class="glossary-entry" id="term-${id}" tabindex="-1">
+          <dt>${name}</dt>
+          <dd>
+            <p>${plain}</p>
+            ${formula ? `<p class="formula">${formula}</p>` : ''}
+            <p class="glossary-from">Defined in
+              <a href="${hashForChapter(home.number)}">chapter ${home.number}, ${home.title}</a></p>
+          </dd>
+        </div>`;
+    })
+    .join('');
+  return `
+    <h2 class="chapter-title" tabindex="-1">Glossary</h2>
+    <p>Every term this guide defines, in alphabetical order, each with the
+       chapter that introduces it. In the chapters a defined term is
+       underlined with dots: point at it, or tap it, to see what it means.</p>
+    <dl class="glossary">${entries}</dl>`;
+}
+
 function narrativeHtml(chapter: Chapter): string {
+  if (chapter.number === GLOSSARY) return glossaryHtml();
   // The landing view is one line: no number, no heading but the wordmark.
   if (chapter.number === LANDING) {
     return `<div class="landing-line">${chapter.body.map(paragraph).join('')}</div>`;
@@ -205,11 +239,13 @@ function landingNextHtml(): string {
 }
 
 function contentsHtml(current: Chapter): string {
-  return CHAPTERS.map(chapter => {
+  return [...CHAPTERS, glossary].map(chapter => {
     const here = chapter === current ? ' aria-current="page"' : '';
     return (
       `<a href="${hashForChapter(chapter.number)}"${here} ` +
-      `aria-label="Chapter ${chapter.number}: ${chapter.title}">` +
+      `aria-label="${
+        chapter.number === GLOSSARY ? 'Glossary' : `Chapter ${chapter.number}: ${chapter.title}`
+      }">` +
       `${chapter.navLabel}</a>`
     );
   }).join('');
@@ -235,8 +271,13 @@ export function mountChapters(store: LabStore): void {
     if (narrative) narrative.innerHTML = narrativeHtml(chapter);
     if (contents) contents.innerHTML = contentsHtml(chapter);
     document.title = isLanding ? 'fmlab' : `${chapter.title} · fmlab`;
-    // For the stylesheet: the landing view is one centred column.
-    document.body.dataset.view = isLanding ? 'landing' : 'chapter';
+    // For the stylesheet: the landing view is one centred column, and so
+    // is the glossary, with no lab.
+    document.body.dataset.view = isLanding
+      ? 'landing'
+      : chapter.number === GLOSSARY
+        ? 'glossary'
+        : 'chapter';
     // The ways on appear once the landing view's sound has been heard,
     // and stay if it is come back to.
     if (next) next.hidden = !isLanding || store.get().notes === 0;
@@ -326,7 +367,8 @@ export function mountChapters(store: LabStore): void {
       hover: null,
       pinned: null,
       noteStartedAt: null,
-      ...(chapter.patch.noteMode ? { playing: false } : {}),
+      // The glossary has no lab to stop a sound from.
+      ...(chapter.patch.noteMode || chapter.number === GLOSSARY ? { playing: false } : {}),
     });
     // A new chapter starts at its top, and says so to a screen reader.
     // On a wide screen the text scrolls in its own column, so that too.
@@ -335,10 +377,31 @@ export function mountChapters(store: LabStore): void {
     narrative
       ?.querySelector<HTMLElement>('.chapter-title')
       ?.focus({ preventScroll: true });
+    showTermInUrl();
   });
 
   mountSoundInUrl(store);
 
   const first = chapterByNumber(store.get().chapter);
   if (first) show(first);
+  showTermInUrl();
+}
+
+/**
+ * In the glossary, the entry the URL names ("#glossary?t=index"): brought
+ * into view, marked and focused, so a term's link lands on its meaning.
+ */
+function showTermInUrl(): void {
+  const { hash } = window.location;
+  if (chapterFromHash(hash, NUMBERS, LANDING) !== GLOSSARY) return;
+  const id = paramsFromHash(hash).get('t');
+  for (const entry of document.querySelectorAll('.glossary-entry.is-current')) {
+    entry.classList.remove('is-current');
+  }
+  if (!id || !(id in TERMS)) return;
+  const entry = document.getElementById(`term-${id as TermId}`);
+  if (!entry) return;
+  entry.classList.add('is-current');
+  entry.focus({ preventScroll: true });
+  entry.scrollIntoView({ block: 'center' });
 }

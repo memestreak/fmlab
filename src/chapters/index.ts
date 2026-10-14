@@ -1,6 +1,7 @@
 import { bessel } from './bessel';
 import { envelope } from './envelope';
 import { fmVsPm } from './fmVsPm';
+import { glossary, GLOSSARY } from './glossary';
 import { landing, LANDING } from './landing';
 import { modulationIndex } from './modulationIndex';
 import { operators } from './operators';
@@ -39,11 +40,15 @@ export const CHAPTERS: readonly Chapter[] = [
 /** The guide's first chapter. (The site itself opens on the landing view.) */
 export const FIRST_CHAPTER = CHAPTERS[0].number;
 
-export { landing, LANDING };
+export { glossary, GLOSSARY, landing, LANDING };
 
-/** A chapter of the guide by its number, or the landing view by its own. */
+/**
+ * A chapter of the guide by its number, or the landing view or the
+ * glossary by their own.
+ */
 export function chapterByNumber(number: number): Chapter | undefined {
   if (number === LANDING) return landing;
+  if (number === GLOSSARY) return glossary;
   return CHAPTERS.find(chapter => chapter.number === number);
 }
 

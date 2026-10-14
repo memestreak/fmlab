@@ -28,6 +28,7 @@ import { mountOperators } from './ui/operators';
 import { mountPiano } from './ui/piano';
 import { mountSliders } from './ui/sliders';
 import { mountSteps } from './ui/steps';
+import { mountTerms } from './ui/terms';
 import { mountThemeSwitch } from './ui/themeSwitch';
 import {
   mountControlsToggle,
@@ -64,6 +65,7 @@ const store = createLabStore({
 const engine = new AudioEngine(store);
 
 mountChapters(store);
+mountTerms();
 mountSliders(store);
 mountFigures(store, engine);
 mountBesselControls(store);

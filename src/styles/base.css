@@ -316,6 +316,97 @@ a {
   display: none;
 }
 
+/* A defined term: a link to the glossary, in ink, underlined with dots.
+   Where it is defined it is also set in bold. */
+a.term {
+  color: inherit;
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+a.term:hover {
+  text-decoration-style: solid;
+}
+
+dfn {
+  font-style: normal;
+  font-weight: 600;
+}
+
+/* What a term means, beside it while it is pointed at, focused or
+   tapped: a slip of paper with an ink rule round it. */
+.term-tip {
+  position: fixed;
+  z-index: 20;
+  max-width: min(20rem, calc(100vw - 1rem));
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--ink);
+  border-radius: 4px;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 0.85rem;
+  line-height: 1.4;
+  pointer-events: none;
+}
+
+.term-tip[hidden] {
+  display: none;
+}
+
+/* The glossary: no lab, one column of entries, as the landing view. */
+[data-view='glossary'] .chapter {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 44rem;
+  margin: 0 auto;
+}
+
+[data-view='glossary'] .lab {
+  display: none;
+}
+
+.glossary {
+  margin: 1.5rem 0 0;
+}
+
+.glossary-entry {
+  padding: 0.75rem 0 0.75rem 0.9rem;
+  border-top: 1px solid var(--rule);
+  border-left: 3px solid transparent;
+  scroll-margin: 2rem;
+}
+
+.glossary-entry:focus {
+  outline: none;
+}
+
+/* The entry a term's link came to. */
+.glossary-entry.is-current {
+  border-left-color: var(--ink);
+}
+
+.glossary dt {
+  font-weight: 600;
+}
+
+.glossary dd {
+  margin: 0.25rem 0 0;
+}
+
+.glossary dd p {
+  margin: 0.25rem 0;
+}
+
+.glossary-from {
+  font-size: 0.85rem;
+}
+
+.footer-links {
+  display: flex;
+  gap: 1rem;
+}
+
 /* The two operators of chapters 3 to 7, drawn small beside the text as
    chapter 8 draws a wiring. */
 .pair-diagram {

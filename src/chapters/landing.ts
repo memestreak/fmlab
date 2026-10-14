@@ -19,7 +19,8 @@ export const landing: Chapter = {
   title: 'fmlab',
   navLabel: 'fmlab',
   body: [
-    `An interactive guide to FM synthesis: how two sine waves, one bending
+    `An interactive guide to FM (frequency modulation) synthesis: how two
+     sine waves, one bending
      the other, make sounds as rich as a brass section or a bell. Press
      Play.`,
   ],

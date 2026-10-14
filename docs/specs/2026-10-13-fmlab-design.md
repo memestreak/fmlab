@@ -392,3 +392,32 @@ while the text scrolls, and for the space bar to start and stop the sound.
   the modulator a quarter cycle on.
 - **Not built:** a demonstration of the FM drift, which would need FM
   stacks or feedback in the engine; the panel shows it in symbols instead.
+
+## Definitions and the glossary (PR #16)
+
+- **Every term is defined where it is first used**, in bold, by one plain
+  sentence, and its formula, where it has one, is in that chapter's
+  maths panel. 33 terms, from sine wave and carrier in chapter 1 to
+  algorithm and the FFT in chapter 8 (chapters 7 and 9 define none).
+- **One source:** `src/chapters/terms.ts`. The chapter text, the glossary
+  and the tips all read the same sentence, so they cannot disagree. A
+  unit test checks each term is defined once, in the chapter it names,
+  and that no text uses it earlier, including the maths panels and the
+  captions; headings and slider labels are not checked.
+- **Copy reordered to pass that test:** chapter 1 introduces the carrier
+  first and no longer names FM; chapter 2's maths no longer names the
+  index, phase or phase modulation, which chapter 3 now introduces in its
+  text (before, only its maths panel said the guide had switched to
+  phase modulation); chapter 3 no longer says sidebands "fold", which
+  chapter 5 defines. Chapter 8 says an operator's ratio is a multiple of
+  the note, not chapter 5's ratio. The landing line spells out FM.
+- **The glossary** is a page of its own at `#glossary`, alphabetical, each
+  entry with its formula and a link to its chapter; it is in the
+  contents after chapter 9 and in the footer. A term's link goes to
+  `#glossary?t=<id>`, which brings that entry into view and marks it.
+- **Marked terms** are links in ink with a dotted underline. Pointing at
+  one, or focusing it, shows its definition in a tip; on a touch screen
+  the first tap shows the tip and the second follows the link. A screen
+  reader hears the definition as the link's description. Defining
+  instances are marked, and some later mentions (the sandbox's,
+  chapter 9's); not every mention, which would underline half the text.
