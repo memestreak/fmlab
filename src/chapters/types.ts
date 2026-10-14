@@ -89,6 +89,8 @@ export interface Chapter {
    * has a moving view.
    */
   hasMotion: boolean;
+  /** Whether to show the piano keyboard, to play the patch at pitches. */
+  hasPiano?: boolean;
   patch: ChapterPatch;
   /**
    * The figures shown, each with what follows "Fig. n" under it. They

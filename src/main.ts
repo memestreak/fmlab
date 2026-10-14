@@ -16,12 +16,14 @@ import './styles/tokens.css';
 import './styles/base.css';
 
 import { AudioEngine } from './audio/engine';
+import { chapterByNumber } from './chapters';
 import { createLabStore } from './model/lab';
 import { loadTheme } from './model/theme';
 import { mountBesselControls } from './ui/besselControls';
 import { chapterInUrl, mountChapters } from './ui/chapterView';
 import { mountEnvelopeControls } from './ui/envelopeControls';
 import { mountFigures } from './ui/figures';
+import { mountPiano } from './ui/piano';
 import { mountSliders } from './ui/sliders';
 import { mountThemeSwitch } from './ui/themeSwitch';
 import {
@@ -68,6 +70,11 @@ if (play) mountPlayButton(play, store);
 
 const motion = document.querySelector<HTMLInputElement>('#motion');
 if (motion) mountMotionToggle(motion, store);
+
+const piano = document.querySelector<HTMLElement>('#piano');
+if (piano) {
+  mountPiano(piano, store, () => chapterByNumber(store.get().chapter)?.hasPiano === true);
+}
 
 const toggle = document.querySelector<HTMLButtonElement>('#controls-toggle');
 if (toggle) mountControlsToggle(toggle);

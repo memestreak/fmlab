@@ -134,11 +134,14 @@ export function mountChapters(store: LabStore): void {
     for (const row of document.querySelectorAll<HTMLElement>('[data-control]')) {
       row.hidden = !chapter.controls.includes(row.dataset.control as ControlId);
     }
-    // For the stylesheet: a chapter with many sliders sets them in two
-    // columns where the lab is pinned beside the text, to leave its
-    // figures room.
+    // For the stylesheet: a chapter with many controls (many sliders, or
+    // the piano as well) sets its sliders in two columns where the lab is
+    // pinned beside the text, to leave its figures room.
     const lab = document.querySelector<HTMLElement>('.lab');
-    if (lab) lab.dataset.manySliders = String(chapter.controls.length > MANY_SLIDERS);
+    const many = chapter.controls.length > MANY_SLIDERS || chapter.hasPiano === true;
+    if (lab) lab.dataset.manySliders = String(many);
+    const piano = document.querySelector<HTMLElement>('#piano');
+    if (piano) piano.hidden = !chapter.hasPiano;
     const motion = document.querySelector<HTMLElement>('#motion-toggle');
     if (motion) motion.hidden = !chapter.hasMotion;
     const follows = document.querySelector<HTMLElement>('#index-follows-toggle');
