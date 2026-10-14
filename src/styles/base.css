@@ -991,6 +991,10 @@ a {
   }
 }
 
+.switch[hidden] {
+  display: none;
+}
+
 /* A two-way switch, Predicted / Live, at the end of the spectrum's
    caption: two joined buttons, the one in force filled with ink. Not in
    italics, which are the caption's. */

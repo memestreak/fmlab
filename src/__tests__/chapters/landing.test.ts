@@ -46,14 +46,14 @@ describe('where the site opens', () => {
   });
 
   it('is the landing view for a number with no chapter, even its own', () => {
-    expect(chapterFromHash('#9', NUMBERS, LANDING)).toBe(LANDING);
+    expect(chapterFromHash('#10', NUMBERS, LANDING)).toBe(LANDING);
     // The landing view has no address of its own: "#0" is a stray.
     expect(chapterFromHash('#0', NUMBERS, LANDING)).toBe(LANDING);
     expect(isStrayHash('#0', NUMBERS)).toBe(true);
   });
 
   it('takes out of the address bar a hash that names nothing', () => {
-    expect(isStrayHash('#9', NUMBERS)).toBe(true);
+    expect(isStrayHash('#10', NUMBERS)).toBe(true);
     expect(isStrayHash('#chapter-two', NUMBERS)).toBe(true);
   });
 

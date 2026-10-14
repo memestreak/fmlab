@@ -1,5 +1,6 @@
 import { bessel } from './bessel';
 import { envelope } from './envelope';
+import { fmVsPm } from './fmVsPm';
 import { landing, LANDING } from './landing';
 import { modulationIndex } from './modulationIndex';
 import { operators } from './operators';
@@ -32,6 +33,7 @@ export const CHAPTERS: readonly Chapter[] = [
   envelope,
   sandbox,
   operators,
+  fmVsPm,
 ];
 
 /** The guide's first chapter. (The site itself opens on the landing view.) */

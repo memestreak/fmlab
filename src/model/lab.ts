@@ -102,6 +102,11 @@ export interface LabState {
   operators: Operator[];
   /** `ops`: how much the algorithm's feedback loop feeds back, in radians. */
   feedback: number;
+  /**
+   * Chapter 9: phase and frequency modulation side by side, both set by
+   * `ratio` and `index`. `mode` says which is heard.
+   */
+  compare: boolean;
   /** Master gain. */
   volume: number;
   /** Whether sound is wanted. The audio engine follows it. */
@@ -172,6 +177,7 @@ export const DEFAULTS: LabState = {
     { ratio: 1, level: 0.2, decay: 0 },
   ],
   feedback: 0,
+  compare: false,
   // Low on purpose: FM gets bright, and loud, quickly.
   volume: 0.2,
   playing: false,
@@ -188,6 +194,30 @@ export function createLabStore(initial: Partial<LabState> = {}): LabStore {
  * modulator's Hz over the carrier's, and the index is the deviation over
  * the modulator's Hz, so a slower modulator means a larger index.
  */
+/**
+ * Chapter 9's patch as phase modulation: ratio and index as set. The same
+ * whichever is being heard.
+ */
+export function asPm(state: LabState): LabState {
+  return { ...state, mode: 'pm' };
+}
+
+/**
+ * Chapter 9's patch as true frequency modulation, matched to the phase
+ * modulation at a ratio of 1: the modulator at `ratio` times the carrier,
+ * pushing the carrier's frequency by `index` times the carrier's. So its
+ * index, deviation over modulator, is index / ratio: the same as phase
+ * modulation's at ratio 1, larger below it and smaller above.
+ */
+export function asFm(state: LabState): LabState {
+  return {
+    ...state,
+    mode: 'fm',
+    modHz: state.ratio * state.carrierHz,
+    deviationHz: state.index * state.carrierHz,
+  };
+}
+
 export function patchOf(state: LabState): { ratio: number; index: number } {
   if (state.mode === 'pm') return { ratio: state.ratio, index: state.index };
   return {
