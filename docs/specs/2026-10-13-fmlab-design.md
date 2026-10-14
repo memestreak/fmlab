@@ -524,3 +524,27 @@ A Lighthouse audit of production (mobile) found three things to fix.
 - Chrome's bar goes from 15 px to 6 px. Only the text pane's line breaks
   change; the lab is a separate column and fits as before.
 - Before and after: `docs/screenshots/scrollbar-*.png`.
+
+## A consistent home page (PR #21)
+
+Jeremy found the step from the home page to the first section abrupt:
+the landing view was a centred column with a large Play and tall
+figures, and every part of the page moved.
+
+- **The landing view is now laid out as a section:** the same header,
+  the text in the left column (kicker "Introduction", title "Hearing FM",
+  the one-line pitch, the two ways on and the grouped list of sections)
+  and the pinned lab on the right (Play, Volume, the waveform and the
+  spectrum, with captions), the same footer. On a phone the lab sticks
+  above the text as in the sections.
+- **Measured going from `#/` to `#/sine`:** the header, both columns, the
+  lab, Play and the footer keep the same boxes at 1280×800, 1024×768 and
+  1440×900; the figures sit 34 px lower in A single sine only because it
+  has one more slider (Carrier), as any two sections differ. Screenshots:
+  `docs/screenshots/home-*.png`.
+- **The ways on are always shown,** no longer after the first Play: the
+  text column has room, and the reader can start reading or press Play.
+- **In the sequence:** the landing view's Next is A single sine, whose
+  Previous is the landing view, and the Contents panel lists it first,
+  under Introduction.
+
