@@ -1,4 +1,4 @@
-import { chapterByNumber } from '../chapters';
+import { chapterById } from '../chapters';
 import { currentStep, isLastStep } from '../chapters/steps';
 import type { Chapter } from '../chapters/types';
 import { algorithm } from '../dsp/algorithms';
@@ -41,7 +41,7 @@ export function mountSteps(store: LabStore): void {
 
   narrative?.addEventListener('click', event => {
     const button = (event.target as Element).closest<HTMLElement>('[data-step]');
-    const chapter = chapterByNumber(store.get().chapter);
+    const chapter = chapterById(store.get().chapter);
     if (button && chapter) go(chapter, Number(button.dataset.step), false);
   });
 
@@ -84,11 +84,11 @@ export function mountSteps(store: LabStore): void {
   };
 
   store.subscribe((state, previous) => {
-    if (state.chapter !== previous.chapter) build(chapterByNumber(state.chapter));
+    if (state.chapter !== previous.chapter) build(chapterById(state.chapter));
     if (state.chapter !== previous.chapter || state.algorithm !== previous.algorithm) {
       show(state);
     }
   });
-  build(chapterByNumber(store.get().chapter));
+  build(chapterById(store.get().chapter));
   show(store.get());
 }

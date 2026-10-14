@@ -1,4 +1,4 @@
-import { chapterByNumber, CHAPTERS } from '../../chapters';
+import { chapterById, CHAPTERS } from '../../chapters';
 import { hzToSemitones, RATIO } from '../../model/lab';
 import {
   FIRST_START,
@@ -115,10 +115,10 @@ describe('the keyboard', () => {
 });
 
 describe('the sandbox', () => {
-  const sandbox = chapterByNumber(7)!;
+  const sandbox = chapterById('sandbox')!;
 
   it('is the only chapter with the piano', () => {
-    expect(CHAPTERS.filter(c => c.hasPiano).map(c => c.number)).toEqual([7]);
+    expect(CHAPTERS.filter(c => c.hasPiano).map(c => c.id)).toEqual(['sandbox']);
   });
 
   it('has presets for a ratio and an index each, inside the sliders', () => {

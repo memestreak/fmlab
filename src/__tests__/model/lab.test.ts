@@ -21,7 +21,7 @@ import { nextTheme, parseTheme } from '../../model/theme';
 describe('the lab store', () => {
   it('starts on the default patch, silent', () => {
     expect(createLabStore().get()).toMatchObject({
-      chapter: 1,
+      chapter: 'sine',
       mode: 'pm',
       carrierHz: 220,
       ratio: 1,

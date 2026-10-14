@@ -1,19 +1,18 @@
 import { BASE_PATCH } from './basePatch';
 import { use } from './terms';
+import { sectionLink, titleOf } from './outline';
 import type { Chapter } from './types';
 
 export const fmVsPm: Chapter = {
-  number: 9,
-  title: 'FM versus PM',
-  navLabel: '9',
+  id: 'fm-vs-pm',
+  title: titleOf('fm-vs-pm'),
   body: [
     `The DX7 is sold as an FM synthesizer, and this guide has called its
-     sound FM. Strictly, though, everything since chapter 3 has been
+     sound FM. Strictly, though, everything since ${sectionLink('index')} has been
      ${use('pm')}: the modulator is added to the
-     carrier's phase, not to its frequency. Chapter 2 was the one
-     exception. Why the DX7 does it this way is easiest to see side by
+     carrier's phase, not to its frequency. ${sectionLink('vibrato')} was the one exception. Why the DX7 does it this way is easiest to see side by
      side.`,
-    `Fig. 1 is phase modulation, as in the sandbox: the modulator pushes
+    `Fig. 1 is phase modulation, as in the two-operator sections: the modulator pushes
      the carrier's phase by up to Index radians. Fig. 2 is true
      ${use('fm')}, matched to it at a ratio of 1: the modulator pushes the
      carrier's frequency by up to Index times the carrier's frequency. At
@@ -43,7 +42,7 @@ export const fmVsPm: Chapter = {
         `Phase modulation adds the modulator to the phase:`,
         `<p class="formula"><var>x</var><sub>PM</sub>(<var>t</var>) = sin(2π <var>f</var><sub>c</sub> <var>t</var> + <var>I</var> sin 2π <var>f</var><sub>m</sub> <var>t</var>)</p>`,
         `Frequency modulation adds it to the frequency, so the phase is the
-         frequency added up over time, as in chapter 2:`,
+         frequency added up over time, as in ${sectionLink('vibrato')}:`,
         `<p class="formula"><var>x</var><sub>FM</sub>(<var>t</var>) = sin(2π <var>f</var><sub>c</sub> <var>t</var> + (Δ<var>f</var> / <var>f</var><sub>m</sub>)(1 − cos 2π <var>f</var><sub>m</sub> <var>t</var>))</p>`,
         `The two are the same shape of signal with the modulator a quarter
          cycle apart, and with index Δ<var>f</var> / <var>f</var><sub>m</sub>

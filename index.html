@@ -26,10 +26,23 @@
   <body>
     <div class="page">
       <header class="masthead">
-        <!-- A bare "#" is no chapter: the landing view. -->
-        <h1 class="wordmark"><a href="#">fmlab</a></h1>
-        <!-- The chapters that exist; filled in by ui/chapterView.ts. -->
-        <nav id="contents" class="contents" aria-label="Chapters"></nav>
+        <h1 class="wordmark"><a href="#/">fmlab</a></h1>
+        <!-- The way round the guide: the contents panel, where the reader
+             is, and the glossary. Built by ui/contents.ts. -->
+        <nav class="guide-nav" aria-label="Guide">
+          <button
+            id="contents-open"
+            type="button"
+            class="btn btn-quiet"
+            aria-haspopup="dialog"
+            aria-controls="contents"
+            aria-expanded="false"
+          >
+            Contents
+          </button>
+          <span id="where" class="where"></span>
+          <a href="#/glossary" class="guide-link">Glossary</a>
+        </nav>
         <button id="theme" type="button" class="btn btn-quiet">
           Theme: Auto
         </button>
@@ -321,10 +334,19 @@
         ></nav>
       </main>
 
+      <!-- Every section, by group: opened by the Contents button. -->
+      <dialog id="contents" class="contents-panel" aria-labelledby="contents-title">
+        <div class="contents-head">
+          <h2 id="contents-title">Contents</h2>
+          <button id="contents-close" type="button" class="btn btn-quiet">Close</button>
+        </div>
+        <nav id="contents-list" aria-label="Sections"></nav>
+      </dialog>
+
       <footer class="footer">
         <span class="footer-links">
           <a href="https://github.com/memestreak/fmlab">Source</a>
-          <a href="#glossary">Glossary</a>
+          <a href="#/glossary">Glossary</a>
         </span>
         <span id="commit" class="num"></span>
       </footer>

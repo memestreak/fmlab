@@ -1,17 +1,17 @@
 import { BASE_PATCH } from './basePatch';
 import { define, formula } from './terms';
+import { sectionLink, titleOf } from './outline';
 import type { Chapter } from './types';
 
 export const bessel: Chapter = {
-  number: 4,
-  title: 'Sidebands and Bessel functions',
-  navLabel: '4',
+  id: 'sidebands',
+  title: titleOf('sidebands'),
   body: [
-    `Chapter 3 showed that more index means more sidebands. It did not say
+    `${sectionLink('index')} showed that more index means more sidebands. It did not say
      how tall each one is. They do not simply grow: drag the line in
      Fig. 2 from left to right and watch Fig. 1. Each stem rises, falls
      away to nothing, and comes back upside down, each at its own pace.`,
-    `To see that plainly this chapter moves the two waves apart. The
+    `To see that plainly this section moves the two waves apart. The
      carrier is up at 880 Hz and the modulator down at 55 Hz, so the
      sidebands stand 55 Hz apart on both sides of the carrier with plenty
      of room, and none of them bounces off zero.`,
@@ -64,8 +64,7 @@ export const bessel: Chapter = {
         `<p class="formula"><var>J</var><sub>0</sub>(<var>I</var>)<sup>2</sup> + 2 (<var>J</var><sub>1</sub>(<var>I</var>)<sup>2</sup> + <var>J</var><sub>2</sub>(<var>I</var>)<sup>2</sup> + …) = 1</p>`,
         `Turning up the index makes the sound brighter, not louder. And
          <var>J</var><sub><var>n</var></sub>(<var>I</var>) stays close to
-         zero until <var>I</var> is about <var>n</var>, which is Carson's
-         rule from chapter 3 seen from the other side.`,
+         zero until <var>I</var> is about <var>n</var>, which is Carson's rule from ${sectionLink('index')} seen from the other side.`,
       ],
     },
   ],

@@ -27,6 +27,8 @@ algorithms. It is a portfolio piece, a public sibling of frets.
 
 ## Chapters
 
+(Now named sections in a different order: see "Named sections" below.)
+
 Version 1:
 
 1. **A single sine.** Frequency and amplitude, as a waveform and as one spectral line.
@@ -450,3 +452,40 @@ while the text scrolls, and for the space bar to start and stop the sound.
 - **No new terms:** chapter 7's text mentions the switch without chapter
   8's words (operator, algorithm), which the glossary rule keeps for
   chapter 8; chapter 8's last step points back to the sandbox.
+
+## Named sections (PR #18)
+
+Jeremy asked for sections with names instead of numbers, a way to find
+them, and the sandbox at the end.
+
+- **The sequence and its names** are one data module,
+  `src/chapters/outline.ts`, in four groups: Basics (A single sine,
+  Vibrato becomes tone), Two operators (The modulation index, Sidebands
+  and Bessel functions, Carrier and modulator ratio, Sounds that change
+  over time), The DX7 (Operators and algorithms, FM versus PM) and Play
+  (Sandbox). Renaming or reordering is an edit there. Some titles changed
+  from the numbered chapters': "Vibrato becomes tone" (was "…timbre"),
+  "The modulation index", "Carrier and modulator ratio", "Sounds that
+  change over time" (was "Time-varying index").
+- **Addresses are names:** `#/sine` … `#/sandbox`, `#/` for the landing
+  view and `#/glossary` for the glossary (an entry `#/glossary?t=index`).
+  Old links (`#0` to `#9`, `#7?c=…`, `#7?m=6…`, `#glossary…`) are replaced
+  in the address bar by the address they meant, their parameters kept.
+- **No numbers on the page:** the kicker above a title is its group; the
+  copy names other sections, as links, where it said "chapter 3"; the
+  glossary says "Defined in" and the section's name. A test fails if any
+  copy says "chapter" and a number. Figures keep "Fig. 1" and "Fig. 2".
+- **The Contents button** in the header opens a panel listing the groups
+  and sections, the current one marked, and the glossary: a modal
+  dialog, so it takes focus (on the current section), keeps Tab inside,
+  closes on Escape or a click outside, and gives focus back; it fills a
+  phone's screen. Beside the button, where the reader is (group ·
+  section); Glossary is linked from the header and the footer.
+- **Previous and Next** at the end of each section are the neighbours'
+  names, across groups. The sandbox is last, so has no Next.
+- **The glossary's order test** uses the sequence from the outline. A
+  link to a later section names it by its title, which may contain a
+  term ("The modulation index"); such links do not count as using it.
+  With the sandbox last, its text now names operators and algorithms.
+- **Internally** a section is still a `Chapter`, with a string `id` in
+  place of the number; `state.chapter` holds it.

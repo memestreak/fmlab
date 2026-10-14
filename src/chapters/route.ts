@@ -1,10 +1,11 @@
-// The chapter is in the URL's hash, "#2", so a chapter can be linked to and
-// survives a reload. With no hash the site opens on the landing view. The
-// glossary is "#glossary", and one of its entries "#glossary?t=index".
-// Switched to six operators, the sandbox's link carries those instead:
-// "#7?m=6&c=220&a=5&f=0.7&o=1_90_2.5-1_35_1.2-1_70_1.5-14_25_0.4-1_40_2-1_15_1". The
-// sandbox also keeps its sound there, "#7?c=220&r=1.41&i=5", so a sound
-// can be shared by its link.
+// The section is in the URL's hash as an address, "#/index", so it can be
+// linked to and survives a reload. "#/" (or no hash) is the landing view,
+// "#/glossary" the glossary and "#/glossary?t=index" one of its entries.
+// The sandbox also keeps its sound there, "#/sandbox?c=220&r=1.41&i=5", or
+// with six operators
+// "#/sandbox?m=6&c=220&a=5&f=0.7&o=1_90_2.5-1_35_1.2-1_70_1.5-14_25_0.4-1_40_2-1_15_1",
+// so a sound can be shared by its link. Addresses from before the sections
+// had names ("#3", "#7?c=…", "#glossary") are upgraded by `upgradeHash`.
 
 import { DX7_COUNT } from '../dsp/algorithms';
 import type { Operator } from '../dsp/operators';
@@ -21,30 +22,28 @@ import {
   RATIO,
   semitonesToHz,
 } from '../model/lab';
-import { GLOSSARY } from './glossary';
+import { GLOSSARY, LANDING, type SectionId } from './outline';
+
+/** The hash's parts: the address after "#/", and anything after a "?". */
+const HASH = /^#\/([a-z0-9-]*)(?:\?(.*))?$/;
 
 /**
- * The hash's parts: the chapter's number (or "glossary"), and anything
- * after a "?".
- */
-const HASH = /^#(\d+|glossary)(?:\?(.*))?$/;
-
-/**
- * The chapter a hash names, or `fallback` when it names none that exists:
- * no hash, not a number, or a number with no chapter.
+ * What a hash shows: a section in `ids`, the glossary, or the landing
+ * view for "#/"; `fallback` when it names none of them.
  *
- * @param numbers the chapters that exist
+ * @param ids the sections that exist
  */
-export function chapterFromHash(
+export function viewFromHash(
   hash: string,
-  numbers: readonly number[],
-  fallback: number,
-): number {
+  ids: readonly string[],
+  fallback: string,
+): string {
   const match = HASH.exec(hash);
   if (!match) return fallback;
-  if (match[1] === 'glossary') return GLOSSARY;
-  const number = Number(match[1]);
-  return numbers.includes(number) ? number : fallback;
+  const [, address] = match;
+  if (address === '') return LANDING;
+  if (address === GLOSSARY) return GLOSSARY;
+  return ids.includes(address) ? address : fallback;
 }
 
 /** What follows the "?" in a hash, as parameters; empty if nothing does. */
@@ -52,19 +51,49 @@ export function paramsFromHash(hash: string): URLSearchParams {
   return new URLSearchParams(HASH.exec(hash)?.[2] ?? '');
 }
 
-export function hashForChapter(number: number, params?: string): string {
-  const name = number === GLOSSARY ? 'glossary' : String(number);
-  return params ? `#${name}?${params}` : `#${name}`;
+/** The hash for a section, the landing view or the glossary. */
+export function hashFor(id: string, params?: string): string {
+  const address = id === LANDING ? '#/' : `#/${id}`;
+  return params ? `${address}?${params}` : address;
 }
 
 /**
  * Whether a hash is one the page should take out of the address bar: it
- * is there, but names no chapter, so the page is showing the landing view
+ * is there, but names nothing, so the page is showing the landing view
  * under an address that claims otherwise.
  */
-export function isStrayHash(hash: string, numbers: readonly number[]): boolean {
+export function isStrayHash(hash: string, ids: readonly string[]): boolean {
   if (hash === '' || hash === '#') return false;
-  return Number.isNaN(chapterFromHash(hash, numbers, Number.NaN));
+  return viewFromHash(hash, ids, '') === '';
+}
+
+/** The sections' numbers before they had names, for old links. */
+const OLD_NUMBERS: Record<string, SectionId | typeof LANDING> = {
+  0: LANDING,
+  1: 'sine',
+  2: 'vibrato',
+  3: 'index',
+  4: 'sidebands',
+  5: 'ratio',
+  6: 'envelopes',
+  7: 'sandbox',
+  8: 'algorithms',
+  9: 'fm-vs-pm',
+};
+const OLD_HASH = /^#(\d+|glossary)(?:\?(.*))?$/;
+
+/**
+ * The address an old link meant ("#4" is now "#/sidebands", "#7?c=220…"
+ * "#/sandbox?c=220…", "#glossary?t=index" "#/glossary?t=index"), with its
+ * parameters kept; null for anything else, including a number that never
+ * had a section.
+ */
+export function upgradeHash(hash: string): string | null {
+  const match = OLD_HASH.exec(hash);
+  if (!match) return null;
+  const [, old, query] = match;
+  const id = old === GLOSSARY ? GLOSSARY : OLD_NUMBERS[old];
+  return id === undefined ? null : hashFor(id, query);
 }
 
 /** A number written as briefly as it can be to `places` decimals: 1.41, 220, 2.5. */

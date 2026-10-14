@@ -1,7 +1,6 @@
 import {
   type Chapter,
-  chapterByNumber,
-  glossary,
+  chapterById,
   labViewOf,
   operatorCountPatch,
   CHAPTERS,
@@ -12,13 +11,15 @@ import {
   LANDING,
   neighbours,
 } from '../chapters';
+import { groupOf, OUTLINE, type SectionId, titleOf } from '../chapters/outline';
 import {
-  chapterFromHash,
-  hashForChapter,
+  hashFor,
   isStrayHash,
   paramsFromHash,
   soundFromParams,
   soundParams,
+  upgradeHash,
+  viewFromHash,
 } from '../chapters/route';
 import { glossaryOrder, term, type TermId, TERMS } from '../chapters/terms';
 import type { LabState, LabStore } from '../model/lab';
@@ -26,7 +27,7 @@ import type { LabState, LabStore } from '../model/lab';
 /** How long the sound must rest before the address is brought up to date. */
 const URL_DELAY_MS = 300;
 
-const NUMBERS = CHAPTERS.map(chapter => chapter.number);
+const IDS = CHAPTERS.map(chapter => chapter.id);
 /** More sliders than this and they go in two columns on a wide screen. */
 const MANY_SLIDERS = 4;
 
@@ -35,15 +36,18 @@ const MANY_SLIDERS = 4;
  * none.
  */
 export function chapterInUrl(): Chapter {
-  const { hash, pathname, search } = window.location;
-  const number = chapterFromHash(hash, NUMBERS, LANDING);
-  // A hash that names no chapter is taken out, so the address bar does
-  // not claim a chapter the page is not showing.
-  if (isStrayHash(hash, NUMBERS)) {
+  const { pathname, search } = window.location;
+  // An old link ("#4", "#7?c=…") is rewritten to the address it meant.
+  const upgraded = upgradeHash(window.location.hash);
+  if (upgraded) window.history.replaceState(null, '', pathname + search + upgraded);
+  const { hash } = window.location;
+  const id = viewFromHash(hash, IDS, LANDING);
+  // A hash that names nothing is taken out, so the address bar does not
+  // claim a section the page is not showing.
+  if (isStrayHash(hash, IDS)) {
     window.history.replaceState(null, '', pathname + search);
   }
-  // chapterFromHash only returns LANDING or a number from NUMBERS.
-  return chapterByNumber(number) ?? landing;
+  return chapterById(id) ?? landing;
 }
 
 /**
@@ -57,8 +61,8 @@ export function openingFromUrl(chapter: Chapter): Partial<LabState> {
   const params = paramsFromHash(hash);
   if (!chapter.sharesSound) {
     // The glossary's parameter names an entry, not a sound: it stays.
-    if ([...params].length > 0 && chapter.number !== GLOSSARY) {
-      window.history.replaceState(null, '', pathname + search + hashForChapter(chapter.number));
+    if ([...params].length > 0 && chapter.id !== GLOSSARY) {
+      window.history.replaceState(null, '', pathname + search + hashFor(chapter.id));
     }
     return chapter.patch;
   }
@@ -75,9 +79,9 @@ function mountSoundInUrl(store: LabStore): void {
   let timer: number | undefined;
   const write = () => {
     const state = store.get();
-    const chapter = chapterByNumber(state.chapter);
+    const chapter = chapterById(state.chapter);
     if (!chapter?.sharesSound) return;
-    const hash = hashForChapter(chapter.number, soundParams(state));
+    const hash = hashFor(chapter.id, soundParams(state));
     if (window.location.hash === hash) return;
     const { pathname, search } = window.location;
     window.history.replaceState(null, '', pathname + search + hash);
@@ -123,8 +127,8 @@ function mountSoundInUrl(store: LabStore): void {
 }
 
 /**
- * The two operators of chapters 3 to 7, drawn small as chapter 8 draws a
- * wiring: the modulator (2, green) above the carrier (1, blue), a line
+ * The two operators of the Two operators group and the sandbox, drawn
+ * small as Operators and algorithms draws a wiring: the modulator (2, green) above the carrier (1, blue), a line
  * from one to the other, and the carrier's line down to the output.
  */
 const PAIR_DIAGRAM = `
@@ -151,8 +155,7 @@ const paragraph = (html: string) =>
 function glossaryHtml(): string {
   const entries = glossaryOrder()
     .map(id => {
-      const { name, plain, formula, chapter } = term(id);
-      const home = chapterByNumber(chapter)!;
+      const { name, plain, formula, section } = term(id);
       return `
         <div class="glossary-entry" id="term-${id}" tabindex="-1">
           <dt>${name}</dt>
@@ -160,7 +163,7 @@ function glossaryHtml(): string {
             <p>${plain}</p>
             ${formula ? `<p class="formula">${formula}</p>` : ''}
             <p class="glossary-from">Defined in
-              <a href="${hashForChapter(home.number)}">chapter ${home.number}, ${home.title}</a></p>
+              <a href="${hashFor(section)}">${titleOf(section)}</a></p>
           </dd>
         </div>`;
     })
@@ -168,18 +171,18 @@ function glossaryHtml(): string {
   return `
     <h2 class="chapter-title" tabindex="-1">Glossary</h2>
     <p>Every term this guide defines, in alphabetical order, each with the
-       chapter that introduces it. In the chapters a defined term is
+       section that introduces it. In the sections a defined term is
        underlined with dots: point at it, or tap it, to see what it means.</p>
     <dl class="glossary">${entries}</dl>`;
 }
 
 function narrativeHtml(chapter: Chapter): string {
-  if (chapter.number === GLOSSARY) return glossaryHtml();
-  // The landing view is one line: no number, no heading but the wordmark.
-  if (chapter.number === LANDING) {
+  if (chapter.id === GLOSSARY) return glossaryHtml();
+  // The landing view is one line: no heading but the wordmark.
+  if (chapter.id === LANDING) {
     return `<div class="landing-line">${chapter.body.map(paragraph).join('')}</div>`;
   }
-  const { previous, next } = neighbours(chapter.number);
+  const { previous, next } = neighbours(chapter.id);
   const maths = chapter.maths
     .map(
       panel => `
@@ -191,9 +194,8 @@ function narrativeHtml(chapter: Chapter): string {
     .join('');
   const link = (to: Chapter | undefined, rel: 'prev' | 'next') => {
     if (!to) return '<span></span>';
-    const text = `${to.number}&ensp;${to.title}`;
-    return `<a href="${hashForChapter(to.number)}" rel="${rel}">${
-      rel === 'prev' ? `← ${text}` : `${text} →`
+    return `<a href="${hashFor(to.id)}" rel="${rel}">${
+      rel === 'prev' ? `← ${to.title}` : `${to.title} →`
     }</a>`;
   };
 
@@ -210,13 +212,13 @@ function narrativeHtml(chapter: Chapter): string {
     .join('');
 
   return `
-    <p class="chapter-kicker">Chapter ${chapter.number}</p>
+    <p class="chapter-kicker">${groupOf(chapter.id as SectionId)}</p>
     <h2 class="chapter-title" tabindex="-1">${chapter.title}</h2>
     ${chapter.showsPair ? PAIR_DIAGRAM : ''}
     ${chapter.body.map(paragraph).join('')}
     ${steps}
     ${maths}
-    <nav class="chapter-nav" aria-label="Previous and next chapter">
+    <nav class="chapter-nav" aria-label="Previous and next section">
       ${link(previous, 'prev')}
       ${link(next, 'next')}
     </nav>`;
@@ -224,64 +226,52 @@ function narrativeHtml(chapter: Chapter): string {
 
 /**
  * What the landing view offers once its sound has been heard: the two
- * ways on, and every chapter by name.
+ * ways on, and every section by name, in its group.
  */
 function landingNextHtml(): string {
   const first = CHAPTERS[0];
-  // The sandbox: the chapter with the keyboard, wherever it is in the list.
-  const last = CHAPTERS.find(chapter => chapter.hasPiano) ?? CHAPTERS[CHAPTERS.length - 1];
-  const chapters = CHAPTERS.map(
-    chapter =>
-      `<li><a href="${hashForChapter(chapter.number)}">` +
-      `<span class="num">${chapter.number}</span>` +
-      `<span class="landing-title">${chapter.title}</span></a></li>`,
+  // The sandbox: the section with the keyboard, wherever it is.
+  const play = CHAPTERS.find(chapter => chapter.hasPiano) ?? CHAPTERS[CHAPTERS.length - 1];
+  const groups = OUTLINE.map(
+    ({ group, sections }) => `
+      <li>
+        <span class="landing-group">${group}</span>
+        <ul>${sections
+          .map(({ id, title }) => `<li><a href="${hashFor(id)}">${title}</a></li>`)
+          .join('')}</ul>
+      </li>`,
   ).join('');
   return `
     <p class="landing-ways">
-      <a class="btn btn-ink" href="${hashForChapter(first.number)}">Start with chapter ${first.number}</a>
-      <a class="btn" href="${hashForChapter(last.number)}">Go to the sandbox</a>
+      <a class="btn btn-ink" href="${hashFor(first.id)}">Start with ${first.title}</a>
+      <a class="btn" href="${hashFor(play.id)}">Go to the sandbox</a>
     </p>
-    <ol class="landing-chapters">${chapters}</ol>`;
-}
-
-function contentsHtml(current: Chapter): string {
-  return [...CHAPTERS, glossary].map(chapter => {
-    const here = chapter === current ? ' aria-current="page"' : '';
-    return (
-      `<a href="${hashForChapter(chapter.number)}"${here} ` +
-      `aria-label="${
-        chapter.number === GLOSSARY ? 'Glossary' : `Chapter ${chapter.number}: ${chapter.title}`
-      }">` +
-      `${chapter.navLabel}</a>`
-    );
-  }).join('');
+    <ol class="landing-chapters">${groups}</ol>`;
 }
 
 /**
  * Shows the store's chapter, or the landing view, which the store holds
  * as one: its text in the narrative pane, its sliders
- * and captions in the lab pane, and the contents list in the masthead.
+ * and captions in the lab pane. (The contents panel is ui/contents.ts.)
  * The chapter itself comes from the URL's hash; when the hash changes the
  * chapter's patch goes into the store and everything else follows from
  * that.
  */
 export function mountChapters(store: LabStore): void {
   const narrative = document.querySelector<HTMLElement>('#narrative');
-  const contents = document.querySelector<HTMLElement>('#contents');
 
   const next = document.querySelector<HTMLElement>('#landing-next');
   if (next) next.innerHTML = landingNextHtml();
 
   const show = (chapter: Chapter) => {
-    const isLanding = chapter.number === LANDING;
+    const isLanding = chapter.id === LANDING;
     if (narrative) narrative.innerHTML = narrativeHtml(chapter);
-    if (contents) contents.innerHTML = contentsHtml(chapter);
     document.title = isLanding ? 'fmlab' : `${chapter.title} · fmlab`;
     // For the stylesheet: the landing view is one centred column, and so
     // is the glossary, with no lab.
     document.body.dataset.view = isLanding
       ? 'landing'
-      : chapter.number === GLOSSARY
+      : chapter.id === GLOSSARY
         ? 'glossary'
         : 'chapter';
     // The ways on appear once the landing view's sound has been heard,
@@ -299,7 +289,7 @@ export function mountChapters(store: LabStore): void {
     // The sandbox's switch, and the small pair beside its text, which
     // describes two operators only.
     const count = document.querySelector<HTMLElement>('#operator-count');
-    if (count) count.hidden = !chapterByNumber(chapter.number)?.sixOperators;
+    if (count) count.hidden = !chapterById(chapter.id)?.sixOperators;
     const six = chapter.patch.mode === 'ops';
     document.querySelector('#two-operators')?.setAttribute('aria-pressed', String(!six));
     document.querySelector('#six-operators')?.setAttribute('aria-pressed', String(six));
@@ -376,10 +366,10 @@ export function mountChapters(store: LabStore): void {
 
   store.subscribe((state, previous) => {
     if (state.chapter !== previous.chapter) {
-      const chapter = chapterByNumber(state.chapter);
+      const chapter = chapterById(state.chapter);
       if (chapter) show(chapter);
     } else if (state.mode !== previous.mode) {
-      const chapter = chapterByNumber(state.chapter);
+      const chapter = chapterById(state.chapter);
       if (chapter?.sixOperators) showLab(labViewOf(chapter, state));
     } else if (state.notes !== previous.notes && state.chapter === LANDING) {
       // The first press on the landing view: now offer the ways on.
@@ -393,13 +383,13 @@ export function mountChapters(store: LabStore): void {
     // note's playhead. A chapter that plays notes has no steady sound to
     // carry on with, so that stops.
     store.set({
-      chapter: chapter.number,
+      chapter: chapter.id,
       ...openingFromUrl(chapter),
       hover: null,
       pinned: null,
       noteStartedAt: null,
       // The glossary has no lab to stop a sound from.
-      ...(chapter.patch.noteMode || chapter.number === GLOSSARY ? { playing: false } : {}),
+      ...(chapter.patch.noteMode || chapter.id === GLOSSARY ? { playing: false } : {}),
     });
     // A new chapter starts at its top, and says so to a screen reader.
     // On a wide screen the text scrolls in its own column, so that too.
@@ -420,18 +410,18 @@ export function mountChapters(store: LabStore): void {
   document.querySelector('#two-operators')?.addEventListener('click', choose(false));
   document.querySelector('#six-operators')?.addEventListener('click', choose(true));
 
-  const first = chapterByNumber(store.get().chapter);
+  const first = chapterById(store.get().chapter);
   if (first) show(first);
   showTermInUrl();
 }
 
 /**
- * In the glossary, the entry the URL names ("#glossary?t=index"): brought
+ * In the glossary, the entry the URL names ("#/glossary?t=index"): brought
  * into view, marked and focused, so a term's link lands on its meaning.
  */
 function showTermInUrl(): void {
   const { hash } = window.location;
-  if (chapterFromHash(hash, NUMBERS, LANDING) !== GLOSSARY) return;
+  if (viewFromHash(hash, IDS, LANDING) !== GLOSSARY) return;
   const id = paramsFromHash(hash).get('t');
   for (const entry of document.querySelectorAll('.glossary-entry.is-current')) {
     entry.classList.remove('is-current');

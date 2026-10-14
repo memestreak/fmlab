@@ -5,6 +5,8 @@
 // glossary cannot drift apart. src/__tests__/chapters/terms.test.ts checks
 // that each term is defined where it says, and not used before.
 
+import type { SectionId } from './outline';
+
 /** A defined term. */
 export interface Term {
   /** As it appears in the text and the glossary; lower case unless a name. */
@@ -16,10 +18,10 @@ export interface Term {
   plain: string;
   /** The formal definition, a formula for the chapter's maths panel. HTML. */
   formula?: string;
-  /** The chapter that defines it. */
-  chapter: number;
+  /** The section that defines it. */
+  section: SectionId;
   /**
-   * The words that count as using the term, to check that no chapter uses
+   * The words that count as using the term, to check that no section uses
    * it before the one that defines it.
    */
   match: RegExp;
@@ -37,14 +39,14 @@ export const TERMS = {
     plain: `A sine wave is the plainest sound there is: one pure tone, swinging
       evenly back and forth in the shape of the sine curve.`,
     formula: `${v('x')}(${v('t')}) = ${v('A')} sin(2π ${v('f')} ${v('t')})`,
-    chapter: 1,
+    section: 'sine',
     match: /\bsine waves?\b/i,
   },
   carrier: {
     name: 'carrier',
-    plain: `The carrier is the sine wave you hear; from the next chapter on, a
+    plain: `The carrier is the sine wave you hear; from the next section on, a
       second wave pushes it around.`,
-    chapter: 1,
+    section: 'sine',
     match: /\bcarriers?\b/i,
   },
   frequency: {
@@ -52,27 +54,27 @@ export const TERMS = {
     plain: `Frequency is how many times a second a wave repeats, counted in
       hertz (Hz), and you hear it as pitch.`,
     formula: `${v('f')} = 1 / ${v('T')}`,
-    chapter: 1,
+    section: 'sine',
     match: /\bfrequenc(y|ies)\b|\bhertz\b/i,
   },
   octave: {
     name: 'octave',
     plain: `An octave is the step from one pitch to the pitch at twice its
       frequency.`,
-    chapter: 1,
+    section: 'sine',
     match: /\boctaves?\b/i,
   },
   waveform: {
     name: 'waveform',
     plain: `A waveform is a sound drawn as its height against time.`,
-    chapter: 1,
+    section: 'sine',
     match: /\bwaveforms?\b/i,
   },
   amplitude: {
     name: 'amplitude',
     plain: `Amplitude is how far a wave swings either side of zero, and you
       hear it as loudness.`,
-    chapter: 1,
+    section: 'sine',
     match: /\bamplitudes?\b/i,
   },
   spectrum: {
@@ -80,14 +82,14 @@ export const TERMS = {
     plain: `A spectrum shows a sound as the sine waves it is made of: one stem
       for each, standing at that wave's frequency and as tall as its
       amplitude.`,
-    chapter: 1,
+    section: 'sine',
     match: /\bspectr(um|a)\b/i,
   },
   partial: {
     name: 'partial',
     plain: `A partial is one of the sine waves a sound is made of, one stem in
       its spectrum.`,
-    chapter: 1,
+    section: 'sine',
     match: /\bpartials?\b/i,
   },
   modulator: {
@@ -95,7 +97,7 @@ export const TERMS = {
     plain: `The modulator is a second sine wave that pushes the carrier
       around; it is not heard itself, only in what it does to the
       carrier.`,
-    chapter: 2,
+    section: 'vibrato',
     match: /\bmodulators?\b/i,
   },
   fm: {
@@ -103,20 +105,20 @@ export const TERMS = {
     plain: `Frequency modulation (FM) is one wave pushing another's frequency
       up and down.`,
     formula: `${v('f')}(${v('t')}) = ${FC} + ${DF} sin(2π ${FM} ${v('t')})`,
-    chapter: 2,
+    section: 'vibrato',
     match: /\bfrequency modulation\b|\bFM\b/i,
   },
   vibrato: {
     name: 'vibrato',
     plain: `Vibrato is a slow, regular wobble in pitch.`,
-    chapter: 2,
+    section: 'vibrato',
     match: /\bvibrato\b/i,
   },
   deviation: {
     name: 'deviation',
     plain: `Deviation is how far the modulator pushes the carrier's frequency
       each way, in Hz.`,
-    chapter: 2,
+    section: 'vibrato',
     match: /\bdeviation\b/i,
   },
   sideband: {
@@ -125,7 +127,7 @@ export const TERMS = {
       sidebands come in pairs, one above it and one below, spaced apart by
       the modulator's frequency.`,
     formula: `${FC} ± ${v('n')} ${FM}, &ensp; ${v('n')} = 1, 2, 3, …`,
-    chapter: 2,
+    section: 'vibrato',
     match: /\bsidebands?\b/i,
   },
   timbre: {
@@ -133,14 +135,14 @@ export const TERMS = {
     plain: `Timbre is a sound's colour: what tells a flute from a violin
       playing the same note as loudly, set by which partials it has and
       how strong each is.`,
-    chapter: 2,
+    section: 'vibrato',
     match: /\btimbres?\b/i,
   },
   phase: {
     name: 'phase',
     plain: `A wave's phase is how far through its cycle it is at a given
       moment, measured as an angle.`,
-    chapter: 3,
+    section: 'index',
     match: /\bphases?\b/i,
   },
   radian: {
@@ -148,7 +150,7 @@ export const TERMS = {
     plain: `A radian is the unit that angle is counted in: a whole cycle is 2π
       radians, about 6.28.`,
     formula: `one cycle = 2π radians ≈ 6.28 radians`,
-    chapter: 3,
+    section: 'index',
     match: /\bradians?\b/i,
   },
   pm: {
@@ -156,7 +158,7 @@ export const TERMS = {
     plain: `Phase modulation (PM) is one wave pushing another's phase back and
       forth, rather than its frequency.`,
     formula: `${v('x')}(${v('t')}) = sin(2π ${FC} ${v('t')} + ${v('I')} sin 2π ${FM} ${v('t')})`,
-    chapter: 3,
+    section: 'index',
     match: /\bphase modulation\b|\bPM\b/i,
   },
   index: {
@@ -164,7 +166,7 @@ export const TERMS = {
     plain: `The modulation index is how hard the modulator pushes: the
       furthest it moves the carrier's phase, in radians.`,
     formula: `${v('I')} = ${DF} / ${FM}`,
-    chapter: 3,
+    section: 'index',
     match: /\bindex\b|\bindices\b/i,
   },
   harmonic: {
@@ -172,14 +174,14 @@ export const TERMS = {
     plain: `A harmonic is a partial at a whole-number multiple of a note's
       frequency: twice it, three times, four times and so on.`,
     formula: `${sub('f', v('k'))} = ${v('k')} ${v('f')}, &ensp; ${v('k')} = 1, 2, 3, …`,
-    chapter: 3,
+    section: 'index',
     match: /\bharmonics?\b/i,
   },
   bandwidth: {
     name: 'bandwidth',
     plain: `A sound's bandwidth is the span of frequencies its partials
       cover.`,
-    chapter: 3,
+    section: 'index',
     match: /\bbandwidths?\b/i,
   },
   carson: {
@@ -187,7 +189,7 @@ export const TERMS = {
     plain: `Carson's rule says that nearly all of an FM sound's power lies in
       the index plus one sidebands each side of the carrier.`,
     formula: `${v('B')} ≈ 2 (${DF} + ${FM}) = 2 ${FM} (${v('I')} + 1)`,
-    chapter: 3,
+    section: 'index',
     match: /\bCarson\b/i,
   },
   bessel: {
@@ -198,7 +200,7 @@ export const TERMS = {
     formula:
       `sin(2π ${FC} ${v('t')} + ${v('I')} sin 2π ${FM} ${v('t')}) = ` +
       `Σ ${sub('J', v('n'))}(${v('I')}) sin 2π (${FC} + ${v('n')} ${FM}) ${v('t')}`,
-    chapter: 4,
+    section: 'sidebands',
     match: /\bBessel\b/i,
   },
   ratio: {
@@ -206,7 +208,7 @@ export const TERMS = {
     plain: `The ratio is the modulator's frequency as a multiple of the
       carrier's.`,
     formula: `${v('r')} = ${FM} / ${FC}`,
-    chapter: 5,
+    section: 'ratio',
     match: /\bratios?\b/i,
   },
   inharmonic: {
@@ -214,7 +216,7 @@ export const TERMS = {
     plain: `Inharmonic partials are ones that are not whole-number multiples
       of any one note's frequency; they are heard as several pitches at
       once, as a bell or a gong is.`,
-    chapter: 5,
+    section: 'ratio',
     match: /\binharmonic\b/i,
   },
   negativeFrequency: {
@@ -223,7 +225,7 @@ export const TERMS = {
       would stand; it folds back, sounding the same distance above zero,
       upside down.`,
     formula: `sin(−${v('x')}) = −sin(${v('x')})`,
-    chapter: 5,
+    section: 'ratio',
     match: /\bnegative frequenc|\bfold(s|ed|ing)?\b/i,
   },
   envelope: {
@@ -233,7 +235,7 @@ export const TERMS = {
     formula:
       `${v('x')}(${v('t')}) = ${v('e')}(${v('t')}) ` +
       `sin(2π ${FC} ${v('t')} + ${v('I')} ${v('e')}(${v('t')}) sin 2π ${FM} ${v('t')})`,
-    chapter: 6,
+    section: 'envelopes',
     match: /\benvelopes?\b/i,
   },
   adsr: {
@@ -242,7 +244,7 @@ export const TERMS = {
       rise; decay, the time to settle to the sustain level; sustain, the
       level it holds while the note is held; and release, the time it
       takes to die away once the note is let go.`,
-    chapter: 6,
+    section: 'envelopes',
     match: /\bADSR\b|\battack\b|\bsustain\b/i,
   },
   spectrogram: {
@@ -250,7 +252,7 @@ export const TERMS = {
     plain: `A spectrogram is a spectrum drawn out over time: time runs left to
       right, frequency upward, and the stronger a partial is, the bolder
       its mark.`,
-    chapter: 6,
+    section: 'envelopes',
     match: /\bspectrograms?\b/i,
   },
   operator: {
@@ -258,35 +260,35 @@ export const TERMS = {
     plain: `An operator is the DX7's name for one sine wave with its own
       frequency, level and envelope; any operator can be a carrier or a
       modulator.`,
-    chapter: 8,
+    section: 'algorithms',
     match: /\boperators?\b/i,
   },
   stack: {
     name: 'stack',
     plain: `A stack is a column of operators, each modulating the one below
       it.`,
-    chapter: 8,
+    section: 'algorithms',
     match: /\bstacks?\b/i,
   },
   feedback: {
     name: 'feedback',
     plain: `Feedback is an operator modulating itself: its own output is added
       back into its phase.`,
-    chapter: 8,
+    section: 'algorithms',
     match: /\bfeedback\b|\bfeeds? back\b|\bfed back\b/i,
   },
   algorithm: {
     name: 'algorithm',
     plain: `An algorithm, on the DX7, is a fixed wiring diagram for its six
       operators: which modulate which, and which are heard.`,
-    chapter: 8,
+    section: 'algorithms',
     match: /\balgorithms?\b/i,
   },
   fft: {
     name: 'fast Fourier transform',
     plain: `The fast Fourier transform (FFT) is the standard way to take a
       stretch of sound apart into the sine waves it is made of.`,
-    chapter: 8,
+    section: 'algorithms',
     match: /\bFourier\b|\bFFT\b/i,
   },
 } satisfies Record<string, Term>;
@@ -308,7 +310,7 @@ export function glossaryOrder(): TermId[] {
 
 /** The address of a term's glossary entry. */
 export function glossaryHash(id: TermId): string {
-  return `#glossary?t=${id}`;
+  return `#/glossary?t=${id}`;
 }
 
 /** A term's text without its markup: for a tooltip or a screen reader. */

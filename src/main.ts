@@ -16,13 +16,14 @@ import './styles/tokens.css';
 import './styles/base.css';
 
 import { AudioEngine } from './audio/engine';
-import { chapterByNumber } from './chapters';
+import { chapterById } from './chapters';
 import { createLabStore } from './model/lab';
 import { loadTheme } from './model/theme';
 import { mountBesselControls } from './ui/besselControls';
 import { chapterInUrl, mountChapters, openingFromUrl } from './ui/chapterView';
-import { mountEnvelopeControls } from './ui/envelopeControls';
 import { mountCompare } from './ui/compare';
+import { mountContents } from './ui/contents';
+import { mountEnvelopeControls } from './ui/envelopeControls';
 import { mountFigures } from './ui/figures';
 import { mountOperators } from './ui/operators';
 import { mountPiano } from './ui/piano';
@@ -57,7 +58,7 @@ function mountCommitHash(slot: HTMLElement): void {
 const opening = chapterInUrl();
 const store = createLabStore({
   theme: loadTheme(),
-  chapter: opening.number,
+  chapter: opening.id,
   // The chapter's patch, and in the sandbox the sound a link carries.
   ...openingFromUrl(opening),
 });
@@ -65,6 +66,7 @@ const store = createLabStore({
 const engine = new AudioEngine(store);
 
 mountChapters(store);
+mountContents(store);
 mountTerms();
 mountSliders(store);
 mountFigures(store, engine);
@@ -82,7 +84,7 @@ if (motion) mountMotionToggle(motion, store);
 
 const piano = document.querySelector<HTMLElement>('#piano');
 if (piano) {
-  mountPiano(piano, store, () => chapterByNumber(store.get().chapter)?.hasPiano === true);
+  mountPiano(piano, store, () => chapterById(store.get().chapter)?.hasPiano === true);
 }
 
 const toggle = document.querySelector<HTMLButtonElement>('#controls-toggle');

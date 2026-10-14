@@ -1,4 +1,4 @@
-import { chapterByNumber, CHAPTERS } from '../../chapters';
+import { chapterById, CHAPTERS } from '../../chapters';
 import { BASE_PATCH } from '../../chapters/basePatch';
 import { noteSeconds } from '../../dsp/envelope';
 import {
@@ -41,7 +41,7 @@ const started = (state: LabState, at: number): LabState => ({
   noteLength: noteSeconds(envelopeOf(state)),
 });
 
-const chapter6 = chapterByNumber(6)!;
+const chapter6 = chapterById('envelopes')!;
 /** Chapter 6 as it opens: Chowning's brass. */
 const brass: LabState = { ...DEFAULTS, ...chapter6.patch };
 const bell: LabState = { ...brass, ...chapter6.presets[1].patch };
@@ -300,10 +300,10 @@ describe('the main button', () => {
 });
 
 describe('chapter 5, the ratio', () => {
-  const chapter = chapterByNumber(5)!;
+  const chapter = chapterById('ratio')!;
 
   it('rules the harmonics on its spectrum, and is the only one to', () => {
-    expect(CHAPTERS.filter(c => c.patch.showHarmonics).map(c => c.number)).toEqual([5]);
+    expect(CHAPTERS.filter(c => c.patch.showHarmonics).map(c => c.id)).toEqual(['ratio']);
   });
 
   it('offers the ratio and the index, and four ratios to try', () => {
@@ -323,7 +323,7 @@ describe('chapter 5, the ratio', () => {
 
 describe('chapter 6, the envelope', () => {
   it('plays notes, as chapter 8 does too', () => {
-    expect(CHAPTERS.filter(c => c.patch.noteMode).map(c => c.number)).toEqual([6, 8]);
+    expect(CHAPTERS.filter(c => c.patch.noteMode).map(c => c.id)).toEqual(['envelopes', 'algorithms']);
     expect(BASE_PATCH.noteMode).toBe(false);
   });
 

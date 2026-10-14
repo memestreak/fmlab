@@ -1,11 +1,11 @@
 import { BASE_PATCH } from './basePatch';
 import { define, formula } from './terms';
+import { titleOf } from './outline';
 import type { Chapter } from './types';
 
 export const singleSine: Chapter = {
-  number: 1,
-  title: 'A single sine',
-  navLabel: '1',
+  id: 'sine',
+  title: titleOf('sine'),
   body: [
     `Every sound in this guide is built from one kind of wave.
      ${define('sineWave')} Press Play to hear one. ${define('carrier')}

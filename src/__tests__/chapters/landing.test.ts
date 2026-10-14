@@ -1,11 +1,11 @@
 import {
-  chapterByNumber,
+  chapterById,
   CHAPTERS,
   landing,
   LANDING,
   neighbours,
 } from '../../chapters';
-import { chapterFromHash, isStrayHash } from '../../chapters/route';
+import { viewFromHash, isStrayHash } from '../../chapters/route';
 import { envelopeAt, noteSeconds } from '../../dsp/envelope';
 import {
   DEFAULTS,
@@ -27,52 +27,53 @@ const started = (state: LabState, at: number): LabState => ({
   noteLength: noteSeconds(envelopeOf(state)),
 });
 
-const NUMBERS = CHAPTERS.map(chapter => chapter.number);
+const IDS = CHAPTERS.map(chapter => chapter.id);
 /** The landing view as the site opens on it. */
 const opened: LabState = { ...DEFAULTS, chapter: LANDING, ...landing.patch };
 /** The same with its note started at second 100 on the page's clock. */
 const sounding: LabState = started({ ...opened, notes: 1 }, 100);
 
 describe('where the site opens', () => {
-  it('is the landing view when the address names no chapter', () => {
-    expect(chapterFromHash('', NUMBERS, LANDING)).toBe(LANDING);
-    expect(chapterFromHash('#', NUMBERS, LANDING)).toBe(LANDING);
+  it('is the landing view when the address names no section, or "#/"', () => {
+    expect(viewFromHash('', IDS, LANDING)).toBe(LANDING);
+    expect(viewFromHash('#', IDS, LANDING)).toBe(LANDING);
+    expect(viewFromHash('#/', IDS, 'x')).toBe(LANDING);
   });
 
-  it('is still a chapter when the address names one', () => {
-    for (const number of NUMBERS) {
-      expect(chapterFromHash(`#${number}`, NUMBERS, LANDING)).toBe(number);
+  it('is still a section when the address names one', () => {
+    for (const id of IDS) {
+      expect(viewFromHash(`#/${id}`, IDS, LANDING)).toBe(id);
     }
   });
 
-  it('is the landing view for a number with no chapter, even its own', () => {
-    expect(chapterFromHash('#10', NUMBERS, LANDING)).toBe(LANDING);
-    // The landing view has no address of its own: "#0" is a stray.
-    expect(chapterFromHash('#0', NUMBERS, LANDING)).toBe(LANDING);
-    expect(isStrayHash('#0', NUMBERS)).toBe(true);
+  it('is the landing view for an address with no section', () => {
+    expect(viewFromHash('#/nowhere', IDS, LANDING)).toBe(LANDING);
+    expect(viewFromHash('#/landing', IDS, LANDING)).toBe(LANDING);
   });
 
   it('takes out of the address bar a hash that names nothing', () => {
-    expect(isStrayHash('#10', NUMBERS)).toBe(true);
-    expect(isStrayHash('#chapter-two', NUMBERS)).toBe(true);
+    expect(isStrayHash('#/nowhere', IDS)).toBe(true);
+    expect(isStrayHash('#chapter-two', IDS)).toBe(true);
+    expect(isStrayHash('#10', IDS)).toBe(true);
   });
 
-  it('leaves a chapter\'s hash, and no hash, alone', () => {
-    expect(isStrayHash('#3', NUMBERS)).toBe(false);
-    expect(isStrayHash('', NUMBERS)).toBe(false);
-    expect(isStrayHash('#', NUMBERS)).toBe(false);
+  it('leaves a section\'s hash, the landing view\'s, and no hash, alone', () => {
+    expect(isStrayHash('#/index', IDS)).toBe(false);
+    expect(isStrayHash('#/', IDS)).toBe(false);
+    expect(isStrayHash('', IDS)).toBe(false);
+    expect(isStrayHash('#', IDS)).toBe(false);
   });
 });
 
 describe('the landing view', () => {
   it('is not one of the guide\'s chapters', () => {
-    expect(NUMBERS).not.toContain(LANDING);
+    expect(IDS).not.toContain(LANDING);
     expect(CHAPTERS).not.toContain(landing);
     expect(neighbours(LANDING)).toEqual({});
   });
 
-  it('is found by its number all the same', () => {
-    expect(chapterByNumber(LANDING)).toBe(landing);
+  it('is found by its id all the same', () => {
+    expect(chapterById(LANDING)).toBe(landing);
   });
 
   it('is one line, the waveform and the spectrum, and a volume slider', () => {

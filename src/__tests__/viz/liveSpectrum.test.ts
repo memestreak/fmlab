@@ -1,4 +1,4 @@
-import { chapterByNumber } from '../../chapters';
+import { chapterById } from '../../chapters';
 import { DEFAULTS, type LabState } from '../../model/lab';
 import { describeLive, isSounding, liveNote } from '../../ui/figures';
 import {
@@ -66,10 +66,10 @@ describe('liveTrace', () => {
 });
 
 describe('the live view\'s words', () => {
-  const steady: LabState = { ...DEFAULTS, chapter: 7, liveSpectrum: true };
+  const steady: LabState = { ...DEFAULTS, chapter: 'sandbox', liveSpectrum: true };
   const brass: LabState = {
     ...DEFAULTS,
-    ...chapterByNumber(6)!.patch,
+    ...chapterById('envelopes')!.patch,
     noteStartedAt: 100,
     // As the engine fixes it when the note starts: brass is 0.75 s.
     noteLength: 0.75,

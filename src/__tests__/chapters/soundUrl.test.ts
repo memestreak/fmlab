@@ -1,41 +1,52 @@
-import { chapterByNumber, CHAPTERS, labViewOf, operatorCountPatch } from '../../chapters';
+import { chapterById, CHAPTERS, labViewOf, operatorCountPatch } from '../../chapters';
 import {
-  chapterFromHash,
-  hashForChapter,
+  viewFromHash,
+  hashFor,
   isStrayHash,
   operatorsFromParam,
   paramsFromHash,
   soundFromParams,
   soundParams,
+  upgradeHash,
 } from '../../chapters/route';
 import { DEFAULTS, hzToSemitones, type LabState } from '../../model/lab';
 
-const NUMBERS = CHAPTERS.map(chapter => chapter.number);
+const IDS = CHAPTERS.map(chapter => chapter.id);
 const sound = (carrierHz: number, ratio: number, index: number): LabState => ({
   ...DEFAULTS,
-  chapter: 7,
+  chapter: 'sandbox',
   carrierHz,
   ratio,
   index,
 });
 
 describe('a hash with a sound in it', () => {
-  it('still names its chapter', () => {
-    expect(chapterFromHash('#7?c=220&r=1&i=2', NUMBERS, 0)).toBe(7);
-    expect(isStrayHash('#7?c=220&r=1&i=2', NUMBERS)).toBe(false);
-    expect(isStrayHash('#10?c=220', NUMBERS)).toBe(true);
+  it('still names its section', () => {
+    expect(viewFromHash('#/sandbox?c=220&r=1&i=2', IDS, 'landing')).toBe('sandbox');
+    expect(isStrayHash('#/sandbox?c=220&r=1&i=2', IDS)).toBe(false);
+    expect(isStrayHash('#/nowhere?c=220', IDS)).toBe(true);
   });
 
   it('gives up its parameters', () => {
-    expect(paramsFromHash('#7?c=220&r=1.41&i=5').get('r')).toBe('1.41');
-    expect([...paramsFromHash('#7')]).toEqual([]);
+    expect(paramsFromHash('#/sandbox?c=220&r=1.41&i=5').get('r')).toBe('1.41');
+    expect([...paramsFromHash('#/sandbox')]).toEqual([]);
     expect([...paramsFromHash('')]).toEqual([]);
   });
 
   it('is written with the parameters after a "?"', () => {
-    expect(hashForChapter(7, 'c=220')).toBe('#7?c=220');
-    expect(hashForChapter(7)).toBe('#7');
-    expect(hashForChapter(7, '')).toBe('#7');
+    expect(hashFor('sandbox', 'c=220')).toBe('#/sandbox?c=220');
+    expect(hashFor('sandbox')).toBe('#/sandbox');
+    expect(hashFor('sandbox', '')).toBe('#/sandbox');
+  });
+
+  it('from before the sections had names still opens the same sound', () => {
+    const upgraded = upgradeHash('#7?c=220&r=1.41&i=5')!;
+    expect(viewFromHash(upgraded, IDS, 'landing')).toBe('sandbox');
+    expect(soundFromParams(paramsFromHash(upgraded))).toEqual(
+      soundFromParams(paramsFromHash('#/sandbox?c=220&r=1.41&i=5')),
+    );
+    const six = upgradeHash('#7?m=6&a=5&f=0.7')!;
+    expect(soundFromParams(paramsFromHash(six))).toMatchObject({ mode: 'ops', algorithm: 5, feedback: 0.7 });
   });
 });
 
@@ -87,18 +98,18 @@ describe('soundFromParams', () => {
 
 describe('which chapters keep their sound in the URL', () => {
   it('is the sandbox alone', () => {
-    expect(CHAPTERS.filter(c => c.sharesSound).map(c => c.number)).toEqual([7]);
-    expect(chapterByNumber(7)!.sharesSound).toBe(true);
+    expect(CHAPTERS.filter(c => c.sharesSound).map(c => c.id)).toEqual(['sandbox']);
+    expect(chapterById('sandbox')!.sharesSound).toBe(true);
   });
 });
 
 describe('the six-operator sandbox in a link', () => {
-  const sandbox = chapterByNumber(7)!;
+  const sandbox = chapterById('sandbox')!;
   const six: LabState = {
     ...DEFAULTS,
     ...sandbox.patch,
     ...operatorCountPatch(DEFAULTS, true),
-    chapter: 7,
+    chapter: 'sandbox',
     carrierHz: 146.83,
     algorithm: 5,
     feedback: 0.7,
@@ -114,7 +125,7 @@ describe('the six-operator sandbox in a link', () => {
   const reopened = (params: string) => ({
     ...DEFAULTS,
     ...sandbox.patch,
-    ...soundFromParams(paramsFromHash(`#7?${params}`)),
+    ...soundFromParams(paramsFromHash(`#/sandbox?${params}`)),
   });
 
   it('is short and readable', () => {
@@ -169,13 +180,13 @@ describe('the six-operator sandbox in a link', () => {
 });
 
 describe('the sandbox switch', () => {
-  const sandbox = chapterByNumber(7)!;
+  const sandbox = chapterById('sandbox')!;
 
   it('has a six-operator lab with chapter 8\'s pieces and the keyboard', () => {
     const six = sandbox.sixOperators!;
     expect(six.controls).toEqual(['volume', 'feedback']);
     expect(Object.keys(six.figures)).toEqual(['algorithm', 'spectrum']);
-    expect(six.presets).toBe(chapterByNumber(8)!.presets);
+    expect(six.presets).toBe(chapterById('algorithms')!.presets);
     expect(six.hasPiano && six.sharesSound).toBe(true);
     expect(six.body).toBe(sandbox.body);
     // It starts from chapter 8's Stacks, a DX7 algorithm.
@@ -193,6 +204,6 @@ describe('the sandbox switch', () => {
   });
 
   it('is the only chapter with one', () => {
-    expect(CHAPTERS.filter(c => c.sixOperators).map(c => c.number)).toEqual([7]);
+    expect(CHAPTERS.filter(c => c.sixOperators).map(c => c.id)).toEqual(['sandbox']);
   });
 });

@@ -172,6 +172,6 @@ describe('motionNote', () => {
 
 describe('Show motion', () => {
   it('is offered by chapter 2 alone', () => {
-    expect(CHAPTERS.filter(c => c.hasMotion).map(c => c.number)).toEqual([2]);
+    expect(CHAPTERS.filter(c => c.hasMotion).map(c => c.id)).toEqual(['vibrato']);
   });
 });

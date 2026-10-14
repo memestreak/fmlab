@@ -1,4 +1,4 @@
-import { chapterByNumber, CHAPTERS } from '../../chapters';
+import { chapterById, CHAPTERS } from '../../chapters';
 import { currentStep, isLastStep } from '../../chapters/steps';
 import {
   algorithm,
@@ -34,8 +34,8 @@ const started = (state: LabState, at: number): LabState => ({
   noteLength: noteSeconds(envelopeOf(state)),
 });
 
-const chapter8 = chapterByNumber(8)!;
-const opened: LabState = { ...DEFAULTS, ...chapter8.patch, chapter: 8 };
+const chapter8 = chapterById('algorithms')!;
+const opened: LabState = { ...DEFAULTS, ...chapter8.patch, chapter: 'algorithms' };
 
 describe('the algorithm diagram', () => {
   it.each(ALGORITHMS.map((alg, i) => [i + 1, alg] as const))(
@@ -101,9 +101,9 @@ describe('the algorithm diagram', () => {
 });
 
 describe('chapter 8', () => {
-  it('comes after the sandbox, and is the only chapter of six operators', () => {
-    expect(CHAPTERS[CHAPTERS.indexOf(chapterByNumber(7)!) + 1]).toBe(chapter8);
-    expect(CHAPTERS.filter(c => c.patch.mode === 'ops').map(c => c.number)).toEqual([8]);
+  it('follows the two-operator sections, and is the only section of six operators', () => {
+    expect(CHAPTERS[CHAPTERS.indexOf(chapterById('envelopes')!) + 1]).toBe(chapter8);
+    expect(CHAPTERS.filter(c => c.patch.mode === 'ops').map(c => c.id)).toEqual(['algorithms']);
   });
 
   it('shows the algorithm and the spectrum, and plays notes', () => {

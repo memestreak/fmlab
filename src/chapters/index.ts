@@ -9,6 +9,7 @@ import { ratio } from './ratio';
 import { sandbox } from './sandbox';
 import { singleSine } from './singleSine';
 import type { LabState } from '../model/lab';
+import { SECTION_IDS, type SectionId, type ViewId } from './outline';
 import type { Chapter } from './types';
 import { vibrato } from './vibrato';
 
@@ -21,36 +22,44 @@ export type {
   Preset,
 } from './types';
 
-/**
- * The chapters that exist, in order. Their numbers are the design spec's.
- * Version 1's seven are all here; previous and next would step over any
- * gap.
- */
-export const CHAPTERS: readonly Chapter[] = [
+const ALL: readonly Chapter[] = [
   singleSine,
   vibrato,
   modulationIndex,
   bessel,
   ratio,
   envelope,
-  sandbox,
   operators,
   fmVsPm,
+  sandbox,
 ];
 
-/** The guide's first chapter. (The site itself opens on the landing view.) */
-export const FIRST_CHAPTER = CHAPTERS[0].number;
+/**
+ * The guide's sections, in the order outline.ts gives them; previous and
+ * next follow it.
+ */
+export const CHAPTERS: readonly Chapter[] = SECTION_IDS.map(
+  id => ALL.find(chapter => chapter.id === id)!,
+);
+
+/** The guide's first section. (The site itself opens on the landing view.) */
+export const FIRST_CHAPTER = CHAPTERS[0].id as SectionId;
 
 export { glossary, GLOSSARY, landing, LANDING };
 
 /**
- * A chapter of the guide by its number, or the landing view or the
- * glossary by their own.
+ * A section of the guide by its id, or the landing view or the glossary
+ * by theirs.
  */
-export function chapterByNumber(number: number): Chapter | undefined {
-  if (number === LANDING) return landing;
-  if (number === GLOSSARY) return glossary;
-  return CHAPTERS.find(chapter => chapter.number === number);
+export function chapterById(id: string): Chapter | undefined {
+  if (id === LANDING) return landing;
+  if (id === GLOSSARY) return glossary;
+  return CHAPTERS.find(chapter => chapter.id === id);
+}
+
+/** Whether an id names something the page can show. */
+export function isViewId(id: string): id is ViewId {
+  return chapterById(id) !== undefined;
 }
 
 /**
@@ -76,12 +85,12 @@ export function operatorCountPatch(
     : { mode: 'pm', noteMode: false, stops: state.stops + 1, noteStartedAt: null };
 }
 
-/** The written chapters either side of one, if any. */
-export function neighbours(number: number): {
+/** The sections either side of one, if any. */
+export function neighbours(id: string): {
   previous?: Chapter;
   next?: Chapter;
 } {
-  const at = CHAPTERS.findIndex(chapter => chapter.number === number);
+  const at = CHAPTERS.findIndex(chapter => chapter.id === id);
   if (at === -1) return {};
   return { previous: CHAPTERS[at - 1], next: CHAPTERS[at + 1] };
 }

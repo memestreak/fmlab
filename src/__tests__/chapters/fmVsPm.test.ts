@@ -1,15 +1,15 @@
-import { chapterByNumber, CHAPTERS } from '../../chapters';
+import { chapterById, CHAPTERS } from '../../chapters';
 import { trueFmSpectrum } from '../../dsp/fmSpectrum';
 import { asFm, asPm, DEFAULTS, type LabState } from '../../model/lab';
 import { axisSpan, spectrumOf } from '../../viz/spectrumPlot';
 
-const chapter9 = chapterByNumber(9)!;
-const opened: LabState = { ...DEFAULTS, ...chapter9.patch, chapter: 9 };
+const chapter9 = chapterById('fm-vs-pm')!;
+const opened: LabState = { ...DEFAULTS, ...chapter9.patch, chapter: 'fm-vs-pm' };
 
 describe('chapter 9, FM versus PM', () => {
-  it('is the last chapter, and the only one comparing', () => {
-    expect(CHAPTERS[CHAPTERS.length - 1]).toBe(chapter9);
-    expect(CHAPTERS.filter(c => c.patch.compare).map(c => c.number)).toEqual([9]);
+  it('ends the DX7 group, just before the sandbox, and is the only one comparing', () => {
+    expect(CHAPTERS[CHAPTERS.length - 2]).toBe(chapter9);
+    expect(CHAPTERS.filter(c => c.patch.compare).map(c => c.id)).toEqual(['fm-vs-pm']);
   });
 
   it('shows the two spectra and offers ratio and index', () => {

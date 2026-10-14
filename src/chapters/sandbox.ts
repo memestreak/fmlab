@@ -1,12 +1,12 @@
 import { BASE_PATCH } from './basePatch';
 import { use } from './terms';
 import { DX7_PRESETS, STACKS } from './dx7Presets';
+import { sectionLink, titleOf } from './outline';
 import type { Chapter } from './types';
 
 const twoOperators: Chapter = {
-  number: 7,
-  title: 'Sandbox',
-  navLabel: 'Sandbox',
+  id: 'sandbox',
+  title: titleOf('sandbox'),
   body: [
     `Every control for two sine waves, with no lesson attached. The
      modulator bends the carrier's ${use('phase')}; what you hear is what
@@ -26,9 +26,7 @@ const twoOperators: Chapter = {
      listen to what each slider does.`,
     `The page's address keeps the sound as you change it. Copy link, or
      the address itself, and whoever opens it hears the same sound.`,
-    `Once you have read chapter 8, the switch beside Play turns this lab
-     into that chapter's, with the keyboard and the link kept. Each key
-     then strikes a note that dies away by itself.`,
+    `Switch to Six and this becomes the lab of ${sectionLink('algorithms')}: six ${use('operator', 'operators')} wired by any of the DX7's 32 ${use('algorithm', 'algorithms')}, with the keyboard and the link kept. Each key then strikes a note that dies away by itself.`,
   ],
   maths: [
     {

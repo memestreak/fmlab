@@ -2,6 +2,7 @@ import { BASE_PATCH } from './basePatch';
 import { DX7_PRESETS, ops, STACKS } from './dx7Presets';
 import { STEP_WIRINGS } from '../dsp/algorithms';
 import { define, use } from './terms';
+import { sectionLink, titleOf } from './outline';
 import type { Chapter, ChapterPatch, Step } from './types';
 
 /** An operator a step wiring leaves out: silent, so it adds nothing. */
@@ -48,8 +49,7 @@ const STEPS: Step[] = [
     title: 'One pair',
     patch: PAIR,
     body: [
-      `You have been using a wiring all along. Fig. 1 draws the two
-       operators of chapters 3 to 7 the way the DX7 draws them. OP2, the
+      `You have been using a wiring all along. Fig. 1 draws the two operators you have used since ${sectionLink('index')} the way the DX7 draws them. OP2, the
        modulator, in green, sits above OP1, the carrier, in blue, and a line
        runs down from one to the other because OP2 modulates OP1. Only OP1
        has a line down to <em>out</em>: it is the one you hear.`,
@@ -68,7 +68,7 @@ const STEPS: Step[] = [
        carrier too, with its own line to the output. Two carriers are two
        sounds added together, each with its own sidebands; here the second
        pair is three times higher.`,
-      `This is the one rule for every diagram in this chapter:
+      `This is the one rule for every diagram in this section:
        <strong>operators on the bottom row are what you hear; everything
        above them only shapes the sound.</strong> A modulator is never
        heard itself, only in what it does to the carrier below it.`,
@@ -125,8 +125,7 @@ const STEPS: Step[] = [
        nothing modulating anything, six sine waves added like an organ's
        drawbars; 5 is three pairs side by side. In 4 and 6 the feedback
        loop runs from lower in a stack back up to its top.`,
-      `The sandbox, chapter 7, has all of this too: switch it to Six
-       operators to play these sounds from a keyboard and share them by
+      `${sectionLink('sandbox', 'The sandbox')}, at the end of the guide, has all of this too: switch it to Six to play these sounds from a keyboard and share them by
        link.`,
       `The buttons are sounds of mine to start from, built the way DX7
        sounds are: an electric piano from three pairs, one with a high
@@ -143,19 +142,16 @@ const STEPS: Step[] = [
 ];
 
 export const operators: Chapter = {
-  number: 8,
-  title: 'Operators and algorithms',
-  navLabel: '8',
+  id: 'algorithms',
+  title: titleOf('algorithms'),
   body: [
     `Everything so far has used two sine waves. The Yamaha DX7, the
      synthesizer that took ${use('fm', 'FM')} out of the laboratory in 1983,
      has six. ${define('operator')} Each operator's frequency is a multiple
-     of the note's, which the DX7 also calls its ratio, though it is not
-     chapter 5's carrier-to-modulator ratio. Its ${use('envelope')} here is
+     of the note's, which the DX7 also calls its ratio, though it is not the carrier-to-modulator ratio of ${sectionLink('ratio')}. Its ${use('envelope')} here is
      one number, how long it takes to die away; a decay of 0 holds it for
      the whole note.`,
-    `What makes a sound is how the operators are wired together. This
-     chapter builds that up a step at a time, from the two you know. The
+    `What makes a sound is how the operators are wired together. This section builds that up a step at a time, from the two you know. The
      buttons in the lab and at the head of each section below set each
      step's sound.`,
   ],
@@ -181,8 +177,7 @@ export const operators: Chapter = {
       title: 'Why the spectrum is worked out numerically',
       body: [
         `For two operators the spectrum is a sum of Bessel functions,
-         <var>J</var><sub><var>n</var></sub>(<var>I</var>), as chapter 4
-         showed. A stack is modulation of a modulated wave, and its spectrum
+         <var>J</var><sub><var>n</var></sub>(<var>I</var>), as ${sectionLink('sidebands')} showed. A stack is modulation of a modulated wave, and its spectrum
          is a sum of products of Bessel functions, one factor per operator,
          over every combination of sidebands. That can be written down but
          not usefully drawn from.`,
