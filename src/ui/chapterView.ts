@@ -16,6 +16,8 @@ import {
 import type { LabStore } from '../model/lab';
 
 const NUMBERS = CHAPTERS.map(chapter => chapter.number);
+/** More sliders than this and they go in two columns on a wide screen. */
+const MANY_SLIDERS = 4;
 
 /**
  * The chapter the URL asks for, or the landing view when it asks for
@@ -132,6 +134,11 @@ export function mountChapters(store: LabStore): void {
     for (const row of document.querySelectorAll<HTMLElement>('[data-control]')) {
       row.hidden = !chapter.controls.includes(row.dataset.control as ControlId);
     }
+    // For the stylesheet: a chapter with many sliders sets them in two
+    // columns where the lab is pinned beside the text, to leave its
+    // figures room.
+    const lab = document.querySelector<HTMLElement>('.lab');
+    if (lab) lab.dataset.manySliders = String(chapter.controls.length > MANY_SLIDERS);
     const motion = document.querySelector<HTMLElement>('#motion-toggle');
     if (motion) motion.hidden = !chapter.hasMotion;
     const follows = document.querySelector<HTMLElement>('#index-follows-toggle');
@@ -193,7 +200,9 @@ export function mountChapters(store: LabStore): void {
       ...(chapter.patch.noteMode ? { playing: false } : {}),
     });
     // A new chapter starts at its top, and says so to a screen reader.
+    // On a wide screen the text scrolls in its own column, so that too.
     window.scrollTo(0, 0);
+    if (narrative) narrative.scrollTop = 0;
     narrative
       ?.querySelector<HTMLElement>('.chapter-title')
       ?.focus({ preventScroll: true });

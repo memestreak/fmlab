@@ -60,6 +60,10 @@ export class AudioEngine {
     store.subscribe((state, previous) => {
       if (state.notes !== previous.notes) {
         void this.playNote();
+      } else if (state.stops !== previous.stops) {
+        // A note stopped before its end.
+        this.hush();
+        this.suspendSoon(SUSPEND_AFTER_MS);
       } else if (state.playing !== previous.playing) {
         if (state.playing) void this.start();
         else this.stop();

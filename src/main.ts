@@ -25,6 +25,7 @@ import { mountFigures } from './ui/figures';
 import { mountSliders } from './ui/sliders';
 import { mountThemeSwitch } from './ui/themeSwitch';
 import {
+  mountControlsToggle,
   mountIndexFollowsToggle,
   mountMotionToggle,
   mountPlayButton,
@@ -67,6 +68,9 @@ if (play) mountPlayButton(play, store);
 
 const motion = document.querySelector<HTMLInputElement>('#motion');
 if (motion) mountMotionToggle(motion, store);
+
+const toggle = document.querySelector<HTMLButtonElement>('#controls-toggle');
+if (toggle) mountControlsToggle(toggle);
 
 const follows = document.querySelector<HTMLInputElement>('#index-follows');
 if (follows) mountIndexFollowsToggle(follows, store);

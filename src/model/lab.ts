@@ -62,6 +62,8 @@ export interface LabState {
   indexFollows: boolean;
   /** Counts the notes asked for. The audio engine plays one per change. */
   notes: number;
+  /** Counts the notes stopped early. The audio engine silences one per change. */
+  stops: number;
   /**
    * When the last note started, in seconds on the page's clock
    * (performance.now), for the figures' playhead. Null before the first.
@@ -128,6 +130,7 @@ export const DEFAULTS: LabState = {
   hold: 0.6,
   indexFollows: true,
   notes: 0,
+  stops: 0,
   noteStartedAt: null,
   hover: null,
   pinned: null,
@@ -177,6 +180,16 @@ export function indexAtTime(state: LabState, time: number): number {
  * clock; null when no note is sounding then (none yet, not started, or
  * over).
  */
+/**
+ * Whether the last note is still sounding at `time`, in seconds on the
+ * page's clock: asked for and not yet over. That includes the instant
+ * between asking and its start, a few milliseconds later.
+ */
+export function noteSounding(state: LabState, time: number): boolean {
+  if (state.noteStartedAt === null) return false;
+  return time <= state.noteStartedAt + noteSeconds(envelopeOf(state));
+}
+
 export function noteProgress(
   state: LabState,
   time: number | undefined,

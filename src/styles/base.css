@@ -559,3 +559,208 @@ a {
   margin-top: 3rem;
   font-size: 0.85rem;
 }
+
+/* A hint for keyboards: shown where there is a pointer that hovers, so
+   not on a phone or tablet. */
+.hint {
+  font-size: 0.85rem;
+}
+
+@media (hover: none) {
+  .hint {
+    display: none;
+  }
+}
+
+/* The Sliders button exists only where the lab is pinned small. */
+.controls-toggle {
+  display: none;
+}
+
+/* The canvas fills its frame where the lab is pinned. Elsewhere the frame
+   is a plain block and the canvas keeps its own proportions. */
+.plot-frame {
+  position: relative;
+}
+
+/* Pinned lab, wide screens. The page is exactly the height of the window:
+   the masthead at the top, the text column scrolling on its own below it,
+   and beside it the lab, which never moves. The lab's figures share out
+   whatever height the controls leave, so the whole lab fits; only if a
+   window is too short even for that does the lab scroll. */
+@media (min-width: 62rem) {
+  [data-view='chapter'] .page {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+    padding-top: 1.25rem;
+    padding-bottom: 0.5rem;
+  }
+
+  [data-view='chapter'] .masthead {
+    flex: none;
+    margin-bottom: 1rem;
+  }
+
+  [data-view='chapter'] .chapter {
+    flex: 1 1 auto;
+    min-height: 0;
+    grid-template-rows: minmax(0, 1fr);
+    align-items: stretch;
+  }
+
+  [data-view='chapter'] .narrative {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    /* Room between the text and the scrollbar, and below the last line. */
+    padding: 0 1rem 2rem 0;
+  }
+
+  [data-view='chapter'] .lab {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  [data-view='chapter'] .lab .figure:not([hidden]) {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    min-height: 0;
+    margin: 0.75rem 0 0;
+    padding: 0.5rem 0 0.4rem;
+  }
+
+  [data-view='chapter'] .plot-frame {
+    flex: 1 1 auto;
+    min-height: 6rem;
+  }
+
+  /* Sliders a little closer together, so a chapter with many of them (6
+     has six) still leaves its figures room. A mouse needs less height to
+     find a slider than a finger. */
+  [data-view='chapter'] .slider {
+    height: 2rem;
+  }
+
+  [data-view='chapter'] .controls {
+    gap: 0;
+  }
+
+  [data-view='chapter'] .lab[data-many-sliders='true'] .sliders {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 1.5rem;
+  }
+
+  [data-view='chapter'] .lab[data-many-sliders='true'] .presets {
+    grid-column: 1 / -1;
+  }
+
+  [data-view='chapter'] .lab[data-many-sliders='true'] .slider-row {
+    grid-template-columns: 4.5rem minmax(0, 1fr) 4.25rem;
+    gap: 0.5rem;
+  }
+
+  [data-view='chapter'] .plot-frame .plot {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    aspect-ratio: auto;
+  }
+
+  [data-view='chapter'] .lab .figure figcaption {
+    margin-top: 0.4rem;
+    font-size: 0.85rem;
+  }
+
+  [data-view='chapter'] .footer {
+    flex: none;
+    margin-top: 0.5rem;
+  }
+}
+
+/* Pinned lab, narrow screens. The lab goes above the text and sticks to
+   the top of the window as the text scrolls up beneath it. To leave the
+   text room (at least two fifths of a phone's height) it is compact: the
+   two figures a fifth of the window high each, their captions kept for
+   screen readers only, and the sliders folded behind a button. */
+@media (max-width: 61.99rem) {
+  [data-view='chapter'] .lab {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    order: -1;
+    margin: 0 -1.25rem;
+    padding: 0.5rem 1.25rem 0.25rem;
+    border-bottom: 1px solid var(--ink);
+    background: var(--paper);
+  }
+
+  [data-view='chapter'] .transport {
+    gap: 0.25rem 0.75rem;
+    margin-bottom: 0.25rem;
+  }
+
+  [data-view='chapter'] .controls-toggle {
+    display: inline-block;
+    margin-left: auto;
+  }
+
+  [data-view='chapter'] .lab:not([data-sliders='open']) .sliders {
+    display: none;
+  }
+
+  /* Opened, the sliders may need more than is left: they scroll. */
+  [data-view='chapter'] .sliders {
+    max-height: 40vh;
+    max-height: 40dvh;
+    overflow-y: auto;
+  }
+
+  [data-view='chapter'] .lab .figure {
+    margin: 0.35rem 0 0;
+    padding: 0.25rem 0 0;
+    border-bottom: 0;
+  }
+
+  [data-view='chapter'] .plot-frame {
+    height: 19vh;
+    height: 19dvh;
+    min-height: 7rem;
+  }
+
+  [data-view='chapter'] .plot-frame .plot {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    aspect-ratio: auto;
+  }
+
+  [data-view='chapter'] .lab .figure figcaption {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* The Bessel plot's buttons in one short row that scrolls sideways. */
+  [data-view='chapter'] .figure-tools {
+    flex-wrap: nowrap;
+    margin-top: 0.25rem;
+  }
+
+  [data-view='chapter'] .chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+}

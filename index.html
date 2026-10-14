@@ -37,12 +37,32 @@
            by side on a wide screen, the text first on a narrow one. -->
       <main class="chapter">
         <!-- The chapter's title, lesson and maths, from src/chapters. -->
-        <article id="narrative" class="narrative"></article>
+        <!-- On a wide screen this column scrolls on its own, beside the
+             lab, so it is a tab stop to scroll it from the keyboard. -->
+        <article
+          id="narrative"
+          class="narrative"
+          tabindex="0"
+          aria-label="Chapter text"
+        ></article>
 
         <section class="lab" aria-label="Lab">
           <div class="controls">
             <div class="transport">
               <button id="play" type="button" class="btn btn-ink">Play</button>
+              <!-- Only where there is a keyboard to press it on. -->
+              <span class="hint" aria-hidden="true">Space: play / stop</span>
+              <!-- Only where the lab is pinned small above the text: shows
+                   and hides the sliders and presets. -->
+              <button
+                id="controls-toggle"
+                type="button"
+                class="btn btn-quiet controls-toggle"
+                aria-expanded="false"
+                aria-controls="sliders"
+              >
+                Sliders
+              </button>
               <!-- Shown by chapters whose waveform has a moving view. -->
               <label id="motion-toggle" class="check" hidden>
                 <input id="motion" type="checkbox" />
@@ -55,67 +75,71 @@
               </label>
             </div>
 
-            <!-- A chapter's presets, as buttons; filled in by script and
-                 hidden when it has none. -->
-            <div
-              id="presets"
-              class="presets"
-              role="group"
-              aria-label="Presets"
-              hidden
-            ></div>
+            <!-- The presets and sliders: where the lab is pinned small, these
+                 fold away behind the Sliders button. -->
+            <div id="sliders" class="sliders">
+              <!-- A chapter's presets, as buttons; filled in by script and
+                   hidden when it has none. -->
+              <div
+                id="presets"
+                class="presets"
+                role="group"
+                aria-label="Presets"
+                hidden
+              ></div>
 
-            <!-- Every slider there is. A chapter shows the ones it names
-                 in `controls`, matched on data-control. -->
-            <div class="slider-row" data-control="volume">
-              <label for="volume">Volume</label>
-              <output id="volume-out" for="volume" class="num"></output>
-              <input id="volume" type="range" class="slider" />
-            </div>
-            <div class="slider-row" data-control="carrier">
-              <label for="carrier">Carrier</label>
-              <output id="carrier-out" for="carrier" class="num"></output>
-              <input id="carrier" type="range" class="slider" />
-            </div>
-            <div class="slider-row" data-control="ratio">
-              <label for="ratio">Ratio</label>
-              <output id="ratio-out" for="ratio" class="num"></output>
-              <input id="ratio" type="range" class="slider" />
-            </div>
-            <div class="slider-row" data-control="index">
-              <label for="index">Index</label>
-              <output id="index-out" for="index" class="num"></output>
-              <input id="index" type="range" class="slider" />
-            </div>
-            <div class="slider-row" data-control="modHz">
-              <label for="modHz">Modulator</label>
-              <output id="modHz-out" for="modHz" class="num"></output>
-              <input id="modHz" type="range" class="slider" />
-            </div>
-            <div class="slider-row" data-control="deviation">
-              <label for="deviation">Deviation</label>
-              <output id="deviation-out" for="deviation" class="num"></output>
-              <input id="deviation" type="range" class="slider" />
-            </div>
-            <div class="slider-row" data-control="attack">
-              <label for="attack">Attack</label>
-              <output id="attack-out" for="attack" class="num"></output>
-              <input id="attack" type="range" class="slider" />
-            </div>
-            <div class="slider-row" data-control="decay">
-              <label for="decay">Decay</label>
-              <output id="decay-out" for="decay" class="num"></output>
-              <input id="decay" type="range" class="slider" />
-            </div>
-            <div class="slider-row" data-control="sustain">
-              <label for="sustain">Sustain</label>
-              <output id="sustain-out" for="sustain" class="num"></output>
-              <input id="sustain" type="range" class="slider" />
-            </div>
-            <div class="slider-row" data-control="release">
-              <label for="release">Release</label>
-              <output id="release-out" for="release" class="num"></output>
-              <input id="release" type="range" class="slider" />
+              <!-- Every slider there is. A chapter shows the ones it names
+                   in `controls`, matched on data-control. -->
+              <div class="slider-row" data-control="volume">
+                <label for="volume">Volume</label>
+                <output id="volume-out" for="volume" class="num"></output>
+                <input id="volume" type="range" class="slider" />
+              </div>
+              <div class="slider-row" data-control="carrier">
+                <label for="carrier">Carrier</label>
+                <output id="carrier-out" for="carrier" class="num"></output>
+                <input id="carrier" type="range" class="slider" />
+              </div>
+              <div class="slider-row" data-control="ratio">
+                <label for="ratio">Ratio</label>
+                <output id="ratio-out" for="ratio" class="num"></output>
+                <input id="ratio" type="range" class="slider" />
+              </div>
+              <div class="slider-row" data-control="index">
+                <label for="index">Index</label>
+                <output id="index-out" for="index" class="num"></output>
+                <input id="index" type="range" class="slider" />
+              </div>
+              <div class="slider-row" data-control="modHz">
+                <label for="modHz">Modulator</label>
+                <output id="modHz-out" for="modHz" class="num"></output>
+                <input id="modHz" type="range" class="slider" />
+              </div>
+              <div class="slider-row" data-control="deviation">
+                <label for="deviation">Deviation</label>
+                <output id="deviation-out" for="deviation" class="num"></output>
+                <input id="deviation" type="range" class="slider" />
+              </div>
+              <div class="slider-row" data-control="attack">
+                <label for="attack">Attack</label>
+                <output id="attack-out" for="attack" class="num"></output>
+                <input id="attack" type="range" class="slider" />
+              </div>
+              <div class="slider-row" data-control="decay">
+                <label for="decay">Decay</label>
+                <output id="decay-out" for="decay" class="num"></output>
+                <input id="decay" type="range" class="slider" />
+              </div>
+              <div class="slider-row" data-control="sustain">
+                <label for="sustain">Sustain</label>
+                <output id="sustain-out" for="sustain" class="num"></output>
+                <input id="sustain" type="range" class="slider" />
+              </div>
+              <div class="slider-row" data-control="release">
+                <label for="release">Release</label>
+                <output id="release-out" for="release" class="num"></output>
+                <input id="release" type="range" class="slider" />
+              </div>
             </div>
           </div>
 
@@ -123,7 +147,9 @@
                `figures`, matched on data-figure, and they are numbered
                from 1 in the order shown (.figure-number). -->
           <figure class="figure" data-figure="waveform">
-            <canvas id="waveform" class="plot" role="img"></canvas>
+            <div class="plot-frame">
+              <canvas id="waveform" class="plot" role="img"></canvas>
+            </div>
             <figcaption>
               Fig. <span class="figure-number"></span>&emsp;<span
                 id="waveform-caption"
@@ -136,7 +162,9 @@
           <figure class="figure" data-figure="envelope">
             <!-- Its dots are dragged; the Attack, Decay, Sustain and
                  Release sliders do the same from the keyboard. -->
-            <canvas id="envelope" class="plot plot-short plot-drag" role="img"></canvas>
+            <div class="plot-frame">
+              <canvas id="envelope" class="plot plot-short plot-drag" role="img"></canvas>
+            </div>
             <figcaption>
               Fig. <span class="figure-number"></span>&emsp;<span
                 id="envelope-caption"
@@ -145,7 +173,9 @@
           </figure>
 
           <figure class="figure" data-figure="spectrum">
-            <canvas id="spectrum" class="plot" role="img"></canvas>
+            <div class="plot-frame">
+              <canvas id="spectrum" class="plot" role="img"></canvas>
+            </div>
             <figcaption>
               Fig. <span class="figure-number"></span>&emsp;<span
                 id="spectrum-caption"
@@ -154,7 +184,9 @@
           </figure>
 
           <figure class="figure" data-figure="spectrogram">
-            <canvas id="spectrogram" class="plot" role="img"></canvas>
+            <div class="plot-frame">
+              <canvas id="spectrogram" class="plot" role="img"></canvas>
+            </div>
             <figcaption>
               Fig. <span class="figure-number"></span>&emsp;<span
                 id="spectrogram-caption"
@@ -165,14 +197,16 @@
           <figure class="figure" data-figure="bessel">
             <!-- The plot is also the index control: a slider, by pointer
                  or keyboard. See ui/besselControls.ts. -->
-            <canvas
-              id="bessel"
-              class="plot plot-control"
-              role="slider"
-              tabindex="0"
-              aria-label="Modulation index"
-              aria-orientation="horizontal"
-            ></canvas>
+            <div class="plot-frame">
+              <canvas
+                id="bessel"
+                class="plot plot-control"
+                role="slider"
+                tabindex="0"
+                aria-label="Modulation index"
+                aria-orientation="horizontal"
+              ></canvas>
+            </div>
             <div class="figure-tools">
               <!-- One button per curve, J0 to J8; filled in by script. -->
               <div

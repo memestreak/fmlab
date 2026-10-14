@@ -181,6 +181,21 @@ ratio and index aliases. Chapter 2's moving waveform runs on the page's
 clock, not the audio's, so its wobble has the sound's rate but not
 necessarily its phase.
 
+## Layout on screen
+
+The lab stays in view while the text scrolls (Jeremy asked for this on
+2026-10-14). On a wide screen (62rem and up) the page is exactly the
+window's height: the masthead, then the text column scrolling on its own
+(`#narrative` is a tab stop for that), and beside it the lab, whose
+figures share out the height the controls leave (`.plot-frame` holds each
+canvas so it can fill it). A chapter with more than four sliders sets
+them in two columns there. Below 62rem the lab moves above the text and
+sticks to the top of the window, compact: figures a fifth of the window
+high, captions for screen readers only, sliders and presets folded behind
+a Sliders button. The text keeps at least two fifths of a phone's height.
+The landing view is neither: one centred column. Check every chapter at
+both sizes after adding controls or figures.
+
 ## Styling
 
 The look is a 1973 paper: paper, ink, and three pens for the plots.
@@ -228,6 +243,11 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
 - The theme switch cycles Auto, Light, Dark and saves the bare word under
   `localStorage["fmlab.theme"]`. The boot script in `index.html` reads the
   same key; keep it in step with `src/model/theme.ts`.
+- The space bar is Play / Stop on every page, including stopping a note
+  that is sounding. It is left alone on a button, link, checkbox, maths
+  panel or anything typed into; on a slider, where space means nothing,
+  it plays and stops. A "Space: play / stop" hint shows where there is a
+  pointer that hovers.
 - Motion: chapter 6's two figures show a playhead while a note sounds,
   and the landing view's follow its sound; under
   `prefers-reduced-motion` they simply stay as they are, and the sound
@@ -240,7 +260,7 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
 ## Testing
 
 Tests live in `src/__tests__/`, in a folder named after the one they test
-(`dsp/`, `model/`, `audio/`, `viz/`, `chapters/`). Vitest runs them in the `node`
+(`dsp/`, `model/`, `audio/`, `viz/`, `chapters/`, `ui/`). Vitest runs them in the `node`
 environment with globals on; there is no jsdom yet, so add it when the
 first DOM test needs it. Test the maths against published values (Bessel
 tables), identities and each other (the kernel against `fmSample` and
