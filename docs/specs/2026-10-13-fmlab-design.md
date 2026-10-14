@@ -312,3 +312,37 @@ while the text scrolls, and for the space bar to start and stop the sound.
   Play to hear it."
 - **Under reduced motion** the live view is redrawn twice a second rather
   than every frame.
+
+## Chapter 8, operators and algorithms (PR #13)
+
+- **The 32 algorithms** are written out in DX7 numbering and checked, by a
+  unit test, against the algorithm table of Dexed's msfa engine, a DX7
+  emulation, decoded operator by operator: modulators, carriers and the
+  feedback loop. Two loops run through a stack rather than round one
+  operator: in algorithm 4 from OP4 back to OP6, in 6 from OP5 to OP6.
+- **Clean units:** each operator has a ratio (0.5 to 16), a level (0 to
+  100%) and a decay time in seconds (0 holds it for the whole note). A
+  modulator's level is its index, 5 radians at full level; the carriers
+  share the output equally, so every algorithm is about as loud. Feedback
+  is 0 to 2 radians, using the mean of the last two samples as the DX7
+  does.
+- **Notes:** chapter 8 plays notes, held as long as the slowest operator
+  needs (1 to 6 seconds) and let go together. Each operator's level is
+  shaped by its own envelope, scheduled in Web Audio on its own param.
+- **The predicted spectrum is numeric**, since there is no Bessel formula
+  for a stack: the engine's kernel is run for 16384 samples (256 cycles of
+  the note), windowed with a flat-top window and transformed, and each peak
+  read as a partial. Heights only. The live FFT works here as everywhere.
+- **The diagram** puts carriers on the bottom row in --pen-blue and
+  modulators above what they modulate in --pen-green, with ink lines and
+  the feedback loop out of the top; a box fades with its operator's level.
+- **Controls:** an Algorithm list (1 to 32) beside Play, a Feedback slider,
+  and a table of the six operators, two to a row, with number boxes
+  rather than eighteen sliders so the figures keep their room.
+- **Presets are mine**, not the DX7's factory sounds: Stacks (where the
+  chapter opens, algorithm 1), E. piano and Bell (algorithm 5), Bass
+  (algorithm 1 with feedback) and Organ (algorithm 32).
+- **A note's length is now fixed when it starts.** Before, choosing a
+  preset with longer decays after a note had ended made it look still
+  sounding, so Play stopped instead of playing; this was true of chapter 6
+  too.

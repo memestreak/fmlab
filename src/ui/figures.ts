@@ -7,6 +7,7 @@ import {
   noteSounding,
   patchOf,
 } from '../model/lab';
+import { describeAlgorithm, drawAlgorithm } from '../viz/algorithmPlot';
 import { drawBessel } from '../viz/besselPlot';
 import { drawEnvelope } from '../viz/envelopePlot';
 import { drawSpectrogram, sliceAt } from '../viz/spectrogramPlot';
@@ -46,6 +47,9 @@ const DRAWN: (keyof LabState)[] = [
   'realUnits',
   'showHarmonics',
   'liveSpectrum',
+  'algorithm',
+  'operators',
+  'feedback',
   // The envelope, and the note whose playhead the figures show.
   'attack',
   'decay',
@@ -254,6 +258,15 @@ export function mountFigures(store: LabStore, engine: AudioEngine): void {
   store.subscribe(showSwitch);
   showSwitch(store.get());
 
+  // Chapter 8's algorithm, as the DX7 draws it.
+  const diagram = document.querySelector<HTMLCanvasElement>('#algorithm-plot');
+  if (diagram) {
+    mountFigure(diagram, store, (state, canvas) => {
+      drawAlgorithm(state, canvas);
+      canvas.setAttribute('aria-label', describeAlgorithm(state.algorithm));
+    });
+  }
+
   // Its label and value are the slider's, kept by ui/besselControls.ts.
   const bessel = document.querySelector<HTMLCanvasElement>('#bessel');
   if (bessel) mountFigure(bessel, store, drawBessel);
@@ -330,7 +343,7 @@ export function noteHasPlayhead(
   reducedMotion: boolean,
 ): boolean {
   if (reducedMotion || state.noteStartedAt === null) return false;
-  return time <= state.noteStartedAt + noteSeconds(envelopeOf(state));
+  return time <= state.noteStartedAt + state.noteLength;
 }
 
 /** What the envelope figure shows, in words. */

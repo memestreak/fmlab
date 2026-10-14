@@ -11,10 +11,12 @@ export type ControlId =
   | 'attack'
   | 'decay'
   | 'sustain'
-  | 'release';
+  | 'release'
+  | 'feedback';
 
 /** A figure on the page, by the id of its canvas in index.html. */
 export type FigureId =
+  | 'algorithm'
   | 'waveform'
   | 'envelope'
   | 'spectrum'
@@ -47,6 +49,9 @@ export type ChapterPatch = Pick<
   | 'release'
   | 'hold'
   | 'indexFollows'
+  | 'algorithm'
+  | 'operators'
+  | 'feedback'
 >;
 
 /** An expandable panel: the formulas, for whoever wants them. */

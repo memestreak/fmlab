@@ -9,8 +9,10 @@ import {
   highlightOf,
   type LabState,
   momentOf,
+  operatorLevelsAt,
   patchOf,
 } from '../model/lab';
+import { operatorSpectrum } from '../dsp/operators';
 import {
   ampToY,
   beginPlot,
@@ -73,10 +75,33 @@ export function hzAxisEnd(ratio: number, index: number): number {
  * whichever units the axis is numbered in.
  */
 export function axisSpan(state: LabState): number {
+  if (state.mode === 'ops') return operatorsAxisEnd(state);
   const { ratio, index } = patchOf(state);
   return state.realUnits
     ? hzAxisEnd(ratio, index) / state.carrierHz
     : axisEnd(ratio, index);
+}
+
+/** The last answer of operatorsAxisEnd, and the patch it was for. */
+let lastAxis = { key: '', end: 0 };
+
+/**
+ * Where the frequency axis should end for six operators: past the highest
+ * partial that matters (a hundredth of the loudest) when every operator is
+ * at its full level, rounded up to the same fixed ends as `axisEnd`. It
+ * holds still through a note, as levels fall. Remembered, since working
+ * out the spectrum is not free.
+ */
+export function operatorsAxisEnd(state: LabState): number {
+  const key = JSON.stringify([state.algorithm, state.operators, state.feedback]);
+  if (key !== lastAxis.key) {
+    const lines = spectrumOf({ ...state, noteStartedAt: null });
+    const loudest = Math.max(0, ...lines.map(line => line.amp));
+    const highest = Math.max(1, ...lines.filter(line => line.amp >= loudest / 100).map(line => line.freq));
+    const end = AXIS_ENDS.find(end => end >= highest * 1.05) ?? AXIS_ENDS[AXIS_ENDS.length - 1];
+    lastAxis = { key, end };
+  }
+  return lastAxis.end;
 }
 
 /**
@@ -85,6 +110,14 @@ export function axisSpan(state: LabState): number {
  * moment's index, with every line scaled by that moment's loudness.
  */
 export function spectrumOf(state: LabState, time?: number): SpectralLine[] {
+  if (state.mode === 'ops') {
+    return operatorSpectrum(
+      state.algorithm,
+      state.operators.map(op => op.ratio),
+      operatorLevelsAt(state, time),
+      state.feedback,
+    );
+  }
   const { ratio } = patchOf(state);
   const { index, level } = momentOf(state, time);
   const lines =

@@ -23,6 +23,7 @@ import { mountBesselControls } from './ui/besselControls';
 import { chapterInUrl, mountChapters, openingFromUrl } from './ui/chapterView';
 import { mountEnvelopeControls } from './ui/envelopeControls';
 import { mountFigures } from './ui/figures';
+import { mountOperators } from './ui/operators';
 import { mountPiano } from './ui/piano';
 import { mountSliders } from './ui/sliders';
 import { mountThemeSwitch } from './ui/themeSwitch';
@@ -64,6 +65,7 @@ mountChapters(store);
 mountSliders(store);
 mountFigures(store, engine);
 mountBesselControls(store);
+mountOperators(store);
 mountEnvelopeControls(store);
 
 const play = document.querySelector<HTMLButtonElement>('#play');

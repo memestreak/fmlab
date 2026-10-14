@@ -17,7 +17,9 @@ figures move with, and then the ways on. Version 1's seven
 chapters are all written: 1 "A single sine", 2 "Vibrato becomes timbre",
 3 "Modulation index", 4 "Sidebands and Bessel functions", 5 "Carrier to
 modulator ratio", 6 "Time-varying index" and 7, the Sandbox; numbers are
-the spec's. One carrier and one modulator throughout.
+the spec's. They use one carrier and one modulator. Version 2 has begun
+with 8 "Operators and algorithms": six operators wired by the DX7's 32
+algorithms.
 
 ## Commands
 
@@ -103,6 +105,16 @@ figures subscribe to it. Nothing else passes values around.
   phase locked to its ratio of the base frequency, easing it back after a
   ratio moves, so the sound stays the signal the figures draw.
   `fmKernel.ts` (`FmKernel`) is true FM for chapter 2 only, with no lock.
+  `PmKernel` also takes an algorithm's feedback loop (the mean of the
+  source's last two samples, as the DX7 does) and can be rewired between
+  notes (`setAlgorithm`). `algorithms.ts` is the DX7's 32 algorithms,
+  written in DX7 numbering and tested against the table in Dexed's msfa
+  engine. `operators.ts` is chapter 8's maths: an `Operator` (ratio,
+  level, decay), `kernelLevels` (a modulator's level is its index times
+  `MOD_INDEX`; the carriers share the output), each operator's envelope,
+  and `operatorSpectrum`, the predicted spectrum worked out by running the
+  kernel and taking an FFT (`fft.ts`) with a flat-top window, since there
+  is no Bessel formula for a stack.
   Tests hold kernels, samples and spectra to each other.
 - `src/dsp/envelope.ts` is the envelope as a pure function,
   `envelopeAt(envelope, t)`: a straight attack, then exponential decay and
@@ -146,7 +158,9 @@ figures subscribe to it. Nothing else passes values around.
   same note as a spectrogram worked out from the patch (`sliceAt`), both
   on one time axis (`envelopeSpan`) and both with a playhead while the
   note sounds. `plot.ts`'s `drawFrame` takes the horizontal rows a plot
-  wants; amplitude from -1 to 1 is only the default. `liveSpectrum.ts` is
+  wants; amplitude from -1 to 1 is only the default. `algorithmPlot.ts` draws an algorithm as the DX7 does (`layoutAlgorithm`:
+  carriers on the bottom row, each modulator above what it modulates).
+  `liveSpectrum.ts` is
   the spectrum's live view: the measured FFT as a filled --pen-blue curve
   over the predicted stems, drawn faintly, on the same axes
   (`drawSpectrumFrame`) and scale (`amplitudeFromDb` undoes the analyser's
@@ -166,6 +180,8 @@ figures subscribe to it. Nothing else passes values around.
   which slider rows (`data-control`) and figures (`data-figure`) show, the
   figures' numbers and their captions. `sliders.ts`
   is a table of every slider (range, step, scale, readout);
+  `operators.ts` is chapter 8's algorithm list and operator table (two
+  operators to a row, number boxes);
   `envelopeControls.ts` drags the envelope's dots; `piano.ts` is the
   sandbox's one-voice keyboard, on screen and on the computer's keys
   (by `KeyboardEvent.code`: A to K the white notes, W E T Y U O P the

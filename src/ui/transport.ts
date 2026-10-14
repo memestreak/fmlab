@@ -1,11 +1,5 @@
 import { LANDING } from '../chapters/landing';
-import {
-  envelopeOf,
-  type LabState,
-  type LabStore,
-  noteSounding,
-} from '../model/lab';
-import { noteSeconds } from '../dsp/envelope';
+import { type LabState, type LabStore, noteSounding } from '../model/lab';
 
 /** The page's clock in seconds, the one notes are timed on. */
 const now = () => performance.now() / 1000;
@@ -71,7 +65,7 @@ export function mountPlayButton(button: HTMLButtonElement, store: LabStore): voi
     button.textContent = playLabel(state, now());
     window.clearTimeout(ending);
     if (state.noteMode && noteSounding(state, now())) {
-      const left = state.noteStartedAt! + noteSeconds(envelopeOf(state)) - now();
+      const left = state.noteStartedAt! + state.noteLength - now();
       ending = window.setTimeout(() => show(store.get()), left * 1000 + 50);
     }
   };

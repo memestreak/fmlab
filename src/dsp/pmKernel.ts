@@ -7,13 +7,20 @@ const TWO_PI = 2 * Math.PI;
  * How the operators are wired. Operators are numbered from 0, and a
  * modulator always has a higher number than the operator it modulates, so
  * one pass from the top down has every modulator's output ready when it is
- * needed. (Feedback, an operator modulating itself, is not here yet.)
+ * needed.
  */
 export interface Algorithm {
   /** For each operator, the operators that modulate its phase. */
   modulators: readonly (readonly number[])[];
   /** The operators that are heard. */
   carriers: readonly number[];
+  /**
+   * Feedback: the output of `from` added to the phase of `to`, a sample
+   * late. Usually an operator feeding itself (`from` = `to`); in two DX7
+   * algorithms a loop through a stack, from a lower operator back up to
+   * the top one. How much is the `feedback` argument of `tick`.
+   */
+  feedback?: { from: number; to: number };
 }
 
 /** Simple FM: operator 1 modulates operator 0, the carrier. */
@@ -44,12 +51,22 @@ export class PmKernel {
   private readonly lastRatios = new Float64Array(MAX_OPERATORS).fill(NaN);
   private readonly outputs = new Float64Array(MAX_OPERATORS);
   private readonly pull: number;
+  /** The feedback source's last two outputs: feedback uses their mean. */
+  private fbLast = 0;
+  private fbBefore = 0;
 
   constructor(
-    private readonly algorithm: Algorithm,
+    private algorithm: Algorithm,
     lockSamples: number,
   ) {
     this.pull = 1 / Math.max(1, lockSamples);
+  }
+
+  /** Rewires the operators, between notes; their phases carry on. */
+  setAlgorithm(algorithm: Algorithm): void {
+    this.algorithm = algorithm;
+    this.fbLast = 0;
+    this.fbBefore = 0;
   }
 
   /**
@@ -59,17 +76,23 @@ export class PmKernel {
    * @param ratios each operator's frequency as a multiple of the base
    * @param levels each operator's output amplitude; for a modulator this
    *   is the modulation index, in radians
+   * @param feedback how much of the feedback source's output is added to
+   *   its target's phase, in radians at full output. The mean of its last
+   *   two samples is used, as the DX7 does: one sample alone sets up a
+   *   buzz at half the sample rate once feedback is strong.
    */
   tick(
     baseFreq: number,
     ratios: ArrayLike<number>,
     levels: ArrayLike<number>,
+    feedback = 0,
   ): number {
-    const { modulators, carriers } = this.algorithm;
+    const { modulators, carriers, feedback: loop } = this.algorithm;
     const { phases, lastRatios, outputs } = this;
+    const fed = loop && feedback !== 0 ? feedback * 0.5 * (this.fbLast + this.fbBefore) : 0;
 
     for (let op = modulators.length - 1; op >= 0; op--) {
-      let modulation = 0;
+      let modulation = loop && op === loop.to ? fed : 0;
       for (const from of modulators[op]) modulation += outputs[from];
       outputs[op] = levels[op] * Math.sin(TWO_PI * phases[op] + modulation);
 
@@ -84,6 +107,10 @@ export class PmKernel {
       lastRatios[op] = ratio;
     }
     this.baseCycles += baseFreq;
+    if (loop) {
+      this.fbBefore = this.fbLast;
+      this.fbLast = outputs[loop.from];
+    }
 
     let sample = 0;
     for (const op of carriers) sample += outputs[op];

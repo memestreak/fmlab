@@ -1,11 +1,23 @@
+import { envelopeOf } from '../../model/lab';
+import { noteSeconds } from '../../dsp/envelope';
 import { chapterByNumber, landing, LANDING } from '../../chapters';
 import { DEFAULTS, type LabState, noteSounding } from '../../model/lab';
 import { playLabel, pressPlay, spaceIsFree } from '../../ui/transport';
 
+/**
+ * A state with a note started at `at` on the page's clock, as the engine
+ * leaves it: with the note's length fixed from the patch at that moment.
+ */
+const started = (state: LabState, at: number): LabState => ({
+  ...state,
+  noteStartedAt: at,
+  noteLength: noteSeconds(envelopeOf(state)),
+});
+
 /** Chapter 6 as it opens: a 0.75 s brass note, none played yet. */
 const brass: LabState = { ...DEFAULTS, ...chapterByNumber(6)!.patch, chapter: 6 };
 /** The same with a note started at second 100 on the page's clock. */
-const sounding: LabState = { ...brass, notes: 1, noteStartedAt: 100 };
+const sounding: LabState = started({ ...brass, notes: 1 }, 100);
 const home: LabState = { ...DEFAULTS, ...landing.patch, chapter: LANDING };
 
 describe('noteSounding', () => {
@@ -37,9 +49,19 @@ describe('the main button and the space bar start and stop the sound', () => {
     expect(pressPlay(sounding, 100.3)).toEqual({ stops: 1, noteStartedAt: null });
   });
 
+  // Found in chapter 8: a preset with longer decays, chosen after a note
+  // had ended, made the old note look still sounding, so Play stopped
+  // instead of playing. A note's length is fixed when it starts.
+  it('start a note after one has ended, whatever the patch now is', () => {
+    const bell = chapterByNumber(6)!.presets[1].patch;
+    const after = { ...started(brass, 100), ...bell };
+    expect(pressPlay(after, 101)).toEqual({ notes: 1 });
+    expect(playLabel(after, 101)).toBe('Play note');
+  });
+
   it('do the same on the landing view', () => {
     expect(pressPlay(home, 0)).toEqual({ notes: 1 });
-    expect(pressPlay({ ...home, notes: 1, noteStartedAt: 10 }, 11)).toEqual({
+    expect(pressPlay(started({ ...home, notes: 1 }, 10), 11)).toEqual({
       stops: 1,
       noteStartedAt: null,
     });
@@ -52,7 +74,7 @@ describe('the main button and the space bar start and stop the sound', () => {
     expect(playLabel(sounding, 100.3)).toBe('Stop');
     expect(playLabel(sounding, 101)).toBe('Play note');
     expect(playLabel(home, 0)).toBe('Play');
-    expect(playLabel({ ...home, noteStartedAt: 10 }, 11)).toBe('Stop');
+    expect(playLabel(started({ ...home }, 10), 11)).toBe('Stop');
   });
 });
 

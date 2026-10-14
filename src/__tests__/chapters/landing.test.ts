@@ -17,11 +17,21 @@ import { noteHasPlayhead } from '../../ui/figures';
 import { playLabel, pressPlay } from '../../ui/transport';
 import { spectrumOf } from '../../viz/spectrumPlot';
 
+/**
+ * A state with a note started at `at` on the page's clock, as the engine
+ * leaves it: with the note's length fixed from the patch at that moment.
+ */
+const started = (state: LabState, at: number): LabState => ({
+  ...state,
+  noteStartedAt: at,
+  noteLength: noteSeconds(envelopeOf(state)),
+});
+
 const NUMBERS = CHAPTERS.map(chapter => chapter.number);
 /** The landing view as the site opens on it. */
 const opened: LabState = { ...DEFAULTS, chapter: LANDING, ...landing.patch };
 /** The same with its note started at second 100 on the page's clock. */
-const sounding: LabState = { ...opened, notes: 1, noteStartedAt: 100 };
+const sounding: LabState = started({ ...opened, notes: 1 }, 100);
 
 describe('where the site opens', () => {
   it('is the landing view when the address names no chapter', () => {
@@ -144,7 +154,7 @@ describe('the figures following the landing view\'s sound', () => {
   });
 
   it('leave a steady patch alone whatever the time', () => {
-    const steady: LabState = { ...DEFAULTS, noteStartedAt: 100 };
+    const steady: LabState = started({ ...DEFAULTS }, 100);
     expect(momentOf(steady, 101)).toEqual({ index: 2, level: 1 });
   });
 });

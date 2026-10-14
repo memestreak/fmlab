@@ -71,6 +71,8 @@ describe('the live view\'s words', () => {
     ...DEFAULTS,
     ...chapterByNumber(6)!.patch,
     noteStartedAt: 100,
+    // As the engine fixes it when the note starts: brass is 0.75 s.
+    noteLength: 0.75,
   };
 
   it('counts a steady sound, or a note not yet over, as sounding', () => {
