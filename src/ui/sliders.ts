@@ -4,6 +4,7 @@ import {
   CARRIER_SEMITONES,
   DECAY,
   DEVIATION_HZ,
+  FEEDBACK,
   hzToSemitones,
   INDEX,
   type LabState,
@@ -105,6 +106,16 @@ const SLIDERS: SliderSpec[] = [
     read: state => state.deviationHz,
     write: position => ({ deviationHz: position }),
     format: state => `${state.deviationHz.toFixed(0)} Hz`,
+  },
+  {
+    // Chapter 8's feedback loop, in radians at full output.
+    id: 'feedback',
+    min: FEEDBACK.min,
+    max: FEEDBACK.max,
+    step: 0.01,
+    read: state => state.feedback,
+    write: position => ({ feedback: position }),
+    format: state => state.feedback.toFixed(2),
   },
   // The envelope. The figure's dots set the same four numbers.
   {

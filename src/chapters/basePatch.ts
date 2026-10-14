@@ -1,3 +1,4 @@
+import { DEFAULTS } from '../model/lab';
 import type { ChapterPatch } from './types';
 
 /**
@@ -24,4 +25,7 @@ export const BASE_PATCH: ChapterPatch = {
   release: 0.2,
   hold: 0.6,
   indexFollows: true,
+  algorithm: DEFAULTS.algorithm,
+  operators: DEFAULTS.operators,
+  feedback: 0,
 };

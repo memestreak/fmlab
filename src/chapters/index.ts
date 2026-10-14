@@ -2,6 +2,7 @@ import { bessel } from './bessel';
 import { envelope } from './envelope';
 import { landing, LANDING } from './landing';
 import { modulationIndex } from './modulationIndex';
+import { operators } from './operators';
 import { ratio } from './ratio';
 import { sandbox } from './sandbox';
 import { singleSine } from './singleSine';
@@ -30,6 +31,7 @@ export const CHAPTERS: readonly Chapter[] = [
   ratio,
   envelope,
   sandbox,
+  operators,
 ];
 
 /** The guide's first chapter. (The site itself opens on the landing view.) */

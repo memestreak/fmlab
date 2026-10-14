@@ -11,10 +11,12 @@ export type ControlId =
   | 'attack'
   | 'decay'
   | 'sustain'
-  | 'release';
+  | 'release'
+  | 'feedback';
 
 /** A figure on the page, by the id of its canvas in index.html. */
 export type FigureId =
+  | 'algorithm'
   | 'waveform'
   | 'envelope'
   | 'spectrum'
@@ -47,6 +49,9 @@ export type ChapterPatch = Pick<
   | 'release'
   | 'hold'
   | 'indexFollows'
+  | 'algorithm'
+  | 'operators'
+  | 'feedback'
 >;
 
 /** An expandable panel: the formulas, for whoever wants them. */
@@ -67,6 +72,22 @@ export interface Preset {
 }
 
 /**
+ * One step of a chapter that is built up a piece at a time: a section of
+ * its text, and a button in the lab and at the head of the section that
+ * sets the sound the section is about. Chapter 8 has them.
+ */
+export interface Step {
+  /** What the lab's button says: short. */
+  label: string;
+  /** The section's heading. */
+  title: string;
+  /** What it sets. */
+  patch: Partial<ChapterPatch>;
+  /** The section's paragraphs of HTML. */
+  body: string[];
+}
+
+/**
  * A chapter is data: its text, what it lets the reader change, and where
  * it starts. The text is HTML written here, in the repository, so it is
  * trusted and put on the page as it is.
@@ -82,13 +103,28 @@ export interface Chapter {
   maths: MathsPanel[];
   /** The sliders shown, in the page's order. */
   controls: ControlId[];
-  /** Buttons above the sliders that set a whole sound; often none. */
+  /**
+   * Buttons above the sliders that set a whole sound; often none. In a
+   * chapter with steps, they belong to the last step and show only there.
+   */
   presets: Preset[];
+  /**
+   * The sections the chapter is built up in, after `body`, each with its
+   * own sound. The first is where the chapter opens: its patch is in
+   * `patch` too. Most chapters have none.
+   */
+  steps?: Step[];
   /**
    * Whether to offer "Show motion", for a chapter whose waveform figure
    * has a moving view.
    */
   hasMotion: boolean;
+  /**
+   * Whether to draw its two operators as chapter 8 draws a wiring, small,
+   * beside the start of the text: the modulator on the carrier. So the
+   * diagrams are familiar by the time chapter 8 needs them.
+   */
+  showsPair?: boolean;
   /** Whether to show the piano keyboard, to play the patch at pitches. */
   hasPiano?: boolean;
   /**

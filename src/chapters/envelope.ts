@@ -96,6 +96,7 @@ export const envelope: Chapter = {
     { label: 'Brass', hint: "Chowning's brass", patch: BRASS },
     { label: 'Bell', hint: "Chowning's bell", patch: BELL },
   ],
+  showsPair: true,
   hasMotion: false,
   patch: {
     ...BASE_PATCH,

@@ -312,3 +312,60 @@ while the text scrolls, and for the space bar to start and stop the sound.
   Play to hear it."
 - **Under reduced motion** the live view is redrawn twice a second rather
   than every frame.
+
+## Chapter 8, operators and algorithms (PR #13)
+
+- **The 32 algorithms** are written out in DX7 numbering and checked, by a
+  unit test, against the algorithm table of Dexed's msfa engine, a DX7
+  emulation, decoded operator by operator: modulators, carriers and the
+  feedback loop. Two loops run through a stack rather than round one
+  operator: in algorithm 4 from OP4 back to OP6, in 6 from OP5 to OP6.
+- **Clean units:** each operator has a ratio (0.5 to 16), a level (0 to
+  100%) and a decay time in seconds (0 holds it for the whole note). A
+  modulator's level is its index, 5 radians at full level; the carriers
+  share the output equally, so every algorithm is about as loud. Feedback
+  is 0 to 2 radians, using the mean of the last two samples as the DX7
+  does.
+- **Notes:** chapter 8 plays notes, held as long as the slowest operator
+  needs (1 to 6 seconds) and let go together. Each operator's level is
+  shaped by its own envelope, scheduled in Web Audio on its own param.
+- **The predicted spectrum is numeric**, since there is no Bessel formula
+  for a stack: the engine's kernel is run for 16384 samples (256 cycles of
+  the note), windowed with a flat-top window and transformed, and each peak
+  read as a partial. Heights only. The live FFT works here as everywhere.
+- **The diagram** puts carriers on the bottom row in --pen-blue and
+  modulators above what they modulate in --pen-green, with ink lines and
+  the feedback loop out of the top; a box fades with its operator's level.
+- **Controls:** an Algorithm list (1 to 32) beside Play, a Feedback slider,
+  and a table of the six operators, two to a row, with number boxes
+  rather than eighteen sliders so the figures keep their room.
+- **Presets are mine**, not the DX7's factory sounds: Stacks (where the
+  chapter opens, algorithm 1), E. piano and Bell (algorithm 5), Bass
+  (algorithm 1 with feedback) and Organ (algorithm 32).
+- **Built up in steps** (after Jeremy found the algorithm poorly
+  introduced): One pair, Two pairs (where the rule is stated: the bottom
+  row is heard, everything above only shapes it), Stack, Two into one,
+  Feedback, then All 32, which names an algorithm as a fixed wiring
+  diagram, not a procedure. Each step is a section of the text headed by a
+  button, and a button in a row under Play; both set the step's sound. The
+  first five are wirings of two to four operators that are not the DX7's
+  (`STEP_WIRINGS`, numbered 33 to 37 after its 32, so `algorithm` holds
+  either and the engine needs nothing new); the operators they leave out
+  are silent and blanked in the table. Which step is current follows from
+  the wiring in force, so it is not stored, nor in the URL. The algorithm
+  list and the presets appear only at the last step, the Feedback slider
+  only where there is a loop. On a phone the row of step buttons is left
+  out for room; the section headings do the same.
+- **The list groups the 32 by how many carriers** each has (1 to 6),
+  still under their DX7 numbers.
+- **The boxes light up** while a note sounds, each filled as strongly as
+  its operator sounds; not under reduced motion.
+- **Chapters 3 to 7 draw their pair** small, floated beside the start of
+  the text, the way chapter 8 draws a wiring: 2 on 1, and 1 heard. So the
+  notation is familiar before it is needed.
+- **The operator table** is narrower, without spin buttons, so it no
+  longer overflows the lab at 1024 px.
+- **A note's length is now fixed when it starts.** Before, choosing a
+  preset with longer decays after a note had ended made it look still
+  sounding, so Play stopped instead of playing; this was true of chapter 6
+  too.

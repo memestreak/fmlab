@@ -112,6 +112,24 @@ function mountSoundInUrl(store: LabStore): void {
   });
 }
 
+/**
+ * The two operators of chapters 3 to 7, drawn small as chapter 8 draws a
+ * wiring: the modulator (2, green) above the carrier (1, blue), a line
+ * from one to the other, and the carrier's line down to the output.
+ */
+const PAIR_DIAGRAM = `
+  <figure class="pair-diagram">
+    <svg viewBox="0 0 64 84" width="64" height="84" aria-hidden="true">
+      <path class="wire" d="M22 30V42M22 66V78" />
+      <rect class="pd-mod" x="10" y="6" width="24" height="24" />
+      <rect class="pd-car" x="10" y="42" width="24" height="24" />
+      <text x="22" y="19">2</text>
+      <text x="22" y="55">1</text>
+      <text class="pd-out" x="26" y="79">out</text>
+    </svg>
+    <figcaption>The wiring: 2 modulates 1, and 1 is heard.</figcaption>
+  </figure>`;
+
 /** A paragraph of chapter text. A formula brings its own <p>. */
 const paragraph = (html: string) =>
   html.trimStart().startsWith('<p') ? html : `<p>${html}</p>`;
@@ -139,10 +157,24 @@ function narrativeHtml(chapter: Chapter): string {
     }</a>`;
   };
 
+  // A chapter built up in steps: a section each, headed by a button that
+  // sets its sound (ui/steps.ts marks the one in force).
+  const steps = (chapter.steps ?? [])
+    .map(
+      (step, index) => `
+        <section class="step" data-step-section="${index}">
+          <h3 class="step-title"><button type="button" class="step-head" data-step="${index}"><span class="num">${index + 1}</span>&ensp;${step.title}</button></h3>
+          ${step.body.map(paragraph).join('')}
+        </section>`,
+    )
+    .join('');
+
   return `
     <p class="chapter-kicker">Chapter ${chapter.number}</p>
     <h2 class="chapter-title" tabindex="-1">${chapter.title}</h2>
+    ${chapter.showsPair ? PAIR_DIAGRAM : ''}
     ${chapter.body.map(paragraph).join('')}
+    ${steps}
     ${maths}
     <nav class="chapter-nav" aria-label="Previous and next chapter">
       ${link(previous, 'prev')}
@@ -156,7 +188,8 @@ function narrativeHtml(chapter: Chapter): string {
  */
 function landingNextHtml(): string {
   const first = CHAPTERS[0];
-  const last = CHAPTERS[CHAPTERS.length - 1];
+  // The sandbox: the chapter with the keyboard, wherever it is in the list.
+  const last = CHAPTERS.find(chapter => chapter.hasPiano) ?? CHAPTERS[CHAPTERS.length - 1];
   const chapters = CHAPTERS.map(
     chapter =>
       `<li><a href="${hashForChapter(chapter.number)}">` +
@@ -215,17 +248,25 @@ export function mountChapters(store: LabStore): void {
     // the piano as well) sets its sliders in two columns where the lab is
     // pinned beside the text, to leave its figures room.
     const lab = document.querySelector<HTMLElement>('.lab');
-    const many = chapter.controls.length > MANY_SLIDERS || chapter.hasPiano === true;
+    const many =
+      chapter.controls.length > MANY_SLIDERS ||
+      chapter.hasPiano === true ||
+      chapter.patch.mode === 'ops';
     if (lab) lab.dataset.manySliders = String(many);
     const piano = document.querySelector<HTMLElement>('#piano');
     if (piano) piano.hidden = !chapter.hasPiano;
+    const operators = document.querySelector<HTMLElement>('#operators-panel');
+    if (operators) operators.hidden = chapter.patch.mode !== 'ops';
+    const picker = document.querySelector<HTMLElement>('#algorithm-picker');
+    if (picker) picker.hidden = chapter.patch.mode !== 'ops';
     const share = document.querySelector<HTMLElement>('#share');
     if (share) share.hidden = !chapter.sharesSound;
     const motion = document.querySelector<HTMLElement>('#motion-toggle');
     if (motion) motion.hidden = !chapter.hasMotion;
     const follows = document.querySelector<HTMLElement>('#index-follows-toggle');
-    // The landing view plays a note too, but teaches nothing about it.
-    if (follows) follows.hidden = !chapter.patch.noteMode || isLanding;
+    // Only where the index has an envelope to follow: chapter 6. The
+    // landing view and chapter 8 play notes too, but not that way.
+    if (follows) follows.hidden = !chapter.controls.includes('attack');
 
     // The chapter's presets, one button each.
     const presets = document.querySelector<HTMLElement>('#presets');
@@ -253,7 +294,7 @@ export function mountChapters(store: LabStore): void {
       number += 1;
       const slot = figure.querySelector('.figure-number');
       if (slot) slot.textContent = String(number);
-      const caption = figure.querySelector(`#${id}-caption`);
+      const caption = figure.querySelector(`[id="${id}-caption"]`);
       if (caption) caption.textContent = text;
     }
   };

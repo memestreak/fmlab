@@ -1,13 +1,15 @@
-import { type Envelope, envelopeAt, noteSeconds } from '../dsp/envelope';
+import { type Envelope, envelopeAt } from '../dsp/envelope';
+import { noteHold, type Operator, operatorEnvelope } from '../dsp/operators';
 import { createStore, type Store } from './store';
 import type { ThemeChoice } from './theme';
 
 /**
- * How the modulator acts on the carrier. `pm` adds to its phase, which is
- * what the lab (and a DX7) does. `fm` moves its frequency, which only the
- * vibrato chapter uses.
+ * How the sound is made. `pm`: one modulator added to one carrier's phase,
+ * as the lab (and a DX7) does. `fm`: the modulator moves the carrier's
+ * frequency, which only the vibrato chapter uses. `ops`: six operators
+ * wired by one of the DX7's algorithms, in chapter 8.
  */
-export type SynthMode = 'pm' | 'fm';
+export type SynthMode = 'pm' | 'fm' | 'ops';
 
 /** Everything the page shows and plays: one carrier, one modulator. */
 export interface LabState {
@@ -70,6 +72,12 @@ export interface LabState {
    */
   noteStartedAt: number | null;
   /**
+   * How long that note lasts, in seconds, fixed when it started. A patch
+   * changed afterwards (a preset with longer decays, say) does not make a
+   * note already played, or already over, any longer.
+   */
+  noteLength: number;
+  /**
    * The sideband order (0 is the carrier, 1 the first pair, ...) being
    * pointed at or focused just now, in either linked figure; null for
    * none.
@@ -88,6 +96,12 @@ export interface LabState {
    * The reader's choice for the visit; neither saved nor in the URL.
    */
   liveSpectrum: boolean;
+  /** `ops`: which of the DX7's 32 algorithms wires the operators. */
+  algorithm: number;
+  /** `ops`: the six operators, OP1 first. */
+  operators: Operator[];
+  /** `ops`: how much the algorithm's feedback loop feeds back, in radians. */
+  feedback: number;
   /** Master gain. */
   volume: number;
   /** Whether sound is wanted. The audio engine follows it. */
@@ -110,6 +124,11 @@ export const MOD_HZ: Range = { min: 0.5, max: 880 };
 export const DEVIATION_HZ: Range = { min: 0, max: 200 };
 /** The top is half of full scale: loud enough, and clear of the limiter. */
 export const VOLUME: Range = { min: 0, max: 0.5 };
+/** An operator's ratio, level and decay time, and the feedback. */
+export const OP_RATIO: Range = { min: 0.5, max: 16 };
+export const OP_LEVEL: Range = { min: 0, max: 1 };
+export const OP_DECAY: Range = { min: 0, max: 6 };
+export const FEEDBACK: Range = { min: 0, max: 2 };
 /** Never quite 0: a note that starts in no time at all starts with a click. */
 export const ATTACK: Range = { min: 0.005, max: 1 };
 export const DECAY: Range = { min: 0.01, max: 5 };
@@ -138,10 +157,21 @@ export const DEFAULTS: LabState = {
   notes: 0,
   stops: 0,
   noteStartedAt: null,
+  noteLength: 0,
   hover: null,
   pinned: null,
   motion: false,
   liveSpectrum: false,
+  algorithm: 1,
+  operators: [
+    { ratio: 1, level: 1, decay: 0 },
+    { ratio: 1, level: 0.3, decay: 0 },
+    { ratio: 1, level: 1, decay: 0 },
+    { ratio: 1, level: 0.3, decay: 0 },
+    { ratio: 1, level: 0.2, decay: 0 },
+    { ratio: 1, level: 0.2, decay: 0 },
+  ],
+  feedback: 0,
   // Low on purpose: FM gets bright, and loud, quickly.
   volume: 0.2,
   playing: false,
@@ -166,10 +196,30 @@ export function patchOf(state: LabState): { ratio: number; index: number } {
   };
 }
 
-/** The state's envelope, as dsp/envelope takes it. */
+/**
+ * The state's envelope, as dsp/envelope takes it. For six operators, each
+ * has its own; this is the envelope of the note as a whole, held for as
+ * long as the slowest operator needs and let go together, which is what
+ * the note's length and the playhead go by.
+ */
 export function envelopeOf(state: LabState): Envelope {
+  if (state.mode === 'ops') {
+    const hold = noteHold(state.operators);
+    return operatorEnvelope({ ratio: 1, level: 1, decay: 0 }, hold);
+  }
   const { attack, decay, sustain, release, hold } = state;
   return { attack, decay, sustain, release, hold };
+}
+
+/**
+ * Each operator's level `time` seconds into a note of six operators: its
+ * level shaped by its own envelope. Before or after a note, as set.
+ */
+export function operatorLevelsAt(state: LabState, time: number | undefined): number[] {
+  const into = noteProgress(state, time);
+  if (into === null) return state.operators.map(op => op.level);
+  const hold = noteHold(state.operators);
+  return state.operators.map(op => op.level * envelopeAt(operatorEnvelope(op, hold), into));
 }
 
 /**
@@ -194,7 +244,7 @@ export function indexAtTime(state: LabState, time: number): number {
  */
 export function noteSounding(state: LabState, time: number): boolean {
   if (state.noteStartedAt === null) return false;
-  return time <= state.noteStartedAt + noteSeconds(envelopeOf(state));
+  return time <= state.noteStartedAt + state.noteLength;
 }
 
 export function noteProgress(
@@ -203,7 +253,7 @@ export function noteProgress(
 ): number | null {
   if (time === undefined || state.noteStartedAt === null) return null;
   const into = time - state.noteStartedAt;
-  if (into < 0 || into > noteSeconds(envelopeOf(state))) return null;
+  if (into < 0 || into > state.noteLength) return null;
   return into;
 }
 

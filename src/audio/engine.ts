@@ -1,4 +1,5 @@
-import { noteSeconds, TIME_CONSTANTS } from '../dsp/envelope';
+import { type Envelope, noteSeconds, TIME_CONSTANTS } from '../dsp/envelope';
+import { noteHold, operatorEnvelope } from '../dsp/operators';
 import { envelopeOf, type LabState, type LabStore } from '../model/lab';
 import type { Measurement } from '../viz/liveSpectrum';
 import { unlockIosAudio } from './iosUnlock';
@@ -191,12 +192,12 @@ export class AudioEngine {
       if (!state.noteMode) return;
 
       const envelope = envelopeOf(state);
-      const { attack, decay, sustain, release, hold } = envelope;
       const now = context.currentTime;
       const start = now + NOTE_LEAD_SECONDS;
 
-      /** Schedules the envelope on a param, scaled to reach `peak`. */
-      const shape = (param: AudioParam, peak: number) => {
+      /** Schedules an envelope on a param, scaled to reach `peak`. */
+      const shape = (param: AudioParam, peak: number, shaped: Envelope = envelope) => {
+        const { attack, decay, sustain, release, hold } = shaped;
         param.cancelScheduledValues(now);
         param.setTargetAtTime(0, now, DIP_SECONDS);
         param.setValueAtTime(0, start);
@@ -220,20 +221,37 @@ export class AudioEngine {
         param.setValueAtTime(value, start);
       };
 
-      shape(note.gain, 1);
-      const index = synth.parameters.get('index');
-      if (index && state.indexFollows) shape(index, state.index);
-      else jump('index', state.index);
       // The pitch changes in the silence between notes, not through one.
       jump('frequency', state.carrierHz);
-      jump('ratio', state.ratio);
-      jump('mode', 0);
+      if (state.mode === 'ops') {
+        // Six operators, each level shaped by its own envelope; the note
+        // gain stays open and the operators do the shaping.
+        const hold = noteHold(state.operators);
+        jump('mode', 2);
+        jump('algorithm', state.algorithm);
+        jump('feedback', state.feedback);
+        state.operators.forEach((op, i) => {
+          jump(`ratio${i + 1}`, op.ratio);
+          const level = synth.parameters.get(`level${i + 1}`);
+          if (level) shape(level, op.level, operatorEnvelope(op, hold));
+        });
+        note.gain.cancelScheduledValues(now);
+        note.gain.setValueAtTime(1, now);
+      } else {
+        shape(note.gain, 1);
+        const index = synth.parameters.get('index');
+        if (index && state.indexFollows) shape(index, state.index);
+        else jump('index', state.index);
+        jump('ratio', state.ratio);
+        jump('mode', 0);
+      }
       master.gain.cancelScheduledValues(now);
       master.gain.setTargetAtTime(state.volume, now, FADE_SECONDS);
 
       // For the figures' playhead: when, on the page's clock, it starts.
       this.store.set({
         noteStartedAt: performance.now() / 1000 + NOTE_LEAD_SECONDS,
+        noteLength: noteSeconds(envelope),
       });
       this.suspendSoon((noteSeconds(envelope) + 1) * 1000);
     } catch (error) {

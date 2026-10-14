@@ -316,6 +316,112 @@ a {
   display: none;
 }
 
+/* The two operators of chapters 3 to 7, drawn small beside the text as
+   chapter 8 draws a wiring. */
+.pair-diagram {
+  float: right;
+  width: 7.5rem;
+  margin: 0.25rem 0 0.5rem 1rem;
+  text-align: center;
+}
+
+.pair-diagram svg {
+  display: block;
+  margin: 0 auto;
+}
+
+.pair-diagram rect {
+  fill: var(--paper);
+  stroke-width: 2.5;
+}
+
+.pair-diagram .pd-mod {
+  stroke: var(--pen-green);
+}
+
+.pair-diagram .pd-car {
+  stroke: var(--pen-blue);
+}
+
+.pair-diagram .wire {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.5;
+}
+
+.pair-diagram text {
+  fill: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+.pair-diagram .pd-out {
+  font-family: var(--font-sans);
+  font-size: 9px;
+  text-anchor: start;
+}
+
+.pair-diagram figcaption {
+  font-size: 0.75rem;
+  font-style: italic;
+  line-height: 1.3;
+}
+
+/* A chapter's steps: a row of small round buttons under Play, the one in
+   force filled with ink. The same buttons head the sections of the text. */
+.steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.5rem;
+}
+
+.steps[hidden] {
+  display: none;
+}
+
+.step-option {
+  min-height: 1.9rem;
+  padding: 0 0.7rem;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.step-option[aria-current='step'] {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.step-title {
+  margin: 1.5rem 0 0.5rem;
+  font-size: 1rem;
+}
+
+/* The heading is the button: it reads as a heading, in ink, with a rule
+   under it that fills in for the step in force. */
+.step-head {
+  padding: 0 0 0.15rem;
+  border: 0;
+  border-bottom: 1px solid var(--ink);
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.step-head[aria-current='step'] {
+  border-bottom-width: 3px;
+}
+
 /* A plot that is also a control: the Bessel plot, whose upright line is
    dragged. A finger moving sideways moves the line; moving up or down
    still scrolls the page. */
@@ -660,6 +766,14 @@ a {
     grid-column: 1 / -1;
   }
 
+  /* Presets as small as the step buttons: a mouse needs less than a
+     finger, and chapter 8's last step shows both rows. */
+  [data-view='chapter'] .lab[data-many-sliders='true'] .presets .btn {
+    min-height: 1.9rem;
+    padding: 0 0.8rem;
+    font-size: 0.85rem;
+  }
+
   [data-view='chapter'] .lab[data-many-sliders='true'] .slider-row {
     grid-template-columns: 4.5rem minmax(0, 1fr) auto;
     gap: 0.5rem;
@@ -715,6 +829,12 @@ a {
   [data-view='chapter'] .controls-toggle {
     display: inline-block;
     margin-left: auto;
+  }
+
+  /* No room for the row of steps above the text: the button heading each
+     section of the text does the same. */
+  [data-view='chapter'] .steps {
+    display: none;
   }
 
   [data-view='chapter'] .lab:not([data-sliders='open']) .sliders {
@@ -904,4 +1024,116 @@ a {
 .switch-option[aria-pressed='true'] {
   background: var(--ink);
   color: var(--paper);
+}
+
+/* Hidden from the eye, not from a screen reader. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Chapter 8's operators: the algorithm, then a compact table, a row per
+   operator, its numbers in mono boxes. */
+.operators {
+  margin-top: 0.5rem;
+}
+
+.operators[hidden] {
+  display: none;
+}
+
+.op-algorithm[hidden] {
+  display: none;
+}
+
+.op-algorithm {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+}
+
+.op-algorithm .input {
+  min-height: 1.75rem;
+}
+
+.input {
+  min-height: 2rem;
+  padding: 0 0.4rem;
+  border: 1px solid var(--ink);
+  border-radius: 6px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+}
+
+/* An operator the step's wiring leaves out keeps its place, unseen. */
+.op-off {
+  visibility: hidden;
+}
+
+.op-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.op-table th,
+.op-table td {
+  padding: 0 0.2rem;
+  text-align: left;
+}
+
+.op-table thead th {
+  font-weight: 600;
+  border-bottom: 1px solid var(--rule);
+}
+
+.op-role {
+  font-style: italic;
+}
+
+/* A rule between the two operators on each row. */
+.op-table .op-second {
+  border-left: 1px solid var(--rule);
+  padding-left: 0.4rem;
+}
+
+.op-input {
+  width: 2.7rem;
+  height: 1.55rem;
+  padding: 0 0.3rem;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 0.85rem;
+}
+
+/* No spin buttons: they would take half the box. Arrow keys still step. */
+.op-input {
+  appearance: textfield;
+}
+
+.op-input::-webkit-inner-spin-button,
+.op-input::-webkit-outer-spin-button {
+  margin: 0;
+  appearance: none;
+}
+
+.op-input:focus-visible {
+  border-color: var(--ink);
+}
+
+/* In two columns where the lab is pinned beside the text: the operators
+   take the full width. */
+@media (min-width: 62rem) {
+  [data-view='chapter'] .lab[data-many-sliders='true'] .operators {
+    grid-column: 1 / -1;
+  }
 }

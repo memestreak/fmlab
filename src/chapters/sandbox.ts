@@ -48,6 +48,7 @@ export const sandbox: Chapter = {
     { label: 'Gong', hint: 'ratio 1.73, index 9', patch: { ratio: 1.732, index: 9 } },
     { label: 'Bass', hint: 'ratio 0.5, index 2', patch: { ratio: 0.5, index: 2 } },
   ],
+  showsPair: true,
   hasMotion: false,
   hasPiano: true,
   sharesSound: true,

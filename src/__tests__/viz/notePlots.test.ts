@@ -31,6 +31,16 @@ import { plotArea, shareToY } from '../../viz/plot';
 import { boldness, FLOOR_DB, sliceAt } from '../../viz/spectrogramPlot';
 import { noteAxisEnd, secondsTicks } from '../../viz/ticks';
 
+/**
+ * A state with a note started at `at` on the page's clock, as the engine
+ * leaves it: with the note's length fixed from the patch at that moment.
+ */
+const started = (state: LabState, at: number): LabState => ({
+  ...state,
+  noteStartedAt: at,
+  noteLength: noteSeconds(envelopeOf(state)),
+});
+
 const chapter6 = chapterByNumber(6)!;
 /** Chapter 6 as it opens: Chowning's brass. */
 const brass: LabState = { ...DEFAULTS, ...chapter6.patch };
@@ -164,7 +174,7 @@ describe('dragging a handle', () => {
 });
 
 describe('the playhead', () => {
-  const sounding = { ...brass, noteStartedAt: 100 };
+  const sounding = started({ ...brass }, 100);
 
   it('is how far into the last note a moment is', () => {
     expect(noteProgress(sounding, 100.25)).toBeCloseTo(0.25, 9);
@@ -312,8 +322,8 @@ describe('chapter 5, the ratio', () => {
 });
 
 describe('chapter 6, the envelope', () => {
-  it('plays notes, and is the only chapter that does', () => {
-    expect(CHAPTERS.filter(c => c.patch.noteMode).map(c => c.number)).toEqual([6]);
+  it('plays notes, as chapter 8 does too', () => {
+    expect(CHAPTERS.filter(c => c.patch.noteMode).map(c => c.number)).toEqual([6, 8]);
     expect(BASE_PATCH.noteMode).toBe(false);
   });
 

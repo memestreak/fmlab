@@ -83,6 +83,7 @@ export const ratio: Chapter = {
     { label: '1:3', hint: 'no third harmonics', patch: { ratio: 3 } },
     { label: '1:1.41', hint: 'not harmonic: a bell', patch: { ratio: 1.414 } },
   ],
+  showsPair: true,
   hasMotion: false,
   patch: {
     ...BASE_PATCH,

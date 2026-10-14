@@ -74,12 +74,21 @@
                 <input id="motion" type="checkbox" />
                 Show motion
               </label>
+              <!-- Chapter 8's algorithm, beside Play. -->
+              <label id="algorithm-picker" class="op-algorithm" hidden>
+                Algorithm
+                <select id="algorithm" class="input num"></select>
+              </label>
               <!-- Shown by a chapter that plays notes through an envelope. -->
               <label id="index-follows-toggle" class="check" hidden>
                 <input id="index-follows" type="checkbox" />
                 Index follows the envelope
               </label>
             </div>
+
+            <!-- A chapter built up in steps (chapter 8): a button for each,
+                 filled in by script and hidden in every other chapter. -->
+            <div id="steps" class="steps" role="group" aria-label="Steps" hidden></div>
 
             <!-- The presets and sliders: where the lab is pinned small, these
                  fold away behind the Sliders button. -->
@@ -141,10 +150,39 @@
                 <output id="sustain-out" for="sustain" class="num"></output>
                 <input id="sustain" type="range" class="slider" />
               </div>
+              <div class="slider-row" data-control="feedback">
+                <label for="feedback">Feedback</label>
+                <output id="feedback-out" for="feedback" class="num"></output>
+                <input id="feedback" type="range" class="slider" />
+              </div>
               <div class="slider-row" data-control="release">
                 <label for="release">Release</label>
                 <output id="release-out" for="release" class="num"></output>
                 <input id="release" type="range" class="slider" />
+              </div>
+
+              <!-- Chapter 8's six operators: the algorithm, then a row per
+                   operator. Built by ui/operators.ts. -->
+              <div id="operators-panel" class="operators" hidden>
+                <!-- Two operators to a row, OP1 beside OP4, to keep it
+                     short. -->
+                <table id="operators" class="op-table">
+                  <thead>
+                    <tr>
+                      <th scope="col"><span class="visually-hidden">Operator</span></th>
+                      <th scope="col">Role</th>
+                      <th scope="col">Ratio</th>
+                      <th scope="col">Level %</th>
+                      <th scope="col">Decay s</th>
+                      <th scope="col" class="op-second"><span class="visually-hidden">Operator</span></th>
+                      <th scope="col">Role</th>
+                      <th scope="col">Ratio</th>
+                      <th scope="col">Level %</th>
+                      <th scope="col">Decay s</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
               </div>
 
               <!-- The sandbox's keyboard: built by ui/piano.ts. -->
@@ -155,6 +193,17 @@
           <!-- Every figure there is. A chapter shows the ones it names in
                `figures`, matched on data-figure, and they are numbered
                from 1 in the order shown (.figure-number). -->
+          <figure class="figure" data-figure="algorithm">
+            <div class="plot-frame">
+              <canvas id="algorithm-plot" class="plot plot-short" role="img"></canvas>
+            </div>
+            <figcaption>
+              Fig. <span class="figure-number"></span>&emsp;<span
+                id="algorithm-caption"
+              ></span>
+            </figcaption>
+          </figure>
+
           <figure class="figure" data-figure="waveform">
             <div class="plot-frame">
               <canvas id="waveform" class="plot" role="img"></canvas>
