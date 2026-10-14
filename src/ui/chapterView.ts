@@ -112,6 +112,24 @@ function mountSoundInUrl(store: LabStore): void {
   });
 }
 
+/**
+ * The two operators of chapters 3 to 7, drawn small as chapter 8 draws a
+ * wiring: the modulator (2, green) above the carrier (1, blue), a line
+ * from one to the other, and the carrier's line down to the output.
+ */
+const PAIR_DIAGRAM = `
+  <figure class="pair-diagram">
+    <svg viewBox="0 0 64 84" width="64" height="84" aria-hidden="true">
+      <path class="wire" d="M22 30V42M22 66V78" />
+      <rect class="pd-mod" x="10" y="6" width="24" height="24" />
+      <rect class="pd-car" x="10" y="42" width="24" height="24" />
+      <text x="22" y="19">2</text>
+      <text x="22" y="55">1</text>
+      <text class="pd-out" x="26" y="79">out</text>
+    </svg>
+    <figcaption>The wiring: 2 modulates 1, and 1 is heard.</figcaption>
+  </figure>`;
+
 /** A paragraph of chapter text. A formula brings its own <p>. */
 const paragraph = (html: string) =>
   html.trimStart().startsWith('<p') ? html : `<p>${html}</p>`;
@@ -139,10 +157,24 @@ function narrativeHtml(chapter: Chapter): string {
     }</a>`;
   };
 
+  // A chapter built up in steps: a section each, headed by a button that
+  // sets its sound (ui/steps.ts marks the one in force).
+  const steps = (chapter.steps ?? [])
+    .map(
+      (step, index) => `
+        <section class="step" data-step-section="${index}">
+          <h3 class="step-title"><button type="button" class="step-head" data-step="${index}"><span class="num">${index + 1}</span>&ensp;${step.title}</button></h3>
+          ${step.body.map(paragraph).join('')}
+        </section>`,
+    )
+    .join('');
+
   return `
     <p class="chapter-kicker">Chapter ${chapter.number}</p>
     <h2 class="chapter-title" tabindex="-1">${chapter.title}</h2>
+    ${chapter.showsPair ? PAIR_DIAGRAM : ''}
     ${chapter.body.map(paragraph).join('')}
+    ${steps}
     ${maths}
     <nav class="chapter-nav" aria-label="Previous and next chapter">
       ${link(previous, 'prev')}

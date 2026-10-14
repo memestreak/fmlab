@@ -71,6 +71,7 @@ export const bessel: Chapter = {
   ],
   controls: ['volume'],
   presets: [],
+  showsPair: true,
   hasMotion: false,
   patch: {
     ...BASE_PATCH,

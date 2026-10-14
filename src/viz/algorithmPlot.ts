@@ -1,6 +1,6 @@
-import { algorithm, targetsOf } from '../dsp/algorithms';
+import { algorithm, isDx7, operatorsUsed, targetsOf } from '../dsp/algorithms';
 import type { Algorithm } from '../dsp/pmKernel';
-import type { LabState } from '../model/lab';
+import { type LabState, noteSounding, operatorLevelsAt } from '../model/lab';
 import { beginPlot } from './plot';
 
 /** Where an operator sits in the diagram: a column, and a row up from the carriers' row 0. */
@@ -18,11 +18,11 @@ export interface Place {
  * modulates several others stands above the first of them, and a line
  * reaches across to the rest.
  *
- * Returns the place of each operator (0 to 5), and how many columns and
- * rows the diagram needs.
+ * Returns the place of each operator (0 to 5), none for an operator the
+ * algorithm leaves out, and how many columns and rows the diagram needs.
  */
 export function layoutAlgorithm(alg: Algorithm): {
-  places: Place[];
+  places: (Place | undefined)[];
   columns: number;
   rows: number;
 } {
@@ -50,11 +50,10 @@ export function layoutAlgorithm(alg: Algorithm): {
       }
     });
   }
-  const done = places as Place[];
   return {
-    places: done,
+    places,
     columns: next,
-    rows: Math.max(...done.map(p => p.row)) + 1,
+    rows: Math.max(...places.map(p => p?.row ?? 0)) + 1,
   };
 }
 
@@ -66,15 +65,17 @@ export function describeAlgorithm(number: number): string {
   const links = alg.modulators
     .flatMap((froms, to) => froms.map(from => `${name(from)} modulates ${name(to)}`))
     .join('; ');
-  const fb = alg.feedback!;
-  const loop =
-    fb.from === fb.to
-      ? `${name(fb.from)} feeds back into itself`
-      : `${name(fb.from)} feeds back into ${name(fb.to)}`;
+  const fb = alg.feedback;
+  const loop = !fb
+    ? ''
+    : fb.from === fb.to
+      ? `; ${name(fb.from)} feeds back into itself`
+      : `; ${name(fb.from)} feeds back into ${name(fb.to)}`;
+  const heard = alg.carriers.length === 1 ? 'carrier' : 'carriers';
   return (
-    `Algorithm ${number}: carriers ${carriers}` +
+    `${isDx7(number) ? `Algorithm ${number}` : 'Wiring'}: ${heard} ${carriers}` +
     (links ? `; ${links}` : '; no modulation') +
-    `; ${loop}.`
+    `${loop}.`
   );
 }
 
@@ -88,18 +89,33 @@ const BOX = 34;
  * what it modulates and from the carriers down to the output, and the
  * feedback loop as an ink line out of the top of one box and back into
  * the top of another (or the same). A box's level dims it, so a silent
- * operator reads as one.
+ * operator reads as one. An operator the algorithm leaves out is not
+ * drawn. At `time`, while a note sounds, each box is filled in its colour
+ * as strongly as the operator sounds at that moment.
  */
-export function drawAlgorithm(state: LabState, canvas: HTMLCanvasElement): void {
+export function drawAlgorithm(
+  state: LabState,
+  canvas: HTMLCanvasElement,
+  time?: number,
+): void {
   const plot = beginPlot(canvas);
   if (!plot) return;
   const { ctx, token } = plot;
   const { width, height } = canvas.getBoundingClientRect();
   const alg = algorithm(state.algorithm);
-  const { places, columns, rows } = layoutAlgorithm(alg);
+  const { places: maybe, columns, rows } = layoutAlgorithm(alg);
+  // Only the operators used have places; the rest are never looked up.
+  const places = maybe as Place[];
+  const used = operatorsUsed(alg);
 
-  // Room for the rows of boxes, the output line and the feedback loops.
-  const box = Math.min(BOX, (height - 40) / (rows * 1.7), (width - 40) / (columns * 1.6));
+  // Room for the rows of boxes and the gaps between (1.7 boxes a row, less
+  // the last gap), the output stub below (0.6) and the feedback loop above
+  // (0.35), with the output line's 14 px and a little to spare.
+  const box = Math.min(
+    BOX,
+    (height - 18) / (rows * 1.7 + 0.25),
+    (width - 40) / (columns * 1.6),
+  );
   const gapX = box * 0.6;
   const gapY = box * 0.7;
   const diagramWidth = columns * box + (columns - 1) * gapX;
@@ -138,41 +154,56 @@ export function drawAlgorithm(state: LabState, canvas: HTMLCanvasElement): void 
 
   // The feedback loop: up from the source, across, and down into the
   // target's top, to the right of everything it passes.
-  const fb = alg.feedback!;
-  const from = places[fb.from];
-  const to = places[fb.to];
-  const loopTop = boxY(to) - box * 0.35;
-  const loopRight = Math.max(boxX(from), boxX(to)) + box + gapX * 0.45;
-  ctx.beginPath();
-  ctx.moveTo(boxX(from) + box, boxY(from) + box / 2);
-  ctx.lineTo(loopRight, boxY(from) + box / 2);
-  ctx.lineTo(loopRight, loopTop);
-  ctx.lineTo(centreX(to), loopTop);
-  ctx.lineTo(centreX(to), boxY(to));
-  ctx.stroke();
-  // Thicker as it feeds back more.
-  if (state.feedback > 0) {
-    ctx.lineWidth = 1.5 + state.feedback * 1.25;
+  const fb = alg.feedback;
+  if (fb) {
+    const from = places[fb.from];
+    const to = places[fb.to];
+    const loopTop = boxY(to) - box * 0.35;
+    const loopRight = Math.max(boxX(from), boxX(to)) + box + gapX * 0.45;
+    ctx.beginPath();
+    ctx.moveTo(boxX(from) + box, boxY(from) + box / 2);
+    ctx.lineTo(loopRight, boxY(from) + box / 2);
+    ctx.lineTo(loopRight, loopTop);
+    ctx.lineTo(centreX(to), loopTop);
+    ctx.lineTo(centreX(to), boxY(to));
     ctx.stroke();
+    // Thicker as it feeds back more.
+    if (state.feedback > 0) {
+      ctx.lineWidth = 1.5 + state.feedback * 1.25;
+      ctx.stroke();
+    }
   }
+
+  // How strongly each operator sounds now, while a note does.
+  const now =
+    time !== undefined && noteSounding(state, time)
+      ? operatorLevelsAt(state, time)
+      : undefined;
 
   // The boxes, over the lines.
   ctx.font = `${Math.round(box * 0.42)}px ${token('--font-mono')}`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  places.forEach((p, op) => {
+  for (const op of used) {
+    const p = places[op];
     const carrier = alg.carriers.includes(op);
     const level = state.operators[op]?.level ?? 1;
+    const pen = token(carrier ? '--pen-blue' : '--pen-green');
     ctx.fillStyle = token('--paper');
     ctx.fillRect(boxX(p), boxY(p), box, box);
+    if (now && now[op] > 0) {
+      ctx.globalAlpha = 0.35 * Math.min(1, now[op]);
+      ctx.fillStyle = pen;
+      ctx.fillRect(boxX(p), boxY(p), box, box);
+    }
     ctx.globalAlpha = 0.35 + 0.65 * level;
-    ctx.strokeStyle = token(carrier ? '--pen-blue' : '--pen-green');
+    ctx.strokeStyle = pen;
     ctx.lineWidth = 2.5;
     ctx.strokeRect(boxX(p), boxY(p), box, box);
     ctx.globalAlpha = 1;
     ctx.fillStyle = ink;
     ctx.fillText(String(op + 1), centreX(p), boxY(p) + box / 2 + 1);
-  });
+  }
 
   ctx.font = `12px ${token('--font-sans')}`;
   ctx.textAlign = 'left';

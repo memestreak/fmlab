@@ -1,4 +1,14 @@
-import { algorithm, ALGORITHMS, targetsOf } from '../../dsp/algorithms';
+import {
+  algorithm,
+  ALGORITHM_COUNT,
+  ALGORITHMS,
+  algorithmsByCarriers,
+  DX7_ALGORITHMS,
+  isDx7,
+  operatorsUsed,
+  STEP_WIRINGS,
+  targetsOf,
+} from '../../dsp/algorithms';
 
 /*
  * The reference: the algorithm table of the msfa engine in Dexed, a DX7
@@ -78,7 +88,7 @@ function decode(row: number[]) {
 
 describe('the 32 algorithms', () => {
   it('are 32', () => {
-    expect(ALGORITHMS).toHaveLength(32);
+    expect(DX7_ALGORITHMS).toHaveLength(32);
   });
 
   it.each(DEXED.map((row, i) => [i + 1, row] as const))(
@@ -101,7 +111,7 @@ describe('the 32 algorithms', () => {
     },
   );
 
-  it.each(ALGORITHMS.map((alg, i) => [i + 1, alg] as const))(
+  it.each(DX7_ALGORITHMS.map((alg, i) => [i + 1, alg] as const))(
     'algorithm %i uses every operator: heard, or modulating one that is',
     (_, alg) => {
       const targets = targetsOf(alg);
@@ -128,6 +138,77 @@ describe('the 32 algorithms', () => {
     expect(algorithm(1)).toBe(ALGORITHMS[0]);
     expect(algorithm(32)).toBe(ALGORITHMS[31]);
     expect(algorithm(0)).toBe(ALGORITHMS[0]);
-    expect(algorithm(40)).toBe(ALGORITHMS[31]);
+    expect(algorithm(40)).toBe(ALGORITHMS[ALGORITHM_COUNT - 1]);
+  });
+});
+
+describe('the step wirings', () => {
+  const wiring = (number: number) => algorithm(number);
+
+  it('come after the 32, and are not the DX7\'s', () => {
+    const numbers = Object.values(STEP_WIRINGS);
+    expect(numbers).toEqual([33, 34, 35, 36, 37]);
+    expect(numbers.some(isDx7)).toBe(false);
+    expect(isDx7(1) && isDx7(32)).toBe(true);
+    expect(ALGORITHM_COUNT).toBe(37);
+  });
+
+  it('start from the familiar pair: OP2 modulates OP1, and OP1 is heard', () => {
+    const pair = wiring(STEP_WIRINGS.pair);
+    expect(pair.carriers).toEqual([0]);
+    expect(targetsOf(pair)[1]).toEqual([0]);
+    expect(operatorsUsed(pair)).toEqual([0, 1]);
+    expect(pair.feedback).toBeUndefined();
+  });
+
+  it('put two pairs side by side, both heard', () => {
+    const two = wiring(STEP_WIRINGS.twoPairs);
+    expect(two.carriers).toEqual([0, 2]);
+    expect(targetsOf(two).slice(0, 4)).toEqual([[], [0], [], [2]]);
+    expect(operatorsUsed(two)).toEqual([0, 1, 2, 3]);
+  });
+
+  it('stack three operators: OP3 on OP2 on OP1', () => {
+    const stack = wiring(STEP_WIRINGS.stack);
+    expect(stack.carriers).toEqual([0]);
+    expect(targetsOf(stack).slice(0, 3)).toEqual([[], [0], [1]]);
+    expect(operatorsUsed(stack)).toEqual([0, 1, 2]);
+  });
+
+  it('send two modulators into one carrier', () => {
+    const two = wiring(STEP_WIRINGS.twoModulators);
+    expect(two.carriers).toEqual([0]);
+    expect(two.modulators[0]).toEqual([1, 2]);
+    expect(operatorsUsed(two)).toEqual([0, 1, 2]);
+  });
+
+  it('feed the pair\'s modulator its own output', () => {
+    const fb = wiring(STEP_WIRINGS.feedback);
+    expect(targetsOf(fb)[1]).toEqual([0]);
+    expect(fb.feedback).toEqual({ from: 1, to: 1 });
+  });
+
+  it('every DX7 algorithm uses all six', () => {
+    for (const alg of DX7_ALGORITHMS) expect(operatorsUsed(alg)).toEqual([0, 1, 2, 3, 4, 5]);
+  });
+});
+
+describe('grouped by carriers', () => {
+  const groups = algorithmsByCarriers();
+
+  it('holds every DX7 algorithm once, fewest carriers first', () => {
+    expect(groups.flatMap(g => g.numbers).sort((a, b) => a - b)).toEqual(
+      Array.from({ length: 32 }, (_, i) => i + 1),
+    );
+    expect(groups.map(g => g.carriers)).toEqual([1, 2, 3, 4, 5, 6]);
+  });
+
+  it('puts each where its carriers say', () => {
+    for (const { carriers, numbers } of groups) {
+      for (const n of numbers) expect(algorithm(n).carriers).toHaveLength(carriers);
+    }
+    expect(groups[0].numbers).toEqual([16, 17, 18]);
+    expect(groups[5].numbers).toEqual([32]);
+    expect(groups[1].numbers).toEqual([1, 2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
   });
 });

@@ -1,7 +1,7 @@
 // Runs on the audio thread, in an AudioWorklet. Vite bundles it on its own
 // (see the `?worker&url` import in engine.ts), so it may import from
 // src/dsp but must not touch the DOM.
-import { algorithm } from '../dsp/algorithms';
+import { algorithm, ALGORITHM_COUNT } from '../dsp/algorithms';
 import { FmKernel } from '../dsp/fmKernel';
 import { kernelLevels } from '../dsp/operators';
 import { MAX_OPERATORS, PmKernel, TWO_OPERATORS } from '../dsp/pmKernel';
@@ -39,7 +39,7 @@ class SynthProcessor extends AudioWorkletProcessor {
         { name: `ratio${op}`, defaultValue: 1, minValue: 0, maxValue: 64 },
         { name: `level${op}`, defaultValue: 0, minValue: 0, maxValue: 1 },
       ]),
-      { name: 'algorithm', defaultValue: 1, minValue: 1, maxValue: 32 },
+      { name: 'algorithm', defaultValue: 1, minValue: 1, maxValue: ALGORITHM_COUNT },
       { name: 'feedback', defaultValue: 0, minValue: 0, maxValue: 8 },
     ].map(param => ({ ...param, automationRate: 'a-rate' }));
   }

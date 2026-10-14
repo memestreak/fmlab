@@ -77,7 +77,9 @@ figures subscribe to it. Nothing else passes values around.
 - `src/chapters/` — a chapter is data (`types.ts`): number, title, lesson
   text and "The maths" panels (HTML strings, trusted because they are
   written here), the sliders it shows, the patch it starts from (all of
-  it, so a chapter always opens the same way) and the figures it shows,
+  it, so a chapter always opens the same way), optional `steps` (sections
+  with a sound each, chapter 8), `showsPair` (chapters 3 to 7 draw their
+  two operators small beside the text) and the figures it shows,
   each with its caption (they are numbered from 1 in the order shown, so
   text that says "Fig. 2" must match the chapter's own list). A chapter
   may have presets, buttons that set several fields at once. Its patch is
@@ -180,8 +182,13 @@ figures subscribe to it. Nothing else passes values around.
   which slider rows (`data-control`) and figures (`data-figure`) show, the
   figures' numbers and their captions. `sliders.ts`
   is a table of every slider (range, step, scale, readout);
-  `operators.ts` is chapter 8's algorithm list and operator table (two
-  operators to a row, number boxes);
+  `operators.ts` is chapter 8's algorithm list (grouped by carriers) and
+  operator table (two operators to a row, number boxes, an operator its
+  wiring leaves out blanked);
+  `steps.ts` is a chapter's steps (`Chapter.steps`, chapter 8): the row
+  of step buttons, the buttons heading the text's sections, and what
+  shows at which step (the step is `currentStep(steps, algorithm)` in
+  `src/chapters/steps.ts`, never stored);
   `envelopeControls.ts` drags the envelope's dots; `piano.ts` is the
   sandbox's one-voice keyboard, on screen and on the computer's keys
   (by `KeyboardEvent.code`: A to K the white notes, W E T Y U O P the

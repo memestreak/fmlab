@@ -342,6 +342,29 @@ while the text scrolls, and for the space bar to start and stop the sound.
 - **Presets are mine**, not the DX7's factory sounds: Stacks (where the
   chapter opens, algorithm 1), E. piano and Bell (algorithm 5), Bass
   (algorithm 1 with feedback) and Organ (algorithm 32).
+- **Built up in steps** (after Jeremy found the algorithm poorly
+  introduced): One pair, Two pairs (where the rule is stated: the bottom
+  row is heard, everything above only shapes it), Stack, Two into one,
+  Feedback, then All 32, which names an algorithm as a fixed wiring
+  diagram, not a procedure. Each step is a section of the text headed by a
+  button, and a button in a row under Play; both set the step's sound. The
+  first five are wirings of two to four operators that are not the DX7's
+  (`STEP_WIRINGS`, numbered 33 to 37 after its 32, so `algorithm` holds
+  either and the engine needs nothing new); the operators they leave out
+  are silent and blanked in the table. Which step is current follows from
+  the wiring in force, so it is not stored, nor in the URL. The algorithm
+  list and the presets appear only at the last step, the Feedback slider
+  only where there is a loop. On a phone the row of step buttons is left
+  out for room; the section headings do the same.
+- **The list groups the 32 by how many carriers** each has (1 to 6),
+  still under their DX7 numbers.
+- **The boxes light up** while a note sounds, each filled as strongly as
+  its operator sounds; not under reduced motion.
+- **Chapters 3 to 7 draw their pair** small, floated beside the start of
+  the text, the way chapter 8 draws a wiring: 2 on 1, and 1 heard. So the
+  notation is familiar before it is needed.
+- **The operator table** is narrower, without spin buttons, so it no
+  longer overflows the lab at 1024 px.
 - **A note's length is now fixed when it starts.** Before, choosing a
   preset with longer decays after a note had ended made it look still
   sounding, so Play stopped instead of playing; this was true of chapter 6

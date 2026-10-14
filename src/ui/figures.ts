@@ -261,10 +261,20 @@ export function mountFigures(store: LabStore, engine: AudioEngine): void {
   // Chapter 8's algorithm, as the DX7 draws it.
   const diagram = document.querySelector<HTMLCanvasElement>('#algorithm-plot');
   if (diagram) {
-    mountFigure(diagram, store, (state, canvas) => {
-      drawAlgorithm(state, canvas);
-      canvas.setAttribute('aria-label', describeAlgorithm(state.algorithm));
-    });
+    // Its boxes light up with each operator's level while a note sounds,
+    // except under reduced motion, as the playhead does.
+    mountFigure(
+      diagram,
+      store,
+      (state, canvas, time) => {
+        drawAlgorithm(state, canvas, time);
+        const label = describeAlgorithm(state.algorithm);
+        if (canvas.getAttribute('aria-label') !== label) {
+          canvas.setAttribute('aria-label', label);
+        }
+      },
+      noteMoves,
+    );
   }
 
   // Its label and value are the slider's, kept by ui/besselControls.ts.

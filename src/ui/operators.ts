@@ -1,4 +1,4 @@
-import { algorithm, ALGORITHM_COUNT } from '../dsp/algorithms';
+import { algorithm, algorithmsByCarriers, operatorsUsed } from '../dsp/algorithms';
 import type { Operator } from '../dsp/operators';
 import {
   clamp,
@@ -53,9 +53,22 @@ const COLUMNS: Column[] = [
   },
 ];
 
-/** "carrier" or "modulator": what an operator is in an algorithm. */
-export function roleOf(algorithmNumber: number, op: number): 'carrier' | 'modulator' {
-  return algorithm(algorithmNumber).carriers.includes(op) ? 'carrier' : 'modulator';
+/**
+ * "carrier" or "modulator": what an operator is in an algorithm; "unused"
+ * for one a step wiring leaves out.
+ */
+export function roleOf(
+  algorithmNumber: number,
+  op: number,
+): 'carrier' | 'modulator' | 'unused' {
+  const alg = algorithm(algorithmNumber);
+  if (!operatorsUsed(alg).includes(op)) return 'unused';
+  return alg.carriers.includes(op) ? 'carrier' : 'modulator';
+}
+
+/** What a group of the algorithm list is called: "1 carrier", "3 carriers". */
+export function carriersLabel(count: number): string {
+  return count === 1 ? '1 carrier' : `${count} carriers`;
 }
 
 /**
@@ -70,11 +83,17 @@ export function mountOperators(store: LabStore): void {
   const table = document.querySelector<HTMLTableSectionElement>('#operators tbody');
   if (!select || !table) return;
 
-  for (let number = 1; number <= ALGORITHM_COUNT; number++) {
-    const option = document.createElement('option');
-    option.value = String(number);
-    option.textContent = String(number);
-    select.append(option);
+  // The DX7's 32, grouped by how many carriers each has.
+  for (const { carriers, numbers } of algorithmsByCarriers()) {
+    const group = document.createElement('optgroup');
+    group.label = carriersLabel(carriers);
+    for (const number of numbers) {
+      const option = document.createElement('option');
+      option.value = String(number);
+      option.textContent = String(number);
+      group.append(option);
+    }
+    select.append(group);
   }
   select.addEventListener('change', () => {
     store.set({ algorithm: Number(select.value) });
@@ -82,6 +101,8 @@ export function mountOperators(store: LabStore): void {
 
   const inputs: HTMLInputElement[][] = [];
   const roles: HTMLElement[] = [];
+  /** Each operator's cells, to blank out when its wiring leaves it out. */
+  const cells: HTMLElement[][] = [];
   // Three rows, each with two operators: OP1 and OP4, OP2 and OP5, ...
   const rows = [0, 1, 2].map(() => document.createElement('tr'));
   for (let op = 0; op < 6; op++) {
@@ -94,6 +115,7 @@ export function mountOperators(store: LabStore): void {
     role.className = 'op-role';
     row.append(name, role);
     roles.push(role);
+    cells.push([name, role]);
     inputs.push(
       COLUMNS.map(column => {
         const cell = document.createElement('td');
@@ -116,15 +138,29 @@ export function mountOperators(store: LabStore): void {
         input.addEventListener('change', () => show(store.get()));
         cell.append(input);
         row.append(cell);
+        cells[op].push(cell);
         return input;
       }),
     );
   }
   table.append(...rows);
+  const secondHeads = [
+    ...(table.closest('table')?.querySelectorAll<HTMLElement>('thead th') ?? []),
+  ].slice(5);
 
   const show = (state: LabState) => {
     select.value = String(state.algorithm);
+    const used = operatorsUsed(algorithm(state.algorithm));
+    // An operator left out is blanked, keeping the columns where they
+    // are; a row with neither of its two is taken out.
+    rows.forEach((row, r) => {
+      row.hidden = !used.includes(r) && !used.includes(r + 3);
+    });
+    // And the right-hand half's headings, when it has no operator.
+    const second = used.some(op => op >= 3);
+    secondHeads.forEach(head => head.classList.toggle('op-off', !second));
     state.operators.forEach((op, i) => {
+      for (const cell of cells[i]) cell.classList.toggle('op-off', !used.includes(i));
       roles[i].textContent = roleOf(state.algorithm, i);
       COLUMNS.forEach((column, c) => {
         const input = inputs[i][c];
