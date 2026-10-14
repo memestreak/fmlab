@@ -98,3 +98,16 @@ if (theme) mountThemeSwitch(theme, store);
 
 const commit = document.querySelector<HTMLElement>('#commit');
 if (commit) mountCommitHash(commit);
+
+/** At most this long is the page kept hidden waiting for its fonts. */
+const FONT_WAIT_MS = 1500;
+
+// Everything is drawn: show the page once its fonts are in too, so that
+// a font arriving late cannot shift what has been laid out (see the style
+// in index.html).
+void Promise.race([
+  document.fonts.ready,
+  new Promise(resolve => window.setTimeout(resolve, FONT_WAIT_MS)),
+]).then(() => {
+  document.documentElement.dataset.ready = '';
+});

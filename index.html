@@ -22,6 +22,20 @@
         }
       } catch (e) {}
     </script>
+    <!-- The page is shown once the script has drawn it and its fonts have
+         arrived (src/main.ts sets data-ready), so nothing moves after the
+         first paint. If that never happens, it is shown anyway after 3 s. -->
+    <style>
+      html:not([data-ready]) .page {
+        visibility: hidden;
+        animation: fmlab-reveal 0s 3s forwards;
+      }
+      @keyframes fmlab-reveal {
+        to {
+          visibility: visible;
+        }
+      }
+    </style>
   </head>
   <body>
     <div class="page">

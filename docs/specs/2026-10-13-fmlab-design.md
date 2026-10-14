@@ -489,3 +489,22 @@ them, and the sandbox at the end.
   With the sandbox last, its text now names operators and algorithms.
 - **Internally** a section is still a `Chapter`, with a string `id` in
   place of the number; `state.chapter` holds it.
+
+## Audit fixes (PR #19)
+
+A Lighthouse audit of production (mobile) found three things to fix.
+
+- **Layout shift** (CLS 0.68 on the landing view, 0.36 on the sections):
+  the web fonts arrived after the first paint and changed the size of
+  the wordmark and buttons, which pushed the lab down; on the landing
+  view the script's drawing moved it too. The page is now kept hidden
+  until the script has drawn it and its fonts are in (at most 1.5 s of
+  waiting for fonts), then shown in place. A style in index.html does
+  the hiding, with a 3 s fallback so a failed script never leaves a
+  blank page. CLS is 0 on all four pages audited.
+- **robots.txt** was missing (the site answered with its page): added,
+  allowing everything.
+- **The J buttons** in Sidebands and Bessel functions showed "J₀" but were
+  named "J0, the carrier"; the name now starts with what is shown
+  ("J₀, the carrier"), so a voice command finds it.
+

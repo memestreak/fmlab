@@ -117,9 +117,11 @@ export function mountBesselControls(store: LabStore): void {
       chip.type = 'button';
       chip.className = 'chip';
       chip.textContent = orderLabel(order);
+      // The name starts with what the button shows, so a voice command
+      // that says what it sees finds it.
       chip.setAttribute(
         'aria-label',
-        order === 0 ? 'J0, the carrier' : `J${order}, sideband pair ${order}`,
+        `${orderLabel(order)}, ${order === 0 ? 'the carrier' : `sideband pair ${order}`}`,
       );
       chip.setAttribute('aria-pressed', 'false');
 
