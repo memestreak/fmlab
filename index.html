@@ -24,7 +24,8 @@
   <body>
     <div class="page">
       <header class="masthead">
-        <h1 class="wordmark">fmlab</h1>
+        <!-- A bare "#" is no chapter: the landing view. -->
+        <h1 class="wordmark"><a href="#">fmlab</a></h1>
         <!-- The chapters that exist; filled in by ui/chapterView.ts. -->
         <nav id="contents" class="contents" aria-label="Chapters"></nav>
         <button id="theme" type="button" class="btn btn-quiet">
@@ -191,6 +192,15 @@
             </figcaption>
           </figure>
         </section>
+
+        <!-- The landing view's ways on, shown once its sound has been
+             heard; filled in by ui/chapterView.ts. -->
+        <nav
+          id="landing-next"
+          class="landing-next"
+          aria-label="Where to go next"
+          hidden
+        ></nav>
       </main>
 
       <footer class="footer">

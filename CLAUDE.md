@@ -11,7 +11,9 @@ as static files to Cloudflare Pages (`DEPLOYMENT.md`).
 
 The page is a chapter at a time: its text in a narrative pane, and the lab
 (Play / Stop, sliders and two figures) beside it, or under it on a narrow
-screen. The chapter is in the URL's hash (`#2`). Version 1's seven
+screen. The chapter is in the URL's hash (`#2`); with no hash the site
+opens on the landing view, one line and a Play button whose sound the two
+figures move with, and then the ways on. Version 1's seven
 chapters are all written: 1 "A single sine", 2 "Vibrato becomes timbre",
 3 "Modulation index", 4 "Sidebands and Bessel functions", 5 "Carrier to
 modulator ratio", 6 "Time-varying index" and 7, the Sandbox; numbers are
@@ -66,6 +68,9 @@ figures subscribe to it. Nothing else passes values around.
   each time `notes` goes up, shaped by the envelope (`attack`, `decay`,
   `sustain`, `release`, `hold`; `envelopeOf(state)`), and
   `indexAtTime(state, t)` is the index at a moment of it.
+  `momentOf(state, time)` is what a figure should draw at a time on the
+  page's clock: the patch as set, or, while a note sounds, that moment's
+  index and loudness.
 - `src/chapters/` — a chapter is data (`types.ts`): number, title, lesson
   text and "The maths" panels (HTML strings, trusted because they are
   written here), the sliders it shows, the patch it starts from (all of
@@ -74,6 +79,10 @@ figures subscribe to it. Nothing else passes values around.
   text that says "Fig. 2" must match the chapter's own list). A chapter
   may have presets, buttons that set several fields at once. Its patch is
   written as `BASE_PATCH` (`basePatch.ts`) with its own differences.
+  `landing.ts` is the landing view, written as a chapter numbered
+  `LANDING` (0) so that everything following the store's chapter needs no
+  special case. It is not in `CHAPTERS`, has no hash and plays one long
+  note.
   `index.ts` lists them (`CHAPTERS`, `neighbours`); `route.ts` reads the
   hash. A new chapter is a file here and an entry in `CHAPTERS`. Lesson
   text is plain language for musicians; formulas go in the panels, as
@@ -156,7 +165,8 @@ figures subscribe to it. Nothing else passes values around.
   pressing a J button sets `pinned`, and one button sets the index where
   the carrier vanishes;
   `transport.ts` is the main button (Play / Stop, or Play note in
-  `noteMode`), the space bar that does the same, and the two checkboxes;
+  `noteMode`, Play on the landing view), the space bar that does the
+  same, and the two checkboxes;
   `themeSwitch.ts`; and `figures.ts` redraws a canvas on patch, size,
   theme and font changes, keeps its `aria-label` describing what it shows,
   and runs the waveform's animation loop while it should move
@@ -218,8 +228,10 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
 - The theme switch cycles Auto, Light, Dark and saves the bare word under
   `localStorage["fmlab.theme"]`. The boot script in `index.html` reads the
   same key; keep it in step with `src/model/theme.ts`.
-- Motion: chapter 6's two figures show a playhead while a note sounds;
-  under `prefers-reduced-motion` they simply stay as they are. The other
+- Motion: chapter 6's two figures show a playhead while a note sounds,
+  and the landing view's follow its sound; under
+  `prefers-reduced-motion` they simply stay as they are, and the sound
+  still plays. The other
   thing that animates is chapter 2's waveform, while sound
   plays or "Show motion" is ticked. Under `prefers-reduced-motion` it
   stays still, the checkbox is hidden and the caption says why. Anything

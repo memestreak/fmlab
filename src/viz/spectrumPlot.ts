@@ -8,6 +8,7 @@ import {
   carsonBand,
   highlightOf,
   type LabState,
+  momentOf,
   patchOf,
 } from '../model/lab';
 import {
@@ -78,12 +79,19 @@ export function axisSpan(state: LabState): number {
     : axisEnd(ratio, index);
 }
 
-/** The patch's line spectrum, by whichever kind of modulation it uses. */
-export function spectrumOf(state: LabState): SpectralLine[] {
-  const { ratio, index } = patchOf(state);
-  return state.mode === 'fm'
-    ? trueFmSpectrum(ratio, index)
-    : fmSpectrum(ratio, index);
+/**
+ * The patch's line spectrum, by whichever kind of modulation it uses. For
+ * a patch that plays notes, `time` makes it the note at that moment: that
+ * moment's index, with every line scaled by that moment's loudness.
+ */
+export function spectrumOf(state: LabState, time?: number): SpectralLine[] {
+  const { ratio } = patchOf(state);
+  const { index, level } = momentOf(state, time);
+  const lines =
+    state.mode === 'fm' ? trueFmSpectrum(ratio, index) : fmSpectrum(ratio, index);
+  return level === 1
+    ? lines
+    : lines.map(line => ({ freq: line.freq, amp: line.amp * level }));
 }
 
 /**
@@ -99,8 +107,9 @@ export function spectrumOf(state: LabState): SpectralLine[] {
 export function drawSpectrum(
   state: LabState,
   canvas: HTMLCanvasElement,
+  time?: number,
 ): SpectralLine[] {
-  const lines = spectrumOf(state);
+  const lines = spectrumOf(state, time);
   const plot = beginPlot(canvas);
   if (!plot) return lines;
   const { ctx, token, left, right, top, bottom } = plot;

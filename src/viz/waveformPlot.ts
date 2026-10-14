@@ -5,7 +5,7 @@ import {
   sampleCycles,
   trueFmSample,
 } from '../dsp/waveform';
-import { type LabState, patchOf } from '../model/lab';
+import { type LabState, momentOf, patchOf } from '../model/lab';
 import { ampToY, beginPlot, drawFrame, type Plot } from './plot';
 import { msTicks, type Tick, waveformTicks } from './ticks';
 
@@ -118,16 +118,22 @@ interface Scene {
   modulator: (at: number) => number;
 }
 
-/** The still view: the signal from its start, in carrier cycles. */
-function stillScene(state: LabState): Scene {
-  const { ratio, index } = patchOf(state);
+/**
+ * The still view: the signal from its start, in carrier cycles. For a
+ * patch that plays notes, `time` makes it the note at that moment, at
+ * that moment's index and loudness; it is still drawn from the start of a
+ * cycle, so it changes shape and height without sliding about.
+ */
+function stillScene(state: LabState, time: number | undefined): Scene {
+  const { ratio } = patchOf(state);
+  const { index, level } = momentOf(state, time);
   const span = cyclesShown(state);
   const signal = state.mode === 'fm' ? trueFmSample : fmSample;
   return {
     span,
     ticks: waveformTicks(span, state.carrierHz),
     title: 'time: cycles of the carrier, and ms',
-    output: cycles => signal(cycles, ratio, index),
+    output: cycles => level * signal(cycles, ratio, index),
     modulator: cycles => modulatorSample(cycles, ratio),
   };
 }
@@ -196,7 +202,7 @@ export function drawWaveform(
       ? movingScene(state, view, time)
       : state.realUnits
         ? realScene(state)
-        : stillScene(state);
+        : stillScene(state, time);
   const { span } = scene;
 
   drawFrame(

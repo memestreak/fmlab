@@ -53,6 +53,75 @@ body {
   }
 }
 
+/* The wordmark is the way home. It reads as the wordmark, not as a link. */
+.wordmark a {
+  text-decoration: none;
+}
+
+/* The landing view: no lesson yet, so one centred column, the line of
+   text, a large Play, the two figures, and then the ways on. */
+[data-view='landing'] .chapter {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem;
+  max-width: 44rem;
+  margin: 0 auto;
+}
+
+.landing-line {
+  font-size: 1.2rem;
+  line-height: 1.45;
+  text-wrap: balance;
+}
+
+.landing-line p {
+  margin: 0;
+}
+
+[data-view='landing'] #play {
+  min-width: 8rem;
+  min-height: 3.5rem;
+  font-size: 1.2rem;
+}
+
+.landing-ways {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 0 0 1.25rem;
+}
+
+/* A link dressed as a button: centred like one. */
+a.btn {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.landing-chapters {
+  display: grid;
+  gap: 0.15rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* The title is underlined, as a link; its number, set apart, is not. */
+.landing-chapters a {
+  display: inline-block;
+  padding: 0.3rem 0;
+  text-decoration: none;
+}
+
+.landing-title {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.landing-chapters .num {
+  display: inline-block;
+  min-width: 1.5rem;
+}
+
 .chapter-kicker {
   margin: 0 0 0.25rem;
   font-size: 0.8rem;

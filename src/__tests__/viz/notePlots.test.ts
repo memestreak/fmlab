@@ -9,6 +9,7 @@ import {
   envelopeOf,
   INDEX,
   type LabState,
+  noteProgress,
   RATIO,
   RELEASE,
   SUSTAIN,
@@ -25,7 +26,6 @@ import {
   envelopeSpan,
   handleAt,
   handles,
-  noteProgress,
 } from '../../viz/envelopePlot';
 import { plotArea, shareToY } from '../../viz/plot';
 import { boldness, FLOOR_DB, sliceAt } from '../../viz/spectrogramPlot';
