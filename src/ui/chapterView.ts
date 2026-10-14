@@ -2,6 +2,8 @@ import {
   type Chapter,
   chapterByNumber,
   glossary,
+  labViewOf,
+  operatorCountPatch,
   CHAPTERS,
   type ControlId,
   type FigureId,
@@ -85,7 +87,11 @@ function mountSoundInUrl(store: LabStore): void {
       state.chapter === previous.chapter &&
       (state.carrierHz !== previous.carrierHz ||
         state.ratio !== previous.ratio ||
-        state.index !== previous.index)
+        state.index !== previous.index ||
+        state.mode !== previous.mode ||
+        state.algorithm !== previous.algorithm ||
+        state.feedback !== previous.feedback ||
+        state.operators !== previous.operators)
     ) {
       window.clearTimeout(timer);
       timer = window.setTimeout(write, URL_DELAY_MS);
@@ -281,6 +287,28 @@ export function mountChapters(store: LabStore): void {
     // The ways on appear once the landing view's sound has been heard,
     // and stay if it is come back to.
     if (next) next.hidden = !isLanding || store.get().notes === 0;
+    showLab(labViewOf(chapter, store.get()));
+  };
+
+  /**
+   * What the lab shows for a chapter: its sliders, buttons, presets and
+   * figures. On its own when the sandbox switches between two and six
+   * operators, which changes the lab and not the text.
+   */
+  const showLab = (chapter: Chapter) => {
+    // The sandbox's switch, and the small pair beside its text, which
+    // describes two operators only.
+    const count = document.querySelector<HTMLElement>('#operator-count');
+    if (count) count.hidden = !chapterByNumber(chapter.number)?.sixOperators;
+    const six = chapter.patch.mode === 'ops';
+    document.querySelector('#two-operators')?.setAttribute('aria-pressed', String(!six));
+    document.querySelector('#six-operators')?.setAttribute('aria-pressed', String(six));
+    const pair = narrative?.querySelector<HTMLElement>('.pair-diagram');
+    if (pair) pair.hidden = six;
+    // The space bar's hint, not where the keyboard's letters stand in for
+    // it: the sandbox needs the room.
+    const hint = document.querySelector<HTMLElement>('.transport .hint');
+    if (hint) hint.hidden = chapter.hasPiano === true;
 
     for (const row of document.querySelectorAll<HTMLElement>('[data-control]')) {
       row.hidden = !chapter.controls.includes(row.dataset.control as ControlId);
@@ -350,6 +378,9 @@ export function mountChapters(store: LabStore): void {
     if (state.chapter !== previous.chapter) {
       const chapter = chapterByNumber(state.chapter);
       if (chapter) show(chapter);
+    } else if (state.mode !== previous.mode) {
+      const chapter = chapterByNumber(state.chapter);
+      if (chapter?.sixOperators) showLab(labViewOf(chapter, state));
     } else if (state.notes !== previous.notes && state.chapter === LANDING) {
       // The first press on the landing view: now offer the ways on.
       if (next) next.hidden = false;
@@ -381,6 +412,13 @@ export function mountChapters(store: LabStore): void {
   });
 
   mountSoundInUrl(store);
+
+  // The sandbox's Two operators / Six operators switch.
+  const choose = (six: boolean) => () => {
+    if ((store.get().mode === 'ops') !== six) store.set(operatorCountPatch(store.get(), six));
+  };
+  document.querySelector('#two-operators')?.addEventListener('click', choose(false));
+  document.querySelector('#six-operators')?.addEventListener('click', choose(true));
 
   const first = chapterByNumber(store.get().chapter);
   if (first) show(first);

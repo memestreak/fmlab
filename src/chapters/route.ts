@@ -1,15 +1,23 @@
 // The chapter is in the URL's hash, "#2", so a chapter can be linked to and
 // survives a reload. With no hash the site opens on the landing view. The
-// glossary is "#glossary", and one of its entries "#glossary?t=index". The
+// glossary is "#glossary", and one of its entries "#glossary?t=index".
+// Switched to six operators, the sandbox's link carries those instead:
+// "#7?m=6&c=220&a=5&f=0.7&o=1_90_2.5-1_35_1.2-1_70_1.5-14_25_0.4-1_40_2-1_15_1". The
 // sandbox also keeps its sound there, "#7?c=220&r=1.41&i=5", so a sound
 // can be shared by its link.
 
+import { DX7_COUNT } from '../dsp/algorithms';
+import type { Operator } from '../dsp/operators';
 import {
   CARRIER_HZ,
   clamp,
+  FEEDBACK,
   hzToSemitones,
   INDEX,
   type LabState,
+  OP_DECAY,
+  OP_LEVEL,
+  OP_RATIO,
   RATIO,
   semitonesToHz,
 } from '../model/lab';
@@ -64,11 +72,60 @@ function brief(value: number, places: number): string {
   return String(Number(value.toFixed(places)));
 }
 
+/** How many operators a link's "m" says; any other value means two. */
+const SIX = '6';
+
 /**
- * The parameters that carry a sandbox sound: the carrier in Hz, the ratio
- * and the index. Volume stays the listener's own, and is left out.
+ * The six operators in a link, short: each as ratio_level_decay, its
+ * level in whole percent, and the six joined by "-". Characters a URL
+ * keeps as they are, so the link stays readable.
+ */
+export function operatorsParam(operators: readonly Operator[]): string {
+  return operators
+    .map(op => [brief(op.ratio, 3), Math.round(op.level * 100), brief(op.decay, 2)].join('_'))
+    .join('-');
+}
+
+/**
+ * The six operators a link's "o" describes, each value held inside its
+ * range; null unless it is exactly six operators of three numbers each,
+ * so a damaged link keeps the operators the chapter starts with.
+ */
+export function operatorsFromParam(raw: string | null): Operator[] | null {
+  if (raw === null) return null;
+  const rows = raw.split('-');
+  if (rows.length !== 6) return null;
+  const operators: Operator[] = [];
+  for (const row of rows) {
+    const values = row.split('_');
+    if (values.length !== 3 || values.some(v => v.trim() === '')) return null;
+    const [ratio, level, decay] = values.map(Number);
+    if (![ratio, level, decay].every(Number.isFinite)) return null;
+    operators.push({
+      ratio: clamp(ratio, OP_RATIO),
+      level: clamp(level / 100, OP_LEVEL),
+      decay: clamp(decay, OP_DECAY),
+    });
+  }
+  return operators;
+}
+
+/**
+ * The parameters that carry a sandbox sound. With two operators: the
+ * carrier in Hz, the ratio and the index. With six: "m=6", the base pitch,
+ * the algorithm, the feedback and the operators. Volume stays the
+ * listener's own, and is left out.
  */
 export function soundParams(state: LabState): string {
+  if (state.mode === 'ops') {
+    return new URLSearchParams({
+      m: SIX,
+      c: brief(state.carrierHz, 2),
+      a: String(state.algorithm),
+      f: brief(state.feedback, 2),
+      o: operatorsParam(state.operators),
+    }).toString();
+  }
   const params = new URLSearchParams({
     c: brief(state.carrierHz, 2),
     r: brief(state.ratio, 3),
@@ -96,6 +153,20 @@ export function soundFromParams(params: URLSearchParams): Partial<LabState> {
   if (carrier !== null && carrier > 0) {
     const hz = clamp(carrier, CARRIER_HZ);
     patch.carrierHz = semitonesToHz(Math.round(hzToSemitones(hz) * 4) / 4);
+  }
+  if (params.get('m') === SIX) {
+    // Six operators, playing notes as chapter 8 does.
+    patch.mode = 'ops';
+    patch.noteMode = true;
+    const algorithm = read('a');
+    if (algorithm !== null) {
+      patch.algorithm = clamp(Math.round(algorithm), { min: 1, max: DX7_COUNT });
+    }
+    const feedback = read('f');
+    if (feedback !== null) patch.feedback = clamp(feedback, FEEDBACK);
+    const operators = operatorsFromParam(params.get('o'));
+    if (operators) patch.operators = operators;
+    return patch;
   }
   const ratio = read('r');
   if (ratio !== null) patch.ratio = clamp(ratio, RATIO);
