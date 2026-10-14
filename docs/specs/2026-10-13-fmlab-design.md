@@ -511,14 +511,16 @@ A Lighthouse audit of production (mobile) found three things to fix.
 ## Subtle scroll bars (PR #20)
 
 - Every scrolling area (the page, the text pane and the lab in the
-  pinned layout, the contents panel, the glossary) has a thin scroll bar:
-  a --rule thumb on no track, a little darker toward --ink while the
-  pointer is over the area (and on Safari while dragging). Defined once at
-  the top of base.css with the standard `scrollbar-width` and
-  `scrollbar-color`, and `::-webkit-scrollbar` rules for Safari; tokens
-  only, so both themes follow. Scroll bars are never hidden, and
-  scrolling by keyboard and focus are unchanged.
-- Chrome's bar goes from 15 px to 10 px. Only the text pane's line
-  breaks change; the lab is a separate column and fits as before.
+  pinned layout, the contents panel, the glossary) has a narrow, faint
+  scroll bar: a thumb half-way between --rule and the paper on no track,
+  with no buttons, coming up to --rule under the pointer. Defined once at
+  the top of base.css with tokens only, so both themes follow. Scroll bars
+  are never hidden, and scrolling by keyboard and focus are unchanged.
+- Chrome, Edge and Safari draw the `::-webkit-scrollbar` bar, 6 px wide;
+  the thumb darkens when it is pointed at. Chrome ignores those rules
+  wherever the standard `scrollbar-width` / `scrollbar-color` apply, so
+  the standard ones are only for browsers without them (Firefox: its thin
+  bar, darker while the area is pointed at).
+- Chrome's bar goes from 15 px to 6 px. Only the text pane's line breaks
+  change; the lab is a separate column and fits as before.
 - Before and after: `docs/screenshots/scrollbar-*.png`.
-
