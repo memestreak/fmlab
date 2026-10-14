@@ -1,5 +1,6 @@
 import { noteSeconds, TIME_CONSTANTS } from '../dsp/envelope';
 import { envelopeOf, type LabState, type LabStore } from '../model/lab';
+import type { Measurement } from '../viz/liveSpectrum';
 import { unlockIosAudio } from './iosUnlock';
 import { PROCESSOR_NAME } from './processorName';
 // `?worker&url` has Vite compile the worklet and its imports into a file
@@ -30,12 +31,24 @@ interface Graph {
   /** The envelope's loudness, for a chapter that plays notes; else 1. */
   note: GainNode;
   master: GainNode;
+  /** Measures the spectrum for the live view, before the volume. */
+  analyser: AnalyserNode;
+  /** A scratch buffer for `measure()`. */
+  bins: Float32Array<ArrayBuffer>;
 }
+
+/**
+ * The live view's FFT: 8192 samples is about a sixth of a second, and
+ * bins about 6 Hz apart, fine enough to part the sidebands of a 55 Hz
+ * modulator.
+ */
+const FFT_SIZE = 8192;
 
 /**
  * Plays the model: it follows the store and owns everything Web Audio.
  *
  *   worklet (the synth) -> note gain -> master gain -> limiter -> speakers
+ *                                  \-> analyser (the live spectrum)
  *
  * There are two ways of playing. Most chapters hold one steady sound while
  * `playing` is true. A chapter in `noteMode` plays one note each time
@@ -229,6 +242,21 @@ export class AudioEngine {
     }
   }
 
+  /**
+   * The spectrum of what is playing now, for the live view; null when
+   * nothing has been played or the context is asleep.
+   */
+  measure(): Measurement | null {
+    const graph = this.graph;
+    if (!graph || graph.context.state !== 'running') return null;
+    graph.analyser.getFloatFrequencyData(graph.bins);
+    return {
+      db: graph.bins,
+      sampleRate: graph.context.sampleRate,
+      fftSize: graph.analyser.fftSize,
+    };
+  }
+
   /** What may change while a note rings: its volume. The rest waits for the next note. */
   private tuneNote(state: LabState): void {
     if (!this.graph) return;
@@ -263,8 +291,26 @@ export class AudioEngine {
       .connect(master)
       .connect(limiter)
       .connect(context.destination);
+    // Tapped before the volume, so the live view's heights are the sound's
+    // own, on the same scale as the predicted stems, at any volume. The
+    // limiter after it never acts at the levels the lab makes, so this is
+    // the spectrum heard.
+    const analyser = new AnalyserNode(context, {
+      fftSize: FFT_SIZE,
+      smoothingTimeConstant: 0.5,
+      minDecibels: -100,
+      maxDecibels: 0,
+    });
+    note.connect(analyser);
 
-    this.graph = { context, synth, note, master };
+    this.graph = {
+      context,
+      synth,
+      note,
+      master,
+      analyser,
+      bins: new Float32Array(analyser.frequencyBinCount),
+    };
     return this.graph;
   }
 

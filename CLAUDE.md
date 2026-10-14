@@ -122,6 +122,8 @@ figures subscribe to it. Nothing else passes values around.
   fades back in. For a note it schedules the envelope on the note gain
   and, if `indexFollows`, on the `index` param, 20 ms ahead so the last
   note can be brought down first.
+  An `AnalyserNode` taps the sound before the volume, and `measure()`
+  hands its spectrum to the live view.
   `iosUnlock.ts` keeps iOS's ringer switch from muting it;
   `worklet-globals.d.ts` types the worklet's globals.
 - `src/viz/` — Canvas 2D drawing. A renderer is a function of
@@ -144,7 +146,11 @@ figures subscribe to it. Nothing else passes values around.
   same note as a spectrogram worked out from the patch (`sliceAt`), both
   on one time axis (`envelopeSpan`) and both with a playhead while the
   note sounds. `plot.ts`'s `drawFrame` takes the horizontal rows a plot
-  wants; amplitude from -1 to 1 is only the default. `besselPlot.ts` draws J_0
+  wants; amplitude from -1 to 1 is only the default. `liveSpectrum.ts` is
+  the spectrum's live view: the measured FFT as a filled --pen-blue curve
+  over the predicted stems, drawn faintly, on the same axes
+  (`drawSpectrumFrame`) and scale (`amplitudeFromDb` undoes the analyser's
+  window, so a full sine reads 1). `besselPlot.ts` draws J_0
   to J_8 against the index, with an ink line at the patch's index and a
   dot where it crosses each curve. The spectrum and the Bessel plot are
   linked: `highlightOf(state)` is a sideband order to pick out, and both

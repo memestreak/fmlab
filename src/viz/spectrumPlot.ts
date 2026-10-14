@@ -104,21 +104,20 @@ export function spectrumOf(state: LabState, time?: number): SpectralLine[] {
  *
  * Returns the lines drawn, for the figure's text description.
  */
-export function drawSpectrum(
+/**
+ * Draws the spectrum's frame: amplitude from -1 to 1, and the frequency
+ * axis, in carrier units with Hz beneath, or with `realUnits` fixed in
+ * Hz. Returns the x pixel for a frequency in carrier units. Shared by the
+ * predicted and the live view, so the two line up.
+ */
+export function drawSpectrumFrame(
+  plot: Plot,
   state: LabState,
-  canvas: HTMLCanvasElement,
-  time?: number,
-): SpectralLine[] {
-  const lines = spectrumOf(state, time);
-  const plot = beginPlot(canvas);
-  if (!plot) return lines;
-  const { ctx, token, left, right, top, bottom } = plot;
+): (freq: number) => number {
+  const { left, right } = plot;
   const { ratio, index } = patchOf(state);
-
   const maxFreq = axisSpan(state);
   const x = (freq: number) => left + (freq / maxFreq) * (right - left);
-  const y = (amp: number) => ampToY(plot, amp);
-
   if (state.realUnits) {
     // Numbered in Hz and fixed, so a stem moves when the carrier does.
     drawFrame(
@@ -135,6 +134,40 @@ export function drawSpectrum(
       'frequency: multiples of the carrier, and Hz',
     );
   }
+  return x;
+}
+
+export function drawSpectrum(
+  state: LabState,
+  canvas: HTMLCanvasElement,
+  time?: number,
+): SpectralLine[] {
+  const plot = beginPlot(canvas);
+  if (!plot) return spectrumOf(state, time);
+  const x = drawSpectrumFrame(plot, state);
+  return drawPredicted(plot, state, x, time);
+}
+
+/**
+ * Draws the predicted line spectrum's stems, and the extras the state
+ * asks for (harmonic lines, Carson's bracket), into a frame already
+ * drawn. Returns the lines drawn.
+ *
+ * @param opacity how strongly to draw the stems: 1, or less to keep them
+ *   faint under the live view so the two can be compared
+ */
+export function drawPredicted(
+  plot: Plot,
+  state: LabState,
+  x: (freq: number) => number,
+  time?: number,
+  opacity = 1,
+): SpectralLine[] {
+  const lines = spectrumOf(state, time);
+  const { ctx, token, top, bottom } = plot;
+  const { ratio, index } = patchOf(state);
+  const maxFreq = axisSpan(state);
+  const y = (amp: number) => ampToY(plot, amp);
 
   if (state.showHarmonics) {
     // An upright line at every whole multiple of the carrier: where the
@@ -163,7 +196,7 @@ export function drawSpectrum(
     const negative = amp < 0;
     // With one order picked out, its pair of stems stays; the rest fade.
     const isPicked = picked !== null && sidebandOrder(freq, ratio) === picked;
-    ctx.globalAlpha = picked === null || isPicked ? 1 : DIMMED;
+    ctx.globalAlpha = opacity * (picked === null || isPicked ? 1 : DIMMED);
     ctx.lineWidth = crowded ? 1 : isPicked ? STEM_WIDTH + 1 : STEM_WIDTH;
     ctx.strokeStyle = token(negative ? '--pen-red' : '--pen-blue');
     ctx.beginPath();

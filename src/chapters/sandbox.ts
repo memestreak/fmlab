@@ -59,6 +59,6 @@ export const sandbox: Chapter = {
     waveform:
       'Waveform. Two cycles of the output, with the modulator behind it as the thinner line.',
     spectrum:
-      'Spectrum. A stem below the axis, with a hollow marker, has negative phase.',
+      'Spectrum. A stem below the axis, with a hollow marker, is upside down.',
   },
 };

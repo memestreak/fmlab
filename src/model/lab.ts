@@ -82,6 +82,12 @@ export interface LabState {
    * view, even with no sound playing.
    */
   motion: boolean;
+  /**
+   * Whether the spectrum figure shows the live, measured spectrum of the
+   * sound (over the predicted one, faintly) instead of the predicted one.
+   * The reader's choice for the visit; neither saved nor in the URL.
+   */
+  liveSpectrum: boolean;
   /** Master gain. */
   volume: number;
   /** Whether sound is wanted. The audio engine follows it. */
@@ -135,6 +141,7 @@ export const DEFAULTS: LabState = {
   hover: null,
   pinned: null,
   motion: false,
+  liveSpectrum: false,
   // Low on purpose: FM gets bright, and loud, quickly.
   volume: 0.2,
   playing: false,
