@@ -1,5 +1,6 @@
 // The chapter is in the URL's hash, "#2", so a chapter can be linked to and
 // survives a reload. With no hash the site opens on the landing view. The
+// glossary is "#glossary", and one of its entries "#glossary?t=index". The
 // sandbox also keeps its sound there, "#7?c=220&r=1.41&i=5", so a sound
 // can be shared by its link.
 
@@ -12,9 +13,13 @@ import {
   RATIO,
   semitonesToHz,
 } from '../model/lab';
+import { GLOSSARY } from './glossary';
 
-/** The hash's parts: the chapter's number, and anything after a "?". */
-const HASH = /^#(\d+)(?:\?(.*))?$/;
+/**
+ * The hash's parts: the chapter's number (or "glossary"), and anything
+ * after a "?".
+ */
+const HASH = /^#(\d+|glossary)(?:\?(.*))?$/;
 
 /**
  * The chapter a hash names, or `fallback` when it names none that exists:
@@ -29,6 +34,7 @@ export function chapterFromHash(
 ): number {
   const match = HASH.exec(hash);
   if (!match) return fallback;
+  if (match[1] === 'glossary') return GLOSSARY;
   const number = Number(match[1]);
   return numbers.includes(number) ? number : fallback;
 }
@@ -39,7 +45,8 @@ export function paramsFromHash(hash: string): URLSearchParams {
 }
 
 export function hashForChapter(number: number, params?: string): string {
-  return params ? `#${number}?${params}` : `#${number}`;
+  const name = number === GLOSSARY ? 'glossary' : String(number);
+  return params ? `#${name}?${params}` : `#${name}`;
 }
 
 /**
@@ -49,7 +56,7 @@ export function hashForChapter(number: number, params?: string): string {
  */
 export function isStrayHash(hash: string, numbers: readonly number[]): boolean {
   if (hash === '' || hash === '#') return false;
-  return chapterFromHash(hash, numbers, -1) === -1;
+  return Number.isNaN(chapterFromHash(hash, numbers, Number.NaN));
 }
 
 /** A number written as briefly as it can be to `places` decimals: 1.41, 220, 2.5. */

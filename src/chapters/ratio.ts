@@ -1,4 +1,5 @@
 import { BASE_PATCH } from './basePatch';
+import { define, formula } from './terms';
 import type { Chapter } from './types';
 
 export const ratio: Chapter = {
@@ -6,11 +7,10 @@ export const ratio: Chapter = {
   title: 'Carrier to modulator ratio',
   navLabel: '5',
   body: [
-    `Index decides how strong each partial is. <strong>Ratio</strong>
-     decides which partials there can be at all. It is the modulator's
-     frequency as a multiple of the carrier's, written here the way FM
-     players write it, carrier first: 1:2 means the modulator runs at
-     twice the carrier.`,
+    `${define('ratio')} Where the index decides how strong each partial is,
+     the ratio decides which partials there can be at all. FM players
+     write it carrier first: 1:2 means the modulator runs at twice the
+     carrier.`,
     `The sidebands stand one modulator frequency apart, counted out from
      the carrier. The faint upright lines in Fig. 2 mark the whole
      multiples of the carrier, which are the harmonics of a note at the
@@ -23,17 +23,16 @@ export const ratio: Chapter = {
      leaves out every third harmonic.`,
     `Now press <strong>1:1.41</strong>. The step is no longer a whole
      number of lines, and the sidebands fall between them. Partials that
-     do not line up are not heard as one note with a colour. They are
-     heard as several pitches at once: a bell, a gong, a struck pipe. Drag
+     do not line up are not heard as one note with a colour.
+     ${define('inharmonic')} Drag
      Ratio slowly and listen for the sound snapping into focus each time
      it passes a simple ratio.`,
     `Chapter 3 left a question open: where do the lower sidebands go?
      Counting down from the carrier in steps of the modulator, you soon
-     pass zero. A frequency below zero is the same wave running backwards,
-     and a sine wave running backwards is a sine wave upside down. So the
-     sideband folds: it bounces off zero and comes back up the axis at the
-     same distance, inverted. Those are the stems that hang below the
-     axis, in red with a hollow marker.`,
+     pass zero. ${define('negativeFrequency')} A wave at a frequency below
+     zero is the same wave running backwards, and a sine wave running
+     backwards is a sine wave upside down. Those are the stems that hang
+     below the axis, in red with a hollow marker.`,
     `With a whole-number ratio the folded sidebands land back on the
      harmonics. At 1:1 they land on the very ones the upper sidebands
      already occupy, where the two add together or cancel, which is why
@@ -44,9 +43,9 @@ export const ratio: Chapter = {
     {
       title: 'Which partials a ratio gives',
       body: [
-        `Write <var>r</var> for the ratio
-         <var>f</var><sub>m</sub> / <var>f</var><sub>c</sub>. Sideband
-         <var>n</var> stands at`,
+        `Write <var>r</var> for the ratio:`,
+        formula('ratio'),
+        `Sideband <var>n</var> stands at`,
         `<p class="formula">| 1 + <var>n</var> <var>r</var> | × <var>f</var><sub>c</sub></p>`,
         `for every whole number <var>n</var>, the bars meaning "fold it
          back if it is negative". With <var>r</var> = 2 that is 1, 3, 5, …
@@ -64,7 +63,7 @@ export const ratio: Chapter = {
       title: 'Folding, and what happens at 1:1',
       body: [
         `A sine wave at a negative frequency is the same wave inverted:`,
-        `<p class="formula">sin(−<var>x</var>) = −sin(<var>x</var>)</p>`,
+        formula('negativeFrequency'),
         `so a sideband below zero is drawn at the positive frequency with
          its sign changed. At a ratio of 1 the partial at harmonic
          <var>k</var> is two sidebands in the same place, the upper one

@@ -1,6 +1,7 @@
 import type { Operator } from '../dsp/operators';
 import { BASE_PATCH } from './basePatch';
 import { STEP_WIRINGS } from '../dsp/algorithms';
+import { define, use } from './terms';
 import type { Chapter, ChapterPatch, Step } from './types';
 
 /** Six operators from a list of [ratio, level, decay]. */
@@ -124,7 +125,7 @@ const STEPS: Step[] = [
     patch: STACK,
     body: [
       `Put the third operator on top of the second instead: OP3 modulates
-       OP2, which modulates OP1. This is a <strong>stack</strong>. OP2 is no
+       OP2, which modulates OP1. ${define('stack')} OP2 is no
        longer a plain sine wave but a modulated one, so what it does to OP1
        is richer than any one pair can be. Raise OP3's level and listen to
        the sound thicken far faster than raising an index ever did.`,
@@ -147,11 +148,11 @@ const STEPS: Step[] = [
     title: 'Feedback',
     patch: FEEDBACK,
     body: [
-      `Last, an operator can modulate itself. Here OP2's own output is fed
-       back into its phase, drawn as a line out of its side and back into
-       its top. A little <strong>feedback</strong> turns its sine wave
-       toward a sawtooth, so the pair grows brighter; a lot turns it to
-       noise. Move Feedback: the line thickens as it goes up.`,
+      `One more wiring is left. ${define('feedback')} Here
+       it is OP2, drawn as a line out of its side and back into its top. A
+       little turns its sine wave toward a sawtooth, so the pair grows
+       brighter; a lot turns it to noise. Move Feedback: the line thickens
+       as it goes up.`,
     ],
   },
   {
@@ -159,10 +160,9 @@ const STEPS: Step[] = [
     title: "The DX7's 32 algorithms",
     patch: STACKS,
     body: [
-      `That is all an <strong>algorithm</strong> is: on the DX7, a fixed
-       wiring diagram for its six operators, not a procedure to follow. It
-       has 32 of them, each with one feedback loop, and you choose one
-       rather than wire your own. The list beside Play now has them all,
+      `That is all there is to it. ${define('algorithm')} It is a diagram,
+       not a procedure to follow. The DX7 has 32 of them, each with one
+       feedback loop, and you choose one rather than wire your own. The list beside Play now has them all,
        grouped by how many carriers each has, which is roughly how many
        sounds it adds together.`,
       `It starts on algorithm 1: a pair on the left, and on the right a
@@ -177,8 +177,8 @@ const STEPS: Step[] = [
       `Fig. 2 is the spectrum, here and at every step. With more than two
        operators there is no tidy sum of Bessel functions to give the
        heights, so it is worked out the long way: the same maths that makes
-       the sound is run for a moment and taken apart into its sine waves.
-       Its stems are heights only, all upright. Press Live to see the real
+       the sound is run for a moment, and the result taken apart.
+       ${define('fft')} Its stems are heights only, all upright. Press Live to see the real
        thing measured.`,
     ],
   },
@@ -190,11 +190,12 @@ export const operators: Chapter = {
   navLabel: '8',
   body: [
     `Everything so far has used two sine waves. The Yamaha DX7, the
-     synthesizer that took FM out of the laboratory in 1983, has six, which
-     it calls <strong>operators</strong>. Each is the same thing as before:
-     a sine wave with a frequency (a ratio of the note's pitch), a level,
-     and how long it takes to die away; a decay of 0 holds it for the whole
-     note.`,
+     synthesizer that took ${use('fm', 'FM')} out of the laboratory in 1983,
+     has six. ${define('operator')} Each operator's frequency is a multiple
+     of the note's, which the DX7 also calls its ratio, though it is not
+     chapter 5's carrier-to-modulator ratio. Its ${use('envelope')} here is
+     one number, how long it takes to die away; a decay of 0 holds it for
+     the whole note.`,
     `What makes a sound is how the operators are wired together. This
      chapter builds that up a step at a time, from the two you know. The
      buttons in the lab and at the head of each section below set each

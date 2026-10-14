@@ -1,4 +1,5 @@
 import { BASE_PATCH } from './basePatch';
+import { define, formula } from './terms';
 import type { Chapter, ChapterPatch } from './types';
 
 /** Chowning's brass: 1:1, the index swelling and fading with the note. */
@@ -37,16 +38,12 @@ export const envelope: Chapter = {
      partials first.`,
     `FM does this with one move: change the index while the note sounds.
      Press <strong>Play note</strong>, or the space bar.`,
-    `Fig. 1 is the note's <strong>envelope</strong>, its shape over time.
-     Attack is how long it takes to rise, Decay how long to settle to the
-     Sustain level, and Release how long to die away once the note is let
-     go. Drag the three dots, or use the sliders. The heavier line is the
+    `${define('envelope')} Fig. 1 is this note's. ${define('adsr')} Drag
+     the three dots, or use the sliders. The heavier line is the
      loudness. The thinner one is the index, the modulator's push; here
      the two move together.`,
-    `Fig. 2 is a <strong>spectrogram</strong>: the spectrum of the earlier
-     chapters turned on its side and stretched out along the note. Time
-     runs left to right, frequency upward, and the stronger a partial is
-     the bolder its mark. Watch the upper partials arrive as the envelope
+    `${define('spectrogram')} Fig. 2 is this note's: the spectrum of the
+     earlier chapters turned on its side and stretched out along it. Watch the upper partials arrive as the envelope
      rises and leave as it falls.`,
     `Untick <strong>Index follows the envelope</strong> and play again.
      Now only the loudness changes. The colour stands still, and the note
@@ -67,7 +64,7 @@ export const envelope: Chapter = {
          between 0 and 1 that changes over the note. The signal is the one
          from chapter 3 with both its loudness and its index following
          it:`,
-        `<p class="formula"><var>x</var>(<var>t</var>) = <var>e</var>(<var>t</var>) sin(2π <var>f</var><sub>c</sub> <var>t</var> + <var>I</var> <var>e</var>(<var>t</var>) sin 2π <var>f</var><sub>m</sub> <var>t</var>)</p>`,
+        formula('envelope'),
         `<var>I</var> is the Index slider: the index at the envelope's
          peak. Since the number of sidebands that matter is about the
          index plus one, the sound's bandwidth follows the envelope too.

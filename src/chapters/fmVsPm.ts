@@ -1,4 +1,5 @@
 import { BASE_PATCH } from './basePatch';
+import { use } from './terms';
 import type { Chapter } from './types';
 
 export const fmVsPm: Chapter = {
@@ -8,13 +9,13 @@ export const fmVsPm: Chapter = {
   body: [
     `The DX7 is sold as an FM synthesizer, and this guide has called its
      sound FM. Strictly, though, everything since chapter 3 has been
-     <strong>phase modulation</strong>: the modulator is added to the
+     ${use('pm')}: the modulator is added to the
      carrier's phase, not to its frequency. Chapter 2 was the one
      exception. Why the DX7 does it this way is easiest to see side by
      side.`,
     `Fig. 1 is phase modulation, as in the sandbox: the modulator pushes
-     the carrier's phase by up to Index radians. Fig. 2 is true frequency
-     modulation, matched to it at a ratio of 1: the modulator pushes the
+     the carrier's phase by up to Index radians. Fig. 2 is true
+     ${use('fm')}, matched to it at a ratio of 1: the modulator pushes the
      carrier's frequency by up to Index times the carrier's frequency. At
      ratio 1 the two have the same index, and much the same spectrum. Press
      Play, and use the switch beside it to hear one or the other.`,

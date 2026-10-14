@@ -91,7 +91,18 @@ figures subscribe to it. Nothing else passes values around.
   `landing.ts` is the landing view, written as a chapter numbered
   `LANDING` (0) so that everything following the store's chapter needs no
   special case. It is not in `CHAPTERS`, has no hash and plays one long
-  note.
+  note. `glossary.ts` is the glossary, the same way: `GLOSSARY` (−1), at
+  `#glossary` (an entry: `#glossary?t=index`), drawn from the terms, with
+  no lab and nothing to play.
+  `terms.ts` holds every defined term: its name, a one-sentence plain
+  definition, an optional formula, and the chapter that defines it. A
+  chapter writes `${define(id)}` where a term is first used (the plain
+  sentence, the term set as a bold `<dfn>`), `${formula(id)}` in its maths
+  panel, and `${use(id)}` to mark a later mention; never write a term's
+  definition by hand. `terms.test.ts` fails if a term is used in any
+  text (lesson, maths or captions) before its chapter, or in its chapter
+  before its definition: a new term goes in `terms.ts` first, and new
+  copy keeps to the order.
   `index.ts` lists them (`CHAPTERS`, `neighbours`); `route.ts` reads and
   writes the hash (`soundParams`, and `soundFromParams`, which checks and
   clamps every value a link carries). A new chapter is a file here and an entry in `CHAPTERS`. Lesson
@@ -209,6 +220,9 @@ figures subscribe to it. Nothing else passes values around.
   `transport.ts` is the main button (Play / Stop, or Play note in
   `noteMode`, Play on the landing view), the space bar that does the
   same, and the two checkboxes;
+  `terms.ts` gives the marked terms their tip (on hover, focus or a first
+  tap; a second tap, a click or Enter follows the link to the glossary)
+  and their screen-reader description;
   `themeSwitch.ts`; and `figures.ts` redraws a canvas on patch, size,
   theme and font changes, keeps its `aria-label` describing what it shows,
   and runs the waveform's animation loop while it should move

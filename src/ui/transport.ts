@@ -1,3 +1,4 @@
+import { GLOSSARY } from '../chapters/glossary';
 import { LANDING } from '../chapters/landing';
 import { type LabState, type LabStore, noteSounding } from '../model/lab';
 
@@ -54,6 +55,8 @@ export function mountPlayButton(button: HTMLButtonElement, store: LabStore): voi
   document.addEventListener('keydown', event => {
     if (event.key !== ' ' || event.repeat) return;
     if (!(event.target instanceof Element) || !spaceIsFree(event.target)) return;
+    // The glossary has no lab: nothing to play.
+    if (store.get().chapter === GLOSSARY) return;
     // Or the page would scroll down a screen as well.
     event.preventDefault();
     press();

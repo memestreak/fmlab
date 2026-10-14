@@ -1,4 +1,5 @@
 import { BASE_PATCH } from './basePatch';
+import { define, formula } from './terms';
 import type { Chapter } from './types';
 
 export const bessel: Chapter = {
@@ -14,10 +15,9 @@ export const bessel: Chapter = {
      carrier is up at 880 Hz and the modulator down at 55 Hz, so the
      sidebands stand 55 Hz apart on both sides of the carrier with plenty
      of room, and none of them bounces off zero.`,
-    `Fig. 2 is the map. Each curve belongs to one pair of sidebands and
-     shows that pair's height at every index. J<sub>0</sub> is the carrier
-     itself; J<sub>1</sub> is the first sideband each side of it;
-     J<sub>2</sub> the second; and so on. The upright line is the index
+    `Fig. 2 is the map. ${define('bessel')} Each curve is one of them:
+     J<sub>1</sub> is the first sideband each side of the carrier,
+     J<sub>2</sub> the second, and so on. The upright line is the index
      you are hearing. Where it crosses a curve is that sideband's height
      in Fig. 1, and the dots mark the crossings. Drag the line, or click
      Fig. 2 and use the arrow keys.`,
@@ -41,7 +41,7 @@ export const bessel: Chapter = {
       body: [
         `The phase-modulated signal can be written out exactly as a sum of
          plain sine waves, one for each whole number <var>n</var>:`,
-        `<p class="formula">sin(2π <var>f</var><sub>c</sub> <var>t</var> + <var>I</var> sin 2π <var>f</var><sub>m</sub> <var>t</var>) = Σ <var>J</var><sub><var>n</var></sub>(<var>I</var>) sin 2π (<var>f</var><sub>c</sub> + <var>n</var> <var>f</var><sub>m</sub>) <var>t</var></p>`,
+        formula('bessel'),
         `The sum runs over every <var>n</var>, negative ones too.
          <var>J</var><sub><var>n</var></sub> is the Bessel function of the
          first kind of order <var>n</var>: the curves in Fig. 2. Sideband

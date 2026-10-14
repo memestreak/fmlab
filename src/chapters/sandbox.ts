@@ -1,4 +1,5 @@
 import { BASE_PATCH } from './basePatch';
+import { use } from './terms';
 import type { Chapter } from './types';
 
 export const sandbox: Chapter = {
@@ -7,12 +8,14 @@ export const sandbox: Chapter = {
   navLabel: 'Sandbox',
   body: [
     `Every control for two sine waves, with no lesson attached. The
-     modulator bends the carrier's phase; what you hear is what the two
-     figures draw.`,
-    `<strong>Ratio</strong> is the modulator's frequency as a multiple of
-     the carrier's. Whole numbers give harmonic, pitched sounds; anything
-     between gives clangs and bells. <strong>Index</strong> is how hard
-     the modulator pushes: more index, more sidebands, a brighter sound.`,
+     modulator bends the carrier's ${use('phase')}; what you hear is what
+     the two figures draw.`,
+    `Ratio sets the ${use('ratio')}, the modulator's frequency as a
+     multiple of the carrier's. Whole numbers give
+     ${use('harmonic', 'harmonic')}, pitched sounds; anything between
+     gives ${use('inharmonic')} clangs and bells. Index sets the
+     ${use('index')}, how hard the modulator pushes: more index, more
+     ${use('sideband', 'sidebands')}, a brighter sound.`,
     `Play it from the keyboard under the sliders, or from your
      computer's: the row from A to K is the white notes from C, the row
      above it the black notes, and Z and X move down and up an octave.
@@ -33,7 +36,7 @@ export const sandbox: Chapter = {
          Sideband <var>n</var> stands at
          <var>f</var><sub>c</sub> + <var>n</var> <var>f</var><sub>m</sub>
          with amplitude <var>J</var><sub><var>n</var></sub>(<var>I</var>),
-         a Bessel function. One that falls below zero folds back to the
+         a ${use('bessel')}. One that falls below zero folds back to the
          positive frequency upside down, which Fig. 2 draws below the
          axis.`,
       ],
