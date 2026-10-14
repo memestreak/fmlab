@@ -20,7 +20,7 @@ import { nextTheme, parseTheme } from '../../model/theme';
 
 describe('the lab store', () => {
   it('starts on the default patch, silent', () => {
-    expect(createLabStore().get()).toEqual({
+    expect(createLabStore().get()).toMatchObject({
       chapter: 1,
       mode: 'pm',
       carrierHz: 220,
@@ -28,15 +28,24 @@ describe('the lab store', () => {
       index: 2,
       modHz: 5,
       deviationHz: 20,
+      volume: 0.2,
+      playing: false,
+      noteMode: false,
+      notes: 0,
+      noteStartedAt: null,
+      theme: 'auto',
+    });
+  });
+
+  it('starts with nothing extra drawn and nothing picked out', () => {
+    expect(createLabStore().get()).toMatchObject({
       showModulator: true,
       showBandwidth: false,
+      showHarmonics: false,
       realUnits: false,
       hover: null,
       pinned: null,
       motion: false,
-      volume: 0.2,
-      playing: false,
-      theme: 'auto',
     });
   });
 

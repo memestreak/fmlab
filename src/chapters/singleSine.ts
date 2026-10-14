@@ -1,3 +1,4 @@
+import { BASE_PATCH } from './basePatch';
 import type { Chapter } from './types';
 
 export const singleSine: Chapter = {
@@ -44,16 +45,14 @@ export const singleSine: Chapter = {
     },
   ],
   controls: ['volume', 'carrier'],
+  presets: [],
   hasMotion: false,
   patch: {
-    mode: 'pm',
-    carrierHz: 220,
-    ratio: 1,
+    ...BASE_PATCH,
+    // No modulator: one sine wave, on axes in real units.
     index: 0,
-    modHz: 5,
     deviationHz: 0,
     showModulator: false,
-    showBandwidth: false,
     realUnits: true,
   },
   figures: {

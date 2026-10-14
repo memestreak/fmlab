@@ -10,12 +10,12 @@ ESLint. Sound comes from one AudioWorklet phase-modulation engine. Deploys
 as static files to Cloudflare Pages (`DEPLOYMENT.md`).
 
 The page is a chapter at a time: its text in a narrative pane, and the lab
-(Play / Stop, sliders, the waveform and spectrum figures) beside it, or
-under it on a narrow screen. The chapter is in the URL's hash (`#2`).
-Written so far: 1 "A single sine", 2 "Vibrato becomes timbre",
-3 "Modulation index", 4 "Sidebands and Bessel functions" and 7, the
-Sandbox; numbers are the spec's, and previous / next step over the gaps.
-One carrier and one modulator throughout.
+(Play / Stop, sliders and two figures) beside it, or under it on a narrow
+screen. The chapter is in the URL's hash (`#2`). Version 1's seven
+chapters are all written: 1 "A single sine", 2 "Vibrato becomes timbre",
+3 "Modulation index", 4 "Sidebands and Bessel functions", 5 "Carrier to
+modulator ratio", 6 "Time-varying index" and 7, the Sandbox; numbers are
+the spec's. One carrier and one modulator throughout.
 
 ## Commands
 
@@ -61,12 +61,19 @@ figures subscribe to it. Nothing else passes values around.
   `patchOf(state)` gives a ratio and an index for either, which is what the
   figures and spectrum maths take; never read `state.ratio` or
   `state.index` directly outside `pm`-only code.
+  There are two ways of playing. Most chapters hold a steady sound while
+  `playing` is true. A chapter with `noteMode` (chapter 6) plays one note
+  each time `notes` goes up, shaped by the envelope (`attack`, `decay`,
+  `sustain`, `release`, `hold`; `envelopeOf(state)`), and
+  `indexAtTime(state, t)` is the index at a moment of it.
 - `src/chapters/` — a chapter is data (`types.ts`): number, title, lesson
   text and "The maths" panels (HTML strings, trusted because they are
   written here), the sliders it shows, the patch it starts from (all of
   it, so a chapter always opens the same way) and the figures it shows,
   each with its caption (they are numbered from 1 in the order shown, so
-  text that says "Fig. 2" must match the chapter's own list).
+  text that says "Fig. 2" must match the chapter's own list). A chapter
+  may have presets, buttons that set several fields at once. Its patch is
+  written as `BASE_PATCH` (`basePatch.ts`) with its own differences.
   `index.ts` lists them (`CHAPTERS`, `neighbours`); `route.ts` reads the
   hash. A new chapter is a file here and an entry in `CHAPTERS`. Lesson
   text is plain language for musicians; formulas go in the panels, as
@@ -86,16 +93,24 @@ figures subscribe to it. Nothing else passes values around.
   ratio moves, so the sound stays the signal the figures draw.
   `fmKernel.ts` (`FmKernel`) is true FM for chapter 2 only, with no lock.
   Tests hold kernels, samples and spectra to each other.
+- `src/dsp/envelope.ts` is the envelope as a pure function,
+  `envelopeAt(envelope, t)`: a straight attack, then exponential decay and
+  release timed to four time constants. The engine schedules exactly that
+  curve (a linear ramp, then `setTargetAtTime`), so the figures and the
+  sound agree; change one and change the other.
 - `src/audio/` — everything Web Audio. `synthProcessor.ts` is the
   AudioWorklet: it runs the kernels and has a-rate AudioParams `frequency`,
   `ratio`, `index`, and for true FM `modFrequency`, `deviation` and `mode`
   (1 is true FM). It is bundled on its own through the `?worker&url`
   import in `engine.ts`, and may import from `src/dsp` only. `engine.ts`
-  (`AudioEngine`) follows the store: worklet, master gain, limiter (a
-  `DynamicsCompressorNode`), speakers. It creates the context on the first
-  Play, inside the gesture, glides params (30 ms linear ramps), fades the
-  master gain in and out, suspends the context after Stop, and on a change
-  of chapter fades out, jumps to the new patch and fades back in.
+  (`AudioEngine`) follows the store: worklet, note gain, master gain,
+  limiter (a `DynamicsCompressorNode`), speakers. It creates the context
+  on the first Play, inside the gesture, glides params (30 ms linear
+  ramps), fades the master gain in and out, suspends the context after
+  Stop, and on a change of chapter fades out, jumps to the new patch and
+  fades back in. For a note it schedules the envelope on the note gain
+  and, if `indexFollows`, on the `index` param, 20 ms ahead so the last
+  note can be brought down first.
   `iosUnlock.ts` keeps iOS's ringer switch from muting it;
   `worklet-globals.d.ts` types the worklet's globals.
 - `src/viz/` — Canvas 2D drawing. A renderer is a function of
@@ -112,7 +127,13 @@ figures subscribe to it. Nothing else passes values around.
   `realUnits` (chapter 1) both figures are on fixed axes in real units
   instead, 20 ms and 0 to 1000 Hz, so that moving the carrier moves what
   is drawn: more waves, and a stem further along. The spectrum
-  can bracket Carson's band (`showBandwidth`). `besselPlot.ts` draws J_0
+  can bracket Carson's band (`showBandwidth`) and rule a line at each of
+  the carrier's harmonics (`showHarmonics`). `envelopePlot.ts` draws a
+  note's envelope with three draggable dots, and `spectrogramPlot.ts` the
+  same note as a spectrogram worked out from the patch (`sliceAt`), both
+  on one time axis (`envelopeSpan`) and both with a playhead while the
+  note sounds. `plot.ts`'s `drawFrame` takes the horizontal rows a plot
+  wants; amplitude from -1 to 1 is only the default. `besselPlot.ts` draws J_0
   to J_8 against the index, with an ink line at the patch's index and a
   dot where it crosses each curve. The spectrum and the Bessel plot are
   linked: `highlightOf(state)` is a sideband order to pick out, and both
@@ -128,12 +149,14 @@ figures subscribe to it. Nothing else passes values around.
   which slider rows (`data-control`) and figures (`data-figure`) show, the
   figures' numbers and their captions. `sliders.ts`
   is a table of every slider (range, step, scale, readout);
+  `envelopeControls.ts` drags the envelope's dots;
   `besselControls.ts` makes the Bessel plot a control: the canvas is a
   `role="slider"` for the index (drag, or arrows, Page Up / Down, Home,
   End), pointing at a curve, a spectrum stem or a J button sets `hover`,
   pressing a J button sets `pinned`, and one button sets the index where
   the carrier vanishes;
-  `transport.ts` is Play / Stop and the "Show motion" checkbox;
+  `transport.ts` is the main button (Play / Stop, or Play note in
+  `noteMode`), the space bar that does the same, and the two checkboxes;
   `themeSwitch.ts`; and `figures.ts` redraws a canvas on patch, size,
   theme and font changes, keeps its `aria-label` describing what it shows,
   and runs the waveform's animation loop while it should move
@@ -195,7 +218,9 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
 - The theme switch cycles Auto, Light, Dark and saves the bare word under
   `localStorage["fmlab.theme"]`. The boot script in `index.html` reads the
   same key; keep it in step with `src/model/theme.ts`.
-- Motion: the one thing that animates is chapter 2's waveform, while sound
+- Motion: chapter 6's two figures show a playhead while a note sounds;
+  under `prefers-reduced-motion` they simply stay as they are. The other
+  thing that animates is chapter 2's waveform, while sound
   plays or "Show motion" is ticked. Under `prefers-reduced-motion` it
   stays still, the checkbox is hidden and the caption says why. Anything
   else that moves must do the same.

@@ -1,6 +1,8 @@
 import type { ControlId } from '../chapters';
 import {
+  ATTACK,
   CARRIER_SEMITONES,
+  DECAY,
   DEVIATION_HZ,
   hzToSemitones,
   INDEX,
@@ -11,7 +13,9 @@ import {
   modulatorHz,
   octavesToModHz,
   RATIO,
+  RELEASE,
   semitonesToHz,
+  SUSTAIN,
   VOLUME,
 } from '../model/lab';
 
@@ -33,6 +37,11 @@ export function formatRate(hz: number): string {
   if (hz < 9.995) return `${hz.toFixed(2)} Hz`;
   if (hz < 99.95) return `${hz.toFixed(1)} Hz`;
   return `${hz.toFixed(0)} Hz`;
+}
+
+/** A short time needs its thousandths; a long one does not: 0.005 s, 0.60 s. */
+export function formatSeconds(seconds: number): string {
+  return `${seconds < 0.0995 ? seconds.toFixed(3) : seconds.toFixed(2)} s`;
 }
 
 const SLIDERS: SliderSpec[] = [
@@ -96,6 +105,43 @@ const SLIDERS: SliderSpec[] = [
     read: state => state.deviationHz,
     write: position => ({ deviationHz: position }),
     format: state => `${state.deviationHz.toFixed(0)} Hz`,
+  },
+  // The envelope. The figure's dots set the same four numbers.
+  {
+    id: 'attack',
+    min: ATTACK.min,
+    max: ATTACK.max,
+    step: 0.005,
+    read: state => state.attack,
+    write: position => ({ attack: position }),
+    format: state => formatSeconds(state.attack),
+  },
+  {
+    id: 'decay',
+    min: DECAY.min,
+    max: DECAY.max,
+    step: 0.01,
+    read: state => state.decay,
+    write: position => ({ decay: position }),
+    format: state => formatSeconds(state.decay),
+  },
+  {
+    id: 'sustain',
+    min: SUSTAIN.min,
+    max: SUSTAIN.max,
+    step: 0.01,
+    read: state => state.sustain,
+    write: position => ({ sustain: position }),
+    format: state => `${Math.round(state.sustain * 100)}%`,
+  },
+  {
+    id: 'release',
+    min: RELEASE.min,
+    max: RELEASE.max,
+    step: 0.01,
+    read: state => state.release,
+    write: position => ({ release: position }),
+    format: state => formatSeconds(state.release),
   },
 ];
 

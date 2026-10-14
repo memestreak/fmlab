@@ -1,3 +1,4 @@
+import { BASE_PATCH } from './basePatch';
 import type { Chapter } from './types';
 
 export const bessel: Chapter = {
@@ -69,18 +70,14 @@ export const bessel: Chapter = {
     },
   ],
   controls: ['volume'],
+  presets: [],
   hasMotion: false,
   patch: {
-    mode: 'pm',
+    ...BASE_PATCH,
     // Far enough apart that no sideband worth drawing reaches zero.
     carrierHz: 880,
     ratio: 1 / 16,
     index: 1,
-    modHz: 5,
-    deviationHz: 20,
-    showModulator: true,
-    showBandwidth: false,
-    realUnits: false,
   },
   figures: {
     spectrum:

@@ -1,3 +1,4 @@
+import { BASE_PATCH } from './basePatch';
 import type { Chapter } from './types';
 
 export const vibrato: Chapter = {
@@ -74,17 +75,13 @@ export const vibrato: Chapter = {
     },
   ],
   controls: ['volume', 'modHz', 'deviation'],
+  presets: [],
   hasMotion: true,
   patch: {
+    ...BASE_PATCH,
     mode: 'fm',
-    carrierHz: 220,
-    ratio: 1,
-    index: 0,
     modHz: 5,
     deviationHz: 20,
-    showModulator: true,
-    showBandwidth: false,
-    realUnits: false,
   },
   figures: {
     waveform:

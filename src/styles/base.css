@@ -222,6 +222,31 @@ a {
   min-height: 13rem;
 }
 
+/* A plot with less to show up and down: the envelope. */
+.plot-short {
+  aspect-ratio: 5 / 2;
+  min-height: 11rem;
+}
+
+/* A plot whose dots are dragged in any direction: the envelope. A finger
+   on it moves a dot and does not scroll the page; scroll from beside or
+   below it. */
+.plot-drag {
+  touch-action: none;
+}
+
+/* A chapter's presets: a row of buttons above its sliders. */
+.presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.presets[hidden] {
+  display: none;
+}
+
 /* A plot that is also a control: the Bessel plot, whose upright line is
    dragged. A finger moving sideways moves the line; moving up or down
    still scrolls the page. */
@@ -282,6 +307,8 @@ a {
   color: var(--ink);
   font: inherit;
   font-weight: 600;
+  /* "Play note" stays on one line; what is beside it wraps instead. */
+  white-space: nowrap;
   cursor: pointer;
 }
 
@@ -323,8 +350,9 @@ a {
 
 .transport {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 1.25rem;
+  gap: 0.25rem 1.25rem;
   margin-bottom: 0.75rem;
 }
 

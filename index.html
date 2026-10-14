@@ -47,7 +47,22 @@
                 <input id="motion" type="checkbox" />
                 Show motion
               </label>
+              <!-- Shown by a chapter that plays notes through an envelope. -->
+              <label id="index-follows-toggle" class="check" hidden>
+                <input id="index-follows" type="checkbox" />
+                Index follows the envelope
+              </label>
             </div>
+
+            <!-- A chapter's presets, as buttons; filled in by script and
+                 hidden when it has none. -->
+            <div
+              id="presets"
+              class="presets"
+              role="group"
+              aria-label="Presets"
+              hidden
+            ></div>
 
             <!-- Every slider there is. A chapter shows the ones it names
                  in `controls`, matched on data-control. -->
@@ -81,6 +96,26 @@
               <output id="deviation-out" for="deviation" class="num"></output>
               <input id="deviation" type="range" class="slider" />
             </div>
+            <div class="slider-row" data-control="attack">
+              <label for="attack">Attack</label>
+              <output id="attack-out" for="attack" class="num"></output>
+              <input id="attack" type="range" class="slider" />
+            </div>
+            <div class="slider-row" data-control="decay">
+              <label for="decay">Decay</label>
+              <output id="decay-out" for="decay" class="num"></output>
+              <input id="decay" type="range" class="slider" />
+            </div>
+            <div class="slider-row" data-control="sustain">
+              <label for="sustain">Sustain</label>
+              <output id="sustain-out" for="sustain" class="num"></output>
+              <input id="sustain" type="range" class="slider" />
+            </div>
+            <div class="slider-row" data-control="release">
+              <label for="release">Release</label>
+              <output id="release-out" for="release" class="num"></output>
+              <input id="release" type="range" class="slider" />
+            </div>
           </div>
 
           <!-- Every figure there is. A chapter shows the ones it names in
@@ -97,11 +132,31 @@
             </figcaption>
           </figure>
 
+          <figure class="figure" data-figure="envelope">
+            <!-- Its dots are dragged; the Attack, Decay, Sustain and
+                 Release sliders do the same from the keyboard. -->
+            <canvas id="envelope" class="plot plot-short plot-drag" role="img"></canvas>
+            <figcaption>
+              Fig. <span class="figure-number"></span>&emsp;<span
+                id="envelope-caption"
+              ></span>
+            </figcaption>
+          </figure>
+
           <figure class="figure" data-figure="spectrum">
             <canvas id="spectrum" class="plot" role="img"></canvas>
             <figcaption>
               Fig. <span class="figure-number"></span>&emsp;<span
                 id="spectrum-caption"
+              ></span>
+            </figcaption>
+          </figure>
+
+          <figure class="figure" data-figure="spectrogram">
+            <canvas id="spectrogram" class="plot" role="img"></canvas>
+            <figcaption>
+              Fig. <span class="figure-number"></span>&emsp;<span
+                id="spectrogram-caption"
               ></span>
             </figcaption>
           </figure>

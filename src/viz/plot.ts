@@ -78,10 +78,40 @@ export function ampToY({ top, bottom }: Area, amp: number): number {
   return (top + bottom) / 2 - (amp * (bottom - top)) / 2;
 }
 
+/** The y pixel for a share of the plot's height, 0 at the bottom, 1 at the top. */
+export function shareToY({ top, bottom }: Area, share: number): number {
+  return bottom - share * (bottom - top);
+}
+
+/** A horizontal line of the frame, with or without a number beside it. */
+export interface Row {
+  /** How far up the plot area, 0 at the bottom to 1 at the top. */
+  share: number;
+  /** The number at its left-hand end, if it has one. */
+  label?: string;
+  /** The axis itself, drawn in --rule where the rest are --grid. */
+  axis?: boolean;
+}
+
+/** Amplitude from -1 to 1 about a zero axis: the waveform and the spectra. */
+const AMPLITUDE_ROWS: Row[] = [
+  { share: 0, label: '−1' },
+  { share: 0.25 },
+  { share: 0.5, label: '0', axis: true },
+  { share: 0.75 },
+  { share: 1, label: '1' },
+];
+
+/** A level from 0 to 1 standing on its axis: an envelope. */
+export const LEVEL_ROWS: Row[] = [
+  { share: 0, label: '0', axis: true },
+  { share: 0.5 },
+  { share: 1, label: '1' },
+];
+
 /**
- * The frame both plots stand in: amplitude from -1 to 1 with gridlines at
- * the halves, a zero axis, mono numbers on both axes and a title under the
- * x axis.
+ * The frame every plot stands in: horizontal gridlines and an axis, mono
+ * numbers on both axes and a title under the x axis.
  *
  * The x axis has two rows of numbers: each tick's label in carrier units,
  * and under it the same place in Hz or ms. The second row's labels are
@@ -89,36 +119,36 @@ export function ampToY({ top, bottom }: Area, amp: number): number {
  *
  * @param ticks the x axis's ticks, evenly spaced
  * @param x the x pixel for a tick's position
+ * @param rows the horizontal lines; amplitude from -1 to 1 unless given
  */
 export function drawFrame(
   plot: Plot,
   ticks: Tick[],
   x: (at: number) => number,
   xTitle: string,
+  rows: Row[] = AMPLITUDE_ROWS,
 ): void {
   const { ctx, token, left, right, bottom } = plot;
 
-  const hLine = (amp: number, colour: string) => {
-    const y = crisp(ampToY(plot, amp));
-    ctx.strokeStyle = colour;
+  ctx.lineWidth = 1;
+  // The axis last, so it lies over a gridline that shares its place.
+  const order = (row: Row) => (row.axis ? 1 : 0);
+  for (const row of [...rows].sort((a, b) => order(a) - order(b))) {
+    const y = crisp(shareToY(plot, row.share));
+    ctx.strokeStyle = token(row.axis ? '--rule' : '--grid');
     ctx.beginPath();
     ctx.moveTo(left, y);
     ctx.lineTo(right, y);
     ctx.stroke();
-  };
-  ctx.lineWidth = 1;
-  for (const amp of [-1, -0.5, 0.5, 1]) hLine(amp, token('--grid'));
-  hLine(0, token('--rule'));
+  }
 
   // All ink: numbers in mono, the title in sans.
   ctx.fillStyle = token('--ink');
   ctx.font = `${LABEL_SIZE}px ${token('--font-mono')}`;
   ctx.textBaseline = 'middle';
   ctx.textAlign = 'right';
-  for (const amp of [-1, 0, 1]) {
-    // A real minus sign, as wide as the digits.
-    const label = String(amp).replace('-', '−');
-    ctx.fillText(label, left - 8, ampToY(plot, amp));
+  for (const row of rows) {
+    if (row.label) ctx.fillText(row.label, left - 8, shareToY(plot, row.share));
   }
   ctx.textBaseline = 'top';
   ctx.textAlign = 'center';
