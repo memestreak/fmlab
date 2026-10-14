@@ -158,7 +158,11 @@ figures subscribe to it. Nothing else passes values around.
   which slider rows (`data-control`) and figures (`data-figure`) show, the
   figures' numbers and their captions. `sliders.ts`
   is a table of every slider (range, step, scale, readout);
-  `envelopeControls.ts` drags the envelope's dots;
+  `envelopeControls.ts` drags the envelope's dots; `piano.ts` is the
+  sandbox's one-voice keyboard, on screen and on the computer's keys
+  (by `KeyboardEvent.code`: A to K the white notes, W E T Y U O P the
+  black, Z and X an octave down and up), holding the steady sound at a
+  key's pitch through `carrierHz` and `playing`;
   `besselControls.ts` makes the Bessel plot a control: the canvas is a
   `role="slider"` for the index (drag, or arrows, Page Up / Down, Home,
   End), pointing at a curve, a spectrum stem or a J button sets `hover`,
@@ -188,8 +192,8 @@ The lab stays in view while the text scrolls (Jeremy asked for this on
 window's height: the masthead, then the text column scrolling on its own
 (`#narrative` is a tab stop for that), and beside it the lab, whose
 figures share out the height the controls leave (`.plot-frame` holds each
-canvas so it can fill it). A chapter with more than four sliders sets
-them in two columns there. Below 62rem the lab moves above the text and
+canvas so it can fill it). A chapter with more than four sliders, or with
+the piano, sets them in two columns there. Below 62rem the lab moves above the text and
 sticks to the top of the window, compact: figures a fifth of the window
 high, captions for screen readers only, sliders and presets folded behind
 a Sliders button. The text keeps at least two fifths of a phone's height.

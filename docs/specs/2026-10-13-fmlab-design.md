@@ -257,3 +257,24 @@ while the text scrolls, and for the space bar to start and stop the sound.
   it plays one, and stops it if pressed again while it sounds; the button
   says Stop meanwhile. Space is left to buttons, links, checkboxes and
   maths panels, where it has a meaning of its own.
+
+## The sandbox's keyboard (PR #10)
+
+- **One voice, held:** pressing a key plays the sandbox's patch with the
+  carrier at that key's pitch, for as long as it is held; pressing a
+  second key moves to it, and letting go falls back to the one still
+  held. No envelope: the sandbox's sound is steady, and the spec leaves
+  polyphony out.
+- **Two octaves on screen**, C3 to B4 to start, moved by the − and +
+  buttons (or Z and X) between C2 and C4. Keys outside the Carrier
+  slider's range, A1 to A5, are drawn but cannot be played.
+- **The computer's keys** are taken by position, not by letter, so they
+  sit the same on any keyboard layout: the home row from A is the white
+  notes from C, the row above the black ones. They work only in the
+  sandbox, and not with Ctrl, Alt or Cmd held.
+- **If the sound was started with Play**, letting go of a key leaves it
+  playing at that pitch; if a key started it, letting go stops it.
+- **Six presets**, each a ratio and an index: Flute (1, 0.8), Brass (1, 4),
+  Clarinet (2, 2.5), Bell (1.41, 5), Gong (1.73, 9) and Bass (0.5, 2).
+- **On a phone the keyboard folds away with the sliders**, behind the
+  Sliders button.

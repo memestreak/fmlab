@@ -13,8 +13,13 @@ export const sandbox: Chapter = {
      the carrier's. Whole numbers give harmonic, pitched sounds; anything
      between gives clangs and bells. <strong>Index</strong> is how hard
      the modulator pushes: more index, more sidebands, a brighter sound.`,
-    `Try the ratios of chapter 5 at other indexes, look for the index
-     where a partial vanishes, or go hunting for a sound of your own.`,
+    `Play it from the keyboard under the sliders, or from your
+     computer's: the row from A to K is the white notes from C, the row
+     above it the black notes, and Z and X move down and up an octave.
+     Hold a key and the sound plays at that pitch; let go and it stops.`,
+    `The buttons are places to start: a flute, brass, a clarinet, a bell,
+     a gong and a bass, each a single ratio and index. Change them and
+     listen to what each slider does.`,
   ],
   maths: [
     {
@@ -33,8 +38,16 @@ export const sandbox: Chapter = {
     },
   ],
   controls: ['volume', 'carrier', 'ratio', 'index'],
-  presets: [],
+  presets: [
+    { label: 'Flute', hint: 'ratio 1, index 0.8', patch: { ratio: 1, index: 0.8 } },
+    { label: 'Brass', hint: 'ratio 1, index 4', patch: { ratio: 1, index: 4 } },
+    { label: 'Clarinet', hint: 'ratio 2, index 2.5', patch: { ratio: 2, index: 2.5 } },
+    { label: 'Bell', hint: 'ratio 1.41, index 5', patch: { ratio: 1.414, index: 5 } },
+    { label: 'Gong', hint: 'ratio 1.73, index 9', patch: { ratio: 1.732, index: 9 } },
+    { label: 'Bass', hint: 'ratio 0.5, index 2', patch: { ratio: 0.5, index: 2 } },
+  ],
   hasMotion: false,
+  hasPiano: true,
   patch: {
     ...BASE_PATCH,
     index: 2,
