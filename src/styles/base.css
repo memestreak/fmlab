@@ -20,6 +20,51 @@ body {
   margin: 0;
 }
 
+/* Scroll bars: narrow and faint, a line paler than --rule with no track
+   or buttons, coming up to --rule under the pointer (the thumb itself in
+   Chrome and Safari; the whole area in Firefox). Everywhere at once: the page, the text pane, the lab, the
+   contents panel. Chrome, Edge and Safari draw the 6 px -webkit- bar;
+   Chrome would ignore it if the standard properties were set, so those go
+   only to browsers without it (Firefox), which draw their thin bar. */
+:root {
+  --scrollbar: color-mix(in srgb, var(--rule) 50%, var(--paper));
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-color: var(--scrollbar) transparent;
+    scrollbar-width: thin;
+  }
+
+  *:hover {
+    scrollbar-color: var(--rule) transparent;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+::-webkit-scrollbar-button {
+  display: none;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 3px;
+  background: var(--scrollbar);
+}
+
+::-webkit-scrollbar-thumb:hover,
+::-webkit-scrollbar-thumb:active {
+  background: var(--rule);
+}
+
 /* Wide enough for the two panes side by side. */
 .page {
   max-width: 74rem;
