@@ -421,3 +421,32 @@ while the text scrolls, and for the space bar to start and stop the sound.
   reader hears the definition as the link's description. Defining
   instances are marked, and some later mentions (the sandbox's,
   chapter 9's); not every mention, which would underline half the text.
+
+## The six-operator sandbox (PR #17)
+
+- **A switch, Two | Six,** beside Play in the sandbox (screen readers hear
+  "Two operators", "Six operators"). Two operators is the sandbox as it
+  was, links and all. Six operators is chapter 8's lab: the 32 algorithms
+  grouped by carriers, the diagram with lit boxes, the operator table,
+  Feedback, the predicted spectrum and Live, and chapter 8's five
+  presets; with the sandbox's keyboard, Volume and Copy link. The two keep
+  their own settings, so switching back finds the other as it was;
+  switching stops any sound. The chapter's text is the same in both.
+- **Six operators play notes,** as in chapter 8: a key strikes a note at
+  its pitch that dies away by itself; letting go does nothing, and
+  pressing another key strikes again. There is no Carrier slider there:
+  the keyboard sets the pitch. It opens on chapter 8's Stacks.
+- **The link:** `#7?m=6&c=220&a=5&f=0.7&o=1_90_2.5-1_35_1.2-…`, the
+  operators as ratio_level_decay with the level in whole percent, six
+  joined by "-": characters a URL keeps as they are. Every value is held
+  inside its range; the algorithm is rounded to 1 to 32; operators that
+  are not exactly six of three numbers are ignored, leaving the starting
+  ones. Without `m=6` a link is read exactly as before.
+- **Room:** to fit at 1024×768 the sandbox drops the space-bar hint (the
+  keyboard's letters stand in for it), the switch reads Two | Six, and the
+  pinned lab's presets and keyboard sit a little closer. At 1024×768 in
+  six operators the figures are at their smallest, 102 px, as at chapter
+  8's last step.
+- **No new terms:** chapter 7's text mentions the switch without chapter
+  8's words (operator, algorithm), which the glossary rule keeps for
+  chapter 8; chapter 8's last step points back to the sandbox.

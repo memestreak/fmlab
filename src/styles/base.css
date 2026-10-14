@@ -763,6 +763,10 @@ dfn {
   font-size: 0.85rem;
 }
 
+.hint[hidden] {
+  display: none;
+}
+
 @media (hover: none) {
   .hint {
     display: none;
@@ -855,6 +859,13 @@ dfn {
 
   [data-view='chapter'] .lab[data-many-sliders='true'] .presets {
     grid-column: 1 / -1;
+    margin-bottom: 0.3rem;
+  }
+
+  /* The sandbox's six operators show the table and the keyboard at once:
+     closer together there, so the figures keep their room at 1024 px. */
+  [data-view='chapter'] .lab[data-many-sliders='true'] .operators:not([hidden]) ~ .piano {
+    margin-top: 0.35rem;
   }
 
   /* Presets as small as the step buttons: a mouse needs less than a

@@ -142,9 +142,17 @@ export function mountPiano(
     }
   };
 
-  const play = () => {
+  /** @param struck whether a key was just pressed, not let go of */
+  const play = (struck: boolean) => {
     const note = sounding(held);
-    if (note === null) {
+    if (store.get().noteMode) {
+      // Six operators play notes: a key strikes one at its pitch, which
+      // dies away by itself as chapter 8's do. Letting go strikes nothing.
+      if (struck && note !== null) {
+        const { notes } = store.get();
+        store.set({ carrierHz: midiToHz(note), notes: notes + 1 });
+      }
+    } else if (note === null) {
       if (ownsSound) store.set({ playing: false });
       ownsSound = false;
     } else {
@@ -157,17 +165,17 @@ export function mountPiano(
   const press = (midi: number) => {
     if (!playable(midi) || held.includes(midi)) return;
     held.push(midi);
-    play();
+    play(true);
   };
   const release = (midi: number) => {
     const at = held.indexOf(midi);
     if (at === -1) return;
     held.splice(at, 1);
-    play();
+    play(false);
   };
   const releaseAll = () => {
     held.length = 0;
-    play();
+    play(false);
   };
 
   const draw = () => {

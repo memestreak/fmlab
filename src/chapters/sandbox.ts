@@ -1,8 +1,9 @@
 import { BASE_PATCH } from './basePatch';
 import { use } from './terms';
+import { DX7_PRESETS, STACKS } from './dx7Presets';
 import type { Chapter } from './types';
 
-export const sandbox: Chapter = {
+const twoOperators: Chapter = {
   number: 7,
   title: 'Sandbox',
   navLabel: 'Sandbox',
@@ -25,6 +26,9 @@ export const sandbox: Chapter = {
      listen to what each slider does.`,
     `The page's address keeps the sound as you change it. Copy link, or
      the address itself, and whoever opens it hears the same sound.`,
+    `Once you have read chapter 8, the switch beside Play turns this lab
+     into that chapter's, with the keyboard and the link kept. Each key
+     then strikes a note that dies away by itself.`,
   ],
   maths: [
     {
@@ -58,6 +62,8 @@ export const sandbox: Chapter = {
   patch: {
     ...BASE_PATCH,
     index: 2,
+    // What Six operators starts from: chapter 8's Stacks.
+    ...STACKS,
   },
   figures: {
     waveform:
@@ -66,3 +72,22 @@ export const sandbox: Chapter = {
       'Spectrum. A stem below the axis, with a hollow marker, is upside down.',
   },
 };
+
+/**
+ * The sandbox with six operators: chapter 8's lab (the algorithm list,
+ * the operator table, feedback and its presets), with the sandbox's
+ * keyboard, and its sound in the link. It plays notes, as chapter 8 does.
+ */
+const sixOperators: Chapter = {
+  ...twoOperators,
+  // No Carrier slider: the keyboard sets the pitch of every note.
+  controls: ['volume', 'feedback'],
+  presets: DX7_PRESETS,
+  patch: { ...twoOperators.patch, mode: 'ops', noteMode: true },
+  figures: {
+    algorithm: 'The algorithm: carriers along the bottom, heard; modulators above.',
+    spectrum: 'Spectrum, worked out numerically: heights only.',
+  },
+};
+
+export const sandbox: Chapter = { ...twoOperators, sixOperators };

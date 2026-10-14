@@ -94,6 +94,14 @@ figures subscribe to it. Nothing else passes values around.
   note. `glossary.ts` is the glossary, the same way: `GLOSSARY` (−1), at
   `#glossary` (an entry: `#glossary?t=index`), drawn from the terms, with
   no lab and nothing to play.
+  `sandbox.ts` has a second lab, `sixOperators`: chapter 8's (algorithm
+  list, operator table, feedback, its presets from `dx7Presets.ts`) with
+  the keyboard and Copy link, shown while the sandbox's Two | Six switch
+  has `mode` at `ops`. `labViewOf(chapter, state)` says which lab to
+  show; the text stays the same. Its link is
+  `#7?m=6&c=&a=&f=&o=ratio_level%_decay-…` (six operators joined by
+  "-"), validated and clamped by `soundFromParams`; a link without
+  `m=6` is the two-operator one, unchanged.
   `terms.ts` holds every defined term: its name, a one-sentence plain
   definition, an optional formula, and the chapter that defines it. A
   chapter writes `${define(id)}` where a term is first used (the plain
