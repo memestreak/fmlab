@@ -249,7 +249,12 @@ figures subscribe to it. Nothing else passes values around.
   no `prefers-reduced-motion`).
 - `src/styles/` — `tokens.css` (colours and fonts) and `base.css` (the two
   panes, type, figures and the controls).
-- `public/` — files copied to `dist/` as they are: `favicon.svg` (follows
+- The page is hidden (a style in `index.html`) until `main.ts` has
+  mounted everything and the fonts are in, then shown by setting
+  `data-ready` on `<html>`; a 3 s CSS fallback shows it regardless. This
+  keeps layout shift at 0; anything that draws the page must be mounted
+  before that point.
+- `public/` — files copied to `dist/` as they are (`robots.txt` too): `favicon.svg` (follows
   the system theme), `favicon.ico` and `apple-touch-icon.png` (rendered
   from it; the home-screen icon is light, full-bleed paper). An XML
   comment cannot contain two hyphens in a row, so don't name CSS tokens in
