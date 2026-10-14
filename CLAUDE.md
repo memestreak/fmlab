@@ -56,8 +56,9 @@ figures subscribe to it. Nothing else passes values around.
   (`createStore`: get, set, subscribe; listeners run synchronously inside
   `set` and get the previous state too), `lab.ts` (`LabState`; the ranges
   and defaults; the log scales of the carrier and modulator sliders) and
-  `theme.ts` (the choice, its storage key, `applyTheme`). No URL
-  serialisation yet beyond the chapter.
+  `theme.ts` (the choice, its storage key, `applyTheme`). The URL holds
+  the chapter and, for a chapter with `sharesSound` (the sandbox), its
+  carrier, ratio and index: `#7?c=220&r=1.41&i=5`.
   The patch is held two ways, by `mode`. `pm` (everywhere but chapter 2):
   `ratio` and `index`. `fm` (chapter 2): `modHz` and `deviationHz`.
   `patchOf(state)` gives a ratio and an index for either, which is what the
@@ -83,8 +84,9 @@ figures subscribe to it. Nothing else passes values around.
   `LANDING` (0) so that everything following the store's chapter needs no
   special case. It is not in `CHAPTERS`, has no hash and plays one long
   note.
-  `index.ts` lists them (`CHAPTERS`, `neighbours`); `route.ts` reads the
-  hash. A new chapter is a file here and an entry in `CHAPTERS`. Lesson
+  `index.ts` lists them (`CHAPTERS`, `neighbours`); `route.ts` reads and
+  writes the hash (`soundParams`, and `soundFromParams`, which checks and
+  clamps every value a link carries). A new chapter is a file here and an entry in `CHAPTERS`. Lesson
   text is plain language for musicians; formulas go in the panels, as
   `<p class="formula">` with `<var>` and `<sub>` (no maths library).
 - `src/dsp/` — pure maths, no DOM and no Web Audio. `bessel.ts`: `besselJ`
