@@ -186,7 +186,11 @@ figures subscribe to it. Nothing else passes values around.
   no `prefers-reduced-motion`).
 - `src/styles/` — `tokens.css` (colours and fonts) and `base.css` (the two
   panes, type, figures and the controls).
-- `public/` — files copied to `dist/` as they are (`favicon.svg`).
+- `public/` — files copied to `dist/` as they are: `favicon.svg` (follows
+  the system theme), `favicon.ico` and `apple-touch-icon.png` (rendered
+  from it; the home-screen icon is light, full-bleed paper). An XML
+  comment cannot contain two hyphens in a row, so don't name CSS tokens in
+  one.
 
 Known limits: the synth is not band-limited, so a high carrier with a high
 ratio and index aliases. Chapter 2's moving waveform runs on the page's

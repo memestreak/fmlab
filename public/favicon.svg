@@ -1,7 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <!-- A carrier and its sidebands. The colours are tokens.css's --paper,
-       --ink and --pen-blue, repeated here because a favicon cannot read
-       the page's CSS. -->
+  <!-- A carrier and its sidebands. The colours are the paper, ink and
+       blue pen tokens from tokens.css, repeated here because a favicon
+       cannot read the page's CSS. An XML comment may not contain two
+       hyphens in a row, so the token names are not spelled out here. -->
   <style>
     .paper { fill: #fbfbf7; }
     .ink { stroke: #000000; }
