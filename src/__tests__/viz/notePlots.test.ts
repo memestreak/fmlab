@@ -266,17 +266,17 @@ describe('describing the envelope', () => {
 
 describe('the main button', () => {
   it('starts and stops a steady sound', () => {
-    expect(playLabel(DEFAULTS)).toBe('Play');
-    expect(pressPlay(DEFAULTS)).toEqual({ playing: true });
+    expect(playLabel(DEFAULTS, 0)).toBe('Play');
+    expect(pressPlay(DEFAULTS, 0)).toEqual({ playing: true });
     const playing = { ...DEFAULTS, playing: true };
-    expect(playLabel(playing)).toBe('Stop');
-    expect(pressPlay(playing)).toEqual({ playing: false });
+    expect(playLabel(playing, 0)).toBe('Stop');
+    expect(pressPlay(playing, 0)).toEqual({ playing: false });
   });
 
   it('plays one more note in a chapter that plays notes', () => {
-    expect(playLabel(brass)).toBe('Play note');
-    expect(pressPlay(brass)).toEqual({ notes: 1 });
-    expect(pressPlay({ ...brass, notes: 4 })).toEqual({ notes: 5 });
+    expect(playLabel(brass, 0)).toBe('Play note');
+    expect(pressPlay(brass, 0)).toEqual({ notes: 1 });
+    expect(pressPlay({ ...brass, notes: 4 }, 0)).toEqual({ notes: 5 });
   });
 
   it('answers to the space bar, except where space has a use of its own', () => {

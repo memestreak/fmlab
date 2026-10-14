@@ -74,8 +74,8 @@ describe('the landing view', () => {
   });
 
   it('says Play, and a press plays its one sound', () => {
-    expect(playLabel(opened)).toBe('Play');
-    expect(pressPlay(opened)).toEqual({ notes: 1 });
+    expect(playLabel(opened, 0)).toBe('Play');
+    expect(pressPlay(opened, 0)).toEqual({ notes: 1 });
   });
 
   it('plays a few seconds: a swell on 1:1 that gives its harmonics back', () => {

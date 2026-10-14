@@ -237,3 +237,23 @@ units, where the lesson is ratios and sidebands.
   "Go to the sandbox" and the chapter list. The contents in the masthead
   are there from the start, so nobody is stuck behind the button.
 - **It keeps a Volume slider**, the one control besides Play.
+
+## Pinned lab and the space bar (PR #9)
+
+Jeremy asked on 2026-10-14 for the controls and figures to stay visible
+while the text scrolls, and for the space bar to start and stop the sound.
+
+- **Wide screens:** the page is the window's height; the text column
+  scrolls on its own and the lab beside it never moves. The figures
+  shrink to fit what the controls leave; chapter 6's six sliders go in two
+  columns so its figures keep room.
+- **Narrow screens:** the lab sits above the text and sticks to the top as
+  the text scrolls beneath. To leave the text at least two fifths of a
+  phone's height, its figures are a fifth of the window high each, their
+  captions are kept for screen readers only, and the sliders and presets
+  fold behind a Sliders button. The figures are cramped there, chapter 4's
+  most of all; that is the price of keeping both in view.
+- **The space bar is Play / Stop everywhere.** Where a chapter plays notes
+  it plays one, and stops it if pressed again while it sounds; the button
+  says Stop meanwhile. Space is left to buttons, links, checkboxes and
+  maths panels, where it has a meaning of its own.
