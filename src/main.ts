@@ -57,12 +57,12 @@ const store = createLabStore({
   // The chapter's patch, and in the sandbox the sound a link carries.
   ...openingFromUrl(opening),
 });
-// It subscribes itself; nothing here needs to hold on to it.
-new AudioEngine(store);
+// It subscribes itself; the live spectrum also asks it what is playing.
+const engine = new AudioEngine(store);
 
 mountChapters(store);
 mountSliders(store);
-mountFigures(store);
+mountFigures(store, engine);
 mountBesselControls(store);
 mountEnvelopeControls(store);
 

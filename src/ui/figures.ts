@@ -4,12 +4,15 @@ import {
   envelopeOf,
   type LabState,
   type LabStore,
+  noteSounding,
   patchOf,
 } from '../model/lab';
 import { drawBessel } from '../viz/besselPlot';
 import { drawEnvelope } from '../viz/envelopePlot';
 import { drawSpectrogram, sliceAt } from '../viz/spectrogramPlot';
+import { drawLiveSpectrum } from '../viz/liveSpectrum';
 import { drawSpectrum, spectrumOf } from '../viz/spectrumPlot';
+import type { AudioEngine } from '../audio/engine';
 import {
   cyclesShown,
   drawWaveform,
@@ -42,6 +45,7 @@ const DRAWN: (keyof LabState)[] = [
   'showBandwidth',
   'realUnits',
   'showHarmonics',
+  'liveSpectrum',
   // The envelope, and the note whose playhead the figures show.
   'attack',
   'decay',
@@ -173,7 +177,10 @@ export function motionNote(state: LabState, reducedMotion: boolean): string {
 }
 
 /** Fig. 1 and Fig. 2, each with a text description that follows the patch. */
-export function mountFigures(store: LabStore): void {
+export function mountFigures(store: LabStore, engine: AudioEngine): void {
+  const spectrumNote = document.querySelector<HTMLElement>('#spectrum-note');
+  /** When the live view was last drawn, for reduced motion. */
+  let lastLive = 0;
   const waveform = document.querySelector<HTMLCanvasElement>('#waveform');
   const note = document.querySelector<HTMLElement>('#waveform-note');
   const reduced = window.matchMedia(REDUCED_MOTION);
@@ -206,17 +213,46 @@ export function mountFigures(store: LabStore): void {
       spectrum,
       store,
       (state, canvas, time) => {
-        drawSpectrum(state, canvas, time);
+        const now = time ?? performance.now() / 1000;
+        if (state.liveSpectrum) {
+          // Under reduced motion the live view moves only a few times a
+          // second; each time is a still picture of the sound.
+          if (time !== undefined && reduced.matches && now - lastLive < CALM_SECONDS) return;
+          lastLive = now;
+          drawLiveSpectrum(state, canvas, isSounding(state, now) ? engine.measure() : null);
+        } else {
+          drawSpectrum(state, canvas, time);
+        }
         // The description is of the patch as set, not of each moment of a
         // note: a screen reader has no use for sixty of them a second.
-        const label = describeSpectrum(state, spectrumOf(state));
+        const label = state.liveSpectrum
+          ? describeLive(isSounding(state, now))
+          : describeSpectrum(state, spectrumOf(state));
         if (canvas.getAttribute('aria-label') !== label) {
           canvas.setAttribute('aria-label', label);
         }
+        const text = liveNote(state, isSounding(state, now));
+        if (spectrumNote && spectrumNote.textContent !== text) {
+          spectrumNote.textContent = text;
+        }
       },
-      (state: LabState, time: number) => noteMoves(state, time),
+      // A note sounding, or the live view of anything sounding.
+      (state: LabState, time: number) =>
+        noteMoves(state, time) || (state.liveSpectrum && isSounding(state, time)),
     );
   }
+
+  // The Predicted / Live switch.
+  const predicted = document.querySelector<HTMLButtonElement>('#spectrum-predicted');
+  const live = document.querySelector<HTMLButtonElement>('#spectrum-live');
+  const showSwitch = (state: LabState) => {
+    predicted?.setAttribute('aria-pressed', String(!state.liveSpectrum));
+    live?.setAttribute('aria-pressed', String(state.liveSpectrum));
+  };
+  predicted?.addEventListener('click', () => store.set({ liveSpectrum: false }));
+  live?.addEventListener('click', () => store.set({ liveSpectrum: true }));
+  store.subscribe(showSwitch);
+  showSwitch(store.get());
 
   // Its label and value are the slider's, kept by ui/besselControls.ts.
   const bessel = document.querySelector<HTMLCanvasElement>('#bessel');
@@ -254,6 +290,29 @@ export function mountFigures(store: LabStore): void {
       playheadMoves,
     );
   }
+}
+
+/** Under reduced motion, the live view is redrawn no oftener than this. */
+const CALM_SECONDS = 0.5;
+
+/** Whether anything is sounding at `time`: a steady sound, or a note. */
+export function isSounding(state: LabState, time: number): boolean {
+  return state.playing || (state.noteMode && noteSounding(state, time));
+}
+
+/** What to add to the spectrum's caption in the live view; nothing otherwise. */
+export function liveNote(state: LabState, sounding: boolean): string {
+  if (!state.liveSpectrum) return '';
+  return sounding
+    ? 'Live: measured, over the predicted stems.'
+    : 'Press Play to hear it.';
+}
+
+/** What the live view shows, in words. */
+export function describeLive(sounding: boolean): string {
+  return sounding
+    ? 'Live spectrum, measured from the sound now playing, drawn over the predicted lines.'
+    : 'Live spectrum: nothing is playing, so it lies flat.';
 }
 
 /**
