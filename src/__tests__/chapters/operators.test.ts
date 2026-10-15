@@ -120,10 +120,10 @@ describe('chapter 8', () => {
     expect(opened.operators[1].level).toBe(0.4);
   });
 
-  it('builds up a step at a time, ending on all 32', () => {
+  it('builds up a step at a time, ending on the DX7 algorithms', () => {
     const steps = chapter8.steps!;
     expect(steps.map(step => step.label)).toEqual(
-      ['One pair', 'Two pairs', 'Stack', 'Two into one', 'Feedback', 'All 32'],
+      ['One pair', 'Two pairs', 'Stack', 'Two into one', 'Feedback', 'DX7 algorithms'],
     );
     expect(steps.map(step => step.patch.algorithm)).toEqual([
       STEP_WIRINGS.pair,

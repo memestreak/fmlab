@@ -227,10 +227,14 @@ figures subscribe to it. Nothing else passes values around.
   figures' numbers and their captions. `sliders.ts`
   is a table of every slider (range, step, scale, readout);
   `operators.ts` fills the six-operator lab (`algorithms`, and the
-  sandbox's Six), two labelled panels in `index.html`'s
-  `#six-operators-lab`: Algorithm (the list of the 32, grouped by
-  carriers and hidden on a step's own wiring; the diagram, Fig. 1; the
-  Feedback slider) and Operators (a row per operator the wiring uses, its
+  sandbox's Six), two labelled panels, one above the other, in
+  `index.html`'s `#six-operators-lab`: Algorithm (how the wiring is
+  chosen, on one row of a fixed height: `algorithms`'s step buttons, the
+  last of them DX7 algorithms, or at that step and in the sandbox the
+  list of the 32, grouped by carriers, with Basic wirings to go back
+  where there are steps and the presets as `#dx7-presets`; the diagram,
+  Fig. 1, with Feedback and its caption beside it) and Operators (a row
+  per operator the wiring uses, its
   tag ringed in its role's pen, and for ratio, level and decay a slider
   with a box to type in; Ratio snaps to `RATIO_STOPS` unless Shift or Alt
   is held). A drag in a box changes it as well (`scrubTo`: up or right
@@ -240,9 +244,11 @@ figures subscribe to it. Nothing else passes values around.
   Where the lab is pinned small, the Operators panel and Feedback fold
   behind Sliders;
   `steps.ts` is a chapter's steps (`Chapter.steps`, `algorithms`): the row
-  of step buttons, the buttons heading the text's sections, and what
-  shows at which step (the step is `currentStep(steps, algorithm)` in
-  `src/chapters/steps.ts`, never stored);
+  of step buttons in the Algorithm panel, the buttons heading the text's
+  sections, Basic wirings (back to the step last left), and what shows
+  at which step: the steps or the DX7 list, never both (the step is
+  `currentStep(steps, algorithm)` in `src/chapters/steps.ts`, never
+  stored);
   `compare.ts` is `fm-vs-pm`'s Hear PM / FM switch (it sets `mode`), and
   keeps `modHz` and `deviationHz` at `asFm(state)`'s while the chapter has
   `compare`, so the FM sound follows Ratio and Index;

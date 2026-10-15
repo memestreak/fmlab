@@ -357,10 +357,9 @@ export function mountOperators(store: LabStore): void {
   diagram?.addEventListener('pointerleave', () => point(null));
 
   const show = (state: LabState) => {
-    select.value = String(state.algorithm);
-    // A step's wiring is none of the 32: the list would show a blank. It
-    // keeps its room, so that choosing All 32 moves nothing.
-    select.style.visibility = isDx7(state.algorithm) ? '' : 'hidden';
+    // Shown only for one of the 32 (ui/steps.ts); a step's own wiring is
+    // none of them.
+    if (isDx7(state.algorithm)) select.value = String(state.algorithm);
     const used = operatorsUsed(algorithm(state.algorithm));
     state.operators.forEach((op, i) => {
       // An operator the wiring leaves out has no row.

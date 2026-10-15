@@ -111,10 +111,6 @@
               </label>
             </div>
 
-            <!-- A chapter built up in steps (chapter 8): a button for each,
-                 filled in by script and hidden in every other chapter. -->
-            <div id="steps" class="steps" role="group" aria-label="Steps" hidden></div>
-
             <!-- The presets and sliders: where the lab is pinned small, these
                  fold away behind the Sliders button. -->
             <div id="sliders" class="sliders">
@@ -187,36 +183,56 @@
           </div>
 
           <!-- Six operators (chapter 8, and the sandbox's Six): two
-               labelled panels. The algorithm is the wiring, with its list,
-               its diagram (Fig. 1) and its feedback; the operators are the
-               six sine waves it wires, a row each. Built by
-               ui/operators.ts. -->
+               labelled panels, one above the other. The algorithm is the
+               wiring: how it is chosen, its diagram (Fig. 1) and its
+               feedback. The operators are the six sine waves it wires, a
+               row each. Built by ui/operators.ts and ui/steps.ts. -->
           <div id="six-operators-lab" class="six-ops" hidden>
             <section class="panel panel-algorithm" aria-labelledby="algorithm-heading">
-              <div class="panel-head">
-                <h3 id="algorithm-heading" class="panel-title">Algorithm</h3>
-                <select
-                  id="algorithm"
-                  class="input num"
-                  aria-labelledby="algorithm-heading"
-                ></select>
-              </div>
-              <!-- The first of the figures below, shown and numbered as
-                   they are, kept here with the algorithm it draws. -->
-              <figure class="figure" data-figure="algorithm">
-                <div class="plot-frame">
-                  <canvas id="algorithm-plot" class="plot plot-short" role="img"></canvas>
+              <h3 id="algorithm-heading" class="panel-title">Algorithm</h3>
+              <!-- One way to choose at a time, on one row of the same
+                   height, so swapping them moves nothing. Chapter 8's
+                   steps, a button each, the last of them DX7 algorithms;
+                   or, at that last step and in the sandbox, the DX7's 32
+                   in a list, with the sounds to start from. -->
+              <div class="algorithm-chooser">
+                <div id="steps" class="steps" role="group" aria-label="Wirings" hidden></div>
+                <div id="dx7-chooser" class="dx7-chooser" hidden>
+                  <button id="basic-wirings" type="button" class="step-option">
+                    ‹ Basic wirings
+                  </button>
+                  <select
+                    id="algorithm"
+                    class="input num"
+                    aria-label="DX7 algorithm"
+                  ></select>
+                  <div
+                    id="dx7-presets"
+                    class="presets dx7-presets"
+                    role="group"
+                    aria-label="Presets"
+                    hidden
+                  ></div>
                 </div>
-                <figcaption>
-                  Fig. <span class="figure-number"></span>&emsp;<span
-                    id="algorithm-caption"
-                  ></span>
-                </figcaption>
-              </figure>
-              <div class="slider-row" data-control="feedback">
-                <label for="feedback">Feedback</label>
-                <output id="feedback-out" for="feedback" class="num"></output>
-                <input id="feedback" type="range" class="slider" />
+              </div>
+              <div class="algorithm-body">
+                <!-- The first of the figures below, shown and numbered as
+                     they are, kept here with the algorithm it draws. -->
+                <figure class="figure" data-figure="algorithm">
+                  <div class="plot-frame">
+                    <canvas id="algorithm-plot" class="plot plot-short" role="img"></canvas>
+                  </div>
+                  <figcaption>
+                    Fig. <span class="figure-number"></span>&emsp;<span
+                      id="algorithm-caption"
+                    ></span>
+                  </figcaption>
+                </figure>
+                <div class="slider-row" data-control="feedback">
+                  <label for="feedback">Feedback</label>
+                  <output id="feedback-out" for="feedback" class="num"></output>
+                  <input id="feedback" type="range" class="slider" />
+                </div>
               </div>
             </section>
             <section class="panel panel-operators" aria-labelledby="operators-heading">
