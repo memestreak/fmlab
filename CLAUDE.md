@@ -226,9 +226,17 @@ figures subscribe to it. Nothing else passes values around.
   which slider rows (`data-control`) and figures (`data-figure`) show, the
   figures' numbers and their captions. `sliders.ts`
   is a table of every slider (range, step, scale, readout);
-  `operators.ts` is `algorithms`'s algorithm list (grouped by carriers) and
-  operator table (two operators to a row, number boxes, an operator its
-  wiring leaves out blanked);
+  `operators.ts` fills the six-operator lab (`algorithms`, and the
+  sandbox's Six), two labelled panels in `index.html`'s
+  `#six-operators-lab`: Algorithm (the list of the 32, grouped by
+  carriers and hidden on a step's own wiring; the diagram, Fig. 1; the
+  Feedback slider) and Operators (a row per operator the wiring uses, its
+  tag ringed in its role's pen, and for ratio, level and decay a slider
+  with a box to type in; Ratio snaps to `RATIO_STOPS` unless Shift or Alt
+  is held). Pointing at or focusing a row sets `hoverOp`, which rings that
+  box in the diagram; pointing at a box (`operatorAt`) picks out its row.
+  Where the lab is pinned small, the Operators panel and Feedback fold
+  behind Sliders;
   `steps.ts` is a chapter's steps (`Chapter.steps`, `algorithms`): the row
   of step buttons, the buttons heading the text's sections, and what
   shows at which step (the step is `currentStep(steps, algorithm)` in

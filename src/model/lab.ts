@@ -88,6 +88,12 @@ export interface LabState {
   /** The order held picked out by its chip until it is pressed again. */
   pinned: number | null;
   /**
+   * `ops`: the operator (0 to 5) pointed at or focused just now, in the
+   * Operators table or the wiring diagram, which both pick it out; null
+   * for none.
+   */
+  hoverOp: number | null;
+  /**
    * Whether the spectrum figure shows the live, measured spectrum of the
    * sound (over the predicted one, faintly) instead of the predicted one.
    * The reader's choice for the visit; neither saved nor in the URL.
@@ -161,6 +167,7 @@ export const DEFAULTS: LabState = {
   noteStartedAt: null,
   noteLength: 0,
   hover: null,
+  hoverOp: null,
   pinned: null,
   liveSpectrum: false,
   algorithm: 1,

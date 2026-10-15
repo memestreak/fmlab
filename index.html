@@ -104,11 +104,6 @@
               <span id="hear-switch" class="switch" role="group" aria-label="Hear" hidden>
                 <button id="hear-pm" type="button" class="switch-option" aria-pressed="true">Hear PM</button><button id="hear-fm" type="button" class="switch-option" aria-pressed="false">Hear FM</button>
               </span>
-              <!-- Chapter 8's algorithm, beside Play. -->
-              <label id="algorithm-picker" class="op-algorithm" hidden>
-                Algorithm
-                <select id="algorithm" class="input num"></select>
-              </label>
               <!-- Shown by a chapter that plays notes through an envelope. -->
               <label id="index-follows-toggle" class="check" hidden>
                 <input id="index-follows" type="checkbox" />
@@ -180,39 +175,10 @@
                 <output id="sustain-out" for="sustain" class="num"></output>
                 <input id="sustain" type="range" class="slider" />
               </div>
-              <div class="slider-row" data-control="feedback">
-                <label for="feedback">Feedback</label>
-                <output id="feedback-out" for="feedback" class="num"></output>
-                <input id="feedback" type="range" class="slider" />
-              </div>
               <div class="slider-row" data-control="release">
                 <label for="release">Release</label>
                 <output id="release-out" for="release" class="num"></output>
                 <input id="release" type="range" class="slider" />
-              </div>
-
-              <!-- Chapter 8's six operators: the algorithm, then a row per
-                   operator. Built by ui/operators.ts. -->
-              <div id="operators-panel" class="operators" hidden>
-                <!-- Two operators to a row, OP1 beside OP4, to keep it
-                     short. -->
-                <table id="operators" class="op-table">
-                  <thead>
-                    <tr>
-                      <th scope="col"><span class="visually-hidden">Operator</span></th>
-                      <th scope="col">Role</th>
-                      <th scope="col">Ratio</th>
-                      <th scope="col">Level %</th>
-                      <th scope="col">Decay s</th>
-                      <th scope="col" class="op-second"><span class="visually-hidden">Operator</span></th>
-                      <th scope="col">Role</th>
-                      <th scope="col">Ratio</th>
-                      <th scope="col">Level %</th>
-                      <th scope="col">Decay s</th>
-                    </tr>
-                  </thead>
-                  <tbody></tbody>
-                </table>
               </div>
 
               <!-- The sandbox's keyboard: built by ui/piano.ts. -->
@@ -220,19 +186,61 @@
             </div>
           </div>
 
+          <!-- Six operators (chapter 8, and the sandbox's Six): two
+               labelled panels. The algorithm is the wiring, with its list,
+               its diagram (Fig. 1) and its feedback; the operators are the
+               six sine waves it wires, a row each. Built by
+               ui/operators.ts. -->
+          <div id="six-operators-lab" class="six-ops" hidden>
+            <section class="panel panel-algorithm" aria-labelledby="algorithm-heading">
+              <div class="panel-head">
+                <h3 id="algorithm-heading" class="panel-title">Algorithm</h3>
+                <select
+                  id="algorithm"
+                  class="input num"
+                  aria-labelledby="algorithm-heading"
+                ></select>
+              </div>
+              <!-- The first of the figures below, shown and numbered as
+                   they are, kept here with the algorithm it draws. -->
+              <figure class="figure" data-figure="algorithm">
+                <div class="plot-frame">
+                  <canvas id="algorithm-plot" class="plot plot-short" role="img"></canvas>
+                </div>
+                <figcaption>
+                  Fig. <span class="figure-number"></span>&emsp;<span
+                    id="algorithm-caption"
+                  ></span>
+                </figcaption>
+              </figure>
+              <div class="slider-row" data-control="feedback">
+                <label for="feedback">Feedback</label>
+                <output id="feedback-out" for="feedback" class="num"></output>
+                <input id="feedback" type="range" class="slider" />
+              </div>
+            </section>
+            <section class="panel panel-operators" aria-labelledby="operators-heading">
+              <h3 id="operators-heading" class="panel-title">Operators</h3>
+              <!-- A row per operator; each number a slider, with a box
+                   beside it to type in. -->
+              <table id="operators" class="op-table">
+                <thead>
+                  <tr>
+                    <th scope="col" class="op-col-name"><span class="visually-hidden">Operator</span></th>
+                    <th scope="col" class="op-col-role"><span class="visually-hidden">Role</span></th>
+                    <th scope="col">Ratio</th>
+                    <th scope="col">Level %</th>
+                    <th scope="col">Decay s</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </section>
+          </div>
+
           <!-- Every figure there is. A chapter shows the ones it names in
                `figures`, matched on data-figure, and they are numbered
                from 1 in the order shown (.figure-number). -->
-          <figure class="figure" data-figure="algorithm">
-            <div class="plot-frame">
-              <canvas id="algorithm-plot" class="plot plot-short" role="img"></canvas>
-            </div>
-            <figcaption>
-              Fig. <span class="figure-number"></span>&emsp;<span
-                id="algorithm-caption"
-              ></span>
-            </figcaption>
-          </figure>
 
           <figure class="figure" data-figure="waveform">
             <div class="plot-frame">

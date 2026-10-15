@@ -83,6 +83,63 @@ export function describeAlgorithm(number: number): string {
 const BOX = 34;
 
 /**
+ * Where everything in the diagram goes on a canvas of a size: the side of
+ * a box, the gaps, the output line, and each operator's box. Pure, so the
+ * drawing and the pointer agree on where a box is.
+ */
+export function diagramGeometry(alg: Algorithm, width: number, height: number) {
+  const { places: maybe, columns, rows } = layoutAlgorithm(alg);
+  // Only the operators used have places; the rest are never looked up.
+  const places = maybe as Place[];
+  // Room for the rows of boxes and the gaps between (1.7 boxes a row, less
+  // the last gap), the output stub below (0.6) and the feedback loop above
+  // (0.35), with the output line's 14 px and a little to spare.
+  const box = Math.min(
+    BOX,
+    (height - 18) / (rows * 1.7 + 0.25),
+    (width - 40) / (columns * 1.6),
+  );
+  const gapX = box * 0.6;
+  const gapY = box * 0.7;
+  const diagramWidth = columns * box + (columns - 1) * gapX;
+  const left = (width - diagramWidth) / 2;
+  const outY = height - 14;
+  const bottom = outY - box * 0.6;
+  const boxX = (p: Place) => left + p.column * (box + gapX);
+  const boxY = (p: Place) => bottom - box - p.row * (box + gapY);
+  const centreX = (p: Place) => boxX(p) + box / 2;
+  return { places, box, gapX, gapY, outY, bottom, boxX, boxY, centreX };
+}
+
+/**
+ * The operator (0 to 5) whose box is at (x, y) on a canvas of a size,
+ * with a few pixels to spare round it; null if none.
+ */
+export function operatorAt(
+  algorithmNumber: number,
+  width: number,
+  height: number,
+  x: number,
+  y: number,
+): number | null {
+  const alg = algorithm(algorithmNumber);
+  const { places, box, boxX, boxY } = diagramGeometry(alg, width, height);
+  const slack = 4;
+  for (const op of operatorsUsed(alg)) {
+    const p = places[op];
+    if (
+      x >= boxX(p) - slack &&
+      x <= boxX(p) + box + slack &&
+      y >= boxY(p) - slack &&
+      y <= boxY(p) + box + slack
+    ) {
+      return op;
+    }
+  }
+  return null;
+}
+
+/**
  * Draws the patch's algorithm as a diagram in the DX7's manner: a box per
  * operator with its number, carriers on the bottom row in --pen-blue,
  * modulators above in --pen-green, ink lines from each modulator down to
@@ -103,28 +160,12 @@ export function drawAlgorithm(
   const { ctx, token } = plot;
   const { width, height } = canvas.getBoundingClientRect();
   const alg = algorithm(state.algorithm);
-  const { places: maybe, columns, rows } = layoutAlgorithm(alg);
-  // Only the operators used have places; the rest are never looked up.
-  const places = maybe as Place[];
   const used = operatorsUsed(alg);
-
-  // Room for the rows of boxes and the gaps between (1.7 boxes a row, less
-  // the last gap), the output stub below (0.6) and the feedback loop above
-  // (0.35), with the output line's 14 px and a little to spare.
-  const box = Math.min(
-    BOX,
-    (height - 18) / (rows * 1.7 + 0.25),
-    (width - 40) / (columns * 1.6),
+  const { places, box, gapX, outY, bottom, boxX, boxY, centreX } = diagramGeometry(
+    alg,
+    width,
+    height,
   );
-  const gapX = box * 0.6;
-  const gapY = box * 0.7;
-  const diagramWidth = columns * box + (columns - 1) * gapX;
-  const left = (width - diagramWidth) / 2;
-  const outY = height - 14;
-  const bottom = outY - box * 0.6;
-  const boxX = (p: Place) => left + p.column * (box + gapX);
-  const boxY = (p: Place) => bottom - box - p.row * (box + gapY);
-  const centreX = (p: Place) => boxX(p) + box / 2;
 
   const ink = token('--ink');
   ctx.lineWidth = 1.5;
@@ -203,6 +244,14 @@ export function drawAlgorithm(
     ctx.globalAlpha = 1;
     ctx.fillStyle = ink;
     ctx.fillText(String(op + 1), centreX(p), boxY(p) + box / 2 + 1);
+    // The operator pointed at in the table, or here: ringed in ink.
+    if (state.hoverOp === op) {
+      ctx.strokeStyle = ink;
+      ctx.lineWidth = 2;
+      // Clear of the box by a fraction of it, so it fits a small diagram.
+      const ring = Math.max(2, box * 0.18);
+      ctx.strokeRect(boxX(p) - ring, boxY(p) - ring, box + 2 * ring, box + 2 * ring);
+    }
   }
 
   ctx.font = `12px ${token('--font-sans')}`;

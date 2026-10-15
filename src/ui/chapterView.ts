@@ -328,16 +328,15 @@ export function mountChapters(store: LabStore): void {
     if (lab) lab.dataset.manySliders = String(many);
     const piano = document.querySelector<HTMLElement>('#piano');
     if (piano) piano.hidden = !chapter.hasPiano;
-    const operators = document.querySelector<HTMLElement>('#operators-panel');
-    if (operators) operators.hidden = chapter.patch.mode !== 'ops';
+    // Six operators: the Algorithm and Operators panels, together.
+    const sixOps = document.querySelector<HTMLElement>('#six-operators-lab');
+    if (sixOps) sixOps.hidden = chapter.patch.mode !== 'ops';
     // Chapter 9 has a switch for what is heard, and draws both spectra
     // predicted, so no live view there.
     const hear = document.querySelector<HTMLElement>('#hear-switch');
     if (hear) hear.hidden = !chapter.patch.compare;
     const live = document.querySelector<HTMLElement>('#live-switch');
     if (live) live.hidden = chapter.patch.compare;
-    const picker = document.querySelector<HTMLElement>('#algorithm-picker');
-    if (picker) picker.hidden = chapter.patch.mode !== 'ops';
     const share = document.querySelector<HTMLElement>('#share');
     if (share) share.hidden = !chapter.sharesSound;
     const follows = document.querySelector<HTMLElement>('#index-follows-toggle');
@@ -395,6 +394,7 @@ export function mountChapters(store: LabStore): void {
       chapter: chapter.id,
       ...openingFromUrl(chapter),
       hover: null,
+      hoverOp: null,
       pinned: null,
       noteStartedAt: null,
       // The glossary has no lab to stop a sound from.
