@@ -184,7 +184,6 @@ export function motionNote(state: LabState, reducedMotion: boolean): string {
 
 /** Fig. 1 and Fig. 2, each with a text description that follows the patch. */
 export function mountFigures(store: LabStore, engine: AudioEngine): void {
-  const spectrumNote = document.querySelector<HTMLElement>('#spectrum-note');
   /** When the live view was last drawn, for reduced motion. */
   let lastLive = 0;
   const waveform = document.querySelector<HTMLCanvasElement>('#waveform');
@@ -239,10 +238,6 @@ export function mountFigures(store: LabStore, engine: AudioEngine): void {
           : describeSpectrum(state, spectrumOf(state));
         if (canvas.getAttribute('aria-label') !== label) {
           canvas.setAttribute('aria-label', label);
-        }
-        const text = liveNote(state, isSounding(state, now));
-        if (spectrumNote && spectrumNote.textContent !== text) {
-          spectrumNote.textContent = text;
         }
       },
       // A note sounding, or the live view of anything sounding.
@@ -336,14 +331,6 @@ const CALM_SECONDS = 0.5;
 /** Whether anything is sounding at `time`: a steady sound, or a note. */
 export function isSounding(state: LabState, time: number): boolean {
   return state.playing || (state.noteMode && noteSounding(state, time));
-}
-
-/** What to add to the spectrum's caption in the live view; nothing otherwise. */
-export function liveNote(state: LabState, sounding: boolean): string {
-  if (!state.liveSpectrum) return '';
-  return sounding
-    ? 'Live: measured, over the predicted stems.'
-    : 'Press Play to hear it.';
 }
 
 /** What the live view shows, in words. */
