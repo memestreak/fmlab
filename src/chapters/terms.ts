@@ -94,7 +94,7 @@ export const TERMS = {
       for each, standing at that wave's frequency and as tall as its
       amplitude.`,
     section: 'sine',
-    wiki: 'Frequency_spectrum',
+    wiki: 'Frequency_domain',
     match: /\bspectr(um|a)\b/i,
   },
   partial: {

@@ -308,7 +308,14 @@ export function mountChapters(store: LabStore): void {
     if (hint) hint.hidden = chapter.hasPiano === true;
 
     for (const row of document.querySelectorAll<HTMLElement>('[data-control]')) {
-      row.hidden = !chapter.controls.includes(row.dataset.control as ControlId);
+      const id = row.dataset.control as ControlId;
+      row.hidden = !chapter.controls.includes(id);
+      // The page's label unless the chapter names the slider its own way.
+      const label = row.querySelector('label');
+      if (label) {
+        label.dataset.label ??= label.textContent ?? '';
+        label.textContent = chapter.labels?.[id] ?? label.dataset.label;
+      }
     }
     // For the stylesheet: a chapter with many controls (many sliders, or
     // the piano as well) sets its sliders in two columns where the lab is

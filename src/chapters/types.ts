@@ -106,6 +106,11 @@ export interface Chapter {
   /** The sliders shown, in the page's order. */
   controls: ControlId[];
   /**
+   * A slider's label where the chapter calls it something else than the
+   * page does: in `sine`, before there is a carrier, Carrier is Wave.
+   */
+  labels?: Partial<Record<ControlId, string>>;
+  /**
    * Buttons above the sliders that set a whole sound; often none. In a
    * chapter with steps, they belong to the last step and show only there.
    */
