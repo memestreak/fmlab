@@ -23,7 +23,6 @@ export const landing: Chapter = {
   maths: [],
   controls: ['volume'],
   presets: [],
-  hasMotion: false,
   patch: {
     ...BASE_PATCH,
     noteMode: true,

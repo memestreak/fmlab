@@ -7,25 +7,25 @@ export const vibrato: Chapter = {
   id: 'vibrato',
   title: titleOf('vibrato'),
   body: [
-    `Press Play. This is a sine wave again, but its pitch now rises and
-     falls five times a second: the wobble a violinist makes by rocking a
-     finger on the string. A slow, regular wobble in pitch like this is
-     ${define('vibrato')}.`,
-    `What moves the pitch is a second sine wave, running at 5 Hz, far too
-     slow to hear as a note. It is the ${define('modulator')}: you never
+    `Press Play. This is a sine wave again, but its pitch now slides slowly
+     up and down, once every two seconds. A regular wobble in pitch like
+     this is ${define('vibrato')}; a violinist makes a faster one, about
+     five times a second, by rocking a finger on the string.`,
+    `What moves the pitch is a second sine wave, running at 0.5 Hz, far
+     too slow to hear as a note. It is the ${define('modulator')}: you never
      hear it, only what it does to the first wave. Fig. 1 draws it behind
      the sound as the thinner line. Where it is high the waves crowd
      together and the pitch is up; where it is low they spread out.`,
     `The wave you hear, the one being pushed around, is the
      ${define('carrier')}. While the sound plays, Fig. 1 moves with it.
      The carrier is drawn slowed down so that each of its waves can be
-     seen; the figure's caption says by how much. Tick Show motion to
-     watch it without the sound.`,
+     seen; the figure's caption says by how much.`,
     `How far the modulator pushes the carrier's frequency each way, in Hz,
      is its ${define('deviation')}. At 20 the carrier swings between 200
      and 240 Hz. Move Deviation down to 0 and the wobble stops; move it up
      and the wobble widens.`,
-    `Move Modulator a little and the wobble speeds up or slows down. One
+    `Move Modulator up to about 5 Hz and the wobble speeds up to a
+     violinist's. One
      wave pushing another's frequency up and down like this is
      ${define('fm')}, FM for short.`,
     `Now the moment this guide is built on. Drag
@@ -40,7 +40,7 @@ export const vibrato: Chapter = {
      playing the same note.`,
     `Fig. 2 shows why. Modulating a sine wave's frequency puts new stems on
      both sides of the carrier, in pairs, one modulator frequency apart.
-     Each is a ${define('sideband')}. At 5 Hz they huddle so close to the
+     Each is a ${define('sideband')}. At 0.5 Hz they huddle so close to the
      carrier that the ear cannot tell them apart and hears one pitch that
      moves. As the modulator speeds up they spread out, until the ear
      hears each as a partial of its own, and the moving pitch has turned
@@ -86,11 +86,12 @@ export const vibrato: Chapter = {
   ],
   controls: ['volume', 'modHz', 'deviation'],
   presets: [],
-  hasMotion: true,
   patch: {
     ...BASE_PATCH,
     mode: 'fm',
-    modHz: 5,
+    // A slow slide, the bottom of the Modulator slider: one sweep up and
+    // down every two seconds, easy to follow by ear and in Fig. 1.
+    modHz: 0.5,
     deviationHz: 20,
   },
   figures: {

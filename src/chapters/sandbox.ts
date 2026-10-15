@@ -54,7 +54,6 @@ const twoOperators: Chapter = {
     { label: 'Bass', hint: 'ratio 0.5, index 2', patch: { ratio: 0.5, index: 2 } },
   ],
   showsPair: true,
-  hasMotion: false,
   hasPiano: true,
   sharesSound: true,
   patch: {

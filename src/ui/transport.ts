@@ -103,7 +103,7 @@ export function mountControlsToggle(button: HTMLButtonElement): void {
 function mountCheckbox(
   input: HTMLInputElement,
   store: LabStore,
-  field: 'motion' | 'indexFollows',
+  field: 'indexFollows',
 ): void {
   input.checked = store.get()[field];
   input.addEventListener('change', () => {
@@ -112,11 +112,6 @@ function mountCheckbox(
   store.subscribe(state => {
     input.checked = state[field];
   });
-}
-
-/** The "Show motion" checkbox: animate the waveform without the sound. */
-export function mountMotionToggle(input: HTMLInputElement, store: LabStore): void {
-  mountCheckbox(input, store, 'motion');
 }
 
 /** "Index follows the envelope": the lesson of the chapter that has it. */

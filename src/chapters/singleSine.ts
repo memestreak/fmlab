@@ -67,7 +67,6 @@ export const singleSine: Chapter = {
   // There is no carrier yet: the slider sets the one wave's frequency.
   labels: { carrier: 'Frequency' },
   presets: [],
-  hasMotion: false,
   patch: {
     ...BASE_PATCH,
     // No modulator: one sine wave, on axes in real units.

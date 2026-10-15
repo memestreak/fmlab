@@ -1,6 +1,6 @@
 import { fmWindowSample, trueFmSample } from '../../dsp/waveform';
 import { CHAPTERS } from '../../chapters';
-import { DEFAULTS, type LabState } from '../../model/lab';
+import { DEFAULTS, type LabState, MOD_HZ } from '../../model/lab';
 import { motionNote, waveformMoves } from '../../ui/figures';
 import { msTicks } from '../../viz/ticks';
 import { motionView } from '../../viz/waveformPlot';
@@ -130,18 +130,17 @@ describe('msTicks', () => {
 });
 
 describe('waveformMoves', () => {
-  it('moves while sound plays, or with Show motion on', () => {
+  it('moves while sound plays, and only then', () => {
     expect(waveformMoves(fm(5), false)).toBe(false);
     expect(waveformMoves(fm(5, 20, { playing: true }), false)).toBe(true);
-    expect(waveformMoves(fm(5, 20, { motion: true }), false)).toBe(true);
   });
 
   it('never moves for someone who asked for reduced motion', () => {
-    expect(waveformMoves(fm(5, 20, { playing: true, motion: true }), true)).toBe(false);
+    expect(waveformMoves(fm(5, 20, { playing: true }), true)).toBe(false);
   });
 
   it('never moves where there is no moving view', () => {
-    expect(waveformMoves({ ...DEFAULTS, playing: true, motion: true }, false)).toBe(false);
+    expect(waveformMoves({ ...DEFAULTS, playing: true }, false)).toBe(false);
     expect(waveformMoves(fm(100, 20, { playing: true }), false)).toBe(false);
   });
 });
@@ -154,12 +153,12 @@ describe('motionNote', () => {
   });
 
   it('says so when the carrier is not slowed at all', () => {
-    expect(motionNote(fm(5, 200, { motion: true }), false)).toBe(
+    expect(motionNote(fm(5, 200, { playing: true }), false)).toBe(
       'In motion, with the carrier at its true speed.',
     );
   });
 
-  it('is empty while the figure is still by choice, or has no moving view', () => {
+  it('is empty while nothing plays, or with no moving view', () => {
     expect(motionNote(fm(5), false)).toBe('');
     expect(motionNote(fm(100, 20, { playing: true }), false)).toBe('');
     expect(motionNote({ ...DEFAULTS, playing: true }, false)).toBe('');
@@ -170,8 +169,13 @@ describe('motionNote', () => {
   });
 });
 
-describe('Show motion', () => {
-  it('is offered by chapter 2 alone', () => {
-    expect(CHAPTERS.filter(c => c.hasMotion).map(c => c.id)).toEqual(['vibrato']);
+describe('Vibrato becomes tone', () => {
+  // A slow slide that ear and eye can follow, at the slider's very bottom.
+  it('opens on a 0.5 Hz modulator and a 20 Hz deviation, which moves', () => {
+    const vibrato = CHAPTERS.find(c => c.id === 'vibrato')!;
+    expect(vibrato.patch.modHz).toBe(0.5);
+    expect(vibrato.patch.modHz).toBe(MOD_HZ.min);
+    expect(vibrato.patch.deviationHz).toBe(20);
+    expect(motionView(fm(vibrato.patch.modHz, vibrato.patch.deviationHz))).not.toBeNull();
   });
 });

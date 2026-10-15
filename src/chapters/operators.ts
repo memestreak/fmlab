@@ -204,7 +204,6 @@ export const operators: Chapter = {
   controls: ['volume', 'feedback'],
   steps: STEPS,
   presets: DX7_PRESETS,
-  hasMotion: false,
   patch: {
     ...BASE_PATCH,
     ...PAIR,

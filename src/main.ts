@@ -34,7 +34,6 @@ import { mountThemeSwitch } from './ui/themeSwitch';
 import {
   mountControlsToggle,
   mountIndexFollowsToggle,
-  mountMotionToggle,
   mountPlayButton,
 } from './ui/transport';
 
@@ -78,9 +77,6 @@ mountEnvelopeControls(store);
 
 const play = document.querySelector<HTMLButtonElement>('#play');
 if (play) mountPlayButton(play, store);
-
-const motion = document.querySelector<HTMLInputElement>('#motion');
-if (motion) mountMotionToggle(motion, store);
 
 const piano = document.querySelector<HTMLElement>('#piano');
 if (piano) {

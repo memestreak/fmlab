@@ -34,9 +34,8 @@ type Draw = (state: LabState, canvas: HTMLCanvasElement, time?: number) => void;
 
 /** The parts of the state a figure is drawn from. */
 const DRAWN: (keyof LabState)[] = [
-  // Whether sound is on, and "Show motion", decide if a figure moves.
+  // Whether sound is on decides if a figure moves.
   'playing',
-  'motion',
   'mode',
   // The carrier moves no curve in `pm`, but it sets the Hz and ms labels.
   'carrierHz',
@@ -159,12 +158,12 @@ export function describeWaveform(state: LabState): string {
 
 /**
  * Whether the waveform figure should be moving: the patch has a moving
- * view, and either sound is playing or "Show motion" is on. Never for
- * someone whose device asks for reduced motion.
+ * view and sound is playing. Never for someone whose device asks for
+ * reduced motion.
  */
 export function waveformMoves(state: LabState, reducedMotion: boolean): boolean {
   if (reducedMotion || motionView(state) === null) return false;
-  return state.playing || state.motion;
+  return state.playing;
 }
 
 /**
