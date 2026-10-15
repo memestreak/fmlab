@@ -7,10 +7,15 @@ export const ratio: Chapter = {
   id: 'ratio',
   title: titleOf('ratio'),
   body: [
-    `${define('ratio')} Where the index decides how strong each partial is,
-     the ratio decides which partials there can be at all. FM players
-     write it carrier first: 1:2 means the modulator runs at twice the
-     carrier.`,
+    `Why do some FM sounds have a clear pitch, while others clang like a
+     bell? The answer is how fast the modulator runs compared with the
+     carrier: the ${define('ratio')} of their frequencies. Where the index
+     decides how strong each partial is, the ratio decides which partials
+     there can be at all.`,
+    `This guide writes a ratio as FM players do, carrier first: 1:2 means
+     the carrier at 1 and the modulator at 2, twice as fast. The Ratio
+     slider shows the modulator's side alone, 2.00, and beside it the
+     modulator's frequency in Hz.`,
     `The sidebands stand one modulator frequency apart, counted out from
      the carrier. The faint upright lines in Fig. 2 mark the whole
      multiples of the carrier, which are the harmonics of a note at the
@@ -23,16 +28,18 @@ export const ratio: Chapter = {
      leaves out every third harmonic.`,
     `Now press <strong>1:1.41</strong>. The step is no longer a whole
      number of lines, and the sidebands fall between them. Partials that
-     do not line up are not heard as one note with a colour.
-     ${define('inharmonic')} Drag
-     Ratio slowly and listen for the sound snapping into focus each time
-     it passes a simple ratio.`,
-    `${sectionLink('index')} left a question open: where do the lower sidebands go?
-     Counting down from the carrier in steps of the modulator, you soon
-     pass zero. ${define('negativeFrequency')} A wave at a frequency below
-     zero is the same wave running backwards, and a sine wave running
-     backwards is a sine wave upside down. Those are the stems that hang
-     below the axis, in red with a hollow marker.`,
+     do not line up are not heard as one note with a colour, but as
+     several pitches at once, the way a bell or a gong is. Such partials
+     are ${define('inharmonic')}. Drag Ratio slowly and listen for the
+     sound snapping into focus each time it passes a simple ratio.`,
+    `Sidebands come in pairs, one above the carrier and one below, and so
+     far the lower ones have kept out of the way. Counting down from the
+     carrier in steps of the modulator, though, you soon pass zero. A
+     sideband down there would have a ${define('negativeFrequency')}: a
+     wave running backwards, which is the same as a wave running forwards
+     but upside down. So it folds back, sounding the same distance above
+     zero, and is drawn upside down: the red stems below the axis, with a
+     hollow marker.`,
     `With a whole-number ratio the folded sidebands land back on the
      harmonics. At 1:1 they land on the very ones the upper sidebands
      already occupy, where the two add together or cancel, which is why

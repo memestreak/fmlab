@@ -117,14 +117,20 @@ figures subscribe to it. Nothing else passes values around.
   "-"), validated and clamped by `soundFromParams`; a link without
   `m=6` is the two-operator one, unchanged.
   `terms.ts` holds every defined term: its name, a one-sentence plain
-  definition, an optional formula, and the chapter that defines it. A
-  chapter writes `${define(id)}` where a term is first used (the plain
-  sentence, the term set as a bold `<dfn>`), `${formula(id)}` in its maths
-  panel, and `${use(id)}` to mark a later mention; never write a term's
-  definition by hand. `terms.test.ts` fails if a term is used in any
+  definition (for the glossary and the term's tip only), an optional
+  formula, its English Wikipedia article and the chapter that defines it.
+  A chapter defines a term in its own words, after the reader has heard or
+  seen the thing, and marks it there with `${define(id)}` (the term set
+  as a bold `<dfn>` linking to the glossary); `${formula(id)}` goes in its
+  maths panel, and `${use(id)}` marks a later mention. A paragraph
+  introduces at most one term, and no two sentences running define one.
+  `terms.test.ts` checks all of that, and fails if a term is used in any
   text (lesson, maths or captions) before its chapter, or in its chapter
   before its definition: a new term goes in `terms.ts` first, and new
-  copy keeps to the order.
+  copy keeps to the order. `wikipedia(article, text)` links out (new tab,
+  `rel="noopener"`, marked ↗): the lesson text uses it only for proper
+  nouns (John Chowning, the Yamaha DX7), maths panels where a formula
+  appears, and the glossary gives each entry its article.
   `index.ts` lists them (`CHAPTERS`, `neighbours`); `route.ts` reads and
   writes the hash (`soundParams`, and `soundFromParams`, which checks and
   clamps every value a link carries). A new chapter is a file here and an entry in `CHAPTERS`. Lesson

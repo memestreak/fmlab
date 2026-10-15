@@ -1,5 +1,5 @@
 import { BASE_PATCH } from './basePatch';
-import { define, formula } from './terms';
+import { define, formula, wikipedia } from './terms';
 import { sectionLink, titleOf } from './outline';
 import type { Chapter } from './types';
 
@@ -12,15 +12,19 @@ export const bessel: Chapter = {
      Fig. 2 from left to right and watch Fig. 1. Each stem rises, falls
      away to nothing, and comes back upside down, each at its own pace.`,
     `To see that plainly this section moves the two waves apart. The
-     carrier is up at 880 Hz and the modulator down at 55 Hz, so the
-     sidebands stand 55 Hz apart on both sides of the carrier with plenty
-     of room, and none of them bounces off zero.`,
-    `Fig. 2 is the map. ${define('bessel')} Each curve is one of them:
-     J<sub>1</sub> is the first sideband each side of the carrier,
-     J<sub>2</sub> the second, and so on. The upright line is the index
-     you are hearing. Where it crosses a curve is that sideband's height
-     in Fig. 1, and the dots mark the crossings. Drag the line, or click
-     Fig. 2 and use the arrow keys.`,
+     carrier is up at 880 Hz and the modulator down at 55 Hz, a sixteenth
+     of it. That spreads the sidebands out, 55 Hz apart on both sides of
+     the carrier, so they are easy to count, and none of them comes near
+     zero.`,
+    `Fig. 2 is the map. Each curve gives the height of one pair of
+     sidebands at every index: J<sub>1</sub> the first pair, either side
+     of the carrier, J<sub>2</sub> the second, and so on, with
+     J<sub>0</sub> for the carrier itself. These curves are
+     ${define('bessel', 'Bessel functions')}, named after the astronomer
+     who studied them in 1824, long before anyone made a sound with them. The upright line is the
+     index you are hearing. Where it crosses a curve is that sideband's
+     height in Fig. 1, and the dots mark the crossings. Drag the line, or
+     click Fig. 2 and use the arrow keys.`,
     `Point at a curve, or at one of the J buttons under the figure, and
      its pair of stems is picked out in Fig. 1. Point at a stem and its
      curve is picked out. Press a J button to keep it picked out.`,
@@ -30,27 +34,31 @@ export const bessel: Chapter = {
      sidebands. That is the heart of FM: the index does not add partials
      to the carrier, it moves the sound's energy around among them.`,
     `Where a curve dips below zero its dot turns red and hollow, and so
-     does its stem: that sideband is upside down. One more wrinkle: on the
-     lower side, the odd-numbered sidebands (first, third, fifth) are
-     flipped once more, so the two stems of an odd pair point opposite
-     ways.`,
+     does its stem in Fig. 1, hanging below the axis. Red means upside
+     down: that sideband's wave is flipped, rising where it would have
+     fallen. On its own that sounds no different. It matters when two
+     partials land in the same place, where they cancel instead of adding;
+     ${sectionLink('ratio')} shows where that happens.`,
   ],
   maths: [
     {
       title: 'Where the curves come from',
       body: [
-        `The phase-modulated signal can be written out exactly as a sum of
+        `The signal can be written out exactly as a sum of
          plain sine waves, one for each whole number <var>n</var>:`,
         formula('bessel'),
         `The sum runs over every <var>n</var>, negative ones too.
-         <var>J</var><sub><var>n</var></sub> is the Bessel function of the
-         first kind of order <var>n</var>: the curves in Fig. 2. Sideband
+         <var>J</var><sub><var>n</var></sub> is the
+         ${wikipedia('Bessel_function', 'Bessel function')} of the first
+         kind of order <var>n</var>: the curves in Fig. 2. Sideband
          <var>n</var> stands at
          <var>f</var><sub>c</sub> + <var>n</var> <var>f</var><sub>m</sub>
          and is <var>J</var><sub><var>n</var></sub>(<var>I</var>) tall.`,
-        `For the lower sidebands,`,
+        `One more wrinkle: on the lower side, the odd-numbered sidebands
+         (first, third, fifth) are flipped once more, so the two stems of an
+         odd pair point opposite ways. That is because`,
         `<p class="formula"><var>J</var><sub>−<var>n</var></sub>(<var>I</var>) = (−1)<sup><var>n</var></sup> <var>J</var><sub><var>n</var></sub>(<var>I</var>)</p>`,
-        `which is the extra flip of the odd ones.`,
+        `which changes the sign only when <var>n</var> is odd.`,
       ],
     },
     {

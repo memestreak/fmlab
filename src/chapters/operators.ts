@@ -1,7 +1,7 @@
 import { BASE_PATCH } from './basePatch';
 import { DX7_PRESETS, ops, STACKS } from './dx7Presets';
 import { STEP_WIRINGS } from '../dsp/algorithms';
-import { define, use } from './terms';
+import { define, use, wikipedia } from './terms';
 import { sectionLink, titleOf } from './outline';
 import type { Chapter, ChapterPatch, Step } from './types';
 
@@ -53,9 +53,11 @@ const STEPS: Step[] = [
        modulator, in green, sits above OP1, the carrier, in blue, and a line
        runs down from one to the other because OP2 modulates OP1. Only OP1
        has a line down to <em>out</em>: it is the one you hear.`,
-      `A modulator's level is its index: OP2 at 40% is an index of 2. Press
-       Play note (or space), then change OP2's level in the table and play
-       it again. While a note sounds, each box fills as strongly as its
+      `Each operator has a level, a percentage in the table. For a carrier
+       it is how loud it is. For a modulator it is how hard it pushes, its
+       index: full level is an index of 5, so OP2 at 40% is an index of 2.
+       Press Play note (or space), then change OP2's level and play it
+       again. While a note sounds, each box fills as strongly as its
        operator is sounding.`,
     ],
   },
@@ -66,8 +68,8 @@ const STEPS: Step[] = [
     body: [
       `Add a second pair beside the first: OP4 modulates OP3, and OP3 is a
        carrier too, with its own line to the output. Two carriers are two
-       sounds added together, each with its own sidebands; here the second
-       pair is three times higher.`,
+       sounds added together, each with its own sidebands. Here the second
+       pair has ratios of 3, so it sounds three times higher.`,
       `This is the one rule for every diagram in this section:
        <strong>operators on the bottom row are what you hear; everything
        above them only shapes the sound.</strong> A modulator is never
@@ -92,7 +94,7 @@ const STEPS: Step[] = [
     patch: TWO_MODULATORS,
     body: [
       `Or wire both modulators into the one carrier: OP2 and OP3 each
-       modulate OP1, and their pushes on its phase add up. With OP3 three
+       modulate OP1, and their pushes add up. With OP3 three
        times higher, the spectrum has sidebands spaced by both, and by
        their sums and differences. There is still one carrier, so still one
        sound, but shaped two ways at once.`,
@@ -103,9 +105,9 @@ const STEPS: Step[] = [
     title: 'Feedback',
     patch: FEEDBACK,
     body: [
-      `One more wiring is left. ${define('feedback')} Here
-       it is OP2, drawn as a line out of its side and back into its top. A
-       little turns its sine wave toward a sawtooth, so the pair grows
+      `One more wiring is left. Here OP2 modulates itself: its own output
+       goes back in, drawn as a line out of its side and into its top. That
+       loop is ${define('feedback')}. A little turns its sine wave toward a sawtooth, so the pair grows
        brighter; a lot turns it to noise. Move Feedback: the line thickens
        as it goes up.`,
     ],
@@ -115,9 +117,8 @@ const STEPS: Step[] = [
     title: "The DX7's 32 algorithms",
     patch: STACKS,
     body: [
-      `That is all there is to it. ${define('algorithm')} It is a diagram,
-       not a procedure to follow. The DX7 has 32 of them, each with one
-       feedback loop, and you choose one rather than wire your own. The list beside Play now has them all,
+      `That is all there is to it. The DX7 has 32
+       ${use('algorithm', 'algorithms')}, each with one feedback loop, and you choose one rather than wire your own. The list beside Play now has them all,
        grouped by how many carriers each has, which is roughly how many
        sounds it adds together.`,
       `It starts on algorithm 1: a pair on the left, and on the right a
@@ -134,9 +135,10 @@ const STEPS: Step[] = [
       `Fig. 2 is the spectrum, here and at every step. With more than two
        operators there is no tidy sum of Bessel functions to give the
        heights, so it is worked out the long way: the same maths that makes
-       the sound is run for a moment, and the result taken apart.
-       ${define('fft')} Its stems are heights only, all upright. Press Live to see the real
-       thing measured.`,
+       the sound is run for a moment, and the result taken apart
+       with the same ${use('fft', 'FFT')} that Live uses. Its stems are
+       heights only, all upright. Press Live to see the real thing
+       measured.`,
     ],
   },
 ];
@@ -145,15 +147,25 @@ export const operators: Chapter = {
   id: 'algorithms',
   title: titleOf('algorithms'),
   body: [
-    `Everything so far has used two sine waves. The Yamaha DX7, the
-     synthesizer that took ${use('fm', 'FM')} out of the laboratory in 1983,
-     has six. ${define('operator')} Each operator's frequency is a multiple
-     of the note's, which the DX7 also calls its ratio, though it is not the carrier-to-modulator ratio of ${sectionLink('ratio')}. Its ${use('envelope')} here is
-     one number, how long it takes to die away; a decay of 0 holds it for
-     the whole note.`,
-    `What makes a sound is how the operators are wired together. This section builds that up a step at a time, from the two you know. The
-     buttons in the lab and at the head of each section below set each
-     step's sound.`,
+    `So far one wave bends another. What if a third wave bends the second?
+     The ${wikipedia('Yamaha_DX7', 'Yamaha DX7')}, the synthesizer that
+     took ${use('fm', 'FM')} out of the laboratory in 1983, lets you find
+     out: it has six sine waves to wire together. Each is an
+     ${define('operator')}, the DX7's name for a sine wave with its own
+     frequency, level and ${use('envelope')}, which can be a carrier or a
+     modulator.`,
+    `The DX7 numbers its operators OP1 to OP6; the numbers are its own,
+     and say nothing about pitch. Each operator's frequency is set as a
+     multiple of the note's, which the DX7 also calls its ratio: a carrier
+     at 1 with a modulator at 2 is the 1:2 of ${sectionLink('ratio')}. Its
+     envelope here is one number, how long it takes to die away; a decay
+     of 0 holds it for the whole note.`,
+    `What makes a sound is how the operators are wired together: which
+     modulate which, and which are heard. A wiring like that is an
+     ${define('algorithm')}, a diagram rather than a procedure to follow.
+     This section builds one up a step at a time, from the two operators
+     you know. The buttons in the lab and at the head of each section
+     below set each step's sound.`,
   ],
   maths: [
     {
@@ -168,8 +180,8 @@ export const operators: Chapter = {
          level is an index of 5. The sound is the carriers' outputs added
          and divided by how many there are, so every algorithm is about as
          loud.`,
-        `Feedback adds <var>β</var> times the loop's source output to its
-         target's phase, a sample late (the mean of the last two samples,
+        `Feedback adds <var>β</var> times the loop's source output to what
+         modulates its target, a sample late (the mean of the last two samples,
          as the DX7 does, which keeps a strong loop from buzzing).`,
       ],
     },

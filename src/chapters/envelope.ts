@@ -1,5 +1,5 @@
 import { BASE_PATCH } from './basePatch';
-import { define, formula } from './terms';
+import { define, formula, use, wikipedia } from './terms';
 import { sectionLink, titleOf } from './outline';
 import type { Chapter, ChapterPatch } from './types';
 
@@ -38,22 +38,32 @@ export const envelope: Chapter = {
      partials first.`,
     `FM does this with one move: change the index while the note sounds.
      Press <strong>Play note</strong>, or the space bar.`,
-    `${define('envelope')} Fig. 1 is this note's. ${define('adsr')} Drag
-     the three dots, or use the sliders. The heavier line is the
-     loudness. The thinner one is the index, the modulator's push; here
-     the two move together.`,
-    `${define('spectrogram')} Fig. 2 is this note's: the spectrum of the earlier sections turned on its side and stretched out along it. Watch the upper partials arrive as the envelope
-     rises and leave as it falls.`,
+    `Fig. 1 draws the note you just heard over time. The heavier line is
+     its loudness, rising and falling. That shape is the note's
+     ${define('envelope')}. The thinner line is the index, the modulator's
+     push; here the two move together.`,
+    `Read Fig. 1 from left to right. It has four parts, named by their
+     initials: ${define('adsr')}. Attack is the rise at the start. Decay
+     is the fall to the level the note holds. Sustain is that level, kept
+     for as long as the note is held. Release is the fade once it is let
+     go. Drag the three dots, or use the sliders.`,
+    `Fig. 2 is the spectrum of the earlier sections turned on its side and
+     stretched out over the note: time runs left to right, frequency
+     upward, and the stronger a partial, the bolder its mark. This is a
+     ${define('spectrogram')}. Watch the upper partials arrive as the
+     envelope rises and leave as it falls.`,
     `Untick <strong>Index follows the envelope</strong> and play again.
      Now only the loudness changes. The colour stands still, and the note
      sounds like an organ key, not a breath. That difference is the whole
-     trick.`,
-    `The two buttons are John Chowning's own recipes from 1973.
-     <strong>Brass</strong> is a ratio of 1:1 with the index rising and
-     falling with the loudness, so the note brightens as it swells.
-     <strong>Bell</strong> is partials that do not line up, at 1:1.4,
-     struck all at once and left to ring, the index sinking with the
-     loudness so that the clang mellows into a hum.`,
+     trick: an envelope on the modulator is an envelope on the
+     ${use('timbre')}.`,
+    `The two buttons are ${wikipedia('John_Chowning', 'John Chowning')}'s
+     own recipes from 1973. <strong>Brass</strong> is a ratio of 1:1 with
+     the index rising and falling with the loudness, so the note brightens
+     as it swells, as a trumpet does. <strong>Bell</strong> is partials
+     that do not line up, at 1:1.4, struck all at once and left to ring.
+     Its index sinks with the loudness, so the clang mellows into a hum
+     as it dies away.`,
   ],
   maths: [
     {

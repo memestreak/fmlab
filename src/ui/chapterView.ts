@@ -21,7 +21,14 @@ import {
   upgradeHash,
   viewFromHash,
 } from '../chapters/route';
-import { glossaryOrder, term, type TermId, TERMS } from '../chapters/terms';
+import {
+  glossaryOrder,
+  term,
+  type Term,
+  type TermId,
+  TERMS,
+  wikiLink,
+} from '../chapters/terms';
 import type { LabState, LabStore } from '../model/lab';
 
 /** How long the sound must rest before the address is brought up to date. */
@@ -155,7 +162,7 @@ const paragraph = (html: string) =>
 function glossaryHtml(): string {
   const entries = glossaryOrder()
     .map(id => {
-      const { name, plain, formula, section } = term(id);
+      const { name, plain, formula, section, wiki } = term(id) as Term;
       return `
         <div class="glossary-entry" id="term-${id}" tabindex="-1">
           <dt>${name}</dt>
@@ -163,7 +170,9 @@ function glossaryHtml(): string {
             <p>${plain}</p>
             ${formula ? `<p class="formula">${formula}</p>` : ''}
             <p class="glossary-from">Defined in
-              <a href="${hashFor(section)}">${titleOf(section)}</a></p>
+              <a href="${hashFor(section)}">${titleOf(section)}</a>${
+                wiki ? ` · ${wikiLink(id)}` : ''
+              }</p>
           </dd>
         </div>`;
     })
