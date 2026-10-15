@@ -1,4 +1,5 @@
 import { chapterById, CHAPTERS, type Chapter, GLOSSARY } from '../../chapters';
+import { landing } from '../../chapters/landing';
 import {
   viewFromHash,
   hashFor,
@@ -16,11 +17,29 @@ import {
   term,
   TERM_IDS,
   TERMS,
+  wikiLink,
+  wikipedia,
 } from '../../chapters/terms';
 
-/** A chapter's lesson: its paragraphs, then its steps' (not their headings). */
-const lessonHtml = (chapter: Chapter) =>
-  [...chapter.body, ...(chapter.steps ?? []).flatMap(step => step.body)].join(' ');
+/** A chapter's paragraphs, then its steps' (not their headings). */
+const paragraphs = (chapter: Chapter) => [
+  ...chapter.body,
+  ...(chapter.steps ?? []).flatMap(step => step.body),
+];
+
+/** A chapter's lesson, as one string. */
+const lessonHtml = (chapter: Chapter) => paragraphs(chapter).join(' ');
+
+/** Where a definition starts, in text with the markup taken out. */
+const MARK = '⟦';
+const marked = (html: string) => html.replace(/<dfn data-defines="\w+">/g, MARK);
+
+/**
+ * Text split into sentences: at a full stop, question or exclamation mark
+ * followed by a capital, a quote, a bracket or a definition. "Fig. 2" is
+ * not a sentence break.
+ */
+const sentences = (plain: string) => plain.split(/(?<=[.!?])\s+(?=[A-Z"(⟦])/);
 
 /** Everything a chapter says: the lesson, the maths and the captions. */
 const allHtml = (chapter: Chapter) =>
@@ -60,8 +79,8 @@ describe('the terms', () => {
       const count = allHtml(chapter).split(marker).length - 1;
       expect(count, chapter.id).toBe(chapter.id === term(id).section ? 1 : 0);
     }
-    // In the lesson itself, not a caption or a panel, and as written here.
-    expect(lessonHtml(chapterById(term(id).section)!)).toContain(define(id));
+    // In the lesson itself, not a caption or a panel.
+    expect(lessonHtml(chapterById(term(id).section)!)).toContain(marker);
   });
 
   // In reading order, which outline.ts sets: not by any number.
@@ -74,8 +93,10 @@ describe('the terms', () => {
 
   it.each(TERM_IDS)('%s is defined at its first use in its section', id => {
     const { section: home, match } = term(id) as Term;
-    const lesson = text(lessonHtml(chapterById(home)!));
-    const definedAt = lesson.indexOf(text(define(id)).trim());
+    const lesson = text(
+      lessonHtml(chapterById(home)!).replace(`<dfn data-defines="${id}">`, MARK),
+    );
+    const definedAt = lesson.indexOf(MARK);
     expect(definedAt).toBeGreaterThanOrEqual(0);
     const firstUse = lesson.search(match);
     expect(firstUse).toBeGreaterThanOrEqual(definedAt);
@@ -86,6 +107,27 @@ describe('the terms', () => {
     id => {
       const maths = chapterById(term(id).section)!.maths.flatMap(panel => panel.body);
       expect(maths).toContain(formula(id));
+    },
+  );
+
+  // One new idea at a time: the reader takes in each before the next.
+  it.each(CHAPTERS.map(chapter => chapter.id))(
+    '%s introduces at most one term a paragraph',
+    id => {
+      for (const html of paragraphs(chapterById(id)!)) {
+        expect(html.split('data-defines=').length - 1, html).toBeLessThanOrEqual(1);
+      }
+    },
+  );
+
+  it.each(CHAPTERS.map(chapter => chapter.id))(
+    '%s never defines terms in two sentences running',
+    id => {
+      const all = sentences(text(marked(lessonHtml(chapterById(id)!))));
+      for (let i = 1; i < all.length; i++) {
+        const both = all[i - 1].includes(MARK) && all[i].includes(MARK);
+        expect(both, `${all[i - 1]} | ${all[i]}`).toBe(false);
+      }
     },
   );
 
@@ -126,6 +168,51 @@ describe('the glossary', () => {
     const html = define('ratio');
     expect(html).toContain(`href="${glossaryHash('ratio')}"`);
     expect(html).toContain('aria-describedby="termdef-ratio"');
-    expect(html.startsWith('The <dfn data-defines="ratio">')).toBe(true);
+    expect(html.startsWith('<dfn data-defines="ratio">')).toBe(true);
+    expect(define('harmonic', 'harmonics')).toContain('>harmonics</a></dfn>');
+  });
+
+  it('links a term to English Wikipedia where it has an article', () => {
+    expect(wikiLink('bessel')).toContain(
+      'href="https://en.wikipedia.org/wiki/Bessel_function"',
+    );
+    expect(wikiLink('stack')).toBe('');
+  });
+
+  // Before there is a carrier the slider is the one wave's frequency.
+  it('calls the carrier slider Frequency in A single sine only', () => {
+    expect(chapterById('sine')!.labels).toEqual({ carrier: 'Frequency' });
+    for (const chapter of CHAPTERS.filter(c => c.id !== 'sine')) {
+      expect(chapter.labels, chapter.id).toBeUndefined();
+    }
+  });
+});
+
+describe('links out of the guide', () => {
+  const views = [landing, ...CHAPTERS, ...CHAPTERS.flatMap(c => c.sixOperators ?? [])];
+  const html = [
+    ...views.map(allHtml),
+    ...views.flatMap(view => view.maths.flatMap(panel => panel.body)),
+    ...TERM_IDS.map(wikiLink),
+  ].join(' ');
+  const external = [...html.matchAll(/<a\b[^>]*href="https?:[^"]*"[^>]*>/g)].map(m => m[0]);
+
+  it('exist, to English Wikipedia', () => {
+    expect(external.length).toBeGreaterThan(TERM_IDS.length);
+    for (const tag of external) {
+      expect(tag).toMatch(/href="https:\/\/en\.wikipedia\.org\/wiki\/[^"\s]+"/);
+    }
+  });
+
+  it.each(external)('opens in a new tab, without the opener: %s', tag => {
+    expect(tag).toMatch(/\btarget="_blank"/);
+    expect(tag).toMatch(/\brel="[^"]*\bnoopener\b[^"]*"/);
+  });
+
+  it('marks a link out with an arrow and says it opens a new tab', () => {
+    const link = wikipedia('Yamaha_DX7', 'Yamaha DX7');
+    expect(link).toContain('↗');
+    expect(link).toContain('opens in a new tab');
+    expect(link).toContain('class="external"');
   });
 });

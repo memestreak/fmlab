@@ -436,6 +436,21 @@ a.term:hover {
   text-decoration-style: solid;
 }
 
+/* A link out to Wikipedia, in a new tab: a plain solid underline and a
+   small arrow, so it never reads as a glossary term. */
+a.external {
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+.external-mark {
+  display: inline-block;
+  margin-left: 0.1em;
+  font-size: 0.75em;
+  text-decoration: none;
+  vertical-align: 0.15em;
+}
+
 dfn {
   font-style: normal;
   font-weight: 600;

@@ -21,7 +21,14 @@ import {
   upgradeHash,
   viewFromHash,
 } from '../chapters/route';
-import { glossaryOrder, term, type TermId, TERMS } from '../chapters/terms';
+import {
+  glossaryOrder,
+  term,
+  type Term,
+  type TermId,
+  TERMS,
+  wikiLink,
+} from '../chapters/terms';
 import type { LabState, LabStore } from '../model/lab';
 
 /** How long the sound must rest before the address is brought up to date. */
@@ -155,7 +162,7 @@ const paragraph = (html: string) =>
 function glossaryHtml(): string {
   const entries = glossaryOrder()
     .map(id => {
-      const { name, plain, formula, section } = term(id);
+      const { name, plain, formula, section, wiki } = term(id) as Term;
       return `
         <div class="glossary-entry" id="term-${id}" tabindex="-1">
           <dt>${name}</dt>
@@ -163,7 +170,9 @@ function glossaryHtml(): string {
             <p>${plain}</p>
             ${formula ? `<p class="formula">${formula}</p>` : ''}
             <p class="glossary-from">Defined in
-              <a href="${hashFor(section)}">${titleOf(section)}</a></p>
+              <a href="${hashFor(section)}">${titleOf(section)}</a>${
+                wiki ? ` · ${wikiLink(id)}` : ''
+              }</p>
           </dd>
         </div>`;
     })
@@ -299,7 +308,14 @@ export function mountChapters(store: LabStore): void {
     if (hint) hint.hidden = chapter.hasPiano === true;
 
     for (const row of document.querySelectorAll<HTMLElement>('[data-control]')) {
-      row.hidden = !chapter.controls.includes(row.dataset.control as ControlId);
+      const id = row.dataset.control as ControlId;
+      row.hidden = !chapter.controls.includes(id);
+      // The page's label unless the chapter names the slider its own way.
+      const label = row.querySelector('label');
+      if (label) {
+        label.dataset.label ??= label.textContent ?? '';
+        label.textContent = chapter.labels?.[id] ?? label.dataset.label;
+      }
     }
     // For the stylesheet: a chapter with many controls (many sliders, or
     // the piano as well) sets its sliders in two columns where the lab is

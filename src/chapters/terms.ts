@@ -1,9 +1,11 @@
-// Every term the guide defines, in one place. A chapter puts a term's
-// definition into its text with `define`, at the term's first use, and its
-// formula into its maths panel with `formula`; later mentions are marked
-// with `use`. The glossary lists the same entries, so the text and the
-// glossary cannot drift apart. src/__tests__/chapters/terms.test.ts checks
-// that each term is defined where it says, and not used before.
+// Every term the guide defines, in one place. A chapter writes its own
+// sentence defining a term, in its own words and after the reader has
+// heard or seen the thing, and marks the term there with `define`; its
+// formula goes into the maths panel with `formula`, and later mentions are
+// marked with `use`. The glossary lists the same entries with their
+// `plain` sentences, which only the glossary and the tips show.
+// src/__tests__/chapters/terms.test.ts checks that each term is defined
+// where it says, and not used before.
 
 import type { SectionId } from './outline';
 
@@ -13,13 +15,16 @@ export interface Term {
   name: string;
   /**
    * The definition: one plain sentence, containing `name` (in any case),
-   * that reads as part of the chapter's text where it is defined. HTML.
+   * for the glossary and the term's tip. The chapter's text says it its
+   * own way. HTML.
    */
   plain: string;
   /** The formal definition, a formula for the chapter's maths panel. HTML. */
   formula?: string;
   /** The section that defines it. */
   section: SectionId;
+  /** Its article on English Wikipedia, as in the article's address. */
+  wiki?: string;
   /**
    * The words that count as using the term, to check that no section uses
    * it before the one that defines it.
@@ -40,13 +45,15 @@ export const TERMS = {
       evenly back and forth in the shape of the sine curve.`,
     formula: `${v('x')}(${v('t')}) = ${v('A')} sin(2π ${v('f')} ${v('t')})`,
     section: 'sine',
+    wiki: 'Sine_wave',
     match: /\bsine waves?\b/i,
   },
   carrier: {
     name: 'carrier',
-    plain: `The carrier is the sine wave you hear; from the next section on, a
-      second wave pushes it around.`,
-    section: 'sine',
+    plain: `The carrier is the sine wave you hear, pushed around by a second
+      wave, the modulator.`,
+    section: 'vibrato',
+    wiki: 'Frequency_modulation_synthesis',
     match: /\bcarriers?\b/i,
   },
   frequency: {
@@ -55,6 +62,7 @@ export const TERMS = {
       hertz (Hz), and you hear it as pitch.`,
     formula: `${v('f')} = 1 / ${v('T')}`,
     section: 'sine',
+    wiki: 'Frequency',
     match: /\bfrequenc(y|ies)\b|\bhertz\b/i,
   },
   octave: {
@@ -62,12 +70,14 @@ export const TERMS = {
     plain: `An octave is the step from one pitch to the pitch at twice its
       frequency.`,
     section: 'sine',
+    wiki: 'Octave',
     match: /\boctaves?\b/i,
   },
   waveform: {
     name: 'waveform',
     plain: `A waveform is a sound drawn as its height against time.`,
     section: 'sine',
+    wiki: 'Waveform',
     match: /\bwaveforms?\b/i,
   },
   amplitude: {
@@ -75,6 +85,7 @@ export const TERMS = {
     plain: `Amplitude is how far a wave swings either side of zero, and you
       hear it as loudness.`,
     section: 'sine',
+    wiki: 'Amplitude',
     match: /\bamplitudes?\b/i,
   },
   spectrum: {
@@ -83,6 +94,7 @@ export const TERMS = {
       for each, standing at that wave's frequency and as tall as its
       amplitude.`,
     section: 'sine',
+    wiki: 'Frequency_domain',
     match: /\bspectr(um|a)\b/i,
   },
   partial: {
@@ -90,6 +102,7 @@ export const TERMS = {
     plain: `A partial is one of the sine waves a sound is made of, one stem in
       its spectrum.`,
     section: 'sine',
+    wiki: 'Overtone',
     match: /\bpartials?\b/i,
   },
   modulator: {
@@ -98,6 +111,7 @@ export const TERMS = {
       around; it is not heard itself, only in what it does to the
       carrier.`,
     section: 'vibrato',
+    wiki: 'Frequency_modulation_synthesis',
     match: /\bmodulators?\b/i,
   },
   fm: {
@@ -106,12 +120,14 @@ export const TERMS = {
       up and down.`,
     formula: `${v('f')}(${v('t')}) = ${FC} + ${DF} sin(2π ${FM} ${v('t')})`,
     section: 'vibrato',
+    wiki: 'Frequency_modulation',
     match: /\bfrequency modulation\b|\bFM\b/i,
   },
   vibrato: {
     name: 'vibrato',
     plain: `Vibrato is a slow, regular wobble in pitch.`,
     section: 'vibrato',
+    wiki: 'Vibrato',
     match: /\bvibrato\b/i,
   },
   deviation: {
@@ -119,6 +135,7 @@ export const TERMS = {
     plain: `Deviation is how far the modulator pushes the carrier's frequency
       each way, in Hz.`,
     section: 'vibrato',
+    wiki: 'Frequency_deviation',
     match: /\bdeviation\b/i,
   },
   sideband: {
@@ -128,6 +145,7 @@ export const TERMS = {
       the modulator's frequency.`,
     formula: `${FC} ± ${v('n')} ${FM}, &ensp; ${v('n')} = 1, 2, 3, …`,
     section: 'vibrato',
+    wiki: 'Sideband',
     match: /\bsidebands?\b/i,
   },
   timbre: {
@@ -136,13 +154,15 @@ export const TERMS = {
       playing the same note as loudly, set by which partials it has and
       how strong each is.`,
     section: 'vibrato',
+    wiki: 'Timbre',
     match: /\btimbres?\b/i,
   },
   phase: {
     name: 'phase',
     plain: `A wave's phase is how far through its cycle it is at a given
       moment, measured as an angle.`,
-    section: 'index',
+    section: 'fm-vs-pm',
+    wiki: 'Phase_(waves)',
     match: /\bphases?\b/i,
   },
   radian: {
@@ -150,7 +170,8 @@ export const TERMS = {
     plain: `A radian is the unit that angle is counted in: a whole cycle is 2π
       radians, about 6.28.`,
     formula: `one cycle = 2π radians ≈ 6.28 radians`,
-    section: 'index',
+    section: 'fm-vs-pm',
+    wiki: 'Radian',
     match: /\bradians?\b/i,
   },
   pm: {
@@ -158,15 +179,17 @@ export const TERMS = {
     plain: `Phase modulation (PM) is one wave pushing another's phase back and
       forth, rather than its frequency.`,
     formula: `${v('x')}(${v('t')}) = sin(2π ${FC} ${v('t')} + ${v('I')} sin 2π ${FM} ${v('t')})`,
-    section: 'index',
+    section: 'fm-vs-pm',
+    wiki: 'Phase_modulation',
     match: /\bphase modulation\b|\bPM\b/i,
   },
   index: {
     name: 'modulation index',
-    plain: `The modulation index is how hard the modulator pushes: the
-      furthest it moves the carrier's phase, in radians.`,
+    plain: `The modulation index is how hard the modulator pushes: its
+      deviation divided by its own frequency.`,
     formula: `${v('I')} = ${DF} / ${FM}`,
     section: 'index',
+    wiki: 'Modulation_index',
     match: /\bindex\b|\bindices\b/i,
   },
   harmonic: {
@@ -175,6 +198,7 @@ export const TERMS = {
       frequency: twice it, three times, four times and so on.`,
     formula: `${sub('f', v('k'))} = ${v('k')} ${v('f')}, &ensp; ${v('k')} = 1, 2, 3, …`,
     section: 'index',
+    wiki: 'Harmonic',
     match: /\bharmonics?\b/i,
   },
   bandwidth: {
@@ -182,6 +206,7 @@ export const TERMS = {
     plain: `A sound's bandwidth is the span of frequencies its partials
       cover.`,
     section: 'index',
+    wiki: 'Bandwidth_(signal_processing)',
     match: /\bbandwidths?\b/i,
   },
   carson: {
@@ -190,6 +215,7 @@ export const TERMS = {
       the index plus one sidebands each side of the carrier.`,
     formula: `${v('B')} ≈ 2 (${DF} + ${FM}) = 2 ${FM} (${v('I')} + 1)`,
     section: 'index',
+    wiki: 'Carson_bandwidth_rule',
     match: /\bCarson\b/i,
   },
   bessel: {
@@ -201,6 +227,7 @@ export const TERMS = {
       `sin(2π ${FC} ${v('t')} + ${v('I')} sin 2π ${FM} ${v('t')}) = ` +
       `Σ ${sub('J', v('n'))}(${v('I')}) sin 2π (${FC} + ${v('n')} ${FM}) ${v('t')}`,
     section: 'sidebands',
+    wiki: 'Bessel_function',
     match: /\bBessel\b/i,
   },
   ratio: {
@@ -209,6 +236,7 @@ export const TERMS = {
       carrier's.`,
     formula: `${v('r')} = ${FM} / ${FC}`,
     section: 'ratio',
+    wiki: 'Frequency_modulation_synthesis',
     match: /\bratios?\b/i,
   },
   inharmonic: {
@@ -217,6 +245,7 @@ export const TERMS = {
       of any one note's frequency; they are heard as several pitches at
       once, as a bell or a gong is.`,
     section: 'ratio',
+    wiki: 'Inharmonicity',
     match: /\binharmonic\b/i,
   },
   negativeFrequency: {
@@ -226,6 +255,7 @@ export const TERMS = {
       upside down.`,
     formula: `sin(−${v('x')}) = −sin(${v('x')})`,
     section: 'ratio',
+    wiki: 'Negative_frequency',
     match: /\bnegative frequenc|\bfold(s|ed|ing)?\b/i,
   },
   envelope: {
@@ -236,6 +266,7 @@ export const TERMS = {
       `${v('x')}(${v('t')}) = ${v('e')}(${v('t')}) ` +
       `sin(2π ${FC} ${v('t')} + ${v('I')} ${v('e')}(${v('t')}) sin 2π ${FM} ${v('t')})`,
     section: 'envelopes',
+    wiki: 'Envelope_(music)',
     match: /\benvelopes?\b/i,
   },
   adsr: {
@@ -245,6 +276,7 @@ export const TERMS = {
       level it holds while the note is held; and release, the time it
       takes to die away once the note is let go.`,
     section: 'envelopes',
+    wiki: 'Envelope_(music)',
     match: /\bADSR\b|\battack\b|\bsustain\b/i,
   },
   spectrogram: {
@@ -253,6 +285,7 @@ export const TERMS = {
       right, frequency upward, and the stronger a partial is, the bolder
       its mark.`,
     section: 'envelopes',
+    wiki: 'Spectrogram',
     match: /\bspectrograms?\b/i,
   },
   operator: {
@@ -261,6 +294,7 @@ export const TERMS = {
       frequency, level and envelope; any operator can be a carrier or a
       modulator.`,
     section: 'algorithms',
+    wiki: 'Frequency_modulation_synthesis',
     match: /\boperators?\b/i,
   },
   stack: {
@@ -272,9 +306,10 @@ export const TERMS = {
   },
   feedback: {
     name: 'feedback',
-    plain: `Feedback is an operator modulating itself: its own output is added
-      back into its phase.`,
+    plain: `Feedback is an operator modulating itself: its own output goes
+      back in as its modulator.`,
     section: 'algorithms',
+    wiki: 'Frequency_modulation_synthesis',
     match: /\bfeedback\b|\bfeeds? back\b|\bfed back\b/i,
   },
   algorithm: {
@@ -282,13 +317,15 @@ export const TERMS = {
     plain: `An algorithm, on the DX7, is a fixed wiring diagram for its six
       operators: which modulate which, and which are heard.`,
     section: 'algorithms',
+    wiki: 'Frequency_modulation_synthesis',
     match: /\balgorithms?\b/i,
   },
   fft: {
     name: 'fast Fourier transform',
     plain: `The fast Fourier transform (FFT) is the standard way to take a
       stretch of sound apart into the sine waves it is made of.`,
-    section: 'algorithms',
+    section: 'sine',
+    wiki: 'Fast_Fourier_transform',
     match: /\bFourier\b|\bFFT\b/i,
   },
 } satisfies Record<string, Term>;
@@ -330,19 +367,32 @@ function link(id: TermId, text: string): string {
 }
 
 /**
- * A term's definition, as a sentence of the chapter's text: the plain
- * definition with the term itself set as the defining instance, in bold.
+ * A term where the chapter's text defines it, as the defining instance,
+ * in bold: `text` if the words differ ("harmonics"). The sentence round
+ * it is the chapter's own.
  */
-export function define(id: TermId): string {
-  const { name, plain } = term(id);
-  const at = plain.toLowerCase().indexOf(name.toLowerCase());
-  if (at < 0) throw new Error(`The definition of ${id} does not name it.`);
-  const said = plain.slice(at, at + name.length);
+export function define(id: TermId, text: string = term(id).name): string {
+  return `<dfn data-defines="${id}">${link(id, text)}</dfn>`;
+}
+
+/**
+ * A link to an article on English Wikipedia, opening in a new tab and
+ * marked ↗. The lesson text links only proper nouns this way and maths
+ * panels where a formula appears; every other term links to the glossary.
+ */
+export function wikipedia(article: string, text: string): string {
   return (
-    plain.slice(0, at) +
-    `<dfn data-defines="${id}">${link(id, said)}</dfn>` +
-    plain.slice(at + name.length)
-  ).replace(/\s+/g, ' ');
+    `<a class="external" href="https://en.wikipedia.org/wiki/${article}" ` +
+    `target="_blank" rel="noopener">${text}<span class="external-mark" ` +
+    `aria-hidden="true">↗</span><span class="visually-hidden"> ` +
+    `(opens in a new tab)</span></a>`
+  );
+}
+
+/** A term's Wikipedia link for its glossary entry; empty if it has none. */
+export function wikiLink(id: TermId): string {
+  const { wiki } = term(id) as Term;
+  return wiki ? wikipedia(wiki, 'Wikipedia') : '';
 }
 
 /** A later mention of a term, marked: `text` if the words differ. */

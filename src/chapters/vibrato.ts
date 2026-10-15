@@ -1,5 +1,5 @@
 import { BASE_PATCH } from './basePatch';
-import { define, formula } from './terms';
+import { define, formula, wikipedia } from './terms';
 import { sectionLink, titleOf } from './outline';
 import type { Chapter } from './types';
 
@@ -7,35 +7,50 @@ export const vibrato: Chapter = {
   id: 'vibrato',
   title: titleOf('vibrato'),
   body: [
-    `Now there are two sine waves. ${define('modulator')} ${define('fm')}
-     That is what this section does. Press Play. The modulator runs at 5 Hz, five times a second, and what you
-     hear is the wobble a violinist makes by rocking a finger on the
-     string. ${define('vibrato')}`,
-    `${define('deviation')} At 20 the carrier swings between 200 and
-     240 Hz. While the sound plays, Fig. 1 moves with it. The thinner line
-     is the modulator, which here is the pitch: where it is high the
-     carrier's waves crowd together, and where it is low they spread out.
-     The carrier is drawn slowed down, so that each of its waves can be
+    `Press Play. This is a sine wave again, but its pitch now rises and
+     falls five times a second: the wobble a violinist makes by rocking a
+     finger on the string. A slow, regular wobble in pitch like this is
+     ${define('vibrato')}.`,
+    `What moves the pitch is a second sine wave, running at 5 Hz, far too
+     slow to hear as a note. It is the ${define('modulator')}: you never
+     hear it, only what it does to the first wave. Fig. 1 draws it behind
+     the sound as the thinner line. Where it is high the waves crowd
+     together and the pitch is up; where it is low they spread out.`,
+    `The wave you hear, the one being pushed around, is the
+     ${define('carrier')}. While the sound plays, Fig. 1 moves with it.
+     The carrier is drawn slowed down so that each of its waves can be
      seen; the figure's caption says by how much. Tick Show motion to
      watch it without the sound.`,
-    `Now drag <strong>Modulator</strong> slowly to the right. Past about
-     20 Hz the wobble is too fast to follow and turns into a roughness, a
-     growl. (The figure stops moving a little before that, and from there
-     shows two whole wobbles standing still, at the carrier's true speed.)
-     Keep going into the hundreds and the wobble is gone altogether: you
-     hear one steady note with a new, brighter colour. Nothing changed but
-     the speed.`,
+    `How far the modulator pushes the carrier's frequency each way, in Hz,
+     is its ${define('deviation')}. At 20 the carrier swings between 200
+     and 240 Hz. Move Deviation down to 0 and the wobble stops; move it up
+     and the wobble widens.`,
+    `Move Modulator a little and the wobble speeds up or slows down. One
+     wave pushing another's frequency up and down like this is
+     ${define('fm')}, FM for short.`,
+    `Now the moment this guide is built on. Drag
+     <strong>Modulator</strong> slowly to the right. Past about 20 Hz the
+     wobble is too fast to follow and turns into a roughness, a growl.
+     (The figure stops moving a little before that, and from there shows
+     two whole wobbles standing still, at the carrier's true speed.) Keep
+     going into the hundreds and the wobble is gone altogether: you hear
+     one steady note with a new, brighter colour. Nothing changed but the
+     speed, and a movement of pitch has become the sound's
+     ${define('timbre')}: its colour, what tells a flute from a violin
+     playing the same note.`,
     `Fig. 2 shows why. Modulating a sine wave's frequency puts new stems on
-     both sides of the carrier. ${define('sideband')} At 5 Hz they huddle
-     so close to the carrier that the ear cannot tell them apart and hears
-     one pitch that moves. As the modulator speeds up they spread out,
-     until the ear hears each as a partial of its own, and the moving pitch
-     has turned into a change of colour. ${define('timbre')}`,
-    `John Chowning came upon this at Stanford in 1967, pushing vibrato
-     faster and deeper than any player could, and published it in 1973 as
-     "The Synthesis of Complex Audio Spectra by Means of Frequency
-     Modulation". A handful of sine waves could now stand in for a whole
-     bank of them. Ten years later it was the sound of the Yamaha DX7.`,
+     both sides of the carrier, in pairs, one modulator frequency apart.
+     Each is a ${define('sideband')}. At 5 Hz they huddle so close to the
+     carrier that the ear cannot tell them apart and hears one pitch that
+     moves. As the modulator speeds up they spread out, until the ear
+     hears each as a partial of its own, and the moving pitch has turned
+     into a change of colour.`,
+    `${wikipedia('John_Chowning', 'John Chowning')} came upon this at
+     Stanford in 1967, pushing vibrato faster and deeper than any player
+     could, and published it in 1973 as "The Synthesis of Complex Audio
+     Spectra by Means of Frequency Modulation". A handful of sine waves
+     could now stand in for a whole bank of them. Ten years later it was
+     the sound of the ${wikipedia('Yamaha_DX7', 'Yamaha DX7')}.`,
   ],
   maths: [
     {
@@ -60,8 +75,7 @@ export const vibrato: Chapter = {
       title: 'Why this section is different under the bonnet',
       body: [
         `Every other section pushes the carrier a slightly different way,
-         the way the DX7 does, which ${sectionLink('index')} describes. The two make the
-         same family of sounds.`,
+         the way the DX7 does. The two make the same family of sounds.`,
         `The difference is what stays put when the modulator's speed
          changes. Here the deviation in Hz is fixed, as it is for a
          violinist's finger, so a slower modulator makes a denser clump.
