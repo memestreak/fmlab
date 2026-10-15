@@ -179,9 +179,9 @@ describe('the glossary', () => {
     expect(wikiLink('stack')).toBe('');
   });
 
-  // Before there is a carrier the slider is the one wave; after, Carrier.
-  it('calls the carrier slider Wave in A single sine only', () => {
-    expect(chapterById('sine')!.labels).toEqual({ carrier: 'Wave' });
+  // Before there is a carrier the slider is the one wave's frequency.
+  it('calls the carrier slider Frequency in A single sine only', () => {
+    expect(chapterById('sine')!.labels).toEqual({ carrier: 'Frequency' });
     for (const chapter of CHAPTERS.filter(c => c.id !== 'sine')) {
       expect(chapter.labels, chapter.id).toBeUndefined();
     }

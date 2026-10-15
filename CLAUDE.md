@@ -91,7 +91,7 @@ figures subscribe to it. Nothing else passes values around.
   groups; `index.ts` joins each id to its file), lesson
   text and "The maths" panels (HTML strings, trusted because they are
   written here), the sliders it shows (and in `labels` any it names
-  its own way: Carrier is Wave in `sine`), the patch it starts from (all
+  its own way: Carrier is Frequency in `sine`), the patch it starts from (all
   of it, so a chapter always opens the same way), optional `steps` (sections
   with a sound each, `algorithms`), `showsPair` (the two-operator
   sections and the sandbox draw their two operators small beside the

@@ -107,7 +107,7 @@ export interface Chapter {
   controls: ControlId[];
   /**
    * A slider's label where the chapter calls it something else than the
-   * page does: in `sine`, before there is a carrier, Carrier is Wave.
+   * page does: in `sine`, before there is a carrier, Carrier is Frequency.
    */
   labels?: Partial<Record<ControlId, string>>;
   /**

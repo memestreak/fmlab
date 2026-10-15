@@ -12,10 +12,10 @@ export const singleSine: Chapter = {
      curve, swinging smoothly back and forth, so it is called a
      ${define('sineWave')}. There are only two things about it you can
      change.`,
-    `Move <strong>Wave</strong> and the pitch goes up and down. What it
-     changes is how many times a second the wave repeats, its
-     ${define('frequency')}, counted in hertz (Hz). You hear it as
-     pitch.`,
+    `Move the slider under Volume and the pitch goes up and down. What it
+     changes is how many times a second the wave repeats: its
+     ${define('frequency')}, counted in hertz (Hz), which is what the
+     slider is called. You hear frequency as pitch.`,
     `At 220 Hz this is the A below middle C. Take it up to 440 Hz and you
      hear the A above it: the same note, higher. Doubling the frequency
      always gives that same note again, and the step it takes is an
@@ -23,7 +23,7 @@ export const singleSine: Chapter = {
     `Fig. 1 draws the sound as its height against time, over 20
      milliseconds, a fiftieth of a second. That drawing is its
      ${define('waveform')}. At 220 Hz a little over four swings fit. Move
-     Wave up and more crowd in; move it down and they spread out.
+     Frequency up and more crowd in; move it down and they spread out.
      A higher pitch is the same shape, repeating sooner.`,
     `Volume changes how far the wave swings either side of zero. That is
      its ${define('amplitude')}, and you hear it as loudness. The figures
@@ -33,7 +33,7 @@ export const singleSine: Chapter = {
      sound is made of, one stem for each, standing at that wave's
      frequency and as tall as its amplitude. This view is the sound's
      ${define('spectrum')}. One sine wave is one stem, and it slides along
-     the axis as you move Wave.`,
+     the axis as you move Frequency.`,
     `More interesting sounds have many stems. Each one is a
      ${define('partial')}: one of the sine waves the sound is made of. The
      rest of this guide is about growing many partials from just two sine
@@ -64,8 +64,8 @@ export const singleSine: Chapter = {
     },
   ],
   controls: ['volume', 'carrier'],
-  // There is no carrier yet: one wave.
-  labels: { carrier: 'Wave' },
+  // There is no carrier yet: the slider sets the one wave's frequency.
+  labels: { carrier: 'Frequency' },
   presets: [],
   hasMotion: false,
   patch: {
