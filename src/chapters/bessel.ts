@@ -79,7 +79,6 @@ export const bessel: Chapter = {
   controls: ['volume'],
   presets: [],
   showsPair: true,
-  hasMotion: false,
   patch: {
     ...BASE_PATCH,
     // Far enough apart that no sideband worth drawing reaches zero.

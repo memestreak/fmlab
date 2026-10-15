@@ -78,7 +78,6 @@ export const modulationIndex: Chapter = {
   controls: ['volume', 'index'],
   presets: [],
   showsPair: true,
-  hasMotion: false,
   patch: {
     ...BASE_PATCH,
     index: 1,

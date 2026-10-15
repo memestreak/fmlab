@@ -88,11 +88,6 @@ export interface LabState {
   /** The order held picked out by its chip until it is pressed again. */
   pinned: number | null;
   /**
-   * "Show motion": animate the waveform figure, where it has a moving
-   * view, even with no sound playing.
-   */
-  motion: boolean;
-  /**
    * Whether the spectrum figure shows the live, measured spectrum of the
    * sound (over the predicted one, faintly) instead of the predicted one.
    * The reader's choice for the visit; neither saved nor in the URL.
@@ -167,7 +162,6 @@ export const DEFAULTS: LabState = {
   noteLength: 0,
   hover: null,
   pinned: null,
-  motion: false,
   liveSpectrum: false,
   algorithm: 1,
   operators: [

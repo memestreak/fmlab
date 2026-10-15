@@ -16,7 +16,6 @@ export const glossary: Chapter = {
   maths: [],
   controls: ['volume'],
   presets: [],
-  hasMotion: false,
   patch: BASE_PATCH,
   figures: {},
 };

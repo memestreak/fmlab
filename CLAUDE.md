@@ -255,7 +255,7 @@ figures subscribe to it. Nothing else passes values around.
   `themeSwitch.ts`; and `figures.ts` redraws a canvas on patch, size,
   theme and font changes, keeps its `aria-label` describing what it shows,
   and runs the waveform's animation loop while it should move
-  (`waveformMoves`: sound playing or "Show motion" on, a moving view, and
+  (`waveformMoves`: sound playing, a moving view, and
   no `prefers-reduced-motion`).
 - `src/styles/` — `tokens.css` (colours and fonts) and `base.css` (the two
   panes, type, figures and the controls).
@@ -348,8 +348,9 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
   `prefers-reduced-motion` they simply stay as they are, and the sound
   still plays. The other
   thing that animates is `vibrato`'s waveform, while sound
-  plays or "Show motion" is ticked. Under `prefers-reduced-motion` it
-  stays still, the checkbox is hidden and the caption says why. Anything
+  plays (it opens on a 0.5 Hz modulator, a slide slow enough to follow).
+  Under `prefers-reduced-motion` it stays still and the caption says
+  why. Anything
   else that moves must do the same.
 
 ## Testing

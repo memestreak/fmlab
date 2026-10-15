@@ -340,8 +340,6 @@ export function mountChapters(store: LabStore): void {
     if (picker) picker.hidden = chapter.patch.mode !== 'ops';
     const share = document.querySelector<HTMLElement>('#share');
     if (share) share.hidden = !chapter.sharesSound;
-    const motion = document.querySelector<HTMLElement>('#motion-toggle');
-    if (motion) motion.hidden = !chapter.hasMotion;
     const follows = document.querySelector<HTMLElement>('#index-follows-toggle');
     // Only where the index has an envelope to follow: chapter 6. The
     // landing view and chapter 8 play notes too, but not that way.

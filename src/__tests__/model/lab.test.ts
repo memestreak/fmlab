@@ -45,7 +45,6 @@ describe('the lab store', () => {
       realUnits: false,
       hover: null,
       pinned: null,
-      motion: false,
     });
   });
 

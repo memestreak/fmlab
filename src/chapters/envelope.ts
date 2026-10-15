@@ -102,7 +102,6 @@ export const envelope: Chapter = {
     { label: 'Bell', hint: "Chowning's bell", patch: BELL },
   ],
   showsPair: true,
-  hasMotion: false,
   patch: {
     ...BASE_PATCH,
     ...BRASS,

@@ -122,11 +122,6 @@ export interface Chapter {
    */
   steps?: Step[];
   /**
-   * Whether to offer "Show motion", for a chapter whose waveform figure
-   * has a moving view.
-   */
-  hasMotion: boolean;
-  /**
    * Whether to draw its two operators as chapter 8 draws a wiring, small,
    * beside the start of the text: the modulator on the carrier. So the
    * diagrams are familiar by the time chapter 8 needs them.

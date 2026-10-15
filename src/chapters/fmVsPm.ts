@@ -85,7 +85,6 @@ export const fmVsPm: Chapter = {
   ],
   controls: ['volume', 'ratio', 'index'],
   presets: [],
-  hasMotion: false,
   patch: {
     ...BASE_PATCH,
     compare: true,
