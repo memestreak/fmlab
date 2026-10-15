@@ -1433,6 +1433,23 @@ dfn {
   border-color: var(--ink);
 }
 
+/* A box is dragged to change it, as well as typed in: a resize cursor
+   until it is clicked into, and a finger's drag changes the value rather
+   than scrolling the page. */
+.op-input {
+  cursor: ew-resize;
+  touch-action: none;
+}
+
+.op-input:focus {
+  cursor: text;
+}
+
+.op-input.is-scrubbing {
+  border-color: var(--ink);
+  user-select: none;
+}
+
 /* Where the lab is pinned beside the text: the two panels side by side,
    the diagram a fixed height, and the spectrum below with the rest. */
 @media (min-width: 62rem) {

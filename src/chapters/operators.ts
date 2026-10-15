@@ -61,8 +61,9 @@ const STEPS: Step[] = [
       `Each operator has a level, a percentage. For a carrier it is how
        loud it is. For a modulator it is how hard it pushes, its index:
        full level is an index of 5, so OP2 at 40% is an index of 2. Press
-       Play note (or space), then drag OP2's Level slider, or type in the
-       box beside it, and play it again. While a note sounds, each box
+       Play note (or space), then drag OP2's Level slider, or drag up or
+       across in the box beside it, or click in the box and type, and play
+       it again. While a note sounds, each box
        fills as strongly as its operator is sounding.`,
     ],
   },
@@ -163,8 +164,8 @@ export const operators: Chapter = {
      and say nothing about pitch. Each operator's frequency is set as a
      multiple of the note's, which the DX7 also calls its ratio: a carrier
      at 1 with a modulator at 2 is the 1:2 of ${sectionLink('ratio')}. Its
-     Ratio slider snaps to whole numbers and a half; hold Shift for the
-     steps between, or type one in the box. Its envelope here is one
+     Ratio slider, and a drag in its box, snap to whole numbers and a
+     half; hold Shift for the steps between, or type one in the box. Its envelope here is one
      number, how long it takes to die away; a decay of 0 holds it for the
      whole note.`,
     `What makes a sound is how the operators are wired together: which

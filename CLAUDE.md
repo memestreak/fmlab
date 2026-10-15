@@ -233,7 +233,9 @@ figures subscribe to it. Nothing else passes values around.
   Feedback slider) and Operators (a row per operator the wiring uses, its
   tag ringed in its role's pen, and for ratio, level and decay a slider
   with a box to type in; Ratio snaps to `RATIO_STOPS` unless Shift or Alt
-  is held). Pointing at or focusing a row sets `hoverOp`, which rings that
+  is held). A drag in a box changes it as well (`scrubTo`: up or right
+  for more, the same stops, Shift or Alt finer and slower); a click
+  without moving still types. Pointing at or focusing a row sets `hoverOp`, which rings that
   box in the diagram; pointing at a box (`operatorAt`) picks out its row.
   Where the lab is pinned small, the Operators panel and Feedback fold
   behind Sliders;

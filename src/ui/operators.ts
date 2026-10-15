@@ -92,6 +92,44 @@ export function stepRatio(ratio: number, direction: 1 | -1): number {
   return [...RATIO_STOPS].reverse().find(stop => stop < ratio - EPSILON) ?? OP_RATIO.min;
 }
 
+/** How far a drag in a box must go before it changes the value, in px. */
+export const SCRUB_THRESHOLD = 3;
+
+/**
+ * How many pixels of drag cross a column's whole range; with Shift or Alt
+ * held, five times as many, for fine control.
+ */
+const SCRUB_PIXELS: Record<keyof Operator, number> = { ratio: 300, level: 200, decay: 200 };
+const FINE_SLOWER = 5;
+
+/**
+ * A value dragged in a box: `start` (as the box shows it, Level in %)
+ * moved by `pixels`, up and to the right counting positive. Ratio goes
+ * from stop to stop (RATIO_STOPS), or, `fine`, in hundredths; Level in
+ * whole percent and Decay in tenths of a second. Kept within the range.
+ */
+export function scrubTo(
+  key: keyof Operator,
+  start: number,
+  pixels: number,
+  fine: boolean,
+): number {
+  const column = COLUMNS.find(c => c.key === key)!;
+  const span = column.max - column.min;
+  const perPixel = span / (SCRUB_PIXELS[key] * (fine ? FINE_SLOWER : 1));
+  const within = (value: number) => Math.min(column.max, Math.max(column.min, value));
+  if (key === 'ratio' && !fine) {
+    // So many stops along, each stop an equal share of the drag.
+    const stops = Math.trunc(pixels / (SCRUB_PIXELS.ratio / RATIO_STOPS.length));
+    let ratio = start;
+    for (let i = 0; i < Math.abs(stops); i++) ratio = stepRatio(ratio, stops > 0 ? 1 : -1);
+    return ratio;
+  }
+  const raw = start + pixels * perPixel;
+  const step = key === 'ratio' ? 0.01 : column.step;
+  return within(Number((Math.round(raw / step) * step).toFixed(2)));
+}
+
 /**
  * "carrier" or "modulator": what an operator is in an algorithm; "unused"
  * for one a step wiring leaves out.
@@ -232,6 +270,56 @@ export function mountOperators(store: LabStore): void {
       });
       // Put a number typed out of range back into it, once left.
       box.addEventListener('change', () => show(store.get()));
+
+      // A drag in the box changes the value too: up or right for more,
+      // down or left for less. A press that does not move (under
+      // SCRUB_THRESHOLD) is a click, and the box takes the typing as ever.
+      let drag: { x: number; y: number; start: number; moved: boolean } | null = null;
+      /** Just dragged: the click and focus that follow are not for typing. */
+      let dragged = false;
+      box.addEventListener('pointerdown', event => {
+        if (event.button !== 0) return;
+        drag = {
+          x: event.clientX,
+          y: event.clientY,
+          start: Number(column.show(store.get().operators[op][column.key])),
+          moved: false,
+        };
+      });
+      box.addEventListener('pointermove', event => {
+        if (!drag) return;
+        const pixels = event.clientX - drag.x - (event.clientY - drag.y);
+        if (!drag.moved) {
+          if (Math.hypot(event.clientX - drag.x, event.clientY - drag.y) < SCRUB_THRESHOLD) {
+            return;
+          }
+          drag.moved = true;
+          box.setPointerCapture(event.pointerId);
+          // Out of typing, so it shows the value as it moves and no text
+          // is selected; the class keeps it so until the drag ends.
+          box.blur();
+          box.classList.add('is-scrubbing');
+        }
+        event.preventDefault();
+        const shown = scrubTo(column.key, drag.start, pixels, event.shiftKey || event.altKey);
+        setOperator(op, column.key, column.read(shown));
+      });
+      const end = () => {
+        if (drag?.moved) {
+          dragged = true;
+          window.setTimeout(() => (dragged = false), 0);
+        }
+        drag = null;
+        box.classList.remove('is-scrubbing');
+      };
+      box.addEventListener('pointerup', end);
+      box.addEventListener('pointercancel', end);
+      box.addEventListener('click', event => {
+        if (dragged) event.preventDefault();
+      });
+      box.addEventListener('focus', () => {
+        if (dragged || drag?.moved) box.blur();
+      });
 
       param.append(slider, box);
       cell.append(param);
