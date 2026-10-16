@@ -1,6 +1,6 @@
 import { chapterById } from '../../chapters';
 import { DEFAULTS, type LabState } from '../../model/lab';
-import { describeLive, isSounding, liveNote } from '../../ui/figures';
+import { describeLive, isSounding } from '../../ui/figures';
 import {
   amplitudeFromDb,
   binHz,
@@ -82,17 +82,11 @@ describe('the live view\'s words', () => {
     expect(isSounding(brass, 102)).toBe(false);
   });
 
-  it('asks for Play when there is nothing to measure', () => {
-    expect(liveNote(steady, false)).toBe('Press Play to hear it.');
+  it('tells a screen reader it lies flat when there is nothing to measure', () => {
     expect(describeLive(false)).toContain('lies flat');
   });
 
-  it('says what it shows while there is', () => {
-    expect(liveNote(steady, true)).toBe('Live: measured, over the predicted stems.');
+  it('tells a screen reader what it shows while there is', () => {
     expect(describeLive(true)).toContain('measured from the sound now playing');
-  });
-
-  it('adds nothing to the caption in the predicted view', () => {
-    expect(liveNote({ ...steady, liveSpectrum: false }, true)).toBe('');
   });
 });
