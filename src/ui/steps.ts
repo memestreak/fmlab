@@ -10,18 +10,24 @@ const REDUCED_MOTION = '(prefers-reduced-motion: reduce)';
 
 /**
  * A chapter built up in steps (chapter 8): a row of step buttons in the
- * lab, and a button at the head of each section of the text, both setting
- * that step's sound. Which step is current follows from the wiring in
- * force, so this also shows what belongs to a step: the algorithm list and
- * the presets only at the last, the Feedback slider only where there is a
- * loop. Mounted after the chapter view, so that what it hides stays
- * hidden after a change of chapter.
+ * Algorithm panel, and a button at the head of each section of the text,
+ * both setting that step's sound. The last step, DX7 algorithms, swaps the
+ * row for the list of the DX7's 32 and the presets, with Basic wirings to
+ * come back to the step last left. Which step is current follows from the
+ * wiring in force, so this also shows the Feedback slider only where there
+ * is a loop. Mounted after the chapter view, so that what it shows and
+ * hides wins after a change of chapter.
  */
 export function mountSteps(store: LabStore): void {
   const row = document.querySelector<HTMLElement>('#steps');
+  const dx7 = document.querySelector<HTMLElement>('#dx7-chooser');
+  const presets = document.querySelector<HTMLElement>('#dx7-presets');
+  const basic = document.querySelector<HTMLElement>('#basic-wirings');
   const narrative = document.querySelector<HTMLElement>('#narrative');
   if (!row) return;
   let shownFor: Chapter | undefined;
+  /** The basic step to go back to from the DX7 list. */
+  let lastBasic = 0;
 
   const go = (chapter: Chapter, index: number, scroll: boolean) => {
     const step = chapter.steps?.[index];
@@ -44,9 +50,14 @@ export function mountSteps(store: LabStore): void {
     const chapter = chapterById(store.get().chapter);
     if (button && chapter) go(chapter, Number(button.dataset.step), false);
   });
+  basic?.addEventListener('click', () => {
+    const chapter = chapterById(store.get().chapter);
+    if (chapter) go(chapter, lastBasic, true);
+  });
 
   const build = (chapter: Chapter | undefined) => {
     shownFor = chapter;
+    lastBasic = 0;
     const steps = chapter?.steps ?? [];
     row.hidden = steps.length === 0;
     row.replaceChildren(
@@ -74,13 +85,13 @@ export function mountSteps(store: LabStore): void {
       mark(button, Number((button as HTMLElement).dataset.step) === at);
     });
     const last = isLastStep(chapter.steps, at);
-    const hide = (selector: string, hidden: boolean) => {
-      const el = document.querySelector<HTMLElement>(selector);
-      if (el) el.hidden = hidden;
-    };
-    hide('#algorithm-picker', !last);
-    hide('#presets', !last || chapter.presets.length === 0);
-    hide('[data-control="feedback"]', !algorithm(state.algorithm).feedback);
+    if (!last) lastBasic = at;
+    // One way of choosing at a time: the steps, or the DX7's list.
+    row.hidden = last;
+    if (dx7) dx7.hidden = !last;
+    if (presets) presets.hidden = !last || chapter.presets.length === 0;
+    const feedback = document.querySelector<HTMLElement>('[data-control="feedback"]');
+    if (feedback) feedback.hidden = !algorithm(state.algorithm).feedback;
   };
 
   store.subscribe((state, previous) => {

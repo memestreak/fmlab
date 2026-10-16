@@ -977,7 +977,7 @@ dfn {
 
   /* The sandbox's six operators show the table and the keyboard at once:
      closer together there, so the figures keep their room at 1024 px. */
-  [data-view='chapter'] .lab[data-many-sliders='true'] .operators:not([hidden]) ~ .piano {
+  [data-view='chapter'] .lab:has(.six-ops:not([hidden])) .piano {
     margin-top: 0.35rem;
   }
 
@@ -1268,30 +1268,112 @@ dfn {
   white-space: nowrap;
 }
 
-/* Chapter 8's operators: the algorithm, then a compact table, a row per
-   operator, its numbers in mono boxes. */
-.operators {
-  margin-top: 0.5rem;
-}
-
-.operators[hidden] {
+/* Six operators: two labelled panels, one above the other: the algorithm
+   (how it is chosen, its diagram as Fig. 1, its feedback) and the
+   operators it wires (a row each).
+   Each panel starts under an ink rule with its name in small capitals, as
+   the chapter's group does above its title. */
+.six-ops[hidden] {
   display: none;
 }
 
-.op-algorithm[hidden] {
-  display: none;
+.six-ops {
+  margin-top: 0.75rem;
 }
 
-.op-algorithm {
-  display: inline-flex;
+.panel {
+  min-width: 0;
+  padding-top: 0.4rem;
+  border-top: 1px solid var(--ink);
+}
+
+.panel + .panel {
+  margin-top: 0.75rem;
+}
+
+/* How the wiring is chosen: chapter 8's step buttons, or the DX7's list
+   with Basic wirings and the presets. Never both, and either fills one
+   row of the same height, so swapping them moves nothing. */
+.algorithm-chooser {
+  display: flex;
   align-items: center;
-  gap: 0.6rem;
-  margin-bottom: 0.25rem;
-  font-weight: 600;
+  min-height: 1.9rem;
+  margin: 0.35rem 0 0.25rem;
 }
 
-.op-algorithm .input {
-  min-height: 1.75rem;
+.algorithm-chooser .steps {
+  margin: 0;
+}
+
+.dx7-chooser {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.dx7-chooser[hidden] {
+  display: none;
+}
+
+.dx7-chooser .input {
+  height: 1.9rem;
+  min-height: 1.9rem;
+  font-size: 0.85rem;
+}
+
+.dx7-chooser .step-option[hidden] {
+  display: none;
+}
+
+/* The presets, as small as the steps they stand in for, set off from the
+   list by a hairline. */
+/* Specific enough to outrank the lab's own margins for presets. */
+.lab .algorithm-chooser .presets.dx7-presets {
+  gap: 0.35rem;
+  margin: 0 0 0 0.35rem;
+  padding-left: 0.6rem;
+  border-left: 1px solid var(--rule);
+}
+
+.dx7-presets .btn {
+  min-height: 0;
+  padding: 0 0.7rem;
+  font-size: 0.8rem;
+}
+
+/* Every control on the chooser's row exactly as tall as a step button. */
+.algorithm-chooser .step-option,
+.algorithm-chooser .input,
+.algorithm-chooser .btn {
+  box-sizing: border-box;
+  height: 1.9rem;
+  min-height: 0;
+}
+
+.panel-title {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* The diagram belongs to the panel: no rules of its own. */
+.panel .figure {
+  margin: 0.25rem 0 0;
+  padding: 0;
+  border: 0;
+}
+
+.panel-algorithm .slider-row {
+  grid-template-columns: 4.5rem 1fr 3rem;
+  gap: 0.5rem;
+}
+
+.panel-algorithm .slider {
+  height: 2rem;
 }
 
 .input {
@@ -1304,20 +1386,27 @@ dfn {
   font: inherit;
 }
 
-/* An operator the step's wiring leaves out keeps its place, unseen. */
-.op-off {
-  visibility: hidden;
-}
-
 .op-table {
   width: 100%;
+  margin-top: 0.25rem;
   border-collapse: collapse;
+  /* Fixed, so the three sliders share what the name and role leave and
+     the table never runs wider than its panel. */
+  table-layout: fixed;
   font-size: 0.8rem;
+}
+
+.op-table .op-col-name {
+  width: 3.1rem;
+}
+
+.op-table .op-col-role {
+  width: 4.6rem;
 }
 
 .op-table th,
 .op-table td {
-  padding: 0 0.2rem;
+  padding: 0.05rem 0.15rem;
   text-align: left;
 }
 
@@ -1326,25 +1415,70 @@ dfn {
   border-bottom: 1px solid var(--rule);
 }
 
+/* The operator's number, ringed in its pen as its box is in the diagram:
+   blue for a carrier, green for a modulator. The text stays ink. */
+.op-tag {
+  display: inline-block;
+  padding: 0 0.2rem;
+  border: 2px solid var(--rule);
+  font-family: var(--font-mono);
+  font-weight: 500;
+  line-height: 1.15;
+}
+
+.op-tag[data-role='carrier'] {
+  border-color: var(--pen-blue);
+}
+
+.op-tag[data-role='modulator'] {
+  border-color: var(--pen-green);
+}
+
 .op-role {
   font-style: italic;
 }
 
-/* A rule between the two operators on each row. */
-.op-table .op-second {
-  border-left: 1px solid var(--rule);
-  padding-left: 0.4rem;
+/* The row pointed at here, or whose box is pointed at in the diagram. */
+.op-row.is-pointed th,
+.op-row.is-pointed td {
+  background: var(--paper-sunken);
+}
+
+/* A slider and the box to type the same number in. */
+.op-param {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+/* In the table, so it outranks the lab's own slider heights. */
+.op-table .op-slider {
+  flex: 1 1 auto;
+  min-width: 1.5rem;
+  height: 1.25rem;
+}
+
+.op-slider::-webkit-slider-thumb {
+  width: 1rem;
+  height: 1rem;
+  margin-top: -0.3125rem;
+}
+
+.op-slider::-moz-range-thumb {
+  width: 1rem;
+  height: 1rem;
 }
 
 .op-input {
-  width: 2.7rem;
-  height: 1.55rem;
+  flex: none;
+  width: 2.5rem;
+  height: 1.3rem;
   padding: 0 0.3rem;
   border: 1px solid var(--rule);
   border-radius: 4px;
   background: var(--paper);
   color: var(--ink);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
 }
 
 /* No spin buttons: they would take half the box. Arrow keys still step. */
@@ -1362,10 +1496,124 @@ dfn {
   border-color: var(--ink);
 }
 
-/* In two columns where the lab is pinned beside the text: the operators
-   take the full width. */
+/* A box is dragged to change it, as well as typed in: a resize cursor
+   until it is clicked into, and a finger's drag changes the value rather
+   than scrolling the page. */
+.op-input {
+  cursor: ew-resize;
+  touch-action: none;
+}
+
+.op-input:focus {
+  cursor: text;
+}
+
+.op-input.is-scrubbing {
+  border-color: var(--ink);
+  user-select: none;
+}
+
+/* The Algorithm panel's title and its chooser on one line, the diagram
+   below; the Operators panel's title on its table's heading row, over the
+   two columns that have no visible heading. Both save a line. */
+.panel-algorithm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 0.75rem;
+}
+
+.panel-algorithm .algorithm-chooser {
+  margin: 0.2rem 0;
+}
+
+.panel-algorithm .algorithm-body {
+  flex-basis: 100%;
+}
+
+.panel-operators {
+  position: relative;
+}
+
+.panel-operators .panel-title {
+  position: absolute;
+  top: 0.55rem;
+  left: 0;
+}
+
+.panel-operators .op-table {
+  margin-top: 0;
+}
+
+/* Where the lab is pinned beside the text: the diagram a fixed height,
+   and beside it Feedback with Fig. 1's caption under it; the spectrum
+   below with the rest. The figure's own box steps aside (display:
+   contents) so its plot and caption can sit in the panel's two columns. */
 @media (min-width: 62rem) {
-  [data-view='chapter'] .lab[data-many-sliders='true'] .operators {
-    grid-column: 1 / -1;
+  [data-view='chapter'] .six-ops:not([hidden]) {
+    flex: none;
+  }
+
+  [data-view='chapter'] .algorithm-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 15rem;
+    grid-template-rows: auto 1fr;
+    column-gap: 1.25rem;
+  }
+
+  [data-view='chapter'] .lab .algorithm-body .figure:not([hidden]) {
+    display: contents;
+  }
+
+  [data-view='chapter'] .algorithm-body .plot-frame {
+    grid-column: 1;
+    grid-row: 1 / 3;
+    flex: none;
+    height: 6.5rem;
+    min-height: 0;
+  }
+
+  [data-view='chapter'] .algorithm-body .slider-row {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: start;
+  }
+
+  /* No loop, no Feedback: its room kept, so the caption stays put. */
+  [data-view='chapter'] .algorithm-body .slider-row[hidden] {
+    display: grid;
+    visibility: hidden;
+  }
+
+  [data-view='chapter'] .lab .algorithm-body figcaption {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: start;
+    margin-top: 0.25rem;
+  }
+}
+
+/* Where the lab is pinned small above the text: the panels one under the
+   other, and the operators and the feedback folded behind Sliders with
+   the other sliders. */
+@media (max-width: 61.99rem) {
+  [data-view='chapter'] .lab:not([data-sliders='open']) .panel-operators,
+  [data-view='chapter'] .lab:not([data-sliders='open']) .panel-algorithm .slider-row {
+    display: none;
+  }
+
+  [data-view='chapter'] .panel-algorithm {
+    justify-content: space-between;
+    border-top: 0;
+    padding-top: 0;
+  }
+
+  [data-view='chapter'] .panel-algorithm .algorithm-chooser {
+    margin: 0;
+  }
+
+  /* The presets fold away with the sliders. */
+  [data-view='chapter'] .lab:not([data-sliders='open']) .dx7-presets {
+    display: none;
   }
 }

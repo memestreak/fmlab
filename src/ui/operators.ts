@@ -1,4 +1,4 @@
-import { algorithm, algorithmsByCarriers, operatorsUsed } from '../dsp/algorithms';
+import { algorithm, algorithmsByCarriers, isDx7, operatorsUsed } from '../dsp/algorithms';
 import type { Operator } from '../dsp/operators';
 import {
   clamp,
@@ -8,50 +8,127 @@ import {
   OP_LEVEL,
   OP_RATIO,
 } from '../model/lab';
+import { operatorAt } from '../viz/algorithmPlot';
 
-/** One column of the operator table: which number, and its input's range. */
+/** One column of the operator table: which number, and its controls' range. */
 interface Column {
   key: keyof Operator;
   label: string;
+  /** In the slider's units, which are the box's: Level in %. */
   min: number;
   max: number;
   step: number;
-  /** The input shows the operator's value through this. */
+  /** The box shows the operator's value through this. */
   show: (value: number) => string;
-  /** And reads the operator's value back from what is typed. */
-  read: (typed: number) => number;
+  /** And reads the operator's value back from a slider or a box. */
+  read: (shown: number) => number;
+  /** What a screen reader hears the slider's value as. */
+  say: (value: number) => string;
 }
 
 const COLUMNS: Column[] = [
   {
+    // Fine steps, so a box or Shift can reach 1.41; a drag or an arrow
+    // key without Shift snaps to RATIO_STOPS.
     key: 'ratio',
     label: 'Ratio',
     min: OP_RATIO.min,
     max: OP_RATIO.max,
     step: 0.01,
     show: value => String(Number(value.toFixed(2))),
-    read: typed => clamp(typed, OP_RATIO),
+    read: shown => clamp(shown, OP_RATIO),
+    say: value => `ratio ${Number(value.toFixed(2))}`,
   },
   {
     // Shown as a percentage; held as 0 to 1.
     key: 'level',
-    label: 'Level %',
+    label: 'Level',
     min: OP_LEVEL.min * 100,
     max: OP_LEVEL.max * 100,
     step: 1,
     show: value => String(Math.round(value * 100)),
-    read: typed => clamp(typed / 100, OP_LEVEL),
+    read: shown => clamp(shown / 100, OP_LEVEL),
+    say: value => `${Math.round(value * 100)}%`,
   },
   {
     key: 'decay',
-    label: 'Decay s',
+    label: 'Decay',
     min: OP_DECAY.min,
     max: OP_DECAY.max,
     step: 0.1,
     show: value => String(Number(value.toFixed(2))),
-    read: typed => clamp(typed, OP_DECAY),
+    read: shown => clamp(shown, OP_DECAY),
+    say: value =>
+      value === 0 ? '0 seconds: holds for the whole note' : `${Number(value.toFixed(2))} seconds`,
   },
 ];
+
+/**
+ * The ratios a Ratio slider snaps to without Shift or Alt: a half, and
+ * every whole number up to the top of the range, as the DX7's coarse
+ * ratios are.
+ */
+export const RATIO_STOPS: readonly number[] = [
+  0.5,
+  ...Array.from({ length: OP_RATIO.max }, (_, i) => i + 1),
+];
+
+/** The stop nearest a ratio. */
+export function snapRatio(ratio: number): number {
+  return RATIO_STOPS.reduce((best, stop) =>
+    Math.abs(stop - ratio) < Math.abs(best - ratio) ? stop : best,
+  );
+}
+
+/**
+ * The next stop up (`direction` 1) or down (-1) from a ratio, which may be
+ * between stops; the end of the range if there is none further.
+ */
+export function stepRatio(ratio: number, direction: 1 | -1): number {
+  const EPSILON = 1e-9;
+  if (direction > 0) {
+    return RATIO_STOPS.find(stop => stop > ratio + EPSILON) ?? OP_RATIO.max;
+  }
+  return [...RATIO_STOPS].reverse().find(stop => stop < ratio - EPSILON) ?? OP_RATIO.min;
+}
+
+/** How far a drag in a box must go before it changes the value, in px. */
+export const SCRUB_THRESHOLD = 3;
+
+/**
+ * How many pixels of drag cross a column's whole range; with Shift or Alt
+ * held, five times as many, for fine control.
+ */
+const SCRUB_PIXELS: Record<keyof Operator, number> = { ratio: 300, level: 200, decay: 200 };
+const FINE_SLOWER = 5;
+
+/**
+ * A value dragged in a box: `start` (as the box shows it, Level in %)
+ * moved by `pixels`, up and to the right counting positive. Ratio goes
+ * from stop to stop (RATIO_STOPS), or, `fine`, in hundredths; Level in
+ * whole percent and Decay in tenths of a second. Kept within the range.
+ */
+export function scrubTo(
+  key: keyof Operator,
+  start: number,
+  pixels: number,
+  fine: boolean,
+): number {
+  const column = COLUMNS.find(c => c.key === key)!;
+  const span = column.max - column.min;
+  const perPixel = span / (SCRUB_PIXELS[key] * (fine ? FINE_SLOWER : 1));
+  const within = (value: number) => Math.min(column.max, Math.max(column.min, value));
+  if (key === 'ratio' && !fine) {
+    // So many stops along, each stop an equal share of the drag.
+    const stops = Math.trunc(pixels / (SCRUB_PIXELS.ratio / RATIO_STOPS.length));
+    let ratio = start;
+    for (let i = 0; i < Math.abs(stops); i++) ratio = stepRatio(ratio, stops > 0 ? 1 : -1);
+    return ratio;
+  }
+  const raw = start + pixels * perPixel;
+  const step = key === 'ratio' ? 0.01 : column.step;
+  return within(Number((Math.round(raw / step) * step).toFixed(2)));
+}
 
 /**
  * "carrier" or "modulator": what an operator is in an algorithm; "unused"
@@ -71,12 +148,23 @@ export function carriersLabel(count: number): string {
   return count === 1 ? '1 carrier' : `${count} carriers`;
 }
 
+/** Keys that move a slider, and which way. */
+const STEP_KEYS: Record<string, 1 | -1> = {
+  ArrowUp: 1,
+  ArrowRight: 1,
+  PageUp: 1,
+  ArrowDown: -1,
+  ArrowLeft: -1,
+  PageDown: -1,
+};
+
 /**
- * The operator controls of chapter 8: the algorithm, chosen from a list of
- * all 32, and a table of the six operators, a row each with its role in
- * the algorithm and three number boxes (ratio, level, decay). Number boxes
- * rather than sliders: eighteen sliders would not leave the figures room.
- * They take arrow keys, and typing.
+ * The six-operator lab of chapter 8 and the sandbox: the Algorithm panel's
+ * list of all 32 (the diagram is a figure, and Feedback a slider), and the
+ * Operators panel's table, a row per operator with its role and a slider
+ * for each of ratio, level and decay, each with a box beside it to type a
+ * value. Pointing at or focusing a row rings its box in the diagram, and
+ * pointing at a box picks out its row.
  */
 export function mountOperators(store: LabStore): void {
   const select = document.querySelector<HTMLSelectElement>('#algorithm');
@@ -99,81 +187,210 @@ export function mountOperators(store: LabStore): void {
     store.set({ algorithm: Number(select.value) });
   });
 
-  const inputs: HTMLInputElement[][] = [];
+  const setOperator = (op: number, key: keyof Operator, value: number) => {
+    const operators = store.get().operators.map((o, i) =>
+      i === op ? { ...o, [key]: value } : o,
+    );
+    store.set({ operators });
+  };
+  const point = (op: number | null) => {
+    if (store.get().hoverOp !== op) store.set({ hoverOp: op });
+  };
+
+  const rows: HTMLTableRowElement[] = [];
+  const tags: HTMLElement[] = [];
   const roles: HTMLElement[] = [];
-  /** Each operator's cells, to blank out when its wiring leaves it out. */
-  const cells: HTMLElement[][] = [];
-  // Three rows, each with two operators: OP1 and OP4, OP2 and OP5, ...
-  const rows = [0, 1, 2].map(() => document.createElement('tr'));
+  const sliders: HTMLInputElement[][] = [];
+  const boxes: HTMLInputElement[][] = [];
   for (let op = 0; op < 6; op++) {
-    const row = rows[op % 3];
+    const row = document.createElement('tr');
+    row.className = 'op-row';
     const name = document.createElement('th');
-    if (op >= 3) name.className = 'op-second';
     name.scope = 'row';
-    name.textContent = `OP${op + 1}`;
+    const tag = document.createElement('span');
+    tag.className = 'op-tag';
+    tag.textContent = `OP${op + 1}`;
+    name.append(tag);
     const role = document.createElement('td');
     role.className = 'op-role';
     row.append(name, role);
+    rows.push(row);
+    tags.push(tag);
     roles.push(role);
-    cells.push([name, role]);
-    inputs.push(
-      COLUMNS.map(column => {
-        const cell = document.createElement('td');
-        const input = document.createElement('input');
-        input.type = 'number';
-        input.className = 'op-input num';
-        input.min = String(column.min);
-        input.max = String(column.max);
-        input.step = String(column.step);
-        input.setAttribute('aria-label', `OP${op + 1} ${column.label.replace(/ .*/, '').toLowerCase()}`);
-        input.addEventListener('input', () => {
-          const typed = input.valueAsNumber;
-          if (!Number.isFinite(typed)) return;
-          const operators = store.get().operators.map((o, i) =>
-            i === op ? { ...o, [column.key]: column.read(typed) } : o,
-          );
-          store.set({ operators });
+
+    const pair = COLUMNS.map(column => {
+      const cell = document.createElement('td');
+      const param = document.createElement('div');
+      param.className = 'op-param';
+      const what = `OP${op + 1} ${column.label.toLowerCase()}`;
+
+      const slider = document.createElement('input');
+      slider.type = 'range';
+      slider.className = 'slider op-slider';
+      slider.min = String(column.min);
+      slider.max = String(column.max);
+      slider.step = String(column.step);
+      slider.setAttribute('aria-label', what);
+
+      const box = document.createElement('input');
+      box.type = 'number';
+      box.className = 'op-input num';
+      box.min = String(column.min);
+      box.max = String(column.max);
+      box.step = String(column.step);
+      box.setAttribute('aria-label', `${what}, typed`);
+
+      // Ratio: Shift or Alt held means fine steps; otherwise a drag snaps
+      // to the stops, and the arrow keys go from one stop to the next.
+      let fine = false;
+      if (column.key === 'ratio') {
+        const hold = (event: PointerEvent | KeyboardEvent) => {
+          fine = event.shiftKey || event.altKey;
+        };
+        slider.addEventListener('pointerdown', hold);
+        slider.addEventListener('pointermove', hold);
+        slider.addEventListener('keydown', event => {
+          hold(event);
+          const direction = STEP_KEYS[event.key];
+          if (fine || !direction) return;
+          event.preventDefault();
+          setOperator(op, 'ratio', stepRatio(store.get().operators[op].ratio, direction));
         });
-        // Put a number typed out of range back into it, once left.
-        input.addEventListener('change', () => show(store.get()));
-        cell.append(input);
-        row.append(cell);
-        cells[op].push(cell);
-        return input;
-      }),
-    );
+      }
+      slider.addEventListener('input', () => {
+        const shown = slider.valueAsNumber;
+        const value = column.key === 'ratio' && !fine ? snapRatio(shown) : shown;
+        setOperator(op, column.key, column.read(value));
+      });
+
+      box.addEventListener('input', () => {
+        const typed = box.valueAsNumber;
+        if (!Number.isFinite(typed)) return;
+        setOperator(op, column.key, column.read(typed));
+      });
+      // Put a number typed out of range back into it, once left.
+      box.addEventListener('change', () => show(store.get()));
+
+      // A drag in the box changes the value too: up or right for more,
+      // down or left for less. A press that does not move (under
+      // SCRUB_THRESHOLD) is a click, and the box takes the typing as ever.
+      let drag: { x: number; y: number; start: number; moved: boolean } | null = null;
+      /** Just dragged: the click and focus that follow are not for typing. */
+      let dragged = false;
+      box.addEventListener('pointerdown', event => {
+        if (event.button !== 0) return;
+        drag = {
+          x: event.clientX,
+          y: event.clientY,
+          start: Number(column.show(store.get().operators[op][column.key])),
+          moved: false,
+        };
+      });
+      box.addEventListener('pointermove', event => {
+        if (!drag) return;
+        const pixels = event.clientX - drag.x - (event.clientY - drag.y);
+        if (!drag.moved) {
+          if (Math.hypot(event.clientX - drag.x, event.clientY - drag.y) < SCRUB_THRESHOLD) {
+            return;
+          }
+          drag.moved = true;
+          box.setPointerCapture(event.pointerId);
+          // Out of typing, so it shows the value as it moves and no text
+          // is selected; the class keeps it so until the drag ends.
+          box.blur();
+          box.classList.add('is-scrubbing');
+        }
+        event.preventDefault();
+        const shown = scrubTo(column.key, drag.start, pixels, event.shiftKey || event.altKey);
+        setOperator(op, column.key, column.read(shown));
+      });
+      const end = () => {
+        if (drag?.moved) {
+          dragged = true;
+          window.setTimeout(() => (dragged = false), 0);
+        }
+        drag = null;
+        box.classList.remove('is-scrubbing');
+      };
+      box.addEventListener('pointerup', end);
+      box.addEventListener('pointercancel', end);
+      box.addEventListener('click', event => {
+        if (dragged) event.preventDefault();
+      });
+      box.addEventListener('focus', () => {
+        if (dragged || drag?.moved) box.blur();
+      });
+
+      param.append(slider, box);
+      cell.append(param);
+      row.append(cell);
+      return { slider, box };
+    });
+    sliders.push(pair.map(p => p.slider));
+    boxes.push(pair.map(p => p.box));
+
+    row.addEventListener('pointerenter', () => point(op));
+    row.addEventListener('pointerleave', () => {
+      if (store.get().hoverOp === op) point(null);
+    });
+    row.addEventListener('focusin', () => point(op));
+    row.addEventListener('focusout', event => {
+      if (!row.contains(event.relatedTarget as Node | null)) point(null);
+    });
   }
   table.append(...rows);
-  const secondHeads = [
-    ...(table.closest('table')?.querySelectorAll<HTMLElement>('thead th') ?? []),
-  ].slice(5);
+
+  // Pointing at a box in the diagram picks out its row.
+  const diagram = document.querySelector<HTMLCanvasElement>('#algorithm-plot');
+  diagram?.addEventListener('pointermove', event => {
+    const rect = diagram.getBoundingClientRect();
+    point(
+      operatorAt(
+        store.get().algorithm,
+        rect.width,
+        rect.height,
+        event.clientX - rect.left,
+        event.clientY - rect.top,
+      ),
+    );
+  });
+  diagram?.addEventListener('pointerleave', () => point(null));
 
   const show = (state: LabState) => {
-    select.value = String(state.algorithm);
+    // Shown only for one of the 32 (ui/steps.ts); a step's own wiring is
+    // none of them.
+    if (isDx7(state.algorithm)) select.value = String(state.algorithm);
     const used = operatorsUsed(algorithm(state.algorithm));
-    // An operator left out is blanked, keeping the columns where they
-    // are; a row with neither of its two is taken out.
-    rows.forEach((row, r) => {
-      row.hidden = !used.includes(r) && !used.includes(r + 3);
-    });
-    // And the right-hand half's headings, when it has no operator.
-    const second = used.some(op => op >= 3);
-    secondHeads.forEach(head => head.classList.toggle('op-off', !second));
     state.operators.forEach((op, i) => {
-      for (const cell of cells[i]) cell.classList.toggle('op-off', !used.includes(i));
-      roles[i].textContent = roleOf(state.algorithm, i);
+      // An operator the wiring leaves out has no row.
+      rows[i].hidden = !used.includes(i);
+      const role = roleOf(state.algorithm, i);
+      roles[i].textContent = role;
+      // Its tag ringed in its pen, as its box is in the diagram.
+      tags[i].dataset.role = role;
       COLUMNS.forEach((column, c) => {
-        const input = inputs[i][c];
+        const slider = sliders[i][c];
+        const shown = column.show(op[column.key]);
+        slider.value = shown;
+        // The filled part of the track; see .slider in base.css.
+        const filled = (Number(shown) - column.min) / (column.max - column.min);
+        slider.style.setProperty('--filled', `${(filled * 100).toFixed(2)}%`);
+        slider.setAttribute('aria-valuetext', column.say(op[column.key]));
+        const box = boxes[i][c];
         // Not while it is being typed in: that would fight the typing.
-        if (document.activeElement === input) return;
-        input.value = column.show(op[column.key]);
+        if (document.activeElement !== box) box.value = shown;
       });
     });
+  };
+  const showPointed = (state: LabState) => {
+    rows.forEach((row, i) => row.classList.toggle('is-pointed', state.hoverOp === i));
   };
   store.subscribe((state, previous) => {
     if (state.algorithm !== previous.algorithm || state.operators !== previous.operators) {
       show(state);
     }
+    if (state.hoverOp !== previous.hoverOp) showPointed(state);
   });
   show(store.get());
+  showPointed(store.get());
 }

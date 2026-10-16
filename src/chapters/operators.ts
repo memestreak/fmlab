@@ -53,12 +53,19 @@ const STEPS: Step[] = [
        modulator, in green, sits above OP1, the carrier, in blue, and a line
        runs down from one to the other because OP2 modulates OP1. Only OP1
        has a line down to <em>out</em>: it is the one you hear.`,
-      `Each operator has a level, a percentage in the table. For a carrier
-       it is how loud it is. For a modulator it is how hard it pushes, its
-       index: full level is an index of 5, so OP2 at 40% is an index of 2.
-       Press Play note (or space), then change OP2's level and play it
-       again. While a note sounds, each box fills as strongly as its
-       operator is sounding.`,
+      `The lab has two panels, one above the other. Algorithm is the
+       wiring: a button for each step of this section, and the diagram.
+       Operators is the operators it wires, a row each,
+       ringed in blue or green as their boxes are. Point at a row and its
+       box is ringed in the diagram; point at a box and its row is picked
+       out.`,
+      `Each operator has a level, a percentage. For a carrier it is how
+       loud it is. For a modulator it is how hard it pushes, its index:
+       full level is an index of 5, so OP2 at 40% is an index of 2. Press
+       Play note (or space), then drag OP2's Level slider, or drag up or
+       across in the box beside it, or click in the box and type, and play
+       it again. While a note sounds, each box
+       fills as strongly as its operator is sounding.`,
     ],
   },
   {
@@ -113,14 +120,16 @@ const STEPS: Step[] = [
     ],
   },
   {
-    label: 'All 32',
-    title: "The DX7's 32 algorithms",
+    label: 'DX7 algorithms',
+    title: 'DX7 algorithms',
     patch: STACKS,
     body: [
       `That is all there is to it. The DX7 has 32
-       ${use('algorithm', 'algorithms')}, each with one feedback loop, and you choose one rather than wire your own. The list beside Play now has them all,
-       grouped by how many carriers each has, which is roughly how many
-       sounds it adds together.`,
+       ${use('algorithm', 'algorithms')}, each with one feedback loop, and
+       you choose one rather than wire your own. The DX7 algorithms button
+       swaps the step buttons for a list of all 32, grouped by how many
+       carriers each has, which is roughly how many sounds it adds
+       together. Basic wirings brings the step buttons back.`,
       `It starts on algorithm 1: a pair on the left, and on the right a
        stack of four. Choose 32 and every operator is a carrier with
        nothing modulating anything, six sine waves added like an organ's
@@ -128,7 +137,7 @@ const STEPS: Step[] = [
        loop runs from lower in a stack back up to its top.`,
       `${sectionLink('sandbox', 'The sandbox')}, at the end of the guide, has all of this too: switch it to Six to play these sounds from a keyboard and share them by
        link.`,
-      `The buttons are sounds of mine to start from, built the way DX7
+      `The buttons beside the list are sounds of mine to start from, built the way DX7
        sounds are: an electric piano from three pairs, one with a high
        tine; a bass from a tall stack with feedback; a bell from pairs whose
        ratios are not whole numbers.`,
@@ -158,14 +167,16 @@ export const operators: Chapter = {
      and say nothing about pitch. Each operator's frequency is set as a
      multiple of the note's, which the DX7 also calls its ratio: a carrier
      at 1 with a modulator at 2 is the 1:2 of ${sectionLink('ratio')}. Its
-     envelope here is one number, how long it takes to die away; a decay
-     of 0 holds it for the whole note.`,
+     Ratio slider, and a drag in its box, snap to whole numbers and a
+     half; hold Shift for the steps between, or type one in the box. Its envelope here is one
+     number, how long it takes to die away; a decay of 0 holds it for the
+     whole note.`,
     `What makes a sound is how the operators are wired together: which
      modulate which, and which are heard. A wiring like that is an
      ${define('algorithm')}, a diagram rather than a procedure to follow.
      This section builds one up a step at a time, from the two operators
-     you know. The buttons in the lab and at the head of each section
-     below set each step's sound.`,
+     you know. The buttons in the Algorithm panel and at the head of each
+     section below set each step's sound.`,
   ],
   maths: [
     {

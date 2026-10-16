@@ -328,16 +328,15 @@ export function mountChapters(store: LabStore): void {
     if (lab) lab.dataset.manySliders = String(many);
     const piano = document.querySelector<HTMLElement>('#piano');
     if (piano) piano.hidden = !chapter.hasPiano;
-    const operators = document.querySelector<HTMLElement>('#operators-panel');
-    if (operators) operators.hidden = chapter.patch.mode !== 'ops';
+    // Six operators: the Algorithm and Operators panels, together.
+    const sixOps = document.querySelector<HTMLElement>('#six-operators-lab');
+    if (sixOps) sixOps.hidden = chapter.patch.mode !== 'ops';
     // Chapter 9 has a switch for what is heard, and draws both spectra
     // predicted, so no live view there.
     const hear = document.querySelector<HTMLElement>('#hear-switch');
     if (hear) hear.hidden = !chapter.patch.compare;
     const live = document.querySelector<HTMLElement>('#live-switch');
     if (live) live.hidden = chapter.patch.compare;
-    const picker = document.querySelector<HTMLElement>('#algorithm-picker');
-    if (picker) picker.hidden = chapter.patch.mode !== 'ops';
     const share = document.querySelector<HTMLElement>('#share');
     if (share) share.hidden = !chapter.sharesSound;
     const follows = document.querySelector<HTMLElement>('#index-follows-toggle');
@@ -345,8 +344,23 @@ export function mountChapters(store: LabStore): void {
     // landing view and chapter 8 play notes too, but not that way.
     if (follows) follows.hidden = !chapter.controls.includes('attack');
 
-    // The chapter's presets, one button each.
-    const presets = document.querySelector<HTMLElement>('#presets');
+    // With six operators the DX7 list chooses the wiring. Where there are
+    // no steps (the sandbox) it is the only way; chapter 8's steps decide
+    // for themselves in ui/steps.ts, which runs after this.
+    const dx7 = document.querySelector<HTMLElement>('#dx7-chooser');
+    if (dx7) dx7.hidden = !six;
+    const basic = document.querySelector<HTMLElement>('#basic-wirings');
+    if (basic) basic.hidden = !chapter.steps;
+
+    // The chapter's presets, one button each: with six operators beside
+    // the DX7 list, as sounds built on its algorithms, elsewhere above the
+    // sliders.
+    const above = document.querySelector<HTMLElement>('#presets');
+    const beside = document.querySelector<HTMLElement>('#dx7-presets');
+    const presets = six ? beside : above;
+    const unused = six ? above : beside;
+    unused?.replaceChildren();
+    if (unused) unused.hidden = true;
     if (presets) {
       presets.hidden = chapter.presets.length === 0;
       presets.replaceChildren(
@@ -395,6 +409,7 @@ export function mountChapters(store: LabStore): void {
       chapter: chapter.id,
       ...openingFromUrl(chapter),
       hover: null,
+      hoverOp: null,
       pinned: null,
       noteStartedAt: null,
       // The glossary has no lab to stop a sound from.

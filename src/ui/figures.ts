@@ -63,6 +63,8 @@ const DRAWN: (keyof LabState)[] = [
   // The sideband order picked out in the linked figures.
   'hover',
   'pinned',
+  // The operator picked out in the wiring diagram.
+  'hoverOp',
   'theme',
 ];
 
