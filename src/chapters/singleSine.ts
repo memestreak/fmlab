@@ -38,9 +38,9 @@ export const singleSine: Chapter = {
      ${define('partial')}: one of the sine waves the sound is made of. The
      rest of this guide is about growing many partials from just two sine
      waves.`,
-    `Fig. 2 is worked out from the settings: what the sound should
-     contain. Press Live, in its top right corner, and it measures what is really
-     coming out, while it plays, and draws that over the predicted stem.
+    `Fig. 2's stem is worked out from the settings: what the sound should
+     contain. While you play, the figure also measures what is really
+     coming out and draws that, a shaded curve, over the predicted stem.
      The measuring is done by the ${define('fft')} (FFT), the standard way
      to take a stretch of sound apart into the sine waves it is made of.
      The two should agree.`,

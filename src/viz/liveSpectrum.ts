@@ -22,9 +22,6 @@ export interface Measurement {
  */
 const PEAK_SCALE = 0.42 / 2;
 
-/** How the live view draws on: the predicted stems, faintly. */
-const PREDICTED_OPACITY = 0.3;
-
 /** The frequency in Hz at the centre of FFT bin `bin`. */
 export function binHz(bin: number, fftSize: number, sampleRate: number): number {
   return (bin * sampleRate) / fftSize;
@@ -60,30 +57,24 @@ export function liveTrace(
 }
 
 /**
- * Draws the live view: the predicted stems faintly, and over them the
- * measured spectrum of what is being played, a --pen-blue curve filled
- * down to the axis, on the same axes. Its heights are magnitudes, so it
- * never goes below the axis: a measured spectrum does not show phase.
- *
- * With no measurement (no sound playing) the curve lies flat on the axis.
+ * Draws the spectrum while sound plays: the predicted stems as ever and,
+ * over them, the measured spectrum of what is being played, a --pen-blue
+ * curve filled down to the axis, on the same axes. Its heights are
+ * magnitudes, so it never goes below the axis: a measured spectrum does
+ * not show phase. The stems are drawn as they are when nothing plays, so
+ * starting and stopping the sound only adds and takes away the curve.
  */
 export function drawLiveSpectrum(
   state: LabState,
   canvas: HTMLCanvasElement,
-  measured: Measurement | null,
+  measured: Measurement,
+  time?: number,
 ): void {
   const plot = beginPlot(canvas);
   if (!plot) return;
   const x = drawSpectrumFrame(plot, state);
-  drawPredicted(plot, state, x, undefined, PREDICTED_OPACITY);
-  const maxFreq = axisSpan(state);
-  const points = measured
-    ? liveTrace(measured, state.carrierHz, maxFreq)
-    : [
-        { freq: 0, amp: 0 },
-        { freq: maxFreq, amp: 0 },
-      ];
-  trace(plot, points, x);
+  drawPredicted(plot, state, x, time);
+  trace(plot, liveTrace(measured, state.carrierHz, axisSpan(state)), x);
 }
 
 function trace(

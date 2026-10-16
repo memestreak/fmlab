@@ -207,8 +207,9 @@ figures subscribe to it. Nothing else passes values around.
   wants; amplitude from -1 to 1 is only the default. `algorithmPlot.ts` draws an algorithm as the DX7 does (`layoutAlgorithm`:
   carriers on the bottom row, each modulator above what it modulates).
   `liveSpectrum.ts` is
-  the spectrum's live view: the measured FFT as a filled --pen-blue curve
-  over the predicted stems, drawn faintly, on the same axes
+  the spectrum's live view, drawn whenever sound plays (there is no
+  switch): the measured FFT as a filled --pen-blue curve over the
+  predicted stems, which are drawn as ever, on the same axes
   (`drawSpectrumFrame`) and scale (`amplitudeFromDb` undoes the analyser's
   window, so a full sine reads 1). `besselPlot.ts` draws J_0
   to J_8 against the index, with an ink line at the patch's index and a

@@ -47,7 +47,6 @@ const DRAWN: (keyof LabState)[] = [
   'showBandwidth',
   'realUnits',
   'showHarmonics',
-  'liveSpectrum',
   'compare',
   'algorithm',
   'operators',
@@ -130,8 +129,14 @@ function patchText(state: LabState): string {
 }
 
 /** What the spectrum shows, in words, for whoever cannot see the canvas. */
-export function describeSpectrum(state: LabState, lines: SpectralLine[]): string {
-  if (lines.length === 0) return `Line spectrum for ${patchText(state)}: silent.`;
+export function describeSpectrum(
+  state: LabState,
+  lines: SpectralLine[],
+  measured = false,
+): string {
+  // While sound plays, its measured spectrum is drawn over the stems.
+  const over = measured ? ' Measured from the sound now playing, drawn over them.' : '';
+  if (lines.length === 0) return `Line spectrum for ${patchText(state)}: silent.${over}`;
   const strongest = lines.reduce((a, b) =>
     Math.abs(b.amp) > Math.abs(a.amp) ? b : a,
   );
@@ -142,7 +147,7 @@ export function describeSpectrum(state: LabState, lines: SpectralLine[]): string
     : `${Number(strongest.freq.toFixed(2))} times the carrier`;
   return (
     `Line spectrum for ${patchText(state)}: ${count}, the strongest at ` +
-    `${where}, ${negative} with negative phase.`
+    `${where}, ${negative} with negative phase.${over}`
   );
 }
 
@@ -224,41 +229,30 @@ export function mountFigures(store: LabStore, engine: AudioEngine): void {
         if (state.compare) {
           // Chapter 9: always the phase-modulated one, whichever is heard.
           drawSpectrum(asPm(state), canvas);
-        } else if (state.liveSpectrum) {
-          // Under reduced motion the live view moves only a few times a
-          // second; each time is a still picture of the sound.
-          if (time !== undefined && reduced.matches && now - lastLive < CALM_SECONDS) return;
+        } else if (time !== undefined && isSounding(state, now)) {
+          // While sound plays, what it measures is drawn over the stems.
+          // Under reduced motion only a few times a second; each time is a
+          // still picture of the sound.
+          if (reduced.matches && now - lastLive < CALM_SECONDS) return;
           lastLive = now;
-          drawLiveSpectrum(state, canvas, isSounding(state, now) ? engine.measure() : null);
+          // Nothing to measure until the audio has started.
+          const measured = engine.measure();
+          if (measured) drawLiveSpectrum(state, canvas, measured, time);
+          else drawSpectrum(state, canvas, time);
         } else {
           drawSpectrum(state, canvas, time);
         }
         // The description is of the patch as set, not of each moment of a
         // note: a screen reader has no use for sixty of them a second.
-        const label = state.liveSpectrum
-          ? describeLive(isSounding(state, now))
-          : describeSpectrum(state, spectrumOf(state));
+        const label = describeSpectrum(state, spectrumOf(state), isSounding(state, now));
         if (canvas.getAttribute('aria-label') !== label) {
           canvas.setAttribute('aria-label', label);
         }
       },
-      // A note sounding, or the live view of anything sounding.
-      (state: LabState, time: number) =>
-        noteMoves(state, time) || (state.liveSpectrum && isSounding(state, time)),
+      // A note sounding, or any sound, measured as it plays.
+      (state: LabState, time: number) => noteMoves(state, time) || isSounding(state, time),
     );
   }
-
-  // The Predicted / Live switch.
-  const predicted = document.querySelector<HTMLButtonElement>('#spectrum-predicted');
-  const live = document.querySelector<HTMLButtonElement>('#spectrum-live');
-  const showSwitch = (state: LabState) => {
-    predicted?.setAttribute('aria-pressed', String(!state.liveSpectrum));
-    live?.setAttribute('aria-pressed', String(state.liveSpectrum));
-  };
-  predicted?.addEventListener('click', () => store.set({ liveSpectrum: false }));
-  live?.addEventListener('click', () => store.set({ liveSpectrum: true }));
-  store.subscribe(showSwitch);
-  showSwitch(store.get());
 
   // Chapter 9's second spectrum: the patch as true frequency modulation.
   const compare = document.querySelector<HTMLCanvasElement>('#compare');
@@ -333,13 +327,6 @@ const CALM_SECONDS = 0.5;
 /** Whether anything is sounding at `time`: a steady sound, or a note. */
 export function isSounding(state: LabState, time: number): boolean {
   return state.playing || (state.noteMode && noteSounding(state, time));
-}
-
-/** What the live view shows, in words. */
-export function describeLive(sounding: boolean): string {
-  return sounding
-    ? 'Live spectrum, measured from the sound now playing, drawn over the predicted lines.'
-    : 'Live spectrum: nothing is playing, so it lies flat.';
 }
 
 /**

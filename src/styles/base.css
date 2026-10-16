@@ -1218,21 +1218,6 @@ dfn {
   font-style: normal;
 }
 
-/* Predicted / Live sits in the spectrum plot's top right corner, part of
-   the graph, and a size smaller than the lab's switches. Laid over the
-   canvas, so it takes no room and moves nothing. */
-.plot-frame > .switch {
-  position: absolute;
-  top: 0;
-  right: 0;
-}
-
-.plot-frame > .switch .switch-option {
-  min-height: 1.4rem;
-  padding: 0 0.5rem;
-  font-size: 0.7rem;
-}
-
 .switch-option {
   min-height: 1.9rem;
   padding: 0 0.7rem;

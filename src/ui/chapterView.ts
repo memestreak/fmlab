@@ -331,12 +331,10 @@ export function mountChapters(store: LabStore): void {
     // Six operators: the Algorithm and Operators panels, together.
     const sixOps = document.querySelector<HTMLElement>('#six-operators-lab');
     if (sixOps) sixOps.hidden = chapter.patch.mode !== 'ops';
-    // Chapter 9 has a switch for what is heard, and draws both spectra
-    // predicted, so no live view there.
+    // Chapter 9 has a switch for what is heard. It draws both spectra
+    // predicted, so nothing measured is drawn over them there.
     const hear = document.querySelector<HTMLElement>('#hear-switch');
     if (hear) hear.hidden = !chapter.patch.compare;
-    const live = document.querySelector<HTMLElement>('#live-switch');
-    if (live) live.hidden = chapter.patch.compare;
     const share = document.querySelector<HTMLElement>('#share');
     if (share) share.hidden = !chapter.sharesSound;
     const follows = document.querySelector<HTMLElement>('#index-follows-toggle');
