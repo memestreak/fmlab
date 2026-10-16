@@ -717,6 +717,31 @@ dfn {
   box-shadow: 0 0 0 1px var(--ink);
 }
 
+/* The theme switch, as frets has it: a small square with only its icon,
+   no border, the paper sunken under it on hover. The icon is ink. */
+.theme-switch {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.theme-switch:hover {
+  background: var(--paper-sunken);
+}
+
+.theme-switch svg {
+  display: block;
+}
+
 .controls {
   display: grid;
   gap: 0.25rem;

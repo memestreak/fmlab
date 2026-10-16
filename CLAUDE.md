@@ -351,7 +351,10 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
   a chapter's lesson is the carrier's own frequency, set `realUnits` so
   the axes are fixed in ms and Hz. Keep carrier units where the lesson is
   ratios and sidebands.
-- The theme switch cycles Auto, Light, Dark and saves the bare word under
+- The theme switch is a small icon button, as frets has it: a half-filled
+  circle for Auto, a sun, a moon, in ink with no border; it is named
+  "Theme: Auto" and its tip says what a click does. It cycles Auto,
+  Light, Dark and saves the bare word under
   `localStorage["fmlab.theme"]`. The boot script in `index.html` reads the
   same key; keep it in step with `src/model/theme.ts`.
 - The space bar is Play / Stop on every page, including stopping a note
