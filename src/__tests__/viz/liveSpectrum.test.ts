@@ -1,6 +1,7 @@
 import { chapterById } from '../../chapters';
 import { DEFAULTS, type LabState } from '../../model/lab';
-import { describeLive, isSounding } from '../../ui/figures';
+import { describeSpectrum, isSounding } from '../../ui/figures';
+import { spectrumOf } from '../../viz/spectrumPlot';
 import {
   amplitudeFromDb,
   binHz,
@@ -66,7 +67,7 @@ describe('liveTrace', () => {
 });
 
 describe('the live view\'s words', () => {
-  const steady: LabState = { ...DEFAULTS, chapter: 'sandbox', liveSpectrum: true };
+  const steady: LabState = { ...DEFAULTS, chapter: 'sandbox' };
   const brass: LabState = {
     ...DEFAULTS,
     ...chapterById('envelopes')!.patch,
@@ -82,11 +83,11 @@ describe('the live view\'s words', () => {
     expect(isSounding(brass, 102)).toBe(false);
   });
 
-  it('tells a screen reader it lies flat when there is nothing to measure', () => {
-    expect(describeLive(false)).toContain('lies flat');
-  });
-
-  it('tells a screen reader what it shows while there is', () => {
-    expect(describeLive(true)).toContain('measured from the sound now playing');
+  it('tells a screen reader the sound is measured over the stems only while it plays', () => {
+    const lines = spectrumOf(steady);
+    expect(describeSpectrum(steady, lines)).not.toContain('Measured');
+    expect(describeSpectrum(steady, lines, true)).toContain(
+      'Measured from the sound now playing, drawn over them.',
+    );
   });
 });

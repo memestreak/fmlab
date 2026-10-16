@@ -93,12 +93,6 @@ export interface LabState {
    * for none.
    */
   hoverOp: number | null;
-  /**
-   * Whether the spectrum figure shows the live, measured spectrum of the
-   * sound (over the predicted one, faintly) instead of the predicted one.
-   * The reader's choice for the visit; neither saved nor in the URL.
-   */
-  liveSpectrum: boolean;
   /** `ops`: which of the DX7's 32 algorithms wires the operators. */
   algorithm: number;
   /** `ops`: the six operators, OP1 first. */
@@ -169,7 +163,6 @@ export const DEFAULTS: LabState = {
   hover: null,
   hoverOp: null,
   pinned: null,
-  liveSpectrum: false,
   algorithm: 1,
   operators: [
     { ratio: 1, level: 1, decay: 0 },
