@@ -299,19 +299,20 @@ while the text scrolls, and for the space bar to start and stop the sound.
 
 ## The live spectrum (PR #12)
 
-- **A Predicted / Live switch** in the top right corner of every spectrum
-  plot (at first at the end of its caption; moved onto the plot, smaller,
-  on 2026-10-15), Predicted to begin with. It holds for the visit, across
-  chapters; it is not saved and not in the URL.
-- **Live draws the measured FFT** as a filled --pen-blue curve on the same
-  frequency axis and the same linear scale as the predicted stems, which
-  stay underneath, faint, for comparison. A measured spectrum has no
-  phase, so the curve never goes below the axis and is never red.
+- **No switch** (since 2026-10-16; before then a Predicted / Live switch
+  chose one or the other). The predicted stems are always drawn, and
+  whenever sound plays the measured spectrum is drawn over them; when it
+  stops, the curve goes. The stems are drawn the same either way, so
+  starting and stopping adds and takes away the curve and nothing else.
+- **The measured FFT** is a filled --pen-blue curve on the same
+  frequency axis and the same linear scale as the predicted stems. A
+  measured spectrum has no phase, so the curve never goes below the axis
+  and is never red.
 - **The measurement is taken before the volume**, not after the limiter.
   The limiter never acts at the lab's levels, so the shape is what is
   heard; tapping before the volume keeps the curve's heights on the
   predicted stems' scale at any volume. A full-height sine reads 1.
-- **With nothing playing** the curve lies flat. The caption says nothing
+- **With nothing playing** there is no curve. The caption says nothing
   about it (it used to say "Press Play to hear it.", until 2026-10-15:
   text that came and went moved the page).
 - **Under reduced motion** the live view is redrawn twice a second rather
@@ -432,7 +433,7 @@ while the text scrolls, and for the space bar to start and stop the sound.
   "Two operators", "Six operators"). Two operators is the sandbox as it
   was, links and all. Six operators is chapter 8's lab: the 32 algorithms
   grouped by carriers, the diagram with lit boxes, the operator table,
-  Feedback, the predicted spectrum and Live, and chapter 8's five
+  Feedback, the spectrum (measured while it plays), and chapter 8's five
   presets; with the sandbox's keyboard, Volume and Copy link. The two keep
   their own settings, so switching back finds the other as it was;
   switching stops any sound. The chapter's text is the same in both.

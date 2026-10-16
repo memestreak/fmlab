@@ -145,9 +145,9 @@ const STEPS: Step[] = [
        operators there is no tidy sum of Bessel functions to give the
        heights, so it is worked out the long way: the same maths that makes
        the sound is run for a moment, and the result taken apart
-       with the same ${use('fft', 'FFT')} that Live uses. Its stems are
-       heights only, all upright. Press Live to see the real thing
-       measured.`,
+       with the same ${use('fft', 'FFT')} that measures the sound as it
+       plays. Its stems are heights only, all upright. Play a note to see
+       the real thing measured over them.`,
     ],
   },
 ];

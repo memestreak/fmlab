@@ -191,16 +191,12 @@ export function drawSpectrum(
  * Draws the predicted line spectrum's stems, and the extras the state
  * asks for (harmonic lines, Carson's bracket), into a frame already
  * drawn. Returns the lines drawn.
- *
- * @param opacity how strongly to draw the stems: 1, or less to keep them
- *   faint under the live view so the two can be compared
  */
 export function drawPredicted(
   plot: Plot,
   state: LabState,
   x: (freq: number) => number,
   time?: number,
-  opacity = 1,
 ): SpectralLine[] {
   const lines = spectrumOf(state, time);
   const { ctx, token, top, bottom } = plot;
@@ -235,7 +231,7 @@ export function drawPredicted(
     const negative = amp < 0;
     // With one order picked out, its pair of stems stays; the rest fade.
     const isPicked = picked !== null && sidebandOrder(freq, ratio) === picked;
-    ctx.globalAlpha = opacity * (picked === null || isPicked ? 1 : DIMMED);
+    ctx.globalAlpha = picked === null || isPicked ? 1 : DIMMED;
     ctx.lineWidth = crowded ? 1 : isPicked ? STEM_WIDTH + 1 : STEM_WIDTH;
     ctx.strokeStyle = token(negative ? '--pen-red' : '--pen-blue');
     ctx.beginPath();

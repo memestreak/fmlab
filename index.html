@@ -286,13 +286,10 @@
 
           <figure class="figure" data-figure="spectrum">
             <div class="plot-frame">
-              <canvas id="spectrum" class="plot" role="img"></canvas>
-              <!-- The spectrum predicted from the patch, or measured from
-                   the sound, in the plot's top right corner. See
+              <!-- The spectrum predicted from the patch and, while sound
+                   plays, measured from it over the top. See
                    ui/figures.ts. -->
-              <span id="live-switch" class="switch" role="group" aria-label="Spectrum">
-                <button id="spectrum-predicted" type="button" class="switch-option" aria-pressed="true">Predicted</button><button id="spectrum-live" type="button" class="switch-option" aria-pressed="false">Live</button>
-              </span>
+              <canvas id="spectrum" class="plot" role="img"></canvas>
             </div>
             <figcaption>
               Fig. <span class="figure-number"></span>&emsp;<span
