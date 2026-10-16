@@ -39,7 +39,7 @@ export const singleSine: Chapter = {
      rest of this guide is about growing many partials from just two sine
      waves.`,
     `Fig. 2 is worked out from the settings: what the sound should
-     contain. Press Live in its caption and it measures what is really
+     contain. Press Live, in its top right corner, and it measures what is really
      coming out, while it plays, and draws that over the predicted stem.
      The measuring is done by the ${define('fft')} (FFT), the standard way
      to take a stretch of sound apart into the sine waves it is made of.

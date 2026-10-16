@@ -299,8 +299,9 @@ while the text scrolls, and for the space bar to start and stop the sound.
 
 ## The live spectrum (PR #12)
 
-- **A Predicted / Live switch** at the end of every spectrum figure's
-  caption, Predicted to begin with. It holds for the visit, across
+- **A Predicted / Live switch** in the top right corner of every spectrum
+  plot (at first at the end of its caption; moved onto the plot, smaller,
+  on 2026-10-15), Predicted to begin with. It holds for the visit, across
   chapters; it is not saved and not in the URL.
 - **Live draws the measured FFT** as a filled --pen-blue curve on the same
   frequency axis and the same linear scale as the predicted stems, which
@@ -310,8 +311,9 @@ while the text scrolls, and for the space bar to start and stop the sound.
   The limiter never acts at the lab's levels, so the shape is what is
   heard; tapping before the volume keeps the curve's heights on the
   predicted stems' scale at any volume. A full-height sine reads 1.
-- **With nothing playing** the curve lies flat and the caption says "Press
-  Play to hear it."
+- **With nothing playing** the curve lies flat. The caption says nothing
+  about it (it used to say "Press Play to hear it.", until 2026-10-15:
+  text that came and went moved the page).
 - **Under reduced motion** the live view is redrawn twice a second rather
   than every frame.
 
