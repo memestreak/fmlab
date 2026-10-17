@@ -979,6 +979,8 @@ dfn {
   }
 
   [data-view='chapter'] .lab .figure:not([hidden]) ~ .figure:not([hidden]) {
+    margin-top: 1rem;
+    padding-top: 2.25rem;
     border-top: 1px solid var(--rule);
   }
 
@@ -1000,7 +1002,7 @@ dfn {
 
   [data-view='chapter'] .controls {
     gap: 0;
-    padding-bottom: 1.25rem;
+    padding-bottom: 2rem;
   }
 
   [data-view='chapter'] .lab[data-many-sliders='true'] .sliders {
