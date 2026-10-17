@@ -20,8 +20,9 @@ Carrier and modulator ratio `#/ratio`, Sounds that change over time
 versus PM `#/fm-vs-pm`) and Play (the Sandbox `#/sandbox`, last). `#/`
 (or no hash) is the landing view, "Hearing FM" under the kicker
 Introduction: laid out exactly as a section (its lab a Play button whose
-note the two figures move with), its text the pitch, the two ways on and
-the guide's contents, its Next the first section and that section's
+note the two figures move with), its text the pitch, a button to the
+sandbox and the guide's contents (no button to the first section: its
+Next link is the way on), its Next the first section and that section's
 Previous it; `#/glossary` is the
 glossary, outside the sequence. The header's Contents button opens a panel
 of every group and section (`ui/contents.ts`); each section ends with
