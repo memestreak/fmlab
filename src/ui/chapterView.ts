@@ -241,11 +241,11 @@ function narrativeHtml(chapter: Chapter): string {
 const INTRODUCTION = 'Introduction';
 
 /**
- * The rest of the landing view's text: the two ways on, and every section
- * by name, in its group.
+ * The rest of the landing view's text: the way to the sandbox, and every
+ * section by name, in its group. The first section is the named Next
+ * link below, as from any section.
  */
 function landingNextHtml(): string {
-  const first = CHAPTERS[0];
   // The sandbox: the section with the keyboard, wherever it is.
   const play = CHAPTERS.find(chapter => chapter.hasPiano) ?? CHAPTERS[CHAPTERS.length - 1];
   const groups = OUTLINE.map(
@@ -259,7 +259,6 @@ function landingNextHtml(): string {
   ).join('');
   return `
     <p class="landing-ways">
-      <a class="btn btn-ink" href="${hashFor(first.id)}">Start with ${first.title}</a>
       <a class="btn" href="${hashFor(play.id)}">Go to the sandbox</a>
     </p>
     <ol class="landing-chapters">${groups}</ol>`;
