@@ -67,7 +67,7 @@ body {
 
 /* Wide enough for the two panes side by side. */
 .page {
-  max-width: 74rem;
+  max-width: 80rem;
   margin: 0 auto;
   padding: 2.5rem 1.25rem 2rem;
 }
@@ -92,7 +92,7 @@ body {
 
 @media (min-width: 62rem) {
   .chapter {
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
     gap: 3.5rem;
     align-items: start;
   }
@@ -957,11 +957,15 @@ dfn {
     padding: 0 1rem 2rem 0;
   }
 
+  /* The figures share one plate, as a journal sets a pair: an ink rule
+     above the first and below the last, a hairline between them, and
+     room around each plot so it does not crowd the controls. */
   [data-view='chapter'] .lab {
     display: flex;
     flex-direction: column;
     min-height: 0;
     overflow-y: auto;
+    border-bottom: 1px solid var(--ink);
   }
 
   [data-view='chapter'] .lab .figure:not([hidden]) {
@@ -969,8 +973,17 @@ dfn {
     flex: 1 1 0;
     flex-direction: column;
     min-height: 0;
-    margin: 0.75rem 0 0;
-    padding: 0.5rem 0 0.4rem;
+    margin: 0;
+    padding: 1.75rem 0 1.25rem;
+    border-bottom: 0;
+  }
+
+  [data-view='chapter'] .lab .figure:not([hidden]) ~ .figure:not([hidden]) {
+    border-top: 1px solid var(--rule);
+  }
+
+  [data-view='chapter'] .figure-tools {
+    margin-top: 1rem;
   }
 
   [data-view='chapter'] .plot-frame {
@@ -987,6 +1000,7 @@ dfn {
 
   [data-view='chapter'] .controls {
     gap: 0;
+    padding-bottom: 1.25rem;
   }
 
   [data-view='chapter'] .lab[data-many-sliders='true'] .sliders {
@@ -1034,7 +1048,7 @@ dfn {
   }
 
   [data-view='chapter'] .lab .figure figcaption {
-    margin-top: 0.4rem;
+    margin-top: 0.75rem;
     font-size: 0.85rem;
   }
 

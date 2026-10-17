@@ -327,7 +327,9 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
   are ink. Never let phase rest on colour alone; a negative stem also gets
   a hollow marker.
 - A figure sits between two ink rules (`.figure`) with an italic caption,
-  "Fig. n" then an em space then the title.
+  "Fig. n" then an em space then the title. Where the lab is pinned
+  beside the text, its figures share one plate instead: an ink rule above
+  the first and below the last, a `--rule` hairline between them.
 - Fonts, self-hosted through `@fontsource` (latin subsets, imported in
   `src/main.ts`): `--font-display` (Fraunces 600: wordmark and headings),
   `--font-sans` (Figtree 400 to 700, italic for figure captions:
