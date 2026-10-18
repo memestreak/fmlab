@@ -337,7 +337,7 @@ with a better looking keyboard", six operators only): no text column, a
 title bar (title and lede, then Volume; no Play or Copy link: the
 keyboard and the space bar play, and the address bar keeps the sound),
 then under the title Algorithms the algorithm list and Start from, the
-wiring diagram between ‹ and › that step round the 32 (`stepAlgorithm`)
+wiring diagram with ‹ › just clear of its widest wiring (`steadyHalfWidth`) stepping round the 32 (`stepAlgorithm`)
 with Feedback beside it, and under the title Operators the operator table, the spectrum the full height on the
 right, the keyboard across the foot. Carriers are solid blue and
 modulators green outlines in the table (filled or outlined tags, carrier rows

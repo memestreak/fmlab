@@ -136,21 +136,34 @@
   flex: none;
 }
 
-/* ‹ and › either side of the diagram itself, with its caption across
-   the foot: the figure's own parts are laid out in this grid. */
+/* ‹ and › either side of the diagram, just clear of the widest wiring
+   (--diagram-half, set in ui/instrument.ts), so they never move; the
+   figure's own parts are laid out in this grid, its caption across the
+   foot. */
 .inst-alg-step {
+  --diagram-half: 40%;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: minmax(0, 1fr) auto;
   align-items: center;
   align-self: stretch;
-  gap: 0 0.5rem;
   min-height: 0;
   padding: 0.5rem 0;
 }
 
 .inst-alg-step .round-step {
+  z-index: 1;
   grid-row: 1;
+  grid-column: 1;
+  justify-self: center;
+}
+
+#inst-alg-prev {
+  transform: translateX(calc(-1 * (var(--diagram-half) + 1.5rem)));
+}
+
+#inst-alg-next {
+  transform: translateX(calc(var(--diagram-half) + 1.5rem));
 }
 
 .round-step {
@@ -284,7 +297,7 @@
 
 #inst-diagram-figure .plot-frame {
   grid-row: 1;
-  grid-column: 2;
+  grid-column: 1;
   align-self: stretch;
 }
 

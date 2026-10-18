@@ -1,7 +1,7 @@
 import { algorithm, operatorsUsed } from '../../dsp/algorithms';
 import { OP_RATIO } from '../../model/lab';
 import { RATIO_STOPS, scrubTo, snapRatio, stepRatio } from '../../ui/operators';
-import { diagramGeometry, operatorAt } from '../../viz/algorithmPlot';
+import { diagramGeometry, operatorAt, steadyHalfWidth } from '../../viz/algorithmPlot';
 
 describe('dragging in a box', () => {
   /** A ratio stop's share of the drag, in pixels: 300 across 17 stops. */
@@ -100,6 +100,21 @@ describe('pointing at the wiring diagram', () => {
       }
       expect(sides.size, `${width}×${height}`).toBe(1);
     }
+  });
+
+  it('says how far every wiring reaches, so ‹ › can stand just clear of it', () => {
+    for (const [width, height] of [[495, 233], [348, 187]]) {
+      const half = steadyHalfWidth(width, height)!;
+      for (let number = 1; number <= 32; number++) {
+        const alg = algorithm(number);
+        const { places, box, boxX } = diagramGeometry(alg, width, height);
+        for (const op of operatorsUsed(alg)) {
+          expect(boxX(places[op])).toBeGreaterThanOrEqual(width / 2 - half);
+          expect(boxX(places[op]) + box).toBeLessThanOrEqual(width / 2 + half);
+        }
+      }
+    }
+    expect(steadyHalfWidth(410, 110)).toBeNull();
   });
 
   it('fits each wiring on its own where the diagram is short', () => {

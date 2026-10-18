@@ -1,6 +1,7 @@
 import type { Chapter } from '../chapters/types';
 import { DX7_COUNT } from '../dsp/algorithms';
 import type { LabStore } from '../model/lab';
+import { steadyHalfWidth } from '../viz/algorithmPlot';
 
 /**
  * Where each of the lab's nodes goes on the instrument page: the id of the
@@ -76,4 +77,15 @@ export function mountAlgorithmSteps(store: LabStore): void {
   };
   step('inst-alg-prev', -1);
   step('inst-alg-next', 1);
+
+  // Just clear of the widest wiring, which the diagram's size decides.
+  const frame = document.querySelector<HTMLElement>('.inst-alg-step');
+  const canvas = document.querySelector<HTMLCanvasElement>('#algorithm-plot');
+  if (!frame || !canvas) return;
+  new ResizeObserver(() => {
+    const { width, height } = canvas.getBoundingClientRect();
+    const half = steadyHalfWidth(width, height);
+    if (half === null) frame.style.removeProperty('--diagram-half');
+    else frame.style.setProperty('--diagram-half', `${half.toFixed(1)}px`);
+  }).observe(canvas);
 }
