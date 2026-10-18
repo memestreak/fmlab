@@ -27,8 +27,14 @@ describe('the instrument page', () => {
     for (const id of Object.keys(sandbox.figures)) {
       expect(PLACES.some(p => p.node === `[data-figure="${id}"]`), id).toBe(true);
     }
-    for (const node of ['#play', '#share', '#piano', '#algorithm', '.panel-operators']) {
+    for (const node of ['#piano', '#algorithm', '.panel-operators']) {
       expect(PLACES.some(p => p.node === node), node).toBe(true);
+    }
+  });
+
+  it('has no Play or Copy link: the keys play, the address keeps the sound', () => {
+    for (const node of ['#play', '#share']) {
+      expect(PLACES.some(p => p.node === node), node).toBe(false);
     }
   });
 });

@@ -60,7 +60,7 @@
   gap: 0.75rem;
 }
 
-/* Volume as one compact line beside Play. */
+/* Volume as one compact line. */
 .inst-tools .slider-row {
   grid-template-columns: auto 9rem auto;
   grid-template-areas: 'label slider value';
@@ -74,13 +74,6 @@
 
 .inst-tools .slider {
   height: 2rem;
-}
-
-/* Wide enough for "Copied", so copying the link moves nothing beside
-   it. */
-.inst-tools #share {
-  min-width: 6.25rem;
-  justify-content: center;
 }
 
 .inst-label {

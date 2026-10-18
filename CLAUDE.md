@@ -334,7 +334,8 @@ both sizes after adding controls or figures.
 The sandbox is an instrument page (`body[data-view='instrument']`;
 Jeremy approved it on 2026-10-18: "the existing app, just full page and
 with a better looking keyboard", six operators only): no text column, a
-title bar (title and lede, then Volume, Play note and Copy link), the
+title bar (title and lede, then Volume; no Play or Copy link: the
+keyboard and the space bar play, and the address bar keeps the sound), the
 algorithm and Start from row, the wiring diagram with Feedback beside it
 and the operator table under it, the spectrum the full height on the
 right, the keyboard across the foot. Carriers are solid blue and

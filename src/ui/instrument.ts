@@ -7,8 +7,6 @@ import type { Chapter } from '../chapters/types';
  */
 export const PLACES: readonly { node: string; to: string }[] = [
   { node: '[data-control="volume"]', to: 'inst-tools' },
-  { node: '#play', to: 'inst-tools' },
-  { node: '#share', to: 'inst-tools' },
   { node: '#algorithm', to: 'inst-algorithm' },
   { node: '#dx7-presets', to: 'inst-dx7-presets' },
   { node: '[data-figure="algorithm"]', to: 'inst-diagram-figure' },
