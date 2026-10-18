@@ -82,6 +82,34 @@ describe('pointing at the wiring diagram', () => {
     }
   });
 
+  it('draws every algorithm with boxes of one size where there is room', () => {
+    // The sandbox's diagram at 1440×900, 1280×800 and on a phone.
+    for (const [width, height] of [[495, 233], [446, 221], [348, 187]]) {
+      const sides = new Set<number>();
+      for (let number = 1; number <= 32; number++) {
+        const alg = algorithm(number);
+        const { places, box, boxX, boxY, outY } = diagramGeometry(alg, width, height);
+        sides.add(box);
+        for (const op of operatorsUsed(alg)) {
+          expect(boxX(places[op])).toBeGreaterThanOrEqual(0);
+          expect(boxX(places[op]) + box).toBeLessThanOrEqual(width);
+          // Room above the top row for the feedback loop.
+          expect(boxY(places[op]) - box * 0.35).toBeGreaterThanOrEqual(0);
+        }
+        expect(outY).toBeLessThanOrEqual(height - 14);
+      }
+      expect(sides.size, `${width}×${height}`).toBe(1);
+    }
+  });
+
+  it('fits each wiring on its own where the diagram is short', () => {
+    // The chapter lab's: one box size for all would be too small to read.
+    const one = diagramGeometry(algorithm(32), 410, 110).box;
+    const stack = diagramGeometry(algorithm(1), 410, 110).box;
+    expect(one).toBeGreaterThan(stack);
+    expect(stack).toBeGreaterThanOrEqual(12);
+  });
+
   it('finds nothing away from the boxes', () => {
     expect(operatorAt(1, SIZE.width, SIZE.height, 2, 2)).toBeNull();
     expect(operatorAt(1, SIZE.width, SIZE.height, SIZE.width - 2, SIZE.height - 2)).toBeNull();

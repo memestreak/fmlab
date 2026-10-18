@@ -1360,9 +1360,20 @@ dfn {
 }
 
 /* The row pointed at here, or whose box is pointed at in the diagram. */
-.op-row.is-pointed th,
-.op-row.is-pointed td {
-  background: var(--paper-sunken);
+/* Tinted in its role's pen, with an ink edge, so it shows on a shaded
+   carrier row too. */
+.op-row.is-pointed > th,
+.op-row.is-pointed > td {
+  background: color-mix(in srgb, var(--pen-green) 18%, var(--paper));
+}
+
+.op-row.is-pointed:has(.op-tag[data-role='carrier']) > th,
+.op-row.is-pointed:has(.op-tag[data-role='carrier']) > td {
+  background: color-mix(in srgb, var(--pen-blue) 18%, var(--paper));
+}
+
+.op-row.is-pointed > th {
+  box-shadow: inset 3px 0 0 var(--ink);
 }
 
 /* A slider and the box to type the same number in. */

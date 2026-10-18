@@ -207,7 +207,11 @@ figures subscribe to it. Nothing else passes values around.
   on one time axis (`envelopeSpan`) and both with a playhead while the
   note sounds. `plot.ts`'s `drawFrame` takes the horizontal rows a plot
   wants; amplitude from -1 to 1 is only the default. `algorithmPlot.ts` draws an algorithm as the DX7 does (`layoutAlgorithm`:
-  carriers on the bottom row, each modulator above what it modulates); a
+  carriers on the bottom row, each modulator above what it modulates),
+  with boxes sized for the largest of the wirings (6 columns, 4 rows) so
+  they keep their size as the algorithm changes, a smaller wiring centred,
+  where that leaves a box of at least `STEADY_BOX` (the sandbox); in the
+  chapter lab's short diagram each wiring is fitted on its own; a
   carrier's box is filled in --pen-blue with its number in paper, a
   modulator's a dashed --pen-green outline, both dimmer as the operator's
   level is lower, so the two read apart without colour too. While a note
@@ -248,7 +252,9 @@ figures subscribe to it. Nothing else passes values around.
   is held). A drag in a box changes it as well (`scrubTo`: up or right
   for more, the same stops, Shift or Alt finer and slower); a click
   without moving still types. Pointing at or focusing a row sets `hoverOp`, which rings that
-  box in the diagram; pointing at a box (`operatorAt`) picks out its row.
+  box in the diagram; pointing at a box (`operatorAt`) picks out its row,
+  tinted in its role's pen with an ink edge, and clicking a box focuses
+  its row. A focused row stays picked out when the pointer leaves.
   Where the lab is pinned small, the Operators panel and Feedback fold
   behind Sliders;
   `steps.ts` is a chapter's steps (`Chapter.steps`, `algorithms`): the row

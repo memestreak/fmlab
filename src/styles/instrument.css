@@ -187,6 +187,15 @@
   background: var(--paper-sunken);
 }
 
+/* The row pointed at, over the carrier shading (base.css has the tint). */
+[data-view='instrument'] .op-row.is-pointed > * {
+  background: color-mix(in srgb, var(--pen-green) 18%, var(--paper));
+}
+
+[data-view='instrument'] .op-row.is-pointed:has(.op-tag[data-role='carrier']) > * {
+  background: color-mix(in srgb, var(--pen-blue) 18%, var(--paper));
+}
+
 /* Six operators: the table given the room. */
 .inst .panel {
   border-top: 1px solid var(--ink);
@@ -711,6 +720,16 @@
 
   [data-view='instrument'] .op-row:has(.op-tag[data-role='carrier']) {
     background: var(--paper-sunken);
+  }
+
+  /* A card has no cells to tint: the card itself, and its edge. */
+  [data-view='instrument'] .op-row.is-pointed {
+    background: color-mix(in srgb, var(--pen-green) 18%, var(--paper));
+    box-shadow: inset 3px 0 0 var(--ink);
+  }
+
+  [data-view='instrument'] .op-row.is-pointed:has(.op-tag[data-role='carrier']) {
+    background: color-mix(in srgb, var(--pen-blue) 18%, var(--paper));
   }
 
   [data-view='instrument'] .op-cell-label {

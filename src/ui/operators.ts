@@ -343,7 +343,7 @@ export function mountOperators(store: LabStore): void {
 
     row.addEventListener('pointerenter', () => point(op));
     row.addEventListener('pointerleave', () => {
-      if (store.get().hoverOp === op) point(null);
+      if (store.get().hoverOp === op) point(selected());
     });
     row.addEventListener('focusin', () => point(op));
     row.addEventListener('focusout', event => {
@@ -352,21 +352,36 @@ export function mountOperators(store: LabStore): void {
   }
   table.append(...rows);
 
-  // Pointing at a box in the diagram picks out its row.
+  // The operator whose row has the focus, if one has: what stays picked
+  // out once the pointer moves away.
+  function selected(): number | null {
+    const at = rows.findIndex(row => row.contains(document.activeElement));
+    return at < 0 ? null : at;
+  }
+
+  // Pointing at a box in the diagram picks out its row, and clicking it
+  // selects the row: its first slider takes the focus.
   const diagram = document.querySelector<HTMLCanvasElement>('#algorithm-plot');
-  diagram?.addEventListener('pointermove', event => {
-    const rect = diagram.getBoundingClientRect();
-    point(
-      operatorAt(
-        store.get().algorithm,
-        rect.width,
-        rect.height,
-        event.clientX - rect.left,
-        event.clientY - rect.top,
-      ),
+  const boxAt = (event: PointerEvent | MouseEvent) => {
+    const rect = diagram!.getBoundingClientRect();
+    return operatorAt(
+      store.get().algorithm,
+      rect.width,
+      rect.height,
+      event.clientX - rect.left,
+      event.clientY - rect.top,
     );
+  };
+  diagram?.addEventListener('pointermove', event => {
+    const op = boxAt(event);
+    diagram.style.cursor = op === null ? '' : 'pointer';
+    point(op ?? selected());
   });
-  diagram?.addEventListener('pointerleave', () => point(null));
+  diagram?.addEventListener('pointerleave', () => point(selected()));
+  diagram?.addEventListener('click', event => {
+    const op = boxAt(event);
+    if (op !== null) sliders[op][0].focus({ preventScroll: true });
+  });
 
   const show = (state: LabState) => {
     // Shown only for one of the 32 (ui/steps.ts); a step's own wiring is

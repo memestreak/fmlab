@@ -1,4 +1,4 @@
-import { algorithm, isDx7, operatorsUsed, targetsOf } from '../dsp/algorithms';
+import { ALGORITHMS, algorithm, isDx7, operatorsUsed, targetsOf } from '../dsp/algorithms';
 import type { Algorithm } from '../dsp/pmKernel';
 import { type LabState, noteSounding, operatorLevelsAt } from '../model/lab';
 import { beginPlot } from './plot';
@@ -87,9 +87,29 @@ export function describeAlgorithm(number: number): string {
 const BOX = 52;
 
 /**
+ * The most columns and the most rows any wiring needs, so every one can
+ * be drawn with boxes of the same size.
+ */
+const LARGEST = ALGORITHMS.map(layoutAlgorithm).reduce(
+  (most, { columns, rows }) => ({
+    columns: Math.max(most.columns, columns),
+    rows: Math.max(most.rows, rows),
+  }),
+  { columns: 1, rows: 1 },
+);
+
+/**
+ * The smallest box worth keeping steady: below it, as in the chapter lab's
+ * short diagram, each wiring is sized to fit on its own instead.
+ */
+const STEADY_BOX = 22;
+
+/**
  * Where everything in the diagram goes on a canvas of a size: the side of
  * a box, the gaps, the output line, and each operator's box. Pure, so the
- * drawing and the pointer agree on where a box is.
+ * drawing and the pointer agree on where a box is. Where the canvas has
+ * the room (the sandbox), the box is sized for the largest wiring, so it
+ * stays the same as the algorithm changes, and a smaller wiring is centred.
  */
 export function diagramGeometry(alg: Algorithm, width: number, height: number) {
   const { places: maybe, columns, rows } = layoutAlgorithm(alg);
@@ -98,16 +118,18 @@ export function diagramGeometry(alg: Algorithm, width: number, height: number) {
   // Room for the rows of boxes and the gaps between (1.7 boxes a row, less
   // the last gap), the output stub below (0.6) and the feedback loop above
   // (0.35), with the output line's 14 px and a little to spare.
-  const box = Math.min(
-    BOX,
-    (height - 18) / (rows * 1.7 + 0.25),
-    (width - 40) / (columns * 1.6),
-  );
+  const tall = (r: number) => r * 1.7 + 0.25;
+  const fit = (c: number, r: number) =>
+    Math.min(BOX, (height - 18) / tall(r), (width - 40) / (c * 1.6));
+  const steady = fit(LARGEST.columns, LARGEST.rows);
+  const box = steady >= STEADY_BOX ? steady : fit(columns, rows);
   const gapX = box * 0.6;
   const gapY = box * 0.7;
   const diagramWidth = columns * box + (columns - 1) * gapX;
   const left = (width - diagramWidth) / 2;
-  const outY = height - 14;
+  // Up by half the height this wiring leaves unused.
+  const spare = Math.max(0, height - 18 - box * tall(rows));
+  const outY = height - 14 - spare / 2;
   const bottom = outY - box * 0.6;
   const boxX = (p: Place) => left + p.column * (box + gapX);
   const boxY = (p: Place) => bottom - box - p.row * (box + gapY);
