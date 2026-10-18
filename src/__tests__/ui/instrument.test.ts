@@ -9,17 +9,19 @@ describe('the instrument page', () => {
     expect(CHAPTERS.at(-1)?.id).toBe('sandbox');
     expect(sandbox.patch.mode).toBe('ops');
     expect(sandbox.patch.noteMode).toBe(true);
-    expect(sandbox.lede).toBe("Six operators, wired by any of the DX7's 32 algorithms.");
+    expect(sandbox.lede).toBe(
+      "Six operators, wired by any of the DX7's 32 algorithms, starting from its factory voices (© Yamaha).",
+    );
   });
 
-  it('plays a DX7 voice from the keyboard, and starts from Stacks', () => {
+  it('plays a DX7 voice from the keyboard, and opens on E.PIANO 1', () => {
     expect(sandbox.patch.voiceModel).toBe('dx7');
     expect(sandbox.controls).toEqual(['volume', 'dxFeedback']);
     expect(Object.keys(sandbox.figures)).toEqual(['algorithm', 'spectrum']);
-    expect(sandbox.presets[0].label).toBe('Stacks');
+    expect(sandbox.presets[0].label).toBe('E.PIANO 1');
     expect(sandbox.patch.dxOperators).toEqual(sandbox.presets[0].patch.dxOperators);
     expect(sandbox.hasPiano && sandbox.sharesSound).toBe(true);
-    expect(sandbox.patch.algorithm).toBe(1);
+    expect(sandbox.patch.algorithm).toBe(5);
   });
 
   it('keeps Operators and algorithms on its simple operators', () => {

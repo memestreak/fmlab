@@ -69,7 +69,7 @@ describe('which chapters keep their sound in the URL', () => {
 
 describe('the sandbox in a link', () => {
   const sandbox = chapterById('sandbox')!;
-  const piano = chapterById('sandbox')!.presets.find(p => p.label === 'E. piano')!.patch;
+  const piano = chapterById('sandbox')!.presets.find(p => p.label === 'E.PIANO 1')!.patch;
   const six: LabState = {
     ...DEFAULTS,
     ...sandbox.patch,
@@ -87,13 +87,13 @@ describe('the sandbox in a link', () => {
     const params = new URLSearchParams(soundParams(six));
     expect(params.get('c')).toBe('146.83');
     expect(params.get('a')).toBe('5');
-    expect(params.get('f')).toBe('3.142');
+    expect(params.get('f')).toBe('3.1415');
     const ops = params.get('o')!.split('~');
     expect(ops).toHaveLength(6);
-    // OP4: ratio 14, no detune, -12 dB; attack 2 ms to 0 dB, 150 ms to the
-    // break at -18 dB, 800 ms to sustain at -60 dB, release 200 ms; break
-    // point C4, quieter up the keyboard, 1.42 times faster an octave up.
-    expect(ops[3]).toBe('14_0_-12_0.002_0_0.15_-18_0.8_-60_0.2_60_l0_l-3_1.42');
+    // E.PIANO 1's OP2: ratio 14, no detune, -30.75 dB; attack 1 ms to
+    // 0 dB, 279 ms to the break at -18.06 dB, 3.37 s to silence; break
+    // point A-1, no level scaling, 1.3 times faster an octave up.
+    expect(ops[1]).toBe('14_0_-30.75_0.001_0_0.2786_-18.06_3.3747_-96_0.0741_21_l0_l0_1.2968');
   });
 
   it('leaves the volume out: that is the listener\'s', () => {
@@ -123,7 +123,7 @@ describe('the sandbox in a link', () => {
     expect(back.dxFeedback).toBeCloseTo(2 * Math.PI, 9);
     const op = back.dxOperators[0];
     expect(op.ratio).toBe(61.69);
-    expect(op.detune).toBe(6.3);
+    expect(op.detune).toBeCloseTo(6.3116, 4);
     expect(op.level).toBe(0);
     expect(op.envelope.attack).toBe(40);
     expect(op.envelope.peak).toBe(0);

@@ -156,7 +156,7 @@ export const dx7Voice: Chapter = {
      then cancelling, as many times a second as their frequencies differ.
      The spectrum, Fig. 2, draws them as one stem, too close together to
      part; your ear hears one note that breathes. A little detune is much
-     of what makes the sandbox's E. piano shimmer.`,
+     of what makes the DX7's E.PIANO 1, in the sandbox, shimmer.`,
     `Real instruments do not sound the same all the way up: a piano's high
      notes are thinner than its low ones, and die away sooner. The DX7 copies
      this with ${define('keyboardScaling')}, which makes an operator louder

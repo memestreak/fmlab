@@ -1,5 +1,5 @@
 import { BASE_PATCH } from './basePatch';
-import { DX7_STACKS, DX7_VOICES } from './dx7Voices';
+import { DX7_START, DX7_VOICES } from './dx7Voices';
 import { titleOf } from './outline';
 import type { Chapter } from './types';
 
@@ -18,7 +18,8 @@ export const sandbox: Chapter = {
   body: [],
   maths: [],
   instrument: true,
-  lede: "Six operators, wired by any of the DX7's 32 algorithms.",
+  // The factory voices it starts from are Yamaha's, and say so.
+  lede: "Six operators, wired by any of the DX7's 32 algorithms, starting from its factory voices (© Yamaha).",
   // No Carrier slider: the keyboard sets the pitch of every note.
   controls: ['volume', 'dxFeedback'],
   presets: DX7_VOICES,
@@ -26,7 +27,8 @@ export const sandbox: Chapter = {
   sharesSound: true,
   patch: {
     ...BASE_PATCH,
-    ...DX7_STACKS,
+    // It opens on E.PIANO 1.
+    ...DX7_START,
     mode: 'ops',
     voiceModel: 'dx7',
     noteMode: true,

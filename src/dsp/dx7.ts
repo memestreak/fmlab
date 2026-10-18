@@ -19,8 +19,9 @@ export const LEVEL_DB = { min: -72, max: 0 };
 export const FULL_INDEX = 4 * Math.PI;
 /** A ratio: msfa's coarse 0 (a half) to 31, times 1 + fine / 100. */
 export const DX7_RATIO = { min: 0.5, max: 61.69 };
-/** Detune in cents: msfa's -7 to +7, each step about 0.9 cent. */
-export const DETUNE_CENTS = { min: -6.3, max: 6.3 };
+/** Detune in cents: msfa's -7 to +7, each step 12606 / 2^24 octave, about 0.9 cent. */
+const DETUNE_STEP = (12606 / 2 ** 24) * 1200;
+export const DETUNE_CENTS = { min: -7 * DETUNE_STEP, max: 7 * DETUNE_STEP };
 /** How much faster the envelope runs an octave up: msfa's 0 to 7. */
 export const RATE_SCALING = { min: 1, max: 2 ** (7 / 8) };
 /**

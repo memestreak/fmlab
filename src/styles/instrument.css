@@ -909,6 +909,32 @@ body[data-envelope='open'] #inst-figures .figure:not([hidden]) {
   }
 }
 
+/* Up to 92rem wide (1440 px), the six voices' names need the room:
+   "Start from" is for screen readers only and the buttons tighten; under
+   80rem they wrap onto a second line. */
+@media (min-width: 62rem) and (max-width: 92rem) {
+  .inst-row .inst-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .inst .inst-row .presets .btn {
+    padding: 0 0.5rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (min-width: 62rem) and (max-width: 79.99rem) {
+  .inst-row,
+  .inst .inst-row .presets {
+    flex-wrap: wrap;
+  }
+}
+
 /* A window under 60rem high gives the keys less. */
 @media (min-width: 62rem) and (max-height: 60rem) {
   .piano-keys {

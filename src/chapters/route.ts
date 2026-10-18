@@ -107,25 +107,25 @@ function brief(value: number, places: number): string {
  * six joined by "~". Characters a URL keeps as they are.
  */
 export function operatorsParam(operators: readonly Dx7Operator[]): string {
-  const side = ({ curve, depth }: ScalingSide) => `${curve === 'lin' ? 'l' : 'e'}${brief(depth, 2)}`;
+  const side = ({ curve, depth }: ScalingSide) => `${curve === 'lin' ? 'l' : 'e'}${brief(depth, 3)}`;
   return operators
     .map(op => {
       const e = op.envelope;
       return [
-        brief(op.ratio, 3),
-        brief(op.detune, 1),
-        op.level === null ? 'x' : brief(op.level, 1),
-        brief(e.attack, 3),
-        brief(e.peak, 1),
-        brief(e.decay1, 3),
-        brief(e.brk, 1),
-        brief(e.decay2, 3),
-        brief(e.sustain, 1),
-        brief(e.release, 3),
+        brief(op.ratio, 4),
+        brief(op.detune, 2),
+        op.level === null ? 'x' : brief(op.level, 2),
+        brief(e.attack, 4),
+        brief(e.peak, 2),
+        brief(e.decay1, 4),
+        brief(e.brk, 2),
+        brief(e.decay2, 4),
+        brief(e.sustain, 2),
+        brief(e.release, 4),
         String(Math.round(op.breakKey)),
         side(op.left),
         side(op.right),
-        brief(op.rateScaling, 3),
+        brief(op.rateScaling, 4),
       ].join('_');
     })
     .join('~');
@@ -196,7 +196,7 @@ export function soundParams(state: LabState): string {
   return new URLSearchParams({
     c: brief(state.carrierHz, 2),
     a: String(state.algorithm),
-    f: brief(state.dxFeedback, 3),
+    f: brief(state.dxFeedback, 4),
     o: operatorsParam(state.dxOperators),
   }).toString();
 }

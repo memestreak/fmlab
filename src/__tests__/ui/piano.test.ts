@@ -112,12 +112,13 @@ describe('the sandbox', () => {
     expect(CHAPTERS.filter(c => c.hasPiano).map(c => c.id)).toEqual(['sandbox']);
   });
 
-  it('has DX7 voices to start from, those after factory sounds marked as approximations', () => {
+  it('starts from six DX7 factory voices, each marked as an approximation', () => {
     expect(sandbox.presets.map(preset => preset.label)).toEqual(
-      ['Stacks', 'E. piano', 'Bass', 'Bell', 'Marimba', 'Organ'],
+      ['E.PIANO 1', 'BRASS 1', 'BASS 1', 'TUB BELLS', 'MARIMBA', 'STRINGS 1'],
     );
-    for (const preset of sandbox.presets.slice(1, 5)) {
-      expect(preset.hint).toMatch(/after the DX7's .*an approximation/);
+    for (const preset of sandbox.presets) {
+      expect(preset.hint).toMatch(/^the DX7's factory .*, a close approximation/);
     }
+    expect(sandbox.presets[0].hint).toContain('without its vibrato and velocity');
   });
 });
