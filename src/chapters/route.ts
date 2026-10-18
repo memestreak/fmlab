@@ -1,9 +1,8 @@
 // The section is in the URL's hash as an address, "#/index", so it can be
 // linked to and survives a reload. "#/" (or no hash) is the landing view,
 // "#/glossary" the glossary and "#/glossary?t=index" one of its entries.
-// The sandbox also keeps its sound there, "#/sandbox?c=220&r=1.41&i=5", or
-// with six operators
-// "#/sandbox?m=6&c=220&a=5&f=0.7&o=1_90_2.5-1_35_1.2-1_70_1.5-14_25_0.4-1_40_2-1_15_1",
+// The sandbox also keeps its sound there,
+// "#/sandbox?c=220&a=5&f=0.7&o=1_90_2.5-1_35_1.2-1_70_1.5-14_25_0.4-1_40_2-1_15_1",
 // so a sound can be shared by its link. Addresses from before the sections
 // had names ("#3", "#7?c=…", "#glossary") are upgraded by `upgradeHash`.
 
@@ -14,12 +13,10 @@ import {
   clamp,
   FEEDBACK,
   hzToSemitones,
-  INDEX,
   type LabState,
   OP_DECAY,
   OP_LEVEL,
   OP_RATIO,
-  RATIO,
   semitonesToHz,
 } from '../model/lab';
 import { GLOSSARY, LANDING, type SectionId } from './outline';
@@ -101,9 +98,6 @@ function brief(value: number, places: number): string {
   return String(Number(value.toFixed(places)));
 }
 
-/** How many operators a link's "m" says; any other value means two. */
-const SIX = '6';
-
 /**
  * The six operators in a link, short: each as ratio_level_decay, its
  * level in whole percent, and the six joined by "-". Characters a URL
@@ -140,27 +134,17 @@ export function operatorsFromParam(raw: string | null): Operator[] | null {
 }
 
 /**
- * The parameters that carry a sandbox sound. With two operators: the
- * carrier in Hz, the ratio and the index. With six: "m=6", the base pitch,
- * the algorithm, the feedback and the operators. Volume stays the
+ * The parameters that carry a sandbox sound: the base pitch, the
+ * algorithm, the feedback and the six operators. Volume stays the
  * listener's own, and is left out.
  */
 export function soundParams(state: LabState): string {
-  if (state.mode === 'ops') {
-    return new URLSearchParams({
-      m: SIX,
-      c: brief(state.carrierHz, 2),
-      a: String(state.algorithm),
-      f: brief(state.feedback, 2),
-      o: operatorsParam(state.operators),
-    }).toString();
-  }
-  const params = new URLSearchParams({
+  return new URLSearchParams({
     c: brief(state.carrierHz, 2),
-    r: brief(state.ratio, 3),
-    i: brief(state.index, 2),
-  });
-  return params.toString();
+    a: String(state.algorithm),
+    f: brief(state.feedback, 2),
+    o: operatorsParam(state.operators),
+  }).toString();
 }
 
 /**
@@ -169,6 +153,9 @@ export function soundParams(state: LabState): string {
  * on the Carrier slider's nearest step, a quarter of a semitone, so a
  * hand-typed 221 Hz becomes a pitch the slider can show. Anything missing
  * or not a number is left out, to keep what the chapter starts with.
+ * The sandbox has only six operators now: a link from when it also had
+ * two ("c=220&r=1.41&i=5", or with "m=6") opens in six, keeping its pitch;
+ * its ratio and index, and "m", mean nothing and are passed over.
  */
 export function soundFromParams(params: URLSearchParams): Partial<LabState> {
   const read = (key: string) => {
@@ -183,23 +170,13 @@ export function soundFromParams(params: URLSearchParams): Partial<LabState> {
     const hz = clamp(carrier, CARRIER_HZ);
     patch.carrierHz = semitonesToHz(Math.round(hzToSemitones(hz) * 4) / 4);
   }
-  if (params.get('m') === SIX) {
-    // Six operators, playing notes as chapter 8 does.
-    patch.mode = 'ops';
-    patch.noteMode = true;
-    const algorithm = read('a');
-    if (algorithm !== null) {
-      patch.algorithm = clamp(Math.round(algorithm), { min: 1, max: DX7_COUNT });
-    }
-    const feedback = read('f');
-    if (feedback !== null) patch.feedback = clamp(feedback, FEEDBACK);
-    const operators = operatorsFromParam(params.get('o'));
-    if (operators) patch.operators = operators;
-    return patch;
+  const algorithm = read('a');
+  if (algorithm !== null) {
+    patch.algorithm = clamp(Math.round(algorithm), { min: 1, max: DX7_COUNT });
   }
-  const ratio = read('r');
-  if (ratio !== null) patch.ratio = clamp(ratio, RATIO);
-  const index = read('i');
-  if (index !== null) patch.index = clamp(index, INDEX);
+  const feedback = read('f');
+  if (feedback !== null) patch.feedback = clamp(feedback, FEEDBACK);
+  const operators = operatorsFromParam(params.get('o'));
+  if (operators) patch.operators = operators;
   return patch;
 }

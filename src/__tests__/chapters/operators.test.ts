@@ -101,9 +101,9 @@ describe('the algorithm diagram', () => {
 });
 
 describe('chapter 8', () => {
-  it('follows the two-operator sections, and is the only section of six operators', () => {
+  it('follows the two-operator sections; only it and the sandbox have six operators', () => {
     expect(CHAPTERS[CHAPTERS.indexOf(chapterById('envelopes')!) + 1]).toBe(chapter8);
-    expect(CHAPTERS.filter(c => c.patch.mode === 'ops').map(c => c.id)).toEqual(['algorithms']);
+    expect(CHAPTERS.filter(c => c.patch.mode === 'ops').map(c => c.id)).toEqual(['algorithms', 'sandbox']);
   });
 
   it('shows the algorithm and the spectrum, and plays notes', () => {

@@ -14,6 +14,8 @@ import { operatorAt } from '../viz/algorithmPlot';
 interface Column {
   key: keyof Operator;
   label: string;
+  /** As the table's heading names it, with its unit: "Level %". */
+  heading: string;
   /** In the slider's units, which are the box's: Level in %. */
   min: number;
   max: number;
@@ -32,6 +34,7 @@ const COLUMNS: Column[] = [
     // key without Shift snaps to RATIO_STOPS.
     key: 'ratio',
     label: 'Ratio',
+    heading: 'Ratio',
     min: OP_RATIO.min,
     max: OP_RATIO.max,
     step: 0.01,
@@ -43,6 +46,7 @@ const COLUMNS: Column[] = [
     // Shown as a percentage; held as 0 to 1.
     key: 'level',
     label: 'Level',
+    heading: 'Level %',
     min: OP_LEVEL.min * 100,
     max: OP_LEVEL.max * 100,
     step: 1,
@@ -53,6 +57,7 @@ const COLUMNS: Column[] = [
   {
     key: 'decay',
     label: 'Decay',
+    heading: 'Decay s',
     min: OP_DECAY.min,
     max: OP_DECAY.max,
     step: 0.1,
@@ -322,7 +327,14 @@ export function mountOperators(store: LabStore): void {
       });
 
       param.append(slider, box);
-      cell.append(param);
+      // The column's name in the cell itself, shown only where the table
+      // is drawn as cards (the sandbox on a phone). Screen readers have
+      // the controls' own labels.
+      const name = document.createElement('span');
+      name.className = 'op-cell-label';
+      name.textContent = column.heading;
+      name.setAttribute('aria-hidden', 'true');
+      cell.append(name, param);
       row.append(cell);
       return { slider, box };
     });
@@ -331,7 +343,7 @@ export function mountOperators(store: LabStore): void {
 
     row.addEventListener('pointerenter', () => point(op));
     row.addEventListener('pointerleave', () => {
-      if (store.get().hoverOp === op) point(null);
+      if (store.get().hoverOp === op) point(selected());
     });
     row.addEventListener('focusin', () => point(op));
     row.addEventListener('focusout', event => {
@@ -340,21 +352,36 @@ export function mountOperators(store: LabStore): void {
   }
   table.append(...rows);
 
-  // Pointing at a box in the diagram picks out its row.
+  // The operator whose row has the focus, if one has: what stays picked
+  // out once the pointer moves away.
+  function selected(): number | null {
+    const at = rows.findIndex(row => row.contains(document.activeElement));
+    return at < 0 ? null : at;
+  }
+
+  // Pointing at a box in the diagram picks out its row, and clicking it
+  // selects the row: its first slider takes the focus.
   const diagram = document.querySelector<HTMLCanvasElement>('#algorithm-plot');
-  diagram?.addEventListener('pointermove', event => {
-    const rect = diagram.getBoundingClientRect();
-    point(
-      operatorAt(
-        store.get().algorithm,
-        rect.width,
-        rect.height,
-        event.clientX - rect.left,
-        event.clientY - rect.top,
-      ),
+  const boxAt = (event: PointerEvent | MouseEvent) => {
+    const rect = diagram!.getBoundingClientRect();
+    return operatorAt(
+      store.get().algorithm,
+      rect.width,
+      rect.height,
+      event.clientX - rect.left,
+      event.clientY - rect.top,
     );
+  };
+  diagram?.addEventListener('pointermove', event => {
+    const op = boxAt(event);
+    diagram.style.cursor = op === null ? '' : 'pointer';
+    point(op ?? selected());
   });
-  diagram?.addEventListener('pointerleave', () => point(null));
+  diagram?.addEventListener('pointerleave', () => point(selected()));
+  diagram?.addEventListener('click', event => {
+    const op = boxAt(event);
+    if (op !== null) sliders[op][0].focus({ preventScroll: true });
+  });
 
   const show = (state: LabState) => {
     // Shown only for one of the 32 (ui/steps.ts); a step's own wiring is

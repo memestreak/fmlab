@@ -1,4 +1,4 @@
-import { algorithm, isDx7, operatorsUsed, targetsOf } from '../dsp/algorithms';
+import { ALGORITHMS, algorithm, isDx7, operatorsUsed, targetsOf } from '../dsp/algorithms';
 import type { Algorithm } from '../dsp/pmKernel';
 import { type LabState, noteSounding, operatorLevelsAt } from '../model/lab';
 import { beginPlot } from './plot';
@@ -79,36 +79,79 @@ export function describeAlgorithm(number: number): string {
   );
 }
 
-/** A box's side, at most; smaller when the canvas is. */
-const BOX = 34;
+/**
+ * A box's side, at most; smaller when the canvas is. Large enough that a
+ * one- or two-row wiring uses the room the sandbox gives it; the chapter
+ * lab's diagram is short, so there the height sets the size.
+ */
+const BOX = 52;
+
+/**
+ * The most columns and the most rows any wiring needs, so every one can
+ * be drawn with boxes of the same size.
+ */
+const LARGEST = ALGORITHMS.map(layoutAlgorithm).reduce(
+  (most, { columns, rows }) => ({
+    columns: Math.max(most.columns, columns),
+    rows: Math.max(most.rows, rows),
+  }),
+  { columns: 1, rows: 1 },
+);
+
+/**
+ * The smallest box worth keeping steady: below it, as in the chapter lab's
+ * short diagram, each wiring is sized to fit on its own instead.
+ */
+const STEADY_BOX = 22;
+
+/**
+ * The side of a box that fits a wiring of so many columns and rows on a
+ * canvas of a size: room for the rows of boxes and the gaps between (1.7
+ * boxes a row, less the last gap), the output stub below (0.6) and the
+ * feedback loop above (0.35), with the output line's 14 px and a little
+ * to spare.
+ */
+function fitBox(columns: number, rows: number, width: number, height: number): number {
+  return Math.min(BOX, (height - 18) / (rows * 1.7 + 0.25), (width - 40) / (columns * 1.6));
+}
 
 /**
  * Where everything in the diagram goes on a canvas of a size: the side of
  * a box, the gaps, the output line, and each operator's box. Pure, so the
- * drawing and the pointer agree on where a box is.
+ * drawing and the pointer agree on where a box is. Where the canvas has
+ * the room (the sandbox), the box is sized for the largest wiring, so it
+ * stays the same as the algorithm changes, and a smaller wiring is centred.
  */
 export function diagramGeometry(alg: Algorithm, width: number, height: number) {
   const { places: maybe, columns, rows } = layoutAlgorithm(alg);
   // Only the operators used have places; the rest are never looked up.
   const places = maybe as Place[];
-  // Room for the rows of boxes and the gaps between (1.7 boxes a row, less
-  // the last gap), the output stub below (0.6) and the feedback loop above
-  // (0.35), with the output line's 14 px and a little to spare.
-  const box = Math.min(
-    BOX,
-    (height - 18) / (rows * 1.7 + 0.25),
-    (width - 40) / (columns * 1.6),
-  );
+  const steady = fitBox(LARGEST.columns, LARGEST.rows, width, height);
+  const box = steady >= STEADY_BOX ? steady : fitBox(columns, rows, width, height);
   const gapX = box * 0.6;
   const gapY = box * 0.7;
   const diagramWidth = columns * box + (columns - 1) * gapX;
   const left = (width - diagramWidth) / 2;
-  const outY = height - 14;
+  // Up by half the height this wiring leaves unused.
+  const spare = Math.max(0, height - 18 - box * (rows * 1.7 + 0.25));
+  const outY = height - 14 - spare / 2;
   const bottom = outY - box * 0.6;
   const boxX = (p: Place) => left + p.column * (box + gapX);
   const boxY = (p: Place) => bottom - box - p.row * (box + gapY);
   const centreX = (p: Place) => boxX(p) + box / 2;
   return { places, box, gapX, gapY, outY, bottom, boxX, boxY, centreX };
+}
+
+/**
+ * How far the widest wiring reaches either side of the canvas's middle,
+ * with its feedback loop and "out", where the boxes are held one size
+ * (see diagramGeometry); null where they are not.
+ */
+export function steadyHalfWidth(width: number, height: number): number | null {
+  const box = fitBox(LARGEST.columns, LARGEST.rows, width, height);
+  if (box < STEADY_BOX) return null;
+  const span = LARGEST.columns * box + (LARGEST.columns - 1) * box * 0.6;
+  return span / 2 + box * 0.3;
 }
 
 /**
@@ -145,10 +188,11 @@ export function operatorAt(
  * modulators above in --pen-green, ink lines from each modulator down to
  * what it modulates and from the carriers down to the output, and the
  * feedback loop as an ink line out of the top of one box and back into
- * the top of another (or the same). A box's level dims it, so a silent
- * operator reads as one. An operator the algorithm leaves out is not
- * drawn. At `time`, while a note sounds, each box is filled in its colour
- * as strongly as the operator sounds at that moment.
+ * the top of another (or the same). Every carrier is drawn alike, and
+ * every modulator, whatever its level. An operator the algorithm leaves
+ * out is not drawn. At `time`, while a note sounds, each modulator's box
+ * is filled in its colour as strongly as the operator sounds at that
+ * moment.
  */
 export function drawAlgorithm(
   state: LabState,
@@ -228,21 +272,27 @@ export function drawAlgorithm(
   for (const op of used) {
     const p = places[op];
     const carrier = alg.carriers.includes(op);
-    const level = state.operators[op]?.level ?? 1;
     const pen = token(carrier ? '--pen-blue' : '--pen-green');
     ctx.fillStyle = token('--paper');
     ctx.fillRect(boxX(p), boxY(p), box, box);
-    if (now && now[op] > 0) {
+    // A carrier, which is heard, is a box filled in its pen; a modulator,
+    // which is not, an outline. The two read apart without colour too.
+    if (carrier) {
+      ctx.fillStyle = pen;
+      ctx.fillRect(boxX(p), boxY(p), box, box);
+    } else if (now && now[op] > 0) {
+      // While a note sounds, a modulator fills as strongly as it sounds.
+      // (A carrier is filled already, so it does not.)
       ctx.globalAlpha = 0.35 * Math.min(1, now[op]);
       ctx.fillStyle = pen;
       ctx.fillRect(boxX(p), boxY(p), box, box);
     }
-    ctx.globalAlpha = 0.35 + 0.65 * level;
-    ctx.strokeStyle = pen;
-    ctx.lineWidth = 2.5;
-    ctx.strokeRect(boxX(p), boxY(p), box, box);
     ctx.globalAlpha = 1;
-    ctx.fillStyle = ink;
+    ctx.strokeStyle = pen;
+    ctx.lineWidth = carrier ? 3 : 2;
+    ctx.strokeRect(boxX(p), boxY(p), box, box);
+    // Paper on a carrier's fill.
+    ctx.fillStyle = carrier ? token('--paper') : ink;
     ctx.fillText(String(op + 1), centreX(p), boxY(p) + box / 2 + 1);
     // The operator pointed at in the table, or here: ringed in ink.
     if (state.hoverOp === op) {
@@ -256,5 +306,7 @@ export function drawAlgorithm(
 
   ctx.font = `12px ${token('--font-sans')}`;
   ctx.textAlign = 'left';
+  // In ink, whatever the last box's number was written in.
+  ctx.fillStyle = ink;
   ctx.fillText('out', Math.max(...carrierXs) + 6, outY);
 }

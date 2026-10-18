@@ -127,15 +127,17 @@ export interface Chapter {
    * diagrams are familiar by the time chapter 8 needs them.
    */
   showsPair?: boolean;
-  /**
-   * The chapter's lab with six operators instead of two: the sandbox's,
-   * shown while its switch says Six operators (`mode` is `ops`). Its text
-   * stays the chapter's own; its sliders, presets, figures and patch are
-   * these.
-   */
-  sixOperators?: Chapter;
   /** Whether to show the piano keyboard, to play the patch at pitches. */
   hasPiano?: boolean;
+  /**
+   * Whether the chapter is an instrument page (the sandbox) rather than a
+   * section: no text column, its controls and figures laid out in
+   * `#instrument` (ui/instrument.ts), and `lede`, one line under its
+   * title, in place of a lesson.
+   */
+  instrument?: boolean;
+  /** An instrument page's one line, beside its title. Plain text. */
+  lede?: string;
   /**
    * Whether the chapter keeps its sound (carrier, ratio, index) in the
    * URL, so that a link brings the same sound back.

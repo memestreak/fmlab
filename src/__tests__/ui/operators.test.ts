@@ -1,7 +1,7 @@
 import { algorithm, operatorsUsed } from '../../dsp/algorithms';
 import { OP_RATIO } from '../../model/lab';
 import { RATIO_STOPS, scrubTo, snapRatio, stepRatio } from '../../ui/operators';
-import { diagramGeometry, operatorAt } from '../../viz/algorithmPlot';
+import { diagramGeometry, operatorAt, steadyHalfWidth } from '../../viz/algorithmPlot';
 
 describe('dragging in a box', () => {
   /** A ratio stop's share of the drag, in pixels: 300 across 17 stops. */
@@ -80,6 +80,49 @@ describe('pointing at the wiring diagram', () => {
         expect(operatorAt(number, SIZE.width, SIZE.height, x, y), `${number} OP${op + 1}`).toBe(op);
       }
     }
+  });
+
+  it('draws every algorithm with boxes of one size where there is room', () => {
+    // The sandbox's diagram at 1440×900, 1280×800 and on a phone.
+    for (const [width, height] of [[495, 233], [446, 221], [348, 187]]) {
+      const sides = new Set<number>();
+      for (let number = 1; number <= 32; number++) {
+        const alg = algorithm(number);
+        const { places, box, boxX, boxY, outY } = diagramGeometry(alg, width, height);
+        sides.add(box);
+        for (const op of operatorsUsed(alg)) {
+          expect(boxX(places[op])).toBeGreaterThanOrEqual(0);
+          expect(boxX(places[op]) + box).toBeLessThanOrEqual(width);
+          // Room above the top row for the feedback loop.
+          expect(boxY(places[op]) - box * 0.35).toBeGreaterThanOrEqual(0);
+        }
+        expect(outY).toBeLessThanOrEqual(height - 14);
+      }
+      expect(sides.size, `${width}×${height}`).toBe(1);
+    }
+  });
+
+  it('says how far every wiring reaches, so ‹ › can stand just clear of it', () => {
+    for (const [width, height] of [[495, 233], [348, 187]]) {
+      const half = steadyHalfWidth(width, height)!;
+      for (let number = 1; number <= 32; number++) {
+        const alg = algorithm(number);
+        const { places, box, boxX } = diagramGeometry(alg, width, height);
+        for (const op of operatorsUsed(alg)) {
+          expect(boxX(places[op])).toBeGreaterThanOrEqual(width / 2 - half);
+          expect(boxX(places[op]) + box).toBeLessThanOrEqual(width / 2 + half);
+        }
+      }
+    }
+    expect(steadyHalfWidth(410, 110)).toBeNull();
+  });
+
+  it('fits each wiring on its own where the diagram is short', () => {
+    // The chapter lab's: one box size for all would be too small to read.
+    const one = diagramGeometry(algorithm(32), 410, 110).box;
+    const stack = diagramGeometry(algorithm(1), 410, 110).box;
+    expect(one).toBeGreaterThan(stack);
+    expect(stack).toBeGreaterThanOrEqual(12);
   });
 
   it('finds nothing away from the boxes', () => {

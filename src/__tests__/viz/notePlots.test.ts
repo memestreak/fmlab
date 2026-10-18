@@ -323,7 +323,7 @@ describe('chapter 5, the ratio', () => {
 
 describe('chapter 6, the envelope', () => {
   it('plays notes, as chapter 8 does too', () => {
-    expect(CHAPTERS.filter(c => c.patch.noteMode).map(c => c.id)).toEqual(['envelopes', 'algorithms']);
+    expect(CHAPTERS.filter(c => c.patch.noteMode).map(c => c.id)).toEqual(['envelopes', 'algorithms', 'sandbox']);
     expect(BASE_PATCH.noteMode).toBe(false);
   });
 

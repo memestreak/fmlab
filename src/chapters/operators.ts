@@ -50,13 +50,14 @@ const STEPS: Step[] = [
     patch: PAIR,
     body: [
       `You have been using a wiring all along. Fig. 1 draws the two operators you have used since ${sectionLink('index')} the way the DX7 draws them. OP2, the
-       modulator, in green, sits above OP1, the carrier, in blue, and a line
+       modulator, a green outline, sits above OP1, the carrier, a filled
+       blue box, and a line
        runs down from one to the other because OP2 modulates OP1. Only OP1
        has a line down to <em>out</em>: it is the one you hear.`,
       `The lab has two panels, one above the other. Algorithm is the
        wiring: a button for each step of this section, and the diagram.
        Operators is the operators it wires, a row each,
-       ringed in blue or green as their boxes are. Point at a row and its
+       ringed in blue or green, the colours of their boxes. Point at a row and its
        box is ringed in the diagram; point at a box and its row is picked
        out.`,
       `Each operator has a level, a percentage. For a carrier it is how
@@ -64,8 +65,8 @@ const STEPS: Step[] = [
        full level is an index of 5, so OP2 at 40% is an index of 2. Press
        Play note (or space), then drag OP2's Level slider, or drag up or
        across in the box beside it, or click in the box and type, and play
-       it again. While a note sounds, each box
-       fills as strongly as its operator is sounding.`,
+       it again. While a note sounds, each modulator's box fills as
+       strongly as it is sounding.`,
     ],
   },
   {

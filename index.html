@@ -96,10 +96,6 @@
               >
                 Sliders
               </button>
-              <!-- The sandbox: two operators, or six as in chapter 8. -->
-              <span id="operator-count" class="switch" role="group" aria-label="Operators" hidden>
-                <button id="two-operators" type="button" class="switch-option" aria-pressed="true">Two<span class="visually-hidden"> operators</span></button><button id="six-operators" type="button" class="switch-option" aria-pressed="false">Six<span class="visually-hidden"> operators</span></button>
-              </span>
               <!-- Chapter 9: which of its two sounds Play plays. -->
               <span id="hear-switch" class="switch" role="group" aria-label="Hear" hidden>
                 <button id="hear-pm" type="button" class="switch-option" aria-pressed="true">Hear PM</button><button id="hear-fm" type="button" class="switch-option" aria-pressed="false">Hear FM</button>
@@ -353,6 +349,63 @@
           </figure>
         </section>
       </main>
+
+      <!-- The sandbox, an instrument page with no text column. Empty
+           here: ui/instrument.ts moves the lab's own controls, figures and
+           keyboard into it on the way in, and back on the way out, so
+           every control keeps its element and id. -->
+      <section id="instrument" class="inst" aria-labelledby="inst-title" hidden>
+        <div class="inst-bar">
+          <div class="inst-head">
+            <h2 id="inst-title" class="inst-title" tabindex="-1"></h2>
+            <p id="inst-lede" class="inst-lede"></p>
+          </div>
+          <!-- Volume. -->
+          <div id="inst-tools" class="inst-tools"></div>
+        </div>
+        <div class="inst-body">
+          <!-- The six operators: the wiring and the operator table on
+               the left, the spectrum the full height on the right. -->
+          <div class="inst-six">
+            <div class="inst-left">
+              <h3 class="panel-title inst-section-title">Algorithms</h3>
+              <div class="inst-row">
+                <div id="inst-algorithm"></div>
+                <span class="inst-label" aria-hidden="true">Start from</span>
+                <div id="inst-dx7-presets"></div>
+              </div>
+              <div class="inst-diagram">
+                <!-- The diagram, with a step to the algorithm either way under it. -->
+                <div class="inst-alg-step">
+                  <button
+                    id="inst-alg-prev"
+                    type="button"
+                    class="round-step"
+                    aria-label="Previous algorithm"
+                  >
+                    ‹
+                  </button>
+                  <div id="inst-diagram-figure"></div>
+                  <button
+                    id="inst-alg-next"
+                    type="button"
+                    class="round-step"
+                    aria-label="Next algorithm"
+                  >
+                    ›
+                  </button>
+                </div>
+                <div id="inst-feedback"></div>
+              </div>
+              <div id="inst-operators"></div>
+            </div>
+            <div id="inst-figures" class="inst-plate"></div>
+          </div>
+        </div>
+        <!-- The keyboard, across the foot; docked to the screen's foot on
+             a phone. -->
+        <div id="inst-keys" class="inst-keys"></div>
+      </section>
 
       <!-- Every section, by group: opened by the Contents button. -->
       <dialog id="contents" class="contents-panel" aria-labelledby="contents-title">

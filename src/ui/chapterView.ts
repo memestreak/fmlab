@@ -1,8 +1,6 @@
 import {
   type Chapter,
   chapterById,
-  labViewOf,
-  operatorCountPatch,
   CHAPTERS,
   type ControlId,
   type FigureId,
@@ -30,6 +28,7 @@ import {
   wikiLink,
 } from '../chapters/terms';
 import type { LabState, LabStore } from '../model/lab';
+import { mountInstrument } from './instrument';
 
 /** How long the sound must rest before the address is brought up to date. */
 const URL_DELAY_MS = 300;
@@ -97,9 +96,6 @@ function mountSoundInUrl(store: LabStore): void {
     if (
       state.chapter === previous.chapter &&
       (state.carrierHz !== previous.carrierHz ||
-        state.ratio !== previous.ratio ||
-        state.index !== previous.index ||
-        state.mode !== previous.mode ||
         state.algorithm !== previous.algorithm ||
         state.feedback !== previous.feedback ||
         state.operators !== previous.operators)
@@ -274,33 +270,31 @@ function landingNextHtml(): string {
  */
 export function mountChapters(store: LabStore): void {
   const narrative = document.querySelector<HTMLElement>('#narrative');
+  const instrument = mountInstrument();
 
   const show = (chapter: Chapter) => {
     const isLanding = chapter.id === LANDING;
-    if (narrative) narrative.innerHTML = narrativeHtml(chapter);
+    // An instrument page has no text column.
+    if (narrative) narrative.innerHTML = chapter.instrument ? '' : narrativeHtml(chapter);
     document.title = isLanding ? 'fmlab' : `${chapter.title} · fmlab`;
     // For the stylesheet: the glossary is one centred column with no lab;
-    // the landing view is laid out as a section, so going on to the first
-    // one changes what is on the page and not where it is.
-    document.body.dataset.view = chapter.id === GLOSSARY ? 'glossary' : 'chapter';
-    showLab(labViewOf(chapter, store.get()));
+    // the sandbox is an instrument page; the landing view is laid out as a
+    // section, so going on to the first one changes what is on the page
+    // and not where it is.
+    document.body.dataset.view =
+      chapter.id === GLOSSARY ? 'glossary' : chapter.instrument ? 'instrument' : 'chapter';
+    showLab(chapter);
   };
 
   /**
    * What the lab shows for a chapter: its sliders, buttons, presets and
-   * figures. On its own when the sandbox switches between two and six
-   * operators, which changes the lab and not the text.
+   * figures.
    */
   const showLab = (chapter: Chapter) => {
-    // The sandbox's switch, and the small pair beside its text, which
-    // describes two operators only.
-    const count = document.querySelector<HTMLElement>('#operator-count');
-    if (count) count.hidden = !chapterById(chapter.id)?.sixOperators;
     const six = chapter.patch.mode === 'ops';
-    document.querySelector('#two-operators')?.setAttribute('aria-pressed', String(!six));
-    document.querySelector('#six-operators')?.setAttribute('aria-pressed', String(six));
-    const pair = narrative?.querySelector<HTMLElement>('.pair-diagram');
-    if (pair) pair.hidden = six;
+    // The instrument page first, so the figures are numbered in the order
+    // it shows them. Anywhere else everything goes back into the lab.
+    instrument.place(chapter, chapter.instrument === true);
     // The space bar's hint, not where the keyboard's letters stand in for
     // it: the sandbox needs the room.
     const hint = document.querySelector<HTMLElement>('.transport .hint');
@@ -391,9 +385,6 @@ export function mountChapters(store: LabStore): void {
     if (state.chapter !== previous.chapter) {
       const chapter = chapterById(state.chapter);
       if (chapter) show(chapter);
-    } else if (state.mode !== previous.mode) {
-      const chapter = chapterById(state.chapter);
-      if (chapter?.sixOperators) showLab(labViewOf(chapter, state));
     }
   });
 
@@ -416,20 +407,14 @@ export function mountChapters(store: LabStore): void {
     // On a wide screen the text scrolls in its own column, so that too.
     window.scrollTo(0, 0);
     if (narrative) narrative.scrollTop = 0;
-    narrative
-      ?.querySelector<HTMLElement>('.chapter-title')
-      ?.focus({ preventScroll: true });
+    const title = chapter.instrument
+      ? document.querySelector<HTMLElement>('#inst-title')
+      : narrative?.querySelector<HTMLElement>('.chapter-title');
+    title?.focus({ preventScroll: true });
     showTermInUrl();
   });
 
   mountSoundInUrl(store);
-
-  // The sandbox's Two operators / Six operators switch.
-  const choose = (six: boolean) => () => {
-    if ((store.get().mode === 'ops') !== six) store.set(operatorCountPatch(store.get(), six));
-  };
-  document.querySelector('#two-operators')?.addEventListener('click', choose(false));
-  document.querySelector('#six-operators')?.addEventListener('click', choose(true));
 
   const first = chapterById(store.get().chapter);
   if (first) show(first);

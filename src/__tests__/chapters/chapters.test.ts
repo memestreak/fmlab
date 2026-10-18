@@ -97,9 +97,16 @@ describe('the chapters', () => {
   });
 
   it.each(CHAPTERS)('$title has text and a title', chapter => {
+    expect(chapter.title).not.toBe('');
+    if (chapter.instrument) {
+      // An instrument page: no lesson, a line beside its title instead.
+      expect(chapter.body).toEqual([]);
+      expect(chapter.maths).toEqual([]);
+      expect(chapter.lede?.trim()).toBeTruthy();
+      return;
+    }
     expect(chapter.body.length).toBeGreaterThan(0);
     expect(chapter.body.every(text => text.trim().length > 0)).toBe(true);
-    expect(chapter.title).not.toBe('');
     for (const panel of chapter.maths) {
       expect(panel.title).not.toBe('');
       expect(panel.body.length).toBeGreaterThan(0);
