@@ -79,8 +79,12 @@ export function describeAlgorithm(number: number): string {
   );
 }
 
-/** A box's side, at most; smaller when the canvas is. */
-const BOX = 34;
+/**
+ * A box's side, at most; smaller when the canvas is. Large enough that a
+ * one- or two-row wiring uses the room the sandbox gives it; the chapter
+ * lab's diagram is short, so there the height sets the size.
+ */
+const BOX = 52;
 
 /**
  * Where everything in the diagram goes on a canvas of a size: the side of
@@ -230,19 +234,33 @@ export function drawAlgorithm(
     const carrier = alg.carriers.includes(op);
     const level = state.operators[op]?.level ?? 1;
     const pen = token(carrier ? '--pen-blue' : '--pen-green');
+    // Dimmer as the operator is quieter, so a silent one reads as one.
+    const strength = 0.35 + 0.65 * level;
     ctx.fillStyle = token('--paper');
     ctx.fillRect(boxX(p), boxY(p), box, box);
-    if (now && now[op] > 0) {
+    // A carrier, which is heard, is a solid box filled in its pen; a
+    // modulator, which is not, is a dashed outline. The two read apart
+    // without colour too.
+    if (carrier) {
+      ctx.globalAlpha = strength;
+      ctx.fillStyle = pen;
+      ctx.fillRect(boxX(p), boxY(p), box, box);
+    } else if (now && now[op] > 0) {
+      // While a note sounds, a modulator fills as strongly as it sounds.
+      // (A carrier is filled already, so it does not.)
       ctx.globalAlpha = 0.35 * Math.min(1, now[op]);
       ctx.fillStyle = pen;
       ctx.fillRect(boxX(p), boxY(p), box, box);
     }
-    ctx.globalAlpha = 0.35 + 0.65 * level;
+    ctx.globalAlpha = strength;
     ctx.strokeStyle = pen;
-    ctx.lineWidth = 2.5;
+    ctx.lineWidth = carrier ? 3 : 2;
+    ctx.setLineDash(carrier ? [] : [4, 3]);
     ctx.strokeRect(boxX(p), boxY(p), box, box);
+    ctx.setLineDash([]);
     ctx.globalAlpha = 1;
-    ctx.fillStyle = ink;
+    // Paper on a carrier's fill, unless the fill is too faint to carry it.
+    ctx.fillStyle = carrier && strength >= 0.6 ? token('--paper') : ink;
     ctx.fillText(String(op + 1), centreX(p), boxY(p) + box / 2 + 1);
     // The operator pointed at in the table, or here: ringed in ink.
     if (state.hoverOp === op) {

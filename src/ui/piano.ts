@@ -126,7 +126,7 @@ export function mountPiano(
   const octave = (label: string, direction: number) => {
     const button = document.createElement('button');
     button.type = 'button';
-    button.className = 'btn btn-quiet piano-octave';
+    button.className = 'piano-octave';
     button.textContent = label;
     button.setAttribute('aria-label', direction < 0 ? 'Octave down (Z)' : 'Octave up (X)');
     button.addEventListener('click', () => move(direction));
@@ -134,6 +134,18 @@ export function mountPiano(
   };
   const down = octave('−', -1);
   const up = octave('+', 1);
+
+  // The octave control, left of the keys: its name, − and + either side
+  // of the range the keys cover, and the computer keys that do the same.
+  const range = document.createElement('span');
+  range.className = 'piano-oct-range num';
+  const control = document.createElement('div');
+  control.className = 'piano-oct';
+  control.innerHTML =
+    '<span class="piano-oct-label" aria-hidden="true">Octave</span>' +
+    '<div class="piano-oct-row"></div>' +
+    '<span class="piano-oct-hint" aria-hidden="true"><kbd>Z</kbd> <kbd>X</kbd> on the keyboard</span>';
+  control.querySelector('.piano-oct-row')?.append(down, range, up);
 
   const update = () => {
     const note = sounding(held);
@@ -200,6 +212,15 @@ export function mountPiano(
         mark.setAttribute('aria-hidden', 'true');
         key.append(mark);
       }
+      // Every C names itself, so the octave can be read off the keys.
+      if (midi % 12 === 0) {
+        key.classList.add('piano-is-c');
+        const name = document.createElement('span');
+        name.className = 'piano-c num';
+        name.textContent = noteName(midi);
+        name.setAttribute('aria-hidden', 'true');
+        key.append(name);
+      }
       // A pointer holds a key for as long as it is down on it.
       key.addEventListener('pointerdown', event => {
         key.setPointerCapture(event.pointerId);
@@ -220,9 +241,10 @@ export function mountPiano(
       keys.set(midi, key);
       board.append(key);
     }
-    const range = `${noteName(start)} to ${noteName(start + KEYS - 1)}`;
-    board.setAttribute('aria-label', `Piano keyboard, ${range}`);
-    board.dataset.range = range;
+    const span = `${noteName(start)} to ${noteName(start + KEYS - 1)}`;
+    board.setAttribute('aria-label', `Piano keyboard, ${span}`);
+    board.dataset.range = span;
+    range.textContent = `${noteName(start)}–${noteName(start + KEYS - 1)}`;
     down.disabled = start === STARTS[0];
     up.disabled = start === STARTS[STARTS.length - 1];
     update();
@@ -236,8 +258,8 @@ export function mountPiano(
     draw();
   };
 
-  // The octave buttons either side of the keys, in one row.
-  container.replaceChildren(down, board, up);
+  // The octave control, then the keys.
+  container.replaceChildren(control, board);
   draw();
 
   // The computer's keys, while the sandbox is showing. Not with Ctrl, Alt

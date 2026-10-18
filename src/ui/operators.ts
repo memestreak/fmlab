@@ -14,6 +14,8 @@ import { operatorAt } from '../viz/algorithmPlot';
 interface Column {
   key: keyof Operator;
   label: string;
+  /** As the table's heading names it, with its unit: "Level %". */
+  heading: string;
   /** In the slider's units, which are the box's: Level in %. */
   min: number;
   max: number;
@@ -32,6 +34,7 @@ const COLUMNS: Column[] = [
     // key without Shift snaps to RATIO_STOPS.
     key: 'ratio',
     label: 'Ratio',
+    heading: 'Ratio',
     min: OP_RATIO.min,
     max: OP_RATIO.max,
     step: 0.01,
@@ -43,6 +46,7 @@ const COLUMNS: Column[] = [
     // Shown as a percentage; held as 0 to 1.
     key: 'level',
     label: 'Level',
+    heading: 'Level %',
     min: OP_LEVEL.min * 100,
     max: OP_LEVEL.max * 100,
     step: 1,
@@ -53,6 +57,7 @@ const COLUMNS: Column[] = [
   {
     key: 'decay',
     label: 'Decay',
+    heading: 'Decay s',
     min: OP_DECAY.min,
     max: OP_DECAY.max,
     step: 0.1,
@@ -322,7 +327,14 @@ export function mountOperators(store: LabStore): void {
       });
 
       param.append(slider, box);
-      cell.append(param);
+      // The column's name in the cell itself, shown only where the table
+      // is drawn as cards (the sandbox on a phone). Screen readers have
+      // the controls' own labels.
+      const name = document.createElement('span');
+      name.className = 'op-cell-label';
+      name.textContent = column.heading;
+      name.setAttribute('aria-hidden', 'true');
+      cell.append(name, param);
       row.append(cell);
       return { slider, box };
     });

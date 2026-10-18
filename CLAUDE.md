@@ -95,8 +95,7 @@ figures subscribe to it. Nothing else passes values around.
   its own way: Carrier is Frequency in `sine`), the patch it starts from (all
   of it, so a chapter always opens the same way), optional `steps` (sections
   with a sound each, `algorithms`), `showsPair` (the two-operator
-  sections and the sandbox draw their two operators small beside the
-  text) and the figures it shows,
+  sections draw their two operators small beside the text) and the figures it shows,
   each with its caption (they are numbered from 1 in the order shown, so
   text that says "Fig. 2" must match the chapter's own list). A chapter
   may have presets, buttons that set several fields at once. Its patch is
@@ -110,11 +109,13 @@ figures subscribe to it. Nothing else passes values around.
   and `upgradeHash` turns a link from before the sections had names
   (`#4`, `#7?c=…`, `#glossary`) into the address it meant, keeping its
   parameters.
-  `sandbox.ts` has a second lab, `sixOperators`: `algorithms`'s (algorithm
-  list, operator table, feedback, its presets from `dx7Presets.ts`) with
-  the keyboard and Copy link, shown while the sandbox's Two | Six switch
-  has `mode` at `ops`. `labViewOf(chapter, state)` says which lab to
-  show; the text stays the same. Its link is
+  `sandbox.ts` is an instrument page, not a section (`instrument`): no
+  lesson or maths, a `lede` beside its title instead, and `HINTS`, a line
+  under each of Two operators' controls. It has a second lab,
+  `sixOperators`: `algorithms`'s (algorithm list, operator table,
+  feedback, its presets from `dx7Presets.ts`) with the keyboard and Copy
+  link, shown while the sandbox's Two | Six switch has `mode` at `ops`.
+  `labViewOf(chapter, state)` says which lab to show. Its link is
   `#/sandbox?m=6&c=&a=&f=&o=ratio_level%_decay-…` (six operators joined by
   "-"), validated and clamped by `soundFromParams`; a link without
   `m=6` is the two-operator one, unchanged.
@@ -206,7 +207,12 @@ figures subscribe to it. Nothing else passes values around.
   on one time axis (`envelopeSpan`) and both with a playhead while the
   note sounds. `plot.ts`'s `drawFrame` takes the horizontal rows a plot
   wants; amplitude from -1 to 1 is only the default. `algorithmPlot.ts` draws an algorithm as the DX7 does (`layoutAlgorithm`:
-  carriers on the bottom row, each modulator above what it modulates).
+  carriers on the bottom row, each modulator above what it modulates); a
+  carrier's box is filled in --pen-blue with its number in paper, a
+  modulator's a dashed --pen-green outline, both dimmer as the operator's
+  level is lower, so the two read apart without colour too. While a note
+  sounds a modulator's box fills as strongly as it sounds (a carrier is
+  filled already).
   `liveSpectrum.ts` is
   the spectrum's live view, drawn whenever sound plays (there is no
   switch): the measured FFT as a filled --pen-blue curve over the
@@ -258,7 +264,15 @@ figures subscribe to it. Nothing else passes values around.
   sandbox's one-voice keyboard, on screen and on the computer's keys
   (by `KeyboardEvent.code`: A to K the white notes, W E T Y U O P the
   black, Z and X an octave down and up), holding the steady sound at a
-  key's pitch through `carrierHz` and `playing`;
+  key's pitch through `carrierHz` and `playing`. Piano-shaped keys under
+  an ink key slip, every C named, the octave control (− the range +, and
+  the Z / X hint) on their left; the held key is drawn in --pen-blue, the
+  note you hear. Its key colours are local tokens (`--key-light` and so
+  on) so the white keys stay light in the dark theme;
+  `instrument.ts` lays out the sandbox's instrument page: `PLACES` says
+  which of the lab's nodes go where in `#instrument` for Two and for Six,
+  and a comment left at each node's place in the lab brings it back on
+  the way out;
   `besselControls.ts` makes the Bessel plot a control: the canvas is a
   `role="slider"` for the index (drag, or arrows, Page Up / Down, Home,
   End), pointing at a curve, a spectrum stem or a J button sets `hover`,
@@ -275,8 +289,11 @@ figures subscribe to it. Nothing else passes values around.
   and runs the waveform's animation loop while it should move
   (`waveformMoves`: sound playing, a moving view, and
   no `prefers-reduced-motion`).
-- `src/styles/` — `tokens.css` (colours and fonts) and `base.css` (the two
-  panes, type, figures and the controls).
+- `src/styles/` — `tokens.css` (colours and fonts), `base.css` (the two
+  panes, type, figures and the controls) and `instrument.css` (the
+  sandbox's instrument page and its keyboard). A slider takes
+  `--slider-fill` for its filled part and thumb where it is set (the
+  sandbox's carrier and modulator controls), ink otherwise.
 - The page is hidden (a style in `index.html`) until `main.ts` has
   mounted everything and the fonts are in, then shown by setting
   `data-ready` on `<html>`; a 3 s CSS fallback shows it regardless. This
@@ -308,6 +325,22 @@ a Sliders button. The text keeps at least two fifths of a phone's height.
 The landing view is laid out the same way, so going on from it moves
 nothing; only the glossary is one centred column. Check every chapter at
 both sizes after adding controls or figures.
+
+The sandbox is an instrument page (`body[data-view='instrument']`,
+`data-ops` 'two' or 'six'; Jeremy approved it on 2026-10-18): no text
+column, a title bar (title, lede, Previous: FM versus PM, then Volume,
+Play, Two | Six and Copy link), the operators with the figures beside
+them, the keyboard across the foot. In Two the operators are drawn as a
+signal flow, Modulator box, Index on the green wire, Carrier box, out,
+with the figures on one plate; in Six the wiring diagram with Feedback
+beside it and the operator table under it, the spectrum the full height
+on the right. Carriers are solid blue and modulators dashed green in the
+boxes, the table and the diagram. On a wide screen it is one window high
+and nothing scrolls; under 52rem high the diagram's caption is for
+screen readers only and the table's rows tighten. Below 62rem it is one
+column: the keyboard docked to the screen's foot, the figures held at the
+top, the controls scrolling under them, and the operator table as cards.
+Volume, Play and the keyboard stay put when Two | Six switches.
 
 ## Styling
 
