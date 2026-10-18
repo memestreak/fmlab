@@ -1,6 +1,6 @@
 import { CHAPTERS } from '../../chapters';
 import { DEFAULTS } from '../../model/lab';
-import { presetOf } from '../../ui/chapterView';
+import { presetOf, stepPreset } from '../../ui/chapterView';
 import { PLACES, stepAlgorithm } from '../../ui/instrument';
 
 describe('the instrument page', () => {
@@ -69,5 +69,19 @@ describe('the sandbox\'s voice menu', () => {
     };
     expect(presetOf(sandbox.presets, edited)).toBe(-1);
     expect(presetOf(sandbox.presets, { ...opening, ...sandbox.presets[25].patch })).toBe(25);
+  });
+});
+
+describe('the presets\' ‹ ›', () => {
+  it('step through the 32 voices, round the ends', () => {
+    expect(stepPreset(10, 1, 32)).toBe(11);
+    expect(stepPreset(10, -1, 32)).toBe(9);
+    expect(stepPreset(31, 1, 32)).toBe(0);
+    expect(stepPreset(0, -1, 32)).toBe(31);
+  });
+
+  it('start from an end when no voice is chosen', () => {
+    expect(stepPreset(-1, 1, 32)).toBe(0);
+    expect(stepPreset(-1, -1, 32)).toBe(31);
   });
 });

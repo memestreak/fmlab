@@ -141,9 +141,15 @@
   font-size: 0.85rem;
 }
 
-/* The algorithm and the presets, a "Start from" row of sounds. */
+/* The section titles, each on its own controls' line: Presets with the
+   voice menu, and Algorithms with the algorithm list, over the diagram. */
 .inst-section-title {
   flex: none;
+  margin: 0;
+}
+
+.inst-section-head {
+  gap: 0.75rem;
 }
 
 /* ‹ and › either side of the diagram, just clear of the widest wiring
@@ -205,7 +211,7 @@
   font-size: 0.85rem;
 }
 
-/* The algorithm list, "Start from" and the six presets on one line. */
+/* The voice menu, its steps and its note on one line. */
 .inst-row {
   flex-wrap: nowrap;
   gap: 0.5rem 0.75rem;
@@ -232,8 +238,9 @@
   min-height: 2.25rem;
 }
 
-/* The sandbox's 32 factory voices, one menu, and beside it what the
-   chosen one plays without, cut short if the line is full. */
+/* The sandbox's 32 factory voices, one menu with ‹ › either side, and
+   beside them what the chosen one plays without, cut short if the line
+   is full. */
 .inst .inst-row #inst-dx7-presets {
   display: flex;
   flex: 1 1 auto;
