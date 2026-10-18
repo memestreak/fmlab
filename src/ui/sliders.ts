@@ -1,4 +1,5 @@
 import type { ControlId } from '../chapters';
+import { DX7_FEEDBACK } from '../dsp/dx7';
 import {
   ATTACK,
   CARRIER_SEMITONES,
@@ -116,6 +117,16 @@ const SLIDERS: SliderSpec[] = [
     read: state => state.feedback,
     write: position => ({ feedback: position }),
     format: state => state.feedback.toFixed(2),
+  },
+  {
+    // The sandbox's, on the source's own output: the DX7's 7 is 2π.
+    id: 'dxFeedback',
+    min: DX7_FEEDBACK.min,
+    max: DX7_FEEDBACK.max,
+    step: 0.01,
+    read: state => state.dxFeedback,
+    write: position => ({ dxFeedback: position }),
+    format: state => state.dxFeedback.toFixed(2),
   },
   // The envelope. The figure's dots set the same four numbers.
   {

@@ -136,8 +136,8 @@ const STEPS: Step[] = [
        nothing modulating anything, six sine waves added like an organ's
        drawbars; 5 is three pairs side by side. In 4 and 6 the feedback
        loop runs from lower in a stack back up to its top.`,
-      `${sectionLink('sandbox', 'The sandbox')}, at the end of the guide, has all of this too: switch it to Six to play these sounds from a keyboard and share them by
-       link.`,
+      `${sectionLink('sandbox', 'The sandbox')}, at the end of the guide, has six operators too, with more to set on each, played from a
+       keyboard and shared by link.`,
       `The buttons beside the list are sounds of mine to start from, built the way DX7
        sounds are: an electric piano from three pairs, one with a high
        tine; a bass from a tall stack with feedback; a bell from pairs whose

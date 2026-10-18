@@ -1,15 +1,16 @@
 import { BASE_PATCH } from './basePatch';
-import { DX7_PRESETS, STACKS } from './dx7Presets';
+import { DX7_START, DX7_VOICES } from './dx7Voices';
 import { titleOf } from './outline';
 import type { Chapter } from './types';
 
 /**
  * The sandbox: an instrument page, not a section. It has no lesson and
  * no maths, only a line beside its title; its controls, figures and
- * keyboard are laid out by ui/instrument.ts. It is chapter 8's
- * six-operator lab (the algorithm list, the operator table, feedback and
- * its presets) with the keyboard and its sound in the link, playing notes
- * as chapter 8 does.
+ * keyboard are laid out by ui/instrument.ts. Its operators are a DX7
+ * voice (dsp/dx7.ts: levels in dB, a four-part envelope, detune and
+ * keyboard scaling), edited in its own table and envelope view
+ * (ui/voiceTable.ts, ui/envelopeView.ts), with the keyboard and its sound
+ * in the link.
  */
 export const sandbox: Chapter = {
   id: 'sandbox',
@@ -17,17 +18,20 @@ export const sandbox: Chapter = {
   body: [],
   maths: [],
   instrument: true,
-  lede: "Six operators, wired by any of the DX7's 32 algorithms.",
+  // The factory voices it starts from are Yamaha's, and say so.
+  lede: "Six operators, wired by any of the DX7's 32 algorithms, starting from its factory voices (© Yamaha).",
   // No Carrier slider: the keyboard sets the pitch of every note.
-  controls: ['volume', 'feedback'],
-  presets: DX7_PRESETS,
+  controls: ['volume', 'dxFeedback'],
+  presets: DX7_VOICES,
+  presetMenu: true,
   hasPiano: true,
   sharesSound: true,
   patch: {
     ...BASE_PATCH,
-    // It starts from chapter 8's Stacks.
-    ...STACKS,
+    // It opens on E.PIANO 1.
+    ...DX7_START,
     mode: 'ops',
+    voiceModel: 'dx7',
     noteMode: true,
   },
   figures: {

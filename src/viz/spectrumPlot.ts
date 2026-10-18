@@ -6,13 +6,15 @@ import {
 import {
   CARRIER_HZ,
   carsonBand,
+  dx7KernelLevelsAt,
+  dx7NoteOf,
   highlightOf,
   type LabState,
   momentOf,
   operatorLevelsAt,
   patchOf,
 } from '../model/lab';
-import { operatorSpectrum } from '../dsp/operators';
+import { kernelSpectrum, operatorSpectrum } from '../dsp/operators';
 import {
   ampToY,
   beginPlot,
@@ -99,7 +101,11 @@ let lastAxis = { key: '', end: 0 };
  * out the spectrum is not free.
  */
 export function operatorsAxisEnd(state: LabState): number {
-  const key = JSON.stringify([state.algorithm, state.operators, state.feedback]);
+  const key = JSON.stringify(
+    state.voiceModel === 'dx7'
+      ? [state.algorithm, state.dxOperators, state.dxFeedback, state.carrierHz]
+      : [state.algorithm, state.operators, state.feedback],
+  );
   if (key !== lastAxis.key) {
     const lines = spectrumOf({ ...state, noteStartedAt: null });
     const loudest = Math.max(0, ...lines.map(line => line.amp));
@@ -116,6 +122,10 @@ export function operatorsAxisEnd(state: LabState): number {
  * moment's index, with every line scaled by that moment's loudness.
  */
 export function spectrumOf(state: LabState, time?: number): SpectralLine[] {
+  if (state.mode === 'ops' && state.voiceModel === 'dx7') {
+    const note = dx7NoteOf(state);
+    return kernelSpectrum(state.algorithm, note.ratios, dx7KernelLevelsAt(state, time), note.feedback);
+  }
   if (state.mode === 'ops') {
     return operatorSpectrum(
       state.algorithm,

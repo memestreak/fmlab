@@ -34,7 +34,7 @@ describe('a hash with a sound in it', () => {
   it('from before the sections had names still opens in the sandbox', () => {
     const upgraded = upgradeHash('#7?m=6&a=5&f=0.7')!;
     expect(viewFromHash(upgraded, IDS, 'landing')).toBe('sandbox');
-    expect(soundFromParams(paramsFromHash(upgraded))).toMatchObject({ algorithm: 5, feedback: 0.7 });
+    expect(soundFromParams(paramsFromHash(upgraded))).toMatchObject({ algorithm: 5, dxFeedback: 0.7 });
   });
 });
 
@@ -69,21 +69,13 @@ describe('which chapters keep their sound in the URL', () => {
 
 describe('the sandbox in a link', () => {
   const sandbox = chapterById('sandbox')!;
+  const piano = chapterById('sandbox')!.presets.find(p => p.label === '11 E.PIANO 1')!.patch;
   const six: LabState = {
     ...DEFAULTS,
     ...sandbox.patch,
+    ...piano,
     chapter: 'sandbox',
     carrierHz: 146.83,
-    algorithm: 5,
-    feedback: 0.7,
-    operators: [
-      { ratio: 1, level: 0.9, decay: 2.5 },
-      { ratio: 1, level: 0.35, decay: 1.2 },
-      { ratio: 1, level: 0.7, decay: 1.5 },
-      { ratio: 14, level: 0.25, decay: 0.4 },
-      { ratio: 1.414, level: 0.4, decay: 2 },
-      { ratio: 1, level: 0.15, decay: 0 },
-    ],
   };
   const reopened = (params: string) => ({
     ...DEFAULTS,
@@ -91,10 +83,17 @@ describe('the sandbox in a link', () => {
     ...soundFromParams(paramsFromHash(`#/sandbox?${params}`)),
   });
 
-  it('is short and readable', () => {
-    expect(soundParams(six)).toBe(
-      'c=146.83&a=5&f=0.7&o=1_90_2.5-1_35_1.2-1_70_1.5-14_25_0.4-1.414_40_2-1_15_0',
-    );
+  it('is readable, each operator in fourteen short fields', () => {
+    const params = new URLSearchParams(soundParams(six));
+    expect(params.get('c')).toBe('146.83');
+    expect(params.get('a')).toBe('5');
+    expect(params.get('f')).toBe('3.1415');
+    const ops = params.get('o')!.split('~');
+    expect(ops).toHaveLength(6);
+    // E.PIANO 1's OP2: ratio 14, no detune, -30.75 dB; attack 1 ms to
+    // 0 dB, 279 ms to the break at -18.06 dB, 3.37 s to silence; break
+    // point A-1, no level scaling, 1.3 times faster an octave up.
+    expect(ops[1]).toBe('14_0_-30.75_0.001_0_0.2786_-18.06_3.3747_-96_0.0741_21_l0_l0_1.2968');
   });
 
   it('leaves the volume out: that is the listener\'s', () => {
@@ -104,42 +103,62 @@ describe('the sandbox in a link', () => {
   it('brings back the same sound, playing notes', () => {
     const back = reopened(soundParams(six));
     expect(back.mode).toBe('ops');
+    expect(back.voiceModel).toBe('dx7');
     expect(back.noteMode).toBe(true);
     expect(back.algorithm).toBe(5);
-    expect(back.feedback).toBe(0.7);
-    expect(back.operators).toEqual(six.operators);
+    expect(back.dxFeedback).toBeCloseTo(Math.PI, 3);
+    expect(back.dxOperators).toEqual(six.dxOperators);
     expect(back.carrierHz).toBeCloseTo(146.83, 1);
   });
 
+  it('carries an operator that is off', () => {
+    const off = { ...six, dxOperators: six.dxOperators.map((o, i) => (i === 5 ? { ...o, level: null } : o)) };
+    expect(reopened(soundParams(off)).dxOperators[5].level).toBeNull();
+  });
+
   it('holds every value inside its range', () => {
-    const back = reopened('a=40&f=9&o=0.1_150_9-1_0_0-1_0_0-1_0_0-1_0_0-99_0_0');
+    const wild = '99_9_5_99_9_-1_-200_0_0_-5_0_e99_l-99_9';
+    const back = reopened(`a=40&f=9&o=${[wild, ...Array(5).fill(wild)].join('~')}`);
     expect(back.algorithm).toBe(32);
-    expect(back.feedback).toBe(2);
-    expect(back.operators[0]).toEqual({ ratio: 0.5, level: 1, decay: 6 });
-    expect(back.operators[5]).toEqual({ ratio: 16, level: 0, decay: 0 });
-    // A minus sign would split an operator in two: the link is damaged.
-    expect(operatorsFromParam('1_1_1-1_1_1-1_1_1-1_1_1-1_1_1-1_-5_1')).toBeNull();
+    expect(back.dxFeedback).toBeCloseTo(2 * Math.PI, 9);
+    const op = back.dxOperators[0];
+    expect(op.ratio).toBe(61.69);
+    expect(op.detune).toBeCloseTo(6.3116, 4);
+    expect(op.level).toBe(0);
+    expect(op.envelope.attack).toBe(40);
+    expect(op.envelope.peak).toBe(0);
+    expect(op.envelope.decay1).toBe(0);
+    expect(op.envelope.brk).toBe(-96);
+    expect(op.envelope.release).toBe(0);
+    expect(op.breakKey).toBe(21);
+    expect(op.left.depth).toBeCloseTo(5.96, 2);
+    expect(op.right.depth).toBeCloseTo(-5.96, 2);
+    expect(op.rateScaling).toBeCloseTo(2 ** (7 / 8), 9);
     expect(reopened('a=0').algorithm).toBe(1);
     expect(reopened('a=2.6').algorithm).toBe(3);
   });
 
-  it('keeps the starting operators when the link\'s are damaged', () => {
-    const start = sandbox.patch.operators;
-    for (const o of ['1_1_1', '1_1_1-1_1_1-1_1_1-1_1_1-1_1_1', 'x_1_1-1_1_1-1_1_1-1_1_1-1_1_1-1_1_1', '1_1-1_1_1-1_1_1-1_1_1-1_1_1-1_1_1', '']) {
+  it('keeps the starting voice when the link\'s is damaged, or from before', () => {
+    const start = sandbox.patch.dxOperators;
+    const good = soundParams(six).split('o=')[1];
+    for (const o of [
+      '1_1_1-1_1_1-1_1_1-1_1_1-1_1_1-1_1_1',
+      good.split('~').slice(0, 5).join('~'),
+      good.replace('_l0_', '_q0_'),
+      good.replace('14_0_-12', 'x_0_-12'),
+      '',
+    ]) {
       expect(operatorsFromParam(o)).toBeNull();
-      expect(reopened(`o=${o}`).operators).toEqual(start);
+      expect(reopened(`o=${encodeURIComponent(o)}`).dxOperators).toEqual(start);
     }
     expect(reopened('a=abc&f=').algorithm).toBe(sandbox.patch.algorithm);
   });
 
-  it('opens an old link, from when it had two operators, in six', () => {
-    // "m=6" (six) or none (two): either way six now, keeping the pitch.
+  it('opens an old link with its pitch and algorithm', () => {
     const two = reopened('c=220&r=1.41&i=5');
-    expect(two.mode).toBe('ops');
-    expect(two.noteMode).toBe(true);
+    expect(two.voiceModel).toBe('dx7');
     expect(two.carrierHz).toBeCloseTo(220, 6);
-    expect(two.algorithm).toBe(sandbox.patch.algorithm);
-    expect(two.operators).toEqual(sandbox.patch.operators);
+    expect(two.dxOperators).toEqual(sandbox.patch.dxOperators);
     expect(reopened('m=6&a=5').algorithm).toBe(5);
   });
 });

@@ -51,6 +51,9 @@ const DRAWN: (keyof LabState)[] = [
   'algorithm',
   'operators',
   'feedback',
+  'voiceModel',
+  'dxOperators',
+  'dxFeedback',
   // The envelope, and the note whose playhead the figures show.
   'attack',
   'decay',
@@ -59,6 +62,8 @@ const DRAWN: (keyof LabState)[] = [
   'hold',
   'indexFollows',
   'noteStartedAt',
+  'noteLength',
+  'noteHold',
   // The sideband order picked out in the linked figures.
   'hover',
   'pinned',

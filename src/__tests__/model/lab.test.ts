@@ -182,14 +182,14 @@ describe('the figures, following the key struck last', () => {
   };
 
   it('hold the levels for as long as the key is down', () => {
-    const held = { ...organ, noteLength: Infinity };
+    const held = { ...organ, noteLength: Infinity, noteHold: Infinity };
     expect(operatorLevelsAt(held, 10 + 30)).toEqual(DEFAULTS.operators.map(op => op.level));
     expect(noteSounding(held, 10 + 30)).toBe(true);
   });
 
   it('let them go once it is, and end with the release', () => {
     // Held 2 s, then the 0.3 s release.
-    const letGo = { ...organ, noteLength: 2.3 };
+    const letGo = { ...organ, noteLength: 2.3, noteHold: 2 };
     const fading = operatorLevelsAt(letGo, 10 + 2.15);
     fading.forEach((level, op) => expect(level).toBeLessThan(DEFAULTS.operators[op].level / 2));
     expect(noteSounding(letGo, 10 + 2.4)).toBe(false);

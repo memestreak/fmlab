@@ -1,8 +1,9 @@
 import { algorithm } from '../../dsp/algorithms';
+import { dx7EnvelopeAt, dx7Note, heldOperator } from '../../dsp/dx7';
 import { envelopeAt } from '../../dsp/envelope';
 import { kernelLevels, type Operator, operatorEnvelope } from '../../dsp/operators';
 import { MAX_OPERATORS, PmKernel } from '../../dsp/pmKernel';
-import { STEAL_SECONDS, VoicePool, type VoicePatch } from '../../dsp/voicePool';
+import { type Dx7Patch, STEAL_SECONDS, VoicePool, type VoicePatch } from '../../dsp/voicePool';
 
 const SAMPLE_RATE = 48000;
 const LOCK_SAMPLES = 0.05 * SAMPLE_RATE;
@@ -154,5 +155,52 @@ describe('the voice pool', () => {
     voices.noteOn(60, 261.63);
     voices.setPatch({ ...ORGAN, operators: ORGAN.operators.map(o => ({ ...o, level: 0 })) });
     expect(Math.max(...render(voices, 2400).map(Math.abs))).toBeGreaterThan(0.3);
+  });
+});
+
+describe('the voice pool, playing a DX7 voice', () => {
+  const held = (ratio: number, level: number | null) => heldOperator(ratio, level);
+  const organ: Dx7Patch = {
+    kind: 'dx7',
+    algorithm: 32,
+    feedback: 0,
+    operators: [held(1, 0), held(2, -6), held(3, null), held(4, null), held(5, null), held(6, null)],
+  };
+
+  it('with one voice plays exactly what dx7Note and the kernel give', () => {
+    const voices = new VoicePool(1, SAMPLE_RATE, LOCK_SAMPLES);
+    voices.setPatch(organ);
+    voices.noteOn(69, 440);
+    const heard = render(voices, 2400);
+    const note = dx7Note(32, organ.operators, 0, 69);
+    const kernel = new PmKernel(note.alg, LOCK_SAMPLES);
+    const scaled = new Float64Array(MAX_OPERATORS);
+    for (let i = 0; i < heard.length; i++) {
+      for (let op = 0; op < MAX_OPERATORS; op++) {
+        scaled[op] = note.gains[op] * dx7EnvelopeAt(note.envelopes[op], i / SAMPLE_RATE);
+      }
+      expect(heard[i]).toBe(Math.fround(kernel.tick(440 / SAMPLE_RATE, note.ratios, scaled, 0)));
+    }
+  });
+
+  it('holds while the key is down, and releases from where it is', () => {
+    const voices = new VoicePool(8, SAMPLE_RATE, LOCK_SAMPLES);
+    voices.setPatch(organ);
+    voices.noteOn(60, 261.63);
+    render(voices, SAMPLE_RATE * 3);
+    // Two of six carriers, at 0 and -6 dB: up to (1 + 0.5) / 6.
+    expect(Math.max(...render(voices, 2400).map(Math.abs))).toBeGreaterThan(0.2);
+    voices.noteOff(60);
+    // Held at 0 dB: 96 dB to fall at 96 dB in 0.3 s.
+    render(voices, Math.round(SAMPLE_RATE * 0.31));
+    expect(voices.active).toBe(0);
+  });
+
+  it('lets an operator that is off make no sound', () => {
+    const silent: Dx7Patch = { ...organ, operators: organ.operators.map(o => ({ ...o, level: null })) };
+    const voices = new VoicePool(8, SAMPLE_RATE, LOCK_SAMPLES);
+    voices.setPatch(silent);
+    voices.noteOn(60, 261.63);
+    expect(render(voices, 2400).every(sample => sample === 0)).toBe(true);
   });
 });

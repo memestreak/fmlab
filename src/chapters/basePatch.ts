@@ -28,5 +28,8 @@ export const BASE_PATCH: ChapterPatch = {
   algorithm: DEFAULTS.algorithm,
   operators: DEFAULTS.operators,
   feedback: 0,
+  voiceModel: 'basic',
+  dxOperators: DEFAULTS.dxOperators,
+  dxFeedback: 0,
   compare: false,
 };

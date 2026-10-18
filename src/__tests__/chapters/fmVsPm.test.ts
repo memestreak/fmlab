@@ -7,8 +7,8 @@ const chapter9 = chapterById('fm-vs-pm')!;
 const opened: LabState = { ...DEFAULTS, ...chapter9.patch, chapter: 'fm-vs-pm' };
 
 describe('chapter 9, FM versus PM', () => {
-  it('ends the DX7 group, just before the sandbox, and is the only one comparing', () => {
-    expect(CHAPTERS[CHAPTERS.length - 2]).toBe(chapter9);
+  it('comes just before A DX7 voice, and is the only one comparing', () => {
+    expect(CHAPTERS[CHAPTERS.indexOf(chapter9) + 1]).toBe(chapterById('dx7-voice'));
     expect(CHAPTERS.filter(c => c.patch.compare).map(c => c.id)).toEqual(['fm-vs-pm']);
   });
 

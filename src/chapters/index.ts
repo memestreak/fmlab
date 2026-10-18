@@ -1,4 +1,5 @@
 import { bessel } from './bessel';
+import { dx7Voice } from './dx7Voice';
 import { envelope } from './envelope';
 import { fmVsPm } from './fmVsPm';
 import { glossary, GLOSSARY } from './glossary';
@@ -30,6 +31,7 @@ const ALL: readonly Chapter[] = [
   envelope,
   operators,
   fmVsPm,
+  dx7Voice,
   sandbox,
 ];
 

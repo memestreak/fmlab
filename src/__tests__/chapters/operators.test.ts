@@ -101,9 +101,9 @@ describe('the algorithm diagram', () => {
 });
 
 describe('chapter 8', () => {
-  it('follows the two-operator sections; only it and the sandbox have six operators', () => {
+  it('follows the two-operator sections; only it, A DX7 voice and the sandbox have six operators', () => {
     expect(CHAPTERS[CHAPTERS.indexOf(chapterById('envelopes')!) + 1]).toBe(chapter8);
-    expect(CHAPTERS.filter(c => c.patch.mode === 'ops').map(c => c.id)).toEqual(['algorithms', 'sandbox']);
+    expect(CHAPTERS.filter(c => c.patch.mode === 'ops').map(c => c.id)).toEqual(['algorithms', 'dx7-voice', 'sandbox']);
   });
 
   it('shows the algorithm and the spectrum, and plays notes', () => {

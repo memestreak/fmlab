@@ -320,6 +320,84 @@ export const TERMS = {
     wiki: 'Frequency_modulation_synthesis',
     match: /\balgorithms?\b/i,
   },
+  voice: {
+    name: 'voice',
+    plain: `A voice is the DX7's name for one whole sound, stored and called up
+      together: the algorithm, the feedback and every setting of its six
+      operators.`,
+    section: 'dx7-voice',
+    match: /\bvoices?\b/i,
+  },
+  decibel: {
+    name: 'decibel',
+    plain: `The decibel (dB) measures a level against full level: 0 dB is
+      full, each 6 dB down halves it, and 20 dB down is a tenth of it.`,
+    formula: `${v('L')} = 20 log<sub>10</sub> ${v('A')}, &ensp; ${v('A')} = 10<sup>${v('L')} / 20</sup>`,
+    section: 'dx7-voice',
+    wiki: 'Decibel',
+    match: /\bdecibels?\b|\bdB\b/,
+  },
+  peakLevel: {
+    name: 'Peak',
+    plain: `Peak is the level a DX7 envelope rises to over its attack, in dB
+      against the operator's own level.`,
+    section: 'dx7-voice',
+    match: /\bPeak\b/,
+  },
+  decay1: {
+    name: 'Decay 1',
+    plain: `Decay 1 is the time a DX7 envelope takes to go from its Peak
+      level to its Break level, the first of its two decays.`,
+    section: 'dx7-voice',
+    match: /\bDecay 1\b/,
+  },
+  breakLevel: {
+    name: 'Break',
+    plain: `Break is the level where a DX7 envelope's first decay ends and its
+      second begins.`,
+    section: 'dx7-voice',
+    match: /\bBreak\b/,
+  },
+  decay2: {
+    name: 'Decay 2',
+    plain: `Decay 2 is the time a DX7 envelope takes to go from its Break
+      level to its sustain level, the second of its two decays.`,
+    section: 'dx7-voice',
+    match: /\bDecay 2\b/,
+  },
+  detune: {
+    name: 'detune',
+    plain: `An operator's detune puts it a few cents sharp or flat of its
+      ratio, a cent being a hundredth of a semitone.`,
+    formula: `${v('r')}′ = ${v('r')} × 2<sup>${v('c')} / 1200</sup>`,
+    section: 'dx7-voice',
+    wiki: 'Cent_(music)',
+    match: /\bdetun(e|es|ed|ing)\b/i,
+  },
+  beating: {
+    name: 'beating',
+    plain: `Beating is the swell and fade of two tones at nearly the same
+      frequency, as many times a second as their frequencies differ.`,
+    formula: `${sub('f', 'beat')} = |${sub('f', '1')} − ${sub('f', '2')}|`,
+    section: 'dx7-voice',
+    wiki: 'Beat_(acoustics)',
+    match: /\bbeat(s|ing)?\b/i,
+  },
+  keyboardScaling: {
+    name: 'keyboard scaling',
+    plain: `Keyboard scaling changes an operator key by key: its level louder
+      or quieter away from a break point, and its envelope faster up the
+      keyboard.`,
+    section: 'dx7-voice',
+    match: /\bkeyboard scaling\b/i,
+  },
+  breakPoint: {
+    name: 'break point',
+    plain: `The break point is the key keyboard scaling works out from, each
+      side of it with its own curve.`,
+    section: 'dx7-voice',
+    match: /\bbreak points?\b/i,
+  },
   fft: {
     name: 'fast Fourier transform',
     plain: `The fast Fourier transform (FFT) is the standard way to take a

@@ -110,8 +110,22 @@ export function operatorSpectrum(
   feedback: number,
 ): SpectralLine[] {
   const alg = algorithm(algorithmNumber);
+  return kernelSpectrum(algorithmNumber, ratios, kernelLevels(alg, levels), feedback);
+}
+
+/**
+ * The same, from the levels as the kernel takes them (a modulator's
+ * index, a carrier's share of the output): the sandbox's DX7 voice works
+ * those out itself (dsp/dx7.ts).
+ */
+export function kernelSpectrum(
+  algorithmNumber: number,
+  ratios: ArrayLike<number>,
+  scaled: ArrayLike<number>,
+  feedback: number,
+): SpectralLine[] {
+  const alg = algorithm(algorithmNumber);
   const kernel = new PmKernel(alg, 1);
-  const scaled = kernelLevels(alg, levels);
   const samples = new Float64Array(SAMPLES);
   for (let i = 0; i < SETTLE; i++) kernel.tick(1 / PER_CYCLE, ratios, scaled, feedback);
   for (let i = 0; i < SAMPLES; i++) {

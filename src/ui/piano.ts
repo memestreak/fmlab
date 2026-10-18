@@ -1,6 +1,5 @@
-import { OPERATOR_RELEASE } from '../dsp/operators';
 import { midiToHz } from '../dsp/voices';
-import { CARRIER_HZ, type LabStore } from '../model/lab';
+import { CARRIER_HZ, type LabStore, releaseSecondsOf } from '../model/lab';
 
 // The sandbox's keyboard: on screen, and on the computer's own keys laid
 // out the way music software does it. Every key held sounds, at its own
@@ -155,6 +154,7 @@ export function mountPiano(
       carrierHz: midiToHz(midi),
       noteStartedAt: now(),
       noteLength: Infinity,
+      noteHold: Infinity,
     });
     update();
   };
@@ -166,9 +166,11 @@ export function mountPiano(
     if (midi === last && noteStartedAt !== null) {
       // The note the figures follow is let go: now its length is known.
       last = null;
+      const hold = Math.max(0, now() - noteStartedAt);
       store.set({
         held: [...held],
-        noteLength: Math.max(0, now() - noteStartedAt) + OPERATOR_RELEASE,
+        noteHold: hold,
+        noteLength: hold + releaseSecondsOf(store.get()),
       });
     } else {
       store.set({ held: [...held] });

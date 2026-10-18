@@ -253,8 +253,10 @@ export function drawAlgorithm(
     ctx.lineTo(centreX(to), boxY(to));
     ctx.stroke();
     // Thicker as it feeds back more.
-    if (state.feedback > 0) {
-      ctx.lineWidth = 1.5 + state.feedback * 1.25;
+    // On the same scale for both voices: the DX7's 0 to 2π as 0 to 2.
+    const amount = state.voiceModel === 'dx7' ? state.dxFeedback / Math.PI : state.feedback;
+    if (amount > 0) {
+      ctx.lineWidth = 1.5 + amount * 1.25;
       ctx.stroke();
     }
   }
