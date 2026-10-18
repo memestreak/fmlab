@@ -360,8 +360,8 @@ canvas.voice-keys {
   display: flex;
   flex: none;
   flex-direction: column;
-  gap: 0.35rem;
-  padding: 0.5rem 0 0.6rem;
+  gap: 0.25rem;
+  padding: 0.4rem 0 0.4rem;
   border-top: 1px solid var(--ink);
 }
 
@@ -383,7 +383,7 @@ canvas.voice-keys {
 }
 
 .voice-envelope-head .btn {
-  height: 2rem;
+  height: 1.85rem;
   margin-left: auto;
 }
 
@@ -397,8 +397,19 @@ canvas.voice-keys {
 .voice-envelope-curve {
   display: block;
   width: 100%;
-  height: 7.5rem;
+  height: 5.6rem;
   touch-action: none;
+}
+
+/* The spectrum keeps room for its plot under its two rows of labels,
+   however much the envelope view takes; with the view open its plate
+   gives up its padding. */
+#inst-figures .plot-frame {
+  min-height: 8.5rem;
+}
+
+body[data-envelope='open'] #inst-figures .figure:not([hidden]) {
+  padding: 0.35rem 0 0.15rem;
 }
 
 .voice-envelope-knobs {
@@ -860,7 +871,11 @@ canvas.voice-keys {
   }
 
   .voice-envelope-curve {
-    height: 5.5rem;
+    height: 4.75rem;
+  }
+
+  #inst-figures .plot-frame {
+    min-height: 7.5rem;
   }
 
   .knob-dial {

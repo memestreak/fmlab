@@ -159,7 +159,9 @@ export function drawVoiceEnvelope(
     ctx.textBaseline = 'middle';
     ctx.strokeStyle = token('--rule');
     ctx.lineWidth = 1;
-    for (const db of [0, -24, -48, -72]) {
+    // Every 24 dB, or every 48 where the drawing is short.
+    const ticks = area.bottom - area.top < 70 ? [0, -48] : [0, -24, -48, -72];
+    for (const db of ticks) {
       const at = Math.round(y(db)) + 0.5;
       ctx.beginPath();
       ctx.moveTo(area.left, at);
