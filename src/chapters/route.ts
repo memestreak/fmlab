@@ -2,23 +2,24 @@
 // linked to and survives a reload. "#/" (or no hash) is the landing view,
 // "#/glossary" the glossary and "#/glossary?t=index" one of its entries.
 // The sandbox also keeps its sound there,
-// "#/sandbox?c=220&a=5&f=0.7&o=1_90_2.5-1_35_1.2-1_70_1.5-14_25_0.4-1_40_2-1_15_1",
+// "#/sandbox?c=220&a=5&f=3.142&o=1_0_-0.9_0.002_0_1.2_-12_4_-48_0.4_60_l0_l0_1.3~…",
 // so a sound can be shared by its link. Addresses from before the sections
 // had names ("#3", "#7?c=…", "#glossary") are upgraded by `upgradeHash`.
 
 import { DX7_COUNT } from '../dsp/algorithms';
-import type { Operator } from '../dsp/operators';
 import {
-  CARRIER_HZ,
-  clamp,
-  FEEDBACK,
-  hzToSemitones,
-  type LabState,
-  OP_DECAY,
-  OP_LEVEL,
-  OP_RATIO,
-  semitonesToHz,
-} from '../model/lab';
+  DETUNE_CENTS,
+  DX7_FEEDBACK,
+  DX7_RATIO,
+  type Dx7Operator,
+  LEVEL_DB,
+  MAX_STAGE_SECONDS,
+  RATE_SCALING,
+  SCALING_DEPTH,
+  type ScalingSide,
+  SILENCE_DB,
+} from '../dsp/dx7';
+import { CARRIER_HZ, clamp, hzToSemitones, type LabState, semitonesToHz } from '../model/lab';
 import { GLOSSARY, LANDING, type SectionId } from './outline';
 
 /** The hash's parts: the address after "#/", and anything after a "?". */
@@ -99,35 +100,88 @@ function brief(value: number, places: number): string {
 }
 
 /**
- * The six operators in a link, short: each as ratio_level_decay, its
- * level in whole percent, and the six joined by "-". Characters a URL
- * keeps as they are, so the link stays readable.
+ * The six operators of a DX7 voice in a link, short: each as its ratio,
+ * detune, level ("x" for off), its envelope (attack, peak, decay 1, break,
+ * decay 2, sustain, release), its break point, left and right scaling
+ * (curve "l" or "e" then depth) and rate scaling, joined by "_", and the
+ * six joined by "~". Characters a URL keeps as they are.
  */
-export function operatorsParam(operators: readonly Operator[]): string {
+export function operatorsParam(operators: readonly Dx7Operator[]): string {
+  const side = ({ curve, depth }: ScalingSide) => `${curve === 'lin' ? 'l' : 'e'}${brief(depth, 2)}`;
   return operators
-    .map(op => [brief(op.ratio, 3), Math.round(op.level * 100), brief(op.decay, 2)].join('_'))
-    .join('-');
+    .map(op => {
+      const e = op.envelope;
+      return [
+        brief(op.ratio, 3),
+        brief(op.detune, 1),
+        op.level === null ? 'x' : brief(op.level, 1),
+        brief(e.attack, 3),
+        brief(e.peak, 1),
+        brief(e.decay1, 3),
+        brief(e.brk, 1),
+        brief(e.decay2, 3),
+        brief(e.sustain, 1),
+        brief(e.release, 3),
+        String(Math.round(op.breakKey)),
+        side(op.left),
+        side(op.right),
+        brief(op.rateScaling, 3),
+      ].join('_');
+    })
+    .join('~');
 }
+
+const FIELDS = 14;
+const STAGE = { min: 0, max: MAX_STAGE_SECONDS };
+const ENV_LEVEL = { min: SILENCE_DB, max: 0 };
+const KEYS = { min: 21, max: 108 };
 
 /**
  * The six operators a link's "o" describes, each value held inside its
- * range; null unless it is exactly six operators of three numbers each,
- * so a damaged link keeps the operators the chapter starts with.
+ * range; null unless it is exactly six operators of fourteen fields each,
+ * all readable, so a damaged or old link keeps the voice the sandbox
+ * starts with.
  */
-export function operatorsFromParam(raw: string | null): Operator[] | null {
+export function operatorsFromParam(raw: string | null): Dx7Operator[] | null {
   if (raw === null) return null;
-  const rows = raw.split('-');
+  const rows = raw.split('~');
   if (rows.length !== 6) return null;
-  const operators: Operator[] = [];
+  const number = (text: string) => (text.trim() === '' ? NaN : Number(text));
+  const side = (text: string): ScalingSide | null => {
+    const curve = text[0] === 'l' ? 'lin' : text[0] === 'e' ? 'exp' : null;
+    const depth = number(text.slice(1));
+    if (!curve || !Number.isFinite(depth)) return null;
+    return { curve, depth: clamp(depth, SCALING_DEPTH) };
+  };
+  const operators: Dx7Operator[] = [];
   for (const row of rows) {
-    const values = row.split('_');
-    if (values.length !== 3 || values.some(v => v.trim() === '')) return null;
-    const [ratio, level, decay] = values.map(Number);
-    if (![ratio, level, decay].every(Number.isFinite)) return null;
+    const f = row.split('_');
+    if (f.length !== FIELDS) return null;
+    const values = [0, 1, ...[3, 4, 5, 6, 7, 8, 9, 10, 13]].map(i => number(f[i]));
+    if (!values.every(Number.isFinite)) return null;
+    const level = f[2] === 'x' ? null : number(f[2]);
+    if (level !== null && !Number.isFinite(level)) return null;
+    const left = side(f[11]);
+    const right = side(f[12]);
+    if (!left || !right) return null;
+    const [ratio, detune, attack, peak, decay1, brk, decay2, sustain, release, breakKey, rate] = values;
     operators.push({
-      ratio: clamp(ratio, OP_RATIO),
-      level: clamp(level / 100, OP_LEVEL),
-      decay: clamp(decay, OP_DECAY),
+      ratio: clamp(ratio, DX7_RATIO),
+      detune: clamp(detune, DETUNE_CENTS),
+      level: level === null ? null : clamp(level, LEVEL_DB),
+      envelope: {
+        attack: clamp(attack, STAGE),
+        peak: clamp(peak, ENV_LEVEL),
+        decay1: clamp(decay1, STAGE),
+        brk: clamp(brk, ENV_LEVEL),
+        decay2: clamp(decay2, STAGE),
+        sustain: clamp(sustain, ENV_LEVEL),
+        release: clamp(release, STAGE),
+      },
+      breakKey: clamp(Math.round(breakKey), KEYS),
+      left,
+      right,
+      rateScaling: clamp(rate, RATE_SCALING),
     });
   }
   return operators;
@@ -142,8 +196,8 @@ export function soundParams(state: LabState): string {
   return new URLSearchParams({
     c: brief(state.carrierHz, 2),
     a: String(state.algorithm),
-    f: brief(state.feedback, 2),
-    o: operatorsParam(state.operators),
+    f: brief(state.dxFeedback, 3),
+    o: operatorsParam(state.dxOperators),
   }).toString();
 }
 
@@ -153,9 +207,9 @@ export function soundParams(state: LabState): string {
  * on the Carrier slider's nearest step, a quarter of a semitone, so a
  * hand-typed 221 Hz becomes a pitch the slider can show. Anything missing
  * or not a number is left out, to keep what the chapter starts with.
- * The sandbox has only six operators now: a link from when it also had
- * two ("c=220&r=1.41&i=5", or with "m=6") opens in six, keeping its pitch;
- * its ratio and index, and "m", mean nothing and are passed over.
+ * A link from before the DX7 voice (its "o" of three numbers an
+ * operator, or the two operators' "r" and "i") keeps its pitch and
+ * algorithm; the rest is passed over.
  */
 export function soundFromParams(params: URLSearchParams): Partial<LabState> {
   const read = (key: string) => {
@@ -175,8 +229,8 @@ export function soundFromParams(params: URLSearchParams): Partial<LabState> {
     patch.algorithm = clamp(Math.round(algorithm), { min: 1, max: DX7_COUNT });
   }
   const feedback = read('f');
-  if (feedback !== null) patch.feedback = clamp(feedback, FEEDBACK);
+  if (feedback !== null) patch.dxFeedback = clamp(feedback, DX7_FEEDBACK);
   const operators = operatorsFromParam(params.get('o'));
-  if (operators) patch.operators = operators;
+  if (operators) patch.dxOperators = operators;
   return patch;
 }

@@ -1,8 +1,15 @@
 import { type Envelope, noteSeconds, TIME_CONSTANTS } from '../dsp/envelope';
-import { noteHold, OPERATOR_RELEASE } from '../dsp/operators';
+import { dx7NoteHold } from '../dsp/dx7';
+import { noteHold } from '../dsp/operators';
 import type { VoiceMessage, VoicePatch } from '../dsp/voicePool';
 import { midiToHz } from '../dsp/voices';
-import { envelopeOf, type LabState, type LabStore, noteSounding } from '../model/lab';
+import {
+  envelopeOf,
+  type LabState,
+  type LabStore,
+  noteSounding,
+  releaseSecondsOf,
+} from '../model/lab';
 import type { Measurement } from '../viz/liveSpectrum';
 import { unlockIosAudio } from './iosUnlock';
 import { PROCESSOR_NAME } from './processorName';
@@ -34,7 +41,16 @@ export const PLAYED_NOTE = 128;
 
 /** What every note of six operators is struck with, from the state. */
 export function voicePatch(state: LabState): VoicePatch {
-  return { algorithm: state.algorithm, feedback: state.feedback, operators: state.operators };
+  return state.voiceModel === 'dx7'
+    ? { kind: 'dx7', algorithm: state.algorithm, feedback: state.dxFeedback, operators: state.dxOperators }
+    : { algorithm: state.algorithm, feedback: state.feedback, operators: state.operators };
+}
+
+/** How long Play note holds a note of six operators. */
+export function playedHold(state: LabState): number {
+  return state.voiceModel === 'dx7'
+    ? dx7NoteHold(state.algorithm, state.dxOperators)
+    : noteHold(state.operators);
 }
 
 /** The nodes, once there is a context. */
@@ -135,21 +151,29 @@ export class AudioEngine {
       for (const note of previous.held) {
         if (!state.held.includes(note)) this.tell({ type: 'noteOff', note });
       }
-      if (state.held.length === 0) this.suspendSoon((OPERATOR_RELEASE + 1) * 1000);
+      if (state.held.length === 0) this.suspendSoon((releaseSecondsOf(state) + 1) * 1000);
     }
     if (state.notes !== previous.notes) {
       // Play note, or the space bar: held as long as the slowest
       // operator needs, then let go, as chapter 8's notes always were.
-      const seconds = noteSeconds(envelopeOf(state));
-      this.strike(PLAYED_NOTE, state.carrierHz, noteHold(state.operators), () => {
-        this.store.set({ noteStartedAt: performance.now() / 1000, noteLength: seconds });
+      const hold = playedHold(state);
+      const seconds = hold + releaseSecondsOf(state);
+      this.strike(PLAYED_NOTE, state.carrierHz, hold, () => {
+        this.store.set({
+          noteStartedAt: performance.now() / 1000,
+          noteLength: seconds,
+          noteHold: hold,
+        });
         this.suspendSoon((seconds + 1) * 1000);
       });
     }
     if (
       state.algorithm !== previous.algorithm ||
       state.feedback !== previous.feedback ||
-      state.operators !== previous.operators
+      state.operators !== previous.operators ||
+      state.voiceModel !== previous.voiceModel ||
+      state.dxFeedback !== previous.dxFeedback ||
+      state.dxOperators !== previous.dxOperators
     ) {
       // Taken up by the next note struck.
       this.tell({ type: 'patch', patch: voicePatch(state) });

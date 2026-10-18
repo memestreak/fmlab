@@ -13,7 +13,8 @@ export type ControlId =
   | 'decay'
   | 'sustain'
   | 'release'
-  | 'feedback';
+  | 'feedback'
+  | 'dxFeedback';
 
 /** A figure on the page, by the id of its canvas in index.html. */
 export type FigureId =
@@ -54,6 +55,9 @@ export type ChapterPatch = Pick<
   | 'algorithm'
   | 'operators'
   | 'feedback'
+  | 'voiceModel'
+  | 'dxOperators'
+  | 'dxFeedback'
   | 'compare'
 >;
 

@@ -13,8 +13,7 @@ export const PLACES: readonly { node: string; to: string }[] = [
   { node: '#algorithm', to: 'inst-algorithm' },
   { node: '#dx7-presets', to: 'inst-dx7-presets' },
   { node: '[data-figure="algorithm"]', to: 'inst-diagram-figure' },
-  { node: '[data-control="feedback"]', to: 'inst-feedback' },
-  { node: '.panel-operators', to: 'inst-operators' },
+  { node: '[data-control="dxFeedback"]', to: 'inst-feedback' },
   { node: '[data-figure="spectrum"]', to: 'inst-figures' },
   { node: '#piano', to: 'inst-keys' },
 ];

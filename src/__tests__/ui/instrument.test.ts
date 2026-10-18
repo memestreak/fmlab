@@ -12,12 +12,18 @@ describe('the instrument page', () => {
     expect(sandbox.lede).toBe("Six operators, wired by any of the DX7's 32 algorithms.");
   });
 
-  it('has chapter 8\'s pieces and the keyboard, and starts from Stacks', () => {
-    expect(sandbox.controls).toEqual(['volume', 'feedback']);
+  it('plays a DX7 voice from the keyboard, and starts from Stacks', () => {
+    expect(sandbox.patch.voiceModel).toBe('dx7');
+    expect(sandbox.controls).toEqual(['volume', 'dxFeedback']);
     expect(Object.keys(sandbox.figures)).toEqual(['algorithm', 'spectrum']);
-    expect(sandbox.presets).toBe(CHAPTERS.find(c => c.id === 'algorithms')!.presets);
+    expect(sandbox.presets[0].label).toBe('Stacks');
+    expect(sandbox.patch.dxOperators).toEqual(sandbox.presets[0].patch.dxOperators);
     expect(sandbox.hasPiano && sandbox.sharesSound).toBe(true);
     expect(sandbox.patch.algorithm).toBe(1);
+  });
+
+  it('keeps Operators and algorithms on its simple operators', () => {
+    expect(CHAPTERS.find(c => c.id === 'algorithms')!.patch.voiceModel).toBe('basic');
   });
 
   it('puts every control and figure it shows somewhere on the page', () => {
@@ -27,7 +33,8 @@ describe('the instrument page', () => {
     for (const id of Object.keys(sandbox.figures)) {
       expect(PLACES.some(p => p.node === `[data-figure="${id}"]`), id).toBe(true);
     }
-    for (const node of ['#piano', '#algorithm', '.panel-operators']) {
+    // The operator table and envelope view are the instrument page's own.
+    for (const node of ['#piano', '#algorithm']) {
       expect(PLACES.some(p => p.node === node), node).toBe(true);
     }
   });

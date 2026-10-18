@@ -1,7 +1,9 @@
 /* The sandbox as an instrument page (body[data-view='instrument']): no
-   text column; a title bar with Volume, Play and Copy link; the wiring
-   diagram with the operator table under it, the spectrum beside them; the
-   keyboard across the foot. The nodes are the lab's own, moved here by
+   text column; a title bar with Volume; along the top the wiring on the
+   left and the spectrum on the right, with the selected operator's
+   envelope view over it when one is open; the operator table the full
+   width under both; the keyboard across the foot. The diagram, spectrum,
+   list and sliders are the lab's own nodes, moved here by
    ui/instrument.ts, so the lab's rules scoped to [data-view='chapter'] do
    not reach them. */
 
@@ -77,14 +79,22 @@
 }
 
 .inst-label {
+  white-space: nowrap;
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-.inst-six {
+.inst-top {
   display: grid;
+}
+
+.inst-right {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
 }
 
 /* The figures share one plate: an ink rule above and below, a hairline
@@ -114,7 +124,7 @@
 
 .inst .plot-frame {
   flex: 1 1 auto;
-  min-height: 6rem;
+  min-height: 4.5rem;
 }
 
 .inst .plot-frame .plot {
@@ -191,8 +201,30 @@
 .inst .presets .btn {
   height: auto;
   min-height: 2.25rem;
-  padding: 0 0.85rem;
+  padding: 0 0.7rem;
   font-size: 0.85rem;
+}
+
+/* The algorithm list, "Start from" and the six presets on one line. */
+.inst-row {
+  flex-wrap: nowrap;
+  gap: 0.5rem 0.75rem;
+}
+
+.inst .inst-row .presets {
+  flex-wrap: nowrap;
+  gap: 0.35rem;
+}
+
+/* The figures' captions are for screen readers only here: the page has
+   no room for them, and its own headings say what each part is. */
+.inst figcaption {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .inst #algorithm {
@@ -234,13 +266,209 @@
   background: color-mix(in srgb, var(--pen-blue) 18%, var(--paper));
 }
 
-/* Six operators: the table given the room. */
+/* The operator table, the full width. */
 .inst .panel {
   border-top: 1px solid var(--ink);
 }
 
-.inst .panel-operators .panel-title {
+.inst .voice-panel .panel-title {
   margin-bottom: 0.15rem;
+}
+
+/* The DX7 voice's columns: ratio and level given the room, detune a box,
+   the envelope and the keyboard as small drawings. */
+.voice-table {
+  width: 100%;
+  table-layout: auto;
+}
+
+.voice-table .voice-ratio .op-slider,
+.voice-table .voice-level .op-slider {
+  flex: 1 1 auto;
+  min-width: 6rem;
+}
+
+.voice-table .voice-ratio,
+.voice-table .voice-level {
+  width: 24%;
+}
+
+.voice-table .voice-env {
+  width: 10rem;
+}
+
+.voice-env-mini,
+.voice-keys {
+  display: block;
+  height: 2rem;
+}
+
+.voice-env-mini {
+  width: 9.5rem;
+}
+
+canvas.voice-keys {
+  width: 7.5rem;
+  cursor: ns-resize;
+}
+
+.voice-scaling {
+  white-space: nowrap;
+}
+
+.voice-scaling > canvas,
+.voice-extras {
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+.voice-extras {
+  align-items: center;
+  gap: 0.25rem;
+  margin-left: 0.6rem;
+}
+
+.voice-extras[hidden] {
+  display: none;
+}
+
+.voice-times {
+  font-size: 0.8rem;
+}
+
+.inst .voice-extras .op-input {
+  width: 3.2rem;
+}
+
+.inst .voice-level .op-input {
+  width: 3.6rem;
+}
+
+/* The selected row: outlined in ink, the operator whose envelope is open. */
+[data-view='instrument'] .voice-row.is-selected {
+  outline: 2px solid var(--ink);
+  outline-offset: -2px;
+}
+
+/* The envelope view, over the spectrum: a header, then the curve with
+   its knobs beside it. */
+.voice-envelope[hidden] {
+  display: none;
+}
+
+.voice-envelope {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.5rem 0 0.6rem;
+  border-top: 1px solid var(--ink);
+}
+
+.voice-envelope-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.voice-envelope-title {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.voice-envelope-head .op-role {
+  font-style: italic;
+}
+
+.voice-envelope-head .btn {
+  height: 2rem;
+  margin-left: auto;
+}
+
+.voice-envelope-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+}
+
+.voice-envelope-curve {
+  display: block;
+  width: 100%;
+  height: 7.5rem;
+  touch-action: none;
+}
+
+.voice-envelope-knobs {
+  display: grid;
+  grid-template-columns: repeat(7, 3.6rem);
+  gap: 0.15rem;
+}
+
+/* A knob: the dial, its name, its value. */
+.knob {
+  display: grid;
+  justify-items: center;
+  gap: 0.05rem;
+}
+
+.knob-dial {
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  cursor: ns-resize;
+  touch-action: none;
+}
+
+.knob-dial:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.knob-dial svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.knob-track,
+.knob-value-arc {
+  fill: none;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+}
+
+.knob-track {
+  stroke: var(--paper-sunken);
+}
+
+.knob-value-arc {
+  stroke: var(--knob-pen, var(--ink));
+}
+
+.knob-face {
+  fill: var(--paper);
+  stroke: var(--ink);
+  stroke-width: 1.5;
+}
+
+.knob-pointer {
+  stroke: var(--ink);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.knob-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.knob-readout {
+  font-size: 0.72rem;
+  white-space: nowrap;
 }
 
 .inst .op-table {
@@ -254,6 +482,7 @@
 
 .inst .op-table thead th {
   padding: 0.35rem 0.3rem;
+  white-space: nowrap;
 }
 
 .inst .op-table .op-col-name {
@@ -553,16 +782,22 @@
   .inst-body {
     display: flex;
     flex: 1 1 auto;
+    flex-direction: column;
+    gap: 0.75rem;
     min-height: 0;
-    padding: 1rem 0 0.75rem;
+    padding: 1rem 0 0.5rem;
   }
 
-  .inst-six {
+  .inst-top {
     flex: 1 1 auto;
     min-height: 0;
-    grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     grid-template-rows: minmax(0, 1fr);
     column-gap: 2.5rem;
+  }
+
+  #inst-figures {
+    flex: 1 1 auto;
   }
 
   .inst-left {
@@ -578,7 +813,7 @@
 
   .inst-diagram {
     flex: 1 1 auto;
-    min-height: 12rem;
+    min-height: 9rem;
   }
 
   #inst-operators {
@@ -616,7 +851,46 @@
   }
 
   .inst-diagram {
-    min-height: 10rem;
+    min-height: 7rem;
+  }
+
+  .voice-env-mini,
+  .voice-keys {
+    height: 1.4rem;
+  }
+
+  .voice-envelope-curve {
+    height: 5.5rem;
+  }
+
+  .knob-dial {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .voice-envelope-knobs {
+    grid-template-columns: repeat(7, 3.3rem);
+  }
+
+  .voice-envelope {
+    padding: 0.35rem 0 0.4rem;
+  }
+
+  .voice-envelope-head .btn {
+    height: 1.75rem;
+  }
+
+  .inst-body {
+    gap: 0.4rem;
+    padding-top: 0.6rem;
+  }
+
+  .inst-left {
+    gap: 0.4rem;
+  }
+
+  .inst .op-table thead th {
+    padding: 0.15rem 0.3rem;
   }
 }
 
@@ -662,19 +936,66 @@
     margin: 0;
   }
 
-  .inst-six {
+  .inst-top {
     grid-template-columns: minmax(0, 1fr);
     gap: 1rem;
     padding-top: 0.75rem;
   }
 
-  /* The figures first, held at the top as the controls scroll. */
+  .inst-row,
+  .inst .inst-row .presets {
+    flex-wrap: wrap;
+  }
+
+  /* The right column's parts as the column's own: the figures first,
+     held at the top as the controls scroll, the envelope view under
+     them. */
+  .inst-right {
+    display: contents;
+  }
+
   #inst-figures {
     position: sticky;
     top: 0;
     z-index: 2;
-    order: -1;
+    order: -2;
     background: var(--paper);
+  }
+
+  .voice-envelope {
+    order: -1;
+  }
+
+  .voice-envelope-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .voice-envelope-knobs {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    row-gap: 0.5rem;
+  }
+
+  #inst-operators {
+    margin-top: 1rem;
+  }
+
+  .voice-env-mini,
+  canvas.voice-keys {
+    width: 100%;
+    height: 2.5rem;
+  }
+
+  .voice-scaling {
+    white-space: normal;
+  }
+
+  .voice-scaling > canvas {
+    display: block;
+  }
+
+  .voice-extras {
+    grid-column: 2;
+    margin: 0.4rem 0 0;
   }
 
   /* Each figure as tall as its plot here: there is no window height to

@@ -30,6 +30,7 @@ const SLIDERS = [
   'sustain',
   'release',
   'feedback',
+  'dxFeedback',
 ];
 const FIGURES = ['algorithm', 'compare', 'waveform', 'envelope', 'spectrum', 'spectrogram', 'bessel'];
 
@@ -45,7 +46,7 @@ describe('the chapters', () => {
     expect(OUTLINE.map(g => [g.group, g.sections.map(s => s.id)])).toEqual([
       ['Basics', ['sine', 'vibrato']],
       ['Two operators', ['index', 'sidebands', 'ratio', 'envelopes']],
-      ['The DX7', ['algorithms', 'fm-vs-pm']],
+      ['The DX7', ['algorithms', 'fm-vs-pm', 'dx7-voice']],
       ['Play', ['sandbox']],
     ]);
     expect(CHAPTERS.map(c => c.title)).toEqual([
@@ -57,6 +58,7 @@ describe('the chapters', () => {
       'Sounds that change over time',
       'Operators and algorithms',
       'FM versus PM',
+      'A DX7 voice',
       'Sandbox',
     ]);
   });
@@ -225,7 +227,8 @@ describe('neighbours', () => {
     expect(neighbours('vibrato').previous?.id).toBe('sine');
     expect(neighbours('vibrato').next?.id).toBe('index');
     expect(neighbours('envelopes').next?.id).toBe('algorithms');
-    expect(neighbours('sandbox').previous?.id).toBe('fm-vs-pm');
+    expect(neighbours('fm-vs-pm').next?.id).toBe('dx7-voice');
+    expect(neighbours('sandbox').previous?.id).toBe('dx7-voice');
   });
 
   it('has none for what is not a section', () => {

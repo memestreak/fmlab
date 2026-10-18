@@ -1,5 +1,16 @@
 import type { ViewId } from '../chapters/outline';
 import { type Envelope, envelopeAt } from '../dsp/envelope';
+import {
+  dbToAmp,
+  dx7EnvelopeAt,
+  type Dx7Note,
+  dx7Note,
+  type Dx7Operator,
+  dx7ReleaseSeconds,
+  heldOperator,
+  keyOf,
+  levelAtKey,
+} from '../dsp/dx7';
 import { noteHold, type Operator, OPERATOR_RELEASE, operatorEnvelope } from '../dsp/operators';
 import { createStore, type Store } from './store';
 import type { ThemeChoice } from './theme';
@@ -91,6 +102,12 @@ export interface LabState {
    */
   noteLength: number;
   /**
+   * `ops`: how long the last note is held before it is let go, in seconds:
+   * Infinity while its key is down. Its envelopes, as the figures draw
+   * them, are let go then.
+   */
+  noteHold: number;
+  /**
    * The sideband order (0 is the carrier, 1 the first pair, ...) being
    * pointed at or focused just now, in either linked figure; null for
    * none.
@@ -110,6 +127,18 @@ export interface LabState {
   operators: Operator[];
   /** `ops`: how much the algorithm's feedback loop feeds back, in radians. */
   feedback: number;
+  /**
+   * `ops`: which operators play. `basic` is Operators and algorithms'
+   * (`operators`, `feedback`: ratio, level and one decay); `dx7` is the
+   * sandbox's DX7 voice (`dxOperators`, `dxFeedback`; dsp/dx7.ts).
+   */
+  voiceModel: 'basic' | 'dx7';
+  /** `dx7`: the six operators, OP1 first. */
+  dxOperators: Dx7Operator[];
+  /** `dx7`: feedback in radians on the source's own output, 0 to 2π. */
+  dxFeedback: number;
+  /** `dx7`: the operator whose envelope view is open; null for none. */
+  selectedOp: number | null;
   /**
    * Chapter 9: phase and frequency modulation side by side, both set by
    * `ratio` and `index`. `mode` says which is heard.
@@ -172,6 +201,7 @@ export const DEFAULTS: LabState = {
   stops: 0,
   noteStartedAt: null,
   noteLength: 0,
+  noteHold: Infinity,
   hover: null,
   hoverOp: null,
   pinned: null,
@@ -185,6 +215,17 @@ export const DEFAULTS: LabState = {
     { ratio: 1, level: 0.2, decay: 0 },
   ],
   feedback: 0,
+  voiceModel: 'basic',
+  dxOperators: [
+    heldOperator(1, 0),
+    heldOperator(1, -18.5),
+    heldOperator(1, 0),
+    heldOperator(1, -18.5),
+    heldOperator(1, -22),
+    heldOperator(1, -22),
+  ],
+  dxFeedback: 0,
+  selectedOp: null,
   compare: false,
   // Low on purpose: FM gets bright, and loud, quickly.
   volume: 0.2,
@@ -256,9 +297,40 @@ export function envelopeOf(state: LabState): Envelope {
  */
 export function operatorLevelsAt(state: LabState, time: number | undefined): number[] {
   const into = noteProgress(state, time);
+  if (state.voiceModel === 'dx7') {
+    // How loud each is, 0 to 1: its level at the key, by its envelope.
+    const key = keyOf(state.carrierHz);
+    const { envelopes } = dx7NoteOf(state);
+    return state.dxOperators.map((op, i) => {
+      const db = levelAtKey(op, key);
+      if (db === null) return 0;
+      return dbToAmp(db) * (into === null ? 1 : dx7EnvelopeAt(envelopes[i], into, state.noteHold));
+    });
+  }
   if (into === null) return state.operators.map(op => op.level);
-  const hold = state.noteLength - OPERATOR_RELEASE;
-  return state.operators.map(op => op.level * envelopeAt(operatorEnvelope(op, hold), into));
+  return state.operators.map(op => op.level * envelopeAt(operatorEnvelope(op, state.noteHold), into));
+}
+
+/** `dx7`: a note of the voice as set, at the carrier's pitch. */
+export function dx7NoteOf(state: LabState): Dx7Note {
+  return dx7Note(state.algorithm, state.dxOperators, state.dxFeedback, keyOf(state.carrierHz));
+}
+
+/**
+ * `dx7`: each operator's level as the kernel takes it `time` seconds
+ * into the last note (or as set, when none is sounding).
+ */
+export function dx7KernelLevelsAt(state: LabState, time: number | undefined): number[] {
+  const into = noteProgress(state, time);
+  const note = dx7NoteOf(state);
+  return Array.from(note.gains, (gain, op) =>
+    into === null ? gain : gain * dx7EnvelopeAt(note.envelopes[op], into, state.noteHold),
+  );
+}
+
+/** How long the operators take to fall silent once a note is let go. */
+export function releaseSecondsOf(state: LabState): number {
+  return state.voiceModel === 'dx7' ? dx7ReleaseSeconds(state.dxOperators) : OPERATOR_RELEASE;
 }
 
 /**

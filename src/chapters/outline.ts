@@ -26,6 +26,7 @@ export const OUTLINE = [
     sections: [
       { id: 'algorithms', title: 'Operators and algorithms' },
       { id: 'fm-vs-pm', title: 'FM versus PM' },
+      { id: 'dx7-voice', title: 'A DX7 voice' },
     ],
   },
   {

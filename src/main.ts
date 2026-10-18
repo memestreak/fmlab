@@ -25,6 +25,7 @@ import { chapterInUrl, mountChapters, openingFromUrl } from './ui/chapterView';
 import { mountCompare } from './ui/compare';
 import { mountContents } from './ui/contents';
 import { mountEnvelopeControls } from './ui/envelopeControls';
+import { mountEnvelopeView } from './ui/envelopeView';
 import { mountFigures } from './ui/figures';
 import { mountAlgorithmSteps } from './ui/instrument';
 import { mountOperators } from './ui/operators';
@@ -33,6 +34,7 @@ import { mountSliders } from './ui/sliders';
 import { mountSteps } from './ui/steps';
 import { mountTerms } from './ui/terms';
 import { mountThemeSwitch } from './ui/themeSwitch';
+import { mountVoiceTable } from './ui/voiceTable';
 import {
   mountControlsToggle,
   mountIndexFollowsToggle,
@@ -73,6 +75,8 @@ mountSliders(store);
 mountFigures(store, engine);
 mountBesselControls(store);
 mountOperators(store);
+mountVoiceTable(store);
+mountEnvelopeView(store);
 mountAlgorithmSteps(store);
 mountSteps(store);
 mountCompare(store);

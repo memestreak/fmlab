@@ -380,7 +380,11 @@ export function mountOperators(store: LabStore): void {
   diagram?.addEventListener('pointerleave', () => point(selected()));
   diagram?.addEventListener('click', event => {
     const op = boxAt(event);
-    if (op !== null) sliders[op][0].focus({ preventScroll: true });
+    if (op === null) return;
+    // The sandbox's voice opens the operator's envelope view; elsewhere
+    // the row's first slider takes the focus.
+    if (store.get().voiceModel === 'dx7') store.set({ selectedOp: op });
+    else sliders[op][0].focus({ preventScroll: true });
   });
 
   const show = (state: LabState) => {

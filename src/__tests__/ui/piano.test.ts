@@ -112,9 +112,12 @@ describe('the sandbox', () => {
     expect(CHAPTERS.filter(c => c.hasPiano).map(c => c.id)).toEqual(['sandbox']);
   });
 
-  it('has chapter 8\'s presets, sounds on the DX7\'s algorithms', () => {
+  it('has DX7 voices to start from, those after factory sounds marked as approximations', () => {
     expect(sandbox.presets.map(preset => preset.label)).toEqual(
-      ['Stacks', 'E. piano', 'Bass', 'Bell', 'Organ'],
+      ['Stacks', 'E. piano', 'Bass', 'Bell', 'Marimba', 'Organ'],
     );
+    for (const preset of sandbox.presets.slice(1, 5)) {
+      expect(preset.hint).toMatch(/after the DX7's .*an approximation/);
+    }
   });
 });

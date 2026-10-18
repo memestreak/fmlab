@@ -1,4 +1,5 @@
 import { algorithm } from './algorithms';
+import { type Dx7Envelope, dx7EnvelopeAt, type Dx7Note, dx7Note, type Dx7Operator, keyOf } from './dx7';
 import { type Envelope, envelopeAt } from './envelope';
 import { kernelLevels, type Operator, operatorEnvelope } from './operators';
 import { type Algorithm, MAX_OPERATORS, PmKernel } from './pmKernel';
@@ -11,11 +12,26 @@ export const STEAL_SECONDS = 0.005;
 /** A voice is free once every carrier is below this, -90 dB. */
 export const SILENT = 10 ** (-90 / 20);
 
-/** What every note is struck with: the six operators and their wiring. */
-export interface VoicePatch {
+/**
+ * What every note is struck with: the six operators and their wiring.
+ * Operators and algorithms' simple operators (ratio, level, one decay),
+ * or the sandbox's DX7 voice (dsp/dx7.ts).
+ */
+export type VoicePatch = BasicPatch | Dx7Patch;
+
+export interface BasicPatch {
+  kind?: 'basic';
   algorithm: number;
   feedback: number;
   operators: readonly Operator[];
+}
+
+export interface Dx7Patch {
+  kind: 'dx7';
+  algorithm: number;
+  /** In radians on the source's own output (dsp/dx7.ts). */
+  feedback: number;
+  operators: readonly Dx7Operator[];
 }
 
 /** What the main thread tells the pool, over the worklet's port. */
@@ -53,6 +69,10 @@ class Voice implements VoiceState {
   readonly levels = new Float64Array(MAX_OPERATORS);
   operators: readonly Operator[] = [];
   envelopes: Envelope[] = [];
+  /** A DX7 voice's note, or null for simple operators. */
+  dx7: Dx7Note | null = null;
+  /** When the note is let go, in seconds; Infinity while it is held. */
+  hold = Infinity;
   /** Samples since the note started. */
   age = 0;
   /** Samples left of a fade out; 0 when not fading. */
@@ -101,7 +121,7 @@ export class VoicePool {
   }
 
   setPatch(patch: VoicePatch): void {
-    this.patch = { ...patch, operators: patch.operators.map(op => ({ ...op })) };
+    this.patch = structuredCloneOf(patch);
   }
 
   /** Strikes `note` at `hz`; it lets itself go after `hold` seconds. */
@@ -172,15 +192,24 @@ export class VoicePool {
   /** One voice's next sample. */
   private tick(voice: Voice, sampleRate: number): number {
     const time = voice.age / sampleRate;
-    for (let op = 0; op < MAX_OPERATORS; op++) {
-      voice.heard[op] = voice.levels[op] * envelopeAt(voice.envelopes[op], time);
+    let sample: number;
+    const dx7 = voice.dx7;
+    if (dx7) {
+      for (let op = 0; op < MAX_OPERATORS; op++) {
+        voice.scaled[op] = dx7.gains[op] * dx7EnvelopeAt(dx7.envelopes[op], time, voice.hold);
+      }
+      sample = voice.kernel.tick(voice.baseFreq, dx7.ratios, voice.scaled, dx7.feedback);
+    } else {
+      for (let op = 0; op < MAX_OPERATORS; op++) {
+        voice.heard[op] = voice.levels[op] * envelopeAt(voice.envelopes[op], time);
+      }
+      sample = voice.kernel.tick(
+        voice.baseFreq,
+        voice.ratios,
+        kernelLevels(voice.alg, voice.heard, voice.scaled),
+        voice.feedback,
+      );
     }
-    let sample = voice.kernel.tick(
-      voice.baseFreq,
-      voice.ratios,
-      kernelLevels(voice.alg, voice.heard, voice.scaled),
-      voice.feedback,
-    );
     voice.age++;
     if (voice.fadeLeft > 0) {
       sample *= voice.fadeLeft / this.fadeSamples;
@@ -200,12 +229,15 @@ export class VoicePool {
   private settle(voice: Voice): void {
     if (!voice.sounding || voice.fadeLeft > 0) return;
     const time = voice.age / this.sampleRate;
-    const hold = voice.envelopes[0]?.hold ?? Infinity;
-    if (voice.releasedAt === null && time >= hold) voice.releasedAt = this.now;
-    const attack = Math.max(...voice.envelopes.map(envelope => envelope.attack));
+    if (voice.releasedAt === null && time >= voice.hold) voice.releasedAt = this.now;
+    const dx7 = voice.dx7;
+    const attacks = dx7 ? dx7.envelopes : voice.envelopes;
+    const attack = Math.max(...attacks.map((envelope: Envelope | Dx7Envelope) => envelope.attack));
     if (time <= attack) return;
-    const silent = voice.alg.carriers.every(
-      op => envelopeAt(voice.envelopes[op], time) < SILENT,
+    const silent = voice.alg.carriers.every(op =>
+      dx7
+        ? dx7EnvelopeAt(dx7.envelopes[op], time, voice.hold) < SILENT
+        : envelopeAt(voice.envelopes[op], time) < SILENT,
     );
     if (silent) {
       voice.sounding = false;
@@ -219,14 +251,20 @@ export class VoicePool {
     voice.alg = algorithm(patch.algorithm);
     voice.kernel.setAlgorithm(voice.alg);
     voice.kernel.reset();
-    voice.feedback = patch.feedback;
     voice.baseFreq = hz / this.sampleRate;
-    voice.operators = patch.operators;
-    for (let op = 0; op < MAX_OPERATORS; op++) {
-      voice.ratios[op] = patch.operators[op]?.ratio ?? 1;
-      voice.levels[op] = patch.operators[op]?.level ?? 0;
+    voice.hold = hold;
+    if (patch.kind === 'dx7') {
+      voice.dx7 = dx7Note(patch.algorithm, patch.operators, patch.feedback, keyOf(hz));
+    } else {
+      voice.dx7 = null;
+      voice.feedback = patch.feedback;
+      voice.operators = patch.operators;
+      for (let op = 0; op < MAX_OPERATORS; op++) {
+        voice.ratios[op] = patch.operators[op]?.ratio ?? 1;
+        voice.levels[op] = patch.operators[op]?.level ?? 0;
+      }
+      voice.envelopes = this.envelopesFor(patch.operators, hold);
     }
-    voice.envelopes = this.envelopesFor(patch.operators, hold);
     voice.age = 0;
     voice.fadeLeft = 0;
     voice.sounding = true;
@@ -235,7 +273,8 @@ export class VoicePool {
   /** Lets a sounding voice go now. */
   private letGo(voice: Voice): void {
     if (!voice.sounding) return;
-    voice.envelopes = this.envelopesFor(voice.operators, voice.age / this.sampleRate);
+    voice.hold = voice.age / this.sampleRate;
+    if (!voice.dx7) voice.envelopes = this.envelopesFor(voice.operators, voice.hold);
   }
 
   private envelopesFor(operators: readonly Operator[], hold: number): Envelope[] {
@@ -243,4 +282,9 @@ export class VoicePool {
       operatorEnvelope(operators[op] ?? { ratio: 1, level: 0, decay: 0 }, hold),
     );
   }
+}
+
+/** A copy of a patch, so later changes to the one sent do not reach it. */
+function structuredCloneOf(patch: VoicePatch): VoicePatch {
+  return JSON.parse(JSON.stringify(patch)) as VoicePatch;
 }

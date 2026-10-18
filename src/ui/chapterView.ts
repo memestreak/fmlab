@@ -97,8 +97,8 @@ function mountSoundInUrl(store: LabStore): void {
       state.chapter === previous.chapter &&
       (state.carrierHz !== previous.carrierHz ||
         state.algorithm !== previous.algorithm ||
-        state.feedback !== previous.feedback ||
-        state.operators !== previous.operators)
+        state.dxFeedback !== previous.dxFeedback ||
+        state.dxOperators !== previous.dxOperators)
     ) {
       window.clearTimeout(timer);
       timer = window.setTimeout(write, URL_DELAY_MS);
@@ -324,6 +324,10 @@ export function mountChapters(store: LabStore): void {
     // Six operators: the Algorithm and Operators panels, together.
     const sixOps = document.querySelector<HTMLElement>('#six-operators-lab');
     if (sixOps) sixOps.hidden = chapter.patch.mode !== 'ops';
+    // Its Operators panel is the simple operators'; a DX7 voice has its
+    // own table, on the instrument page only.
+    const basicOps = document.querySelector<HTMLElement>('.panel-operators');
+    if (basicOps) basicOps.hidden = chapter.patch.voiceModel === 'dx7';
     // Chapter 9 has a switch for what is heard. It draws both spectra
     // predicted, so nothing measured is drawn over them there.
     const hear = document.querySelector<HTMLElement>('#hear-switch');
@@ -398,6 +402,7 @@ export function mountChapters(store: LabStore): void {
       ...openingFromUrl(chapter),
       hover: null,
       hoverOp: null,
+      selectedOp: null,
       pinned: null,
       noteStartedAt: null,
       // The glossary has no lab to stop a sound from.
