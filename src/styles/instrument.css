@@ -152,6 +152,13 @@
   gap: 0.75rem;
 }
 
+/* The rule between the sections is above Algorithms: the list and the
+   diagram it draws are one section, the presets another. */
+.inst-alg-head {
+  padding-top: 0.15rem;
+  border-top: 1px solid var(--ink);
+}
+
 /* ‹ and › either side of the diagram, just clear of the widest wiring
    (--diagram-half, set in ui/instrument.ts), so they never move; the
    figure's own parts are laid out in this grid, its caption across the
@@ -557,7 +564,6 @@ body[data-envelope='open'] #inst-figures .figure:not([hidden]) {
   grid-template-rows: minmax(0, 1fr);
   column-gap: 1.5rem;
   align-items: center;
-  border-top: 1px solid var(--ink);
   border-bottom: 1px solid var(--ink);
 }
 
