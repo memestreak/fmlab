@@ -50,7 +50,7 @@ const MIN_HOLD = 1;
 const MAX_HOLD = 6;
 /** Every operator is struck this quickly, and let go this slowly. */
 const ATTACK = 0.005;
-const RELEASE = 0.3;
+export const OPERATOR_RELEASE = 0.3;
 
 /**
  * How long a note of these operators is held before it is let go: long
@@ -63,12 +63,14 @@ export function noteHold(operators: readonly Operator[]): number {
 
 /**
  * One operator's envelope over a note: struck at once, then dying away
- * over its decay time, or held; let go with the rest at `hold`.
+ * over its decay time, or held; let go with the rest at `hold` (Infinity
+ * while a key is still down). The audio thread and the figures both use
+ * it, so what is drawn is what is heard.
  */
 export function operatorEnvelope(op: Operator, hold: number): Envelope {
   return op.decay > 0
-    ? { attack: ATTACK, decay: op.decay, sustain: 0, release: RELEASE, hold }
-    : { attack: ATTACK, decay: 1, sustain: 1, release: RELEASE, hold };
+    ? { attack: ATTACK, decay: op.decay, sustain: 0, release: OPERATOR_RELEASE, hold }
+    : { attack: ATTACK, decay: 1, sustain: 1, release: OPERATOR_RELEASE, hold };
 }
 
 /** The predicted spectrum is worked out from this many samples. */

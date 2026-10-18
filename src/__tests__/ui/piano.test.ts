@@ -12,7 +12,6 @@ import {
   OCTAVE_UP,
   playable,
   shiftStart,
-  sounding,
   STARTS,
 } from '../../ui/piano';
 
@@ -103,14 +102,6 @@ describe('the keyboard', () => {
       const keys = Array.from({ length: KEYS }, (_, i) => start + i);
       expect(keys.filter(playable).length).toBeGreaterThan(12);
     }
-  });
-
-  it('plays the last key pressed, and falls back when it is let go', () => {
-    expect(sounding([])).toBeNull();
-    expect(sounding([60])).toBe(60);
-    expect(sounding([60, 64])).toBe(64);
-    // 64 let go, 60 still held:
-    expect(sounding([60])).toBe(60);
   });
 });
 

@@ -80,11 +80,18 @@ figures subscribe to it. Nothing else passes values around.
   `patchOf(state)` gives a ratio and an index for either, which is what the
   figures and spectrum maths take; never read `state.ratio` or
   `state.index` directly outside `pm`-only code.
-  There are two ways of playing. Most chapters hold a steady sound while
+  There are three ways of playing. Most chapters hold a steady sound while
   `playing` is true. A chapter with `noteMode` (`envelopes`) plays one note
   each time `notes` goes up, shaped by the envelope (`attack`, `decay`,
   `sustain`, `release`, `hold`; `envelopeOf(state)`), and
-  `indexAtTime(state, t)` is the index at a moment of it.
+  `indexAtTime(state, t)` is the index at a moment of it. Six operators
+  (`ops`: `algorithms` and the sandbox) play notes in the worklet's voice
+  pool: `held` is the keys down on the keyboard, in the order struck, each
+  sounding until it is let go; `notes` still strikes one (Play note, the
+  space bar) held for `noteHold` and then let go; `stops` silences them
+  all. The figures follow the note struck last: `noteStartedAt`, and
+  `noteLength` Infinity while its key is down, then the time held plus the
+  release (`operatorLevelsAt`).
   `momentOf(state, time)` is what a figure should draw at a time on the
   page's clock: the patch as set, or, while a note sounds, that moment's
   index and loudness.
@@ -147,7 +154,14 @@ figures subscribe to it. Nothing else passes values around.
   carrier units, signed amplitudes, negative frequencies folded,
   coincident lines summed; and `trueFmSpectrum`, the same for true FM,
   whose lines are magnitudes. `waveform.ts`: `fmSample` and `trueFmSample`,
-  the signals at one instant, for drawing. `pmKernel.ts` (`PmKernel`:
+  the signals at one instant, for drawing. `voicePool.ts` (`VoicePool`:
+  `VOICES` notes of six operators at once, each a `PmKernel` whose levels
+  follow `operatorEnvelope` worked out per sample, summed; a note takes up
+  the patch as it was when struck; a voice is free once its carriers are
+  below -90 dB) and `voices.ts` (`chooseVoice`: a key's own voice, else a
+  free one, else the one let go longest ago, else the oldest held; a
+  voice taken is faded over `STEAL_SECONDS` first; and `midiToHz`).
+  `pmKernel.ts` (`PmKernel`:
   phase modulation a sample at a time, up to six operators through an
   `Algorithm`, now `TWO_OPERATORS`; no feedback yet) keeps each operator's
   phase locked to its ratio of the base frequency, easing it back after a
@@ -166,13 +180,18 @@ figures subscribe to it. Nothing else passes values around.
   Tests hold kernels, samples and spectra to each other.
 - `src/dsp/envelope.ts` is the envelope as a pure function,
   `envelopeAt(envelope, t)`: a straight attack, then exponential decay and
-  release timed to four time constants. The engine schedules exactly that
-  curve (a linear ramp, then `setTargetAtTime`), so the figures and the
-  sound agree; change one and change the other.
+  release timed to four time constants; `hold` is Infinity while a key is
+  down, and set when it is let go the release starts from wherever the
+  curve is. For six operators the voice pool calls this same function on
+  the audio thread, so the figures and the sound cannot disagree. For the
+  two-operator `envelopes` note the engine schedules exactly that curve (a
+  linear ramp, then `setTargetAtTime`); change one and change the other.
 - `src/audio/` — everything Web Audio. `synthProcessor.ts` is the
   AudioWorklet: it runs the kernels and has a-rate AudioParams `frequency`,
   `ratio`, `index`, and for true FM `modFrequency`, `deviation` and `mode`
-  (1 is true FM). It is bundled on its own through the `?worker&url`
+  (1 is true FM; 2 the voice pool, told what to play by messages on its
+  port, `VoiceMessage`: `patch`, `noteOn`, `noteOff`, `allOff`). It is
+  bundled on its own through the `?worker&url`
   import in `engine.ts`, and may import from `src/dsp` only. `engine.ts`
   (`AudioEngine`) follows the store: worklet, note gain, master gain,
   limiter (a `DynamicsCompressorNode`), speakers. It creates the context
@@ -181,7 +200,10 @@ figures subscribe to it. Nothing else passes values around.
   Stop, and on a change of chapter fades out, jumps to the new patch and
   fades back in. For a note it schedules the envelope on the note gain
   and, if `indexFollows`, on the `index` param, 20 ms ahead so the last
-  note can be brought down first.
+  note can be brought down first. For six operators it tells the voice
+  pool which keys went down and up (`held`), strikes `PLAYED_NOTE` for
+  Play note, and sends `allOff` for Stop and a change of chapter; the
+  context is suspended once nothing is held or sounding.
   An `AnalyserNode` taps the sound before the volume, and `measure()`
   hands its spectrum to the live view.
   `iosUnlock.ts` keeps iOS's ringer switch from muting it;
@@ -267,13 +289,15 @@ figures subscribe to it. Nothing else passes values around.
   keeps `modHz` and `deviationHz` at `asFm(state)`'s while the chapter has
   `compare`, so the FM sound follows Ratio and Index;
   `envelopeControls.ts` drags the envelope's dots; `piano.ts` is the
-  sandbox's one-voice keyboard, on screen and on the computer's keys
+  sandbox's keyboard, on screen and on the computer's keys
   (by `KeyboardEvent.code`: A to K the white notes, W E T Y U O P the
-  black, Z and X an octave down and up), holding the steady sound at a
-  key's pitch through `carrierHz` and `playing`. Piano-shaped keys under
-  an ink key slip, every C named, the octave control (− the range +, and
-  the Z / X hint) on their left; the held key is drawn in --pen-blue, the
-  note you hear. Its key colours are local tokens (`--key-light` and so
+  black, Z and X an octave down and up). Every key held sounds: it writes
+  `held`, and the key struck last's pitch into `carrierHz` and its moment
+  into `noteStartedAt` / `noteLength`. Keys are let go on blur, a hidden
+  tab, a lost pointer capture and a change of chapter, so none sticks.
+  Piano-shaped keys under an ink key slip, every C named, the octave
+  control (− the range +, and the Z / X hint) on their left; every held
+  key is drawn in --pen-blue. Its key colours are local tokens (`--key-light` and so
   on) so the white keys stay light in the dark theme;
   `instrument.ts` lays out the sandbox's instrument page: `PLACES` says
   which of the lab's nodes go where in `#instrument`, and a comment left

@@ -1,6 +1,6 @@
 import type { ViewId } from '../chapters/outline';
 import { type Envelope, envelopeAt } from '../dsp/envelope';
-import { noteHold, type Operator, operatorEnvelope } from '../dsp/operators';
+import { noteHold, type Operator, OPERATOR_RELEASE, operatorEnvelope } from '../dsp/operators';
 import { createStore, type Store } from './store';
 import type { ThemeChoice } from './theme';
 
@@ -64,7 +64,16 @@ export interface LabState {
    * the index stays at `index` for the whole note.
    */
   indexFollows: boolean;
-  /** Counts the notes asked for. The audio engine plays one per change. */
+  /**
+   * `ops`: the notes held down on the keyboard (MIDI numbers), in the
+   * order they were struck. Each sounds for as long as it is held; the
+   * audio engine strikes and lets go as the list changes.
+   */
+  held: number[];
+  /**
+   * Counts the notes asked for by Play note or the space bar. The audio
+   * engine plays one per change, held for `noteHold` and then let go.
+   */
   notes: number;
   /** Counts the notes stopped early. The audio engine silences one per change. */
   stops: number;
@@ -76,7 +85,9 @@ export interface LabState {
   /**
    * How long that note lasts, in seconds, fixed when it started. A patch
    * changed afterwards (a preset with longer decays, say) does not make a
-   * note already played, or already over, any longer.
+   * note already played, or already over, any longer. For a key still
+   * held, Infinity: its length is known once it is let go (then the time
+   * it was held plus the release).
    */
   noteLength: number;
   /**
@@ -156,6 +167,7 @@ export const DEFAULTS: LabState = {
   release: 0.2,
   hold: 0.6,
   indexFollows: true,
+  held: [],
   notes: 0,
   stops: 0,
   noteStartedAt: null,
@@ -238,13 +250,14 @@ export function envelopeOf(state: LabState): Envelope {
 }
 
 /**
- * Each operator's level `time` seconds into a note of six operators: its
- * level shaped by its own envelope. Before or after a note, as set.
+ * Each operator's level `time` seconds into the last note struck: its
+ * level shaped by its own envelope, held for as long as that note is (for
+ * ever, while its key is down). Before or after a note, as set.
  */
 export function operatorLevelsAt(state: LabState, time: number | undefined): number[] {
   const into = noteProgress(state, time);
   if (into === null) return state.operators.map(op => op.level);
-  const hold = noteHold(state.operators);
+  const hold = state.noteLength - OPERATOR_RELEASE;
   return state.operators.map(op => op.level * envelopeAt(operatorEnvelope(op, hold), into));
 }
 
