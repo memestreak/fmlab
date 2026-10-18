@@ -127,13 +127,6 @@ export interface Chapter {
    * diagrams are familiar by the time chapter 8 needs them.
    */
   showsPair?: boolean;
-  /**
-   * The chapter's lab with six operators instead of two: the sandbox's,
-   * shown while its switch says Six operators (`mode` is `ops`). Its text
-   * stays the chapter's own; its sliders, presets, figures and patch are
-   * these.
-   */
-  sixOperators?: Chapter;
   /** Whether to show the piano keyboard, to play the patch at pitches. */
   hasPiano?: boolean;
   /**

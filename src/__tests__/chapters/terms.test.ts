@@ -189,7 +189,7 @@ describe('the glossary', () => {
 });
 
 describe('links out of the guide', () => {
-  const views = [landing, ...CHAPTERS, ...CHAPTERS.flatMap(c => c.sixOperators ?? [])];
+  const views = [landing, ...CHAPTERS];
   const html = [
     ...views.map(allHtml),
     ...views.flatMap(view => view.maths.flatMap(panel => panel.body)),

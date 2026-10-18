@@ -96,10 +96,6 @@
               >
                 Sliders
               </button>
-              <!-- The sandbox: two operators, or six as in chapter 8. -->
-              <span id="operator-count" class="switch" role="group" aria-label="Operators" hidden>
-                <button id="two-operators" type="button" class="switch-option" aria-pressed="true">Two<span class="visually-hidden"> operators</span></button><button id="six-operators" type="button" class="switch-option" aria-pressed="false">Six<span class="visually-hidden"> operators</span></button>
-              </span>
               <!-- Chapter 9: which of its two sounds Play plays. -->
               <span id="hear-switch" class="switch" role="group" aria-label="Hear" hidden>
                 <button id="hear-pm" type="button" class="switch-option" aria-pressed="true">Hear PM</button><button id="hear-fm" type="button" class="switch-option" aria-pressed="false">Hear FM</button>
@@ -362,47 +358,14 @@
         <div class="inst-bar">
           <div class="inst-head">
             <h2 id="inst-title" class="inst-title" tabindex="-1"></h2>
-            <p class="inst-lede">
-              <span id="inst-lede"></span>
-              <a id="inst-previous" class="inst-previous" rel="prev"></a>
-            </p>
+            <p id="inst-lede" class="inst-lede"></p>
           </div>
-          <!-- Volume, Play, Two | Six and Copy link. -->
+          <!-- Volume, Play and Copy link. -->
           <div id="inst-tools" class="inst-tools"></div>
         </div>
         <div class="inst-body">
-          <!-- Two operators, drawn as the signal they make: the modulator,
-               Index on the green wire into the carrier, then out. -->
-          <div class="inst-two">
-            <div class="inst-patch">
-              <section class="op-box op-mod" aria-labelledby="op-box-mod">
-                <h3 id="op-box-mod" class="op-box-title">
-                  <span class="op-tag" data-role="modulator">2</span> Modulator
-                </h3>
-                <div id="inst-ratio"></div>
-                <p class="inst-hint" data-hint="ratio"></p>
-              </section>
-              <div class="wire wire-mod">
-                <div id="inst-index"></div>
-                <p class="inst-hint" data-hint="index"></p>
-              </div>
-              <section class="op-box op-car" aria-labelledby="op-box-car">
-                <h3 id="op-box-car" class="op-box-title">
-                  <span class="op-tag" data-role="carrier">1</span> Carrier
-                </h3>
-                <div id="inst-carrier"></div>
-                <p class="inst-hint" data-hint="carrier"></p>
-              </section>
-              <div class="wire wire-out"><span>out</span></div>
-            </div>
-            <div id="inst-two-figures" class="inst-plate"></div>
-            <div class="inst-start">
-              <span class="inst-label" aria-hidden="true">Start from</span>
-              <div id="inst-presets"></div>
-            </div>
-          </div>
-          <!-- Six operators: the wiring and the operator table on the
-               left, the spectrum the full height on the right. -->
+          <!-- The six operators: the wiring and the operator table on
+               the left, the spectrum the full height on the right. -->
           <div class="inst-six">
             <div class="inst-left">
               <div class="inst-row">
@@ -417,7 +380,7 @@
               </div>
               <div id="inst-operators"></div>
             </div>
-            <div id="inst-six-figures" class="inst-plate"></div>
+            <div id="inst-figures" class="inst-plate"></div>
           </div>
         </div>
         <!-- The keyboard, across the foot; docked to the screen's foot on

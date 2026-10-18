@@ -1,5 +1,5 @@
 import { chapterById, CHAPTERS } from '../../chapters';
-import { hzToSemitones, RATIO } from '../../model/lab';
+import { hzToSemitones } from '../../model/lab';
 import {
   FIRST_START,
   isBlack,
@@ -121,14 +121,9 @@ describe('the sandbox', () => {
     expect(CHAPTERS.filter(c => c.hasPiano).map(c => c.id)).toEqual(['sandbox']);
   });
 
-  it('has presets for a ratio and an index each, inside the sliders', () => {
+  it('has chapter 8\'s presets, sounds on the DX7\'s algorithms', () => {
     expect(sandbox.presets.map(preset => preset.label)).toEqual(
-      ['Flute', 'Brass', 'Clarinet', 'Bell', 'Gong', 'Bass'],
+      ['Stacks', 'E. piano', 'Bass', 'Bell', 'Organ'],
     );
-    for (const { patch } of sandbox.presets) {
-      expect(Object.keys(patch).sort()).toEqual(['index', 'ratio']);
-      expect(patch.ratio!).toBeGreaterThanOrEqual(RATIO.min);
-      expect(patch.ratio!).toBeLessThanOrEqual(RATIO.max);
-    }
   });
 });

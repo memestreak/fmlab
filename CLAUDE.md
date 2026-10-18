@@ -26,7 +26,8 @@ Next link is the way on), its Next the first section and that section's
 Previous it; `#/glossary` is the
 glossary, outside the sequence. The header's Contents button opens a panel
 of every group and section (`ui/contents.ts`); each section ends with
-Previous and Next by name. In the code a section is still a "chapter".
+Previous and Next by name, except the sandbox, an instrument page with no
+text (its way back is the Contents panel). In the code a section is still a "chapter".
 Never write a section's number in its copy: link to it by name with
 `sectionLink(id)`.
 
@@ -69,7 +70,7 @@ figures subscribe to it. Nothing else passes values around.
   and defaults; the log scales of the carrier and modulator sliders) and
   `theme.ts` (the choice, its storage key, `applyTheme`). The URL holds
   the section and, for one with `sharesSound` (the sandbox), its
-  carrier, ratio and index: `#/sandbox?c=220&r=1.41&i=5`. `state.chapter`
+  sound (see `sandbox.ts` below). `state.chapter`
   is a section's id, or `landing` or `glossary`.
   The patch is held two ways, by `mode`. `pm` (everywhere but `vibrato`):
   `ratio` and `index`. `fm` (`vibrato`): `modHz` and `deviationHz`.
@@ -110,15 +111,14 @@ figures subscribe to it. Nothing else passes values around.
   (`#4`, `#7?c=…`, `#glossary`) into the address it meant, keeping its
   parameters.
   `sandbox.ts` is an instrument page, not a section (`instrument`): no
-  lesson or maths, a `lede` beside its title instead, and `HINTS`, a line
-  under each of Two operators' controls. It has a second lab,
-  `sixOperators`: `algorithms`'s (algorithm list, operator table,
+  lesson or maths, a `lede` beside its title instead. It is
+  `algorithms`'s six-operator lab (algorithm list, operator table,
   feedback, its presets from `dx7Presets.ts`) with the keyboard and Copy
-  link, shown while the sandbox's Two | Six switch has `mode` at `ops`.
-  `labViewOf(chapter, state)` says which lab to show. Its link is
-  `#/sandbox?m=6&c=&a=&f=&o=ratio_level%_decay-…` (six operators joined by
-  "-"), validated and clamped by `soundFromParams`; a link without
-  `m=6` is the two-operator one, unchanged.
+  link; it has six operators only (Jeremy, 2026-10-18). Its link is
+  `#/sandbox?c=&a=&f=&o=ratio_level%_decay-…` (six operators joined by
+  "-"), validated and clamped by `soundFromParams`; a link from when it
+  also had two operators (`r`, `i`, or `m=6`) opens in six, keeping its
+  pitch.
   `terms.ts` holds every defined term: its name, a one-sentence plain
   definition (for the glossary and the term's tip only), an optional
   formula, its English Wikipedia article and the chapter that defines it.
@@ -270,9 +270,8 @@ figures subscribe to it. Nothing else passes values around.
   note you hear. Its key colours are local tokens (`--key-light` and so
   on) so the white keys stay light in the dark theme;
   `instrument.ts` lays out the sandbox's instrument page: `PLACES` says
-  which of the lab's nodes go where in `#instrument` for Two and for Six,
-  and a comment left at each node's place in the lab brings it back on
-  the way out;
+  which of the lab's nodes go where in `#instrument`, and a comment left
+  at each node's place in the lab brings it back on the way out;
   `besselControls.ts` makes the Bessel plot a control: the canvas is a
   `role="slider"` for the index (drag, or arrows, Page Up / Down, Home,
   End), pointing at a curve, a spectrum stem or a J button sets `hover`,
@@ -326,21 +325,19 @@ The landing view is laid out the same way, so going on from it moves
 nothing; only the glossary is one centred column. Check every chapter at
 both sizes after adding controls or figures.
 
-The sandbox is an instrument page (`body[data-view='instrument']`,
-`data-ops` 'two' or 'six'; Jeremy approved it on 2026-10-18): no text
-column, a title bar (title, lede, Previous: FM versus PM, then Volume,
-Play, Two | Six and Copy link), the operators with the figures beside
-them, the keyboard across the foot. In Two the operators are drawn as a
-signal flow, Modulator box, Index on the green wire, Carrier box, out,
-with the figures on one plate; in Six the wiring diagram with Feedback
-beside it and the operator table under it, the spectrum the full height
-on the right. Carriers are solid blue and modulators dashed green in the
-boxes, the table and the diagram. On a wide screen it is one window high
-and nothing scrolls; under 52rem high the diagram's caption is for
-screen readers only and the table's rows tighten. Below 62rem it is one
-column: the keyboard docked to the screen's foot, the figures held at the
-top, the controls scrolling under them, and the operator table as cards.
-Volume, Play and the keyboard stay put when Two | Six switches.
+The sandbox is an instrument page (`body[data-view='instrument']`;
+Jeremy approved it on 2026-10-18: "the existing app, just full page and
+with a better looking keyboard", six operators only): no text column, a
+title bar (title and lede, then Volume, Play note and Copy link), the
+algorithm and Start from row, the wiring diagram with Feedback beside it
+and the operator table under it, the spectrum the full height on the
+right, the keyboard across the foot. Carriers are solid blue and
+modulators dashed green in the table (filled or dashed tags, carrier rows
+shaded) and the diagram. On a wide screen it is one window high and
+nothing scrolls; under 52rem high the diagram's caption is for screen
+readers only and the table's rows tighten. Below 62rem it is one column:
+the keyboard docked to the screen's foot, the spectrum held at the top,
+the controls scrolling under it, and the operator table as cards.
 
 ## Styling
 

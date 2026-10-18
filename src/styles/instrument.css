@@ -1,9 +1,7 @@
 /* The sandbox as an instrument page (body[data-view='instrument']): no
-   text column; a title bar with Volume, Play, Two | Six and Copy link; the
-   operators in the middle with the figures beside them; the keyboard
-   across the foot. body[data-ops] says which layout: 'two' draws the two
-   operators as a signal flow, 'six' the wiring diagram with the operator
-   table under it. The nodes are the lab's own, moved here by
+   text column; a title bar with Volume, Play and Copy link; the wiring
+   diagram with the operator table under it, the spectrum beside them; the
+   keyboard across the foot. The nodes are the lab's own, moved here by
    ui/instrument.ts, so the lab's rules scoped to [data-view='chapter'] do
    not reach them. */
 
@@ -55,12 +53,6 @@
   margin: 0;
 }
 
-.inst-previous {
-  margin-left: 0.6rem;
-  font-size: 0.85rem;
-  white-space: nowrap;
-}
-
 .inst-tools {
   display: flex;
   flex: none;
@@ -84,12 +76,8 @@
   height: 2rem;
 }
 
-/* Wide enough for "Play note" and for "Copied", so switching Two | Six
-   or copying the link moves nothing beside them. */
-.inst-tools #play {
-  min-width: 7.5rem;
-}
-
+/* Wide enough for "Copied", so copying the link moves nothing beside
+   it. */
 .inst-tools #share {
   min-width: 6.25rem;
   justify-content: center;
@@ -102,13 +90,7 @@
   text-transform: uppercase;
 }
 
-.inst-two,
 .inst-six {
-  display: none;
-}
-
-[data-ops='two'] .inst-two,
-[data-ops='six'] .inst-six {
   display: grid;
 }
 
@@ -156,14 +138,7 @@
   font-size: 0.85rem;
 }
 
-.inst-hint {
-  margin: 0.15rem 0 0;
-  font-size: 0.85rem;
-  font-style: italic;
-}
-
-/* The presets, a "Start from" row of sounds. */
-.inst-start,
+/* The algorithm and the presets, a "Start from" row of sounds. */
 .inst-row {
   display: flex;
   flex-wrap: wrap;
@@ -186,74 +161,10 @@
   min-height: 2.25rem;
 }
 
-/* Two operators: the modulator's box, the Index wire into the carrier's
-   box, and the wire out. Box and wire take their role's pen: the carrier
-   solid blue, the modulator dashed green; the sliders in them too. Text
-   and Volume stay ink. */
-.op-box {
-  padding: 0.6rem 1rem 0.75rem;
-  border-radius: 4px;
-}
-
-.op-box-title {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  margin: 0 0 0.25rem;
-  font-family: var(--font-sans);
-  font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.op-car {
-  --slider-fill: var(--pen-blue);
-  border: 3px solid var(--pen-blue);
-}
-
-.op-mod {
-  --slider-fill: var(--pen-green);
-  border: 1.5px dashed var(--pen-green);
-}
-
-.wire {
-  position: relative;
-  margin-left: 1.5rem;
-  padding: 0.5rem 0 1rem 2.5rem;
-  border-left: 2px solid var(--ink);
-}
-
-.wire-mod {
-  --slider-fill: var(--pen-green);
-  border-left-color: var(--pen-green);
-}
-
-.wire-out {
-  height: 2.5rem;
-  padding: 0.35rem 0 0 1rem;
-  font-style: italic;
-}
-
-/* The arrowhead at the foot of each wire. */
-.wire::after {
-  position: absolute;
-  bottom: -1px;
-  left: -7px;
-  border-top: 8px solid var(--ink);
-  border-right: 6px solid transparent;
-  border-left: 6px solid transparent;
-  content: '';
-}
-
-.wire-mod::after {
-  border-top-color: var(--pen-green);
-}
-
 /* Carrier and modulator, at a glance: a carrier's tag is filled in its
-   pen, a modulator's dashed; in the table a carrier's row sits on a band
-   with a blue edge and its role in bold, and each row's sliders take its
-   pen. The row is marked by its tag's role, so it follows the algorithm. */
+   pen, a modulator's dashed; in the table a carrier's row sits on a shaded
+   band, and each row's sliders take its pen. The row is marked by its
+   tag's role, so it follows the algorithm. */
 [data-view='instrument'] .op-tag[data-role='carrier'] {
   border: 2px solid var(--pen-blue);
   background: var(--pen-blue);
@@ -274,15 +185,6 @@
 
 [data-view='instrument'] .op-row:has(.op-tag[data-role='carrier']) > * {
   background: var(--paper-sunken);
-}
-
-[data-view='instrument'] .op-row:has(.op-tag[data-role='carrier']) > th {
-  box-shadow: inset 4px 0 0 var(--pen-blue);
-}
-
-[data-view='instrument'] .op-row:has(.op-tag[data-role='carrier']) .op-role {
-  font-style: normal;
-  font-weight: 600;
 }
 
 /* Six operators: the table given the room. */
@@ -611,27 +513,9 @@
     padding: 1rem 0 0.75rem;
   }
 
-  .inst-two,
   .inst-six {
     flex: 1 1 auto;
     min-height: 0;
-  }
-
-  .inst-two {
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    grid-template-rows: minmax(0, 1fr) auto;
-    gap: 0.75rem 3rem;
-  }
-
-  .inst-patch {
-    align-self: center;
-  }
-
-  .inst-start {
-    grid-column: 1 / -1;
-  }
-
-  .inst-six {
     grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
     grid-template-rows: minmax(0, 1fr);
     column-gap: 2.5rem;
@@ -692,8 +576,7 @@
   }
 }
 
-/* A window under 60rem high gives the keys less; the same in Two and Six,
-   so switching between them moves nothing. */
+/* A window under 60rem high gives the keys less. */
 @media (min-width: 62rem) and (max-height: 60rem) {
   .piano-keys {
     height: 6.25rem;
@@ -723,10 +606,6 @@
     flex-wrap: wrap;
   }
 
-  .inst-previous {
-    margin-left: 0;
-  }
-
   .inst-tools {
     flex: 1 1 100%;
     flex-wrap: wrap;
@@ -739,11 +618,6 @@
     margin: 0;
   }
 
-  .inst-tools #play {
-    min-width: 6.5rem;
-  }
-
-  .inst-two,
   .inst-six {
     grid-template-columns: minmax(0, 1fr);
     gap: 1rem;
@@ -751,8 +625,7 @@
   }
 
   /* The figures first, held at the top as the controls scroll. */
-  #inst-two-figures,
-  #inst-six-figures {
+  #inst-figures {
     position: sticky;
     top: 0;
     z-index: 2;
@@ -770,10 +643,6 @@
 
   .inst-plate .plot-frame {
     flex: none;
-    height: 7.5rem;
-  }
-
-  #inst-six-figures .plot-frame {
     height: 8rem;
   }
 
@@ -785,19 +654,6 @@
     overflow: hidden;
     clip-path: inset(50%);
     white-space: nowrap;
-  }
-
-  .op-box .slider-row,
-  .wire .slider-row {
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-areas:
-      'label value'
-      'slider slider';
-    row-gap: 0;
-  }
-
-  .inst-hint {
-    font-size: 0.8rem;
   }
 
   .inst-left {
@@ -855,7 +711,6 @@
 
   [data-view='instrument'] .op-row:has(.op-tag[data-role='carrier']) {
     background: var(--paper-sunken);
-    box-shadow: inset 4px 0 0 var(--pen-blue);
   }
 
   [data-view='instrument'] .op-cell-label {

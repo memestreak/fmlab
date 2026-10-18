@@ -103,7 +103,6 @@ describe('the chapters', () => {
       expect(chapter.body).toEqual([]);
       expect(chapter.maths).toEqual([]);
       expect(chapter.lede?.trim()).toBeTruthy();
-      expect(chapter.sixOperators?.lede?.trim()).toBeTruthy();
       return;
     }
     expect(chapter.body.length).toBeGreaterThan(0);

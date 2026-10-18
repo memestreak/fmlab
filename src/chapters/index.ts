@@ -8,7 +8,6 @@ import { operators } from './operators';
 import { ratio } from './ratio';
 import { sandbox } from './sandbox';
 import { singleSine } from './singleSine';
-import type { LabState } from '../model/lab';
 import { SECTION_IDS, type SectionId, type ViewId } from './outline';
 import type { Chapter } from './types';
 import { vibrato } from './vibrato';
@@ -60,29 +59,6 @@ export function chapterById(id: string): Chapter | undefined {
 /** Whether an id names something the page can show. */
 export function isViewId(id: string): id is ViewId {
   return chapterById(id) !== undefined;
-}
-
-/**
- * What a chapter's lab shows for a state: the chapter itself, or, in the
- * sandbox switched to six operators, its six-operator lab.
- */
-export function labViewOf(chapter: Chapter, state: Pick<LabState, 'mode'>): Chapter {
-  return chapter.sixOperators && state.mode === 'ops' ? chapter.sixOperators : chapter;
-}
-
-/**
- * What the sandbox's switch sets: two operators, a steady sound as
- * before; or six, playing notes. The two keep their own settings (ratio
- * and index; algorithm, operators and feedback), so switching back finds
- * them as they were. Any sound stops.
- */
-export function operatorCountPatch(
-  state: Pick<LabState, 'stops'>,
-  six: boolean,
-): Partial<LabState> {
-  return six
-    ? { mode: 'ops', noteMode: true, playing: false }
-    : { mode: 'pm', noteMode: false, stops: state.stops + 1, noteStartedAt: null };
 }
 
 /** The sections either side of one, if any. */
