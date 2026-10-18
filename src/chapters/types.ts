@@ -76,6 +76,8 @@ export interface Preset {
   hint: string;
   /** What it sets; anything left out stays as it is. */
   patch: Partial<ChapterPatch>;
+  /** A short line shown beside a preset menu while it is chosen. */
+  note?: string;
 }
 
 /**
@@ -131,6 +133,11 @@ export interface Chapter {
    * diagrams are familiar by the time chapter 8 needs them.
    */
   showsPair?: boolean;
+  /**
+   * Whether its presets are one dropdown (the sandbox's 32 DX7 factory
+   * voices) rather than a button each.
+   */
+  presetMenu?: boolean;
   /** Whether to show the piano keyboard, to play the patch at pitches. */
   hasPiano?: boolean;
   /**

@@ -27,6 +27,7 @@ import {
   TERMS,
   wikiLink,
 } from '../chapters/terms';
+import type { Preset } from '../chapters';
 import type { LabState, LabStore } from '../model/lab';
 import { mountInstrument } from './instrument';
 
@@ -356,7 +357,10 @@ export function mountChapters(store: LabStore): void {
     const unused = six ? above : beside;
     unused?.replaceChildren();
     if (unused) unused.hidden = true;
-    if (presets) {
+    if (presets && chapter.presetMenu) {
+      presets.hidden = false;
+      presets.replaceChildren(...presetMenu(chapter.presets, store));
+    } else if (presets) {
       presets.hidden = chapter.presets.length === 0;
       presets.replaceChildren(
         ...chapter.presets.map(preset => {
@@ -443,4 +447,66 @@ function showTermInUrl(): void {
   entry.classList.add('is-current');
   entry.focus({ preventScroll: true });
   entry.scrollIntoView({ block: 'center' });
+}
+
+/** The voice a state is, of `presets`: the one whose sound it is exactly. */
+export function presetOf(presets: readonly Preset[], state: LabState): number {
+  const sound = (s: Partial<LabState>) =>
+    JSON.stringify([s.algorithm, s.dxFeedback, s.dxOperators]);
+  const now = sound(state);
+  return presets.findIndex(preset => sound(preset.patch) === now);
+}
+
+/**
+ * The sandbox's presets as one dropdown, with a line beside it saying
+ * what the chosen voice plays without. It shows the voice the sound is,
+ * or "Edited" once it has been changed.
+ */
+function presetMenu(presets: readonly Preset[], store: LabStore): HTMLElement[] {
+  const select = document.createElement('select');
+  select.className = 'input num preset-menu';
+  select.setAttribute('aria-label', 'Start from a DX7 factory voice');
+  const edited = document.createElement('option');
+  edited.value = '';
+  edited.textContent = 'Edited';
+  edited.disabled = true;
+  select.append(
+    edited,
+    ...presets.map((preset, i) => {
+      const option = document.createElement('option');
+      option.value = String(i);
+      option.textContent = preset.label;
+      return option;
+    }),
+  );
+  const note = document.createElement('span');
+  note.className = 'preset-note';
+  note.id = 'preset-note';
+  select.setAttribute('aria-describedby', note.id);
+  const show = (state: LabState) => {
+    const at = presetOf(presets, state);
+    select.value = at < 0 ? '' : String(at);
+    edited.hidden = at >= 0;
+    // Beside it, briefly, what the voice plays without; in full in its
+    // title and for a screen reader.
+    const preset = at < 0 ? null : presets[at];
+    note.textContent = preset ? (preset.note ?? preset.hint) : 'your own, from a factory voice';
+    note.title = preset ? preset.hint : note.textContent;
+  };
+  select.addEventListener('change', () => {
+    const preset = presets[Number(select.value)];
+    if (preset) store.set(preset.patch);
+  });
+  const stop = store.subscribe((state, previous) => {
+    if (!select.isConnected) return stop();
+    if (
+      state.dxOperators !== previous.dxOperators ||
+      state.algorithm !== previous.algorithm ||
+      state.dxFeedback !== previous.dxFeedback
+    ) {
+      show(state);
+    }
+  });
+  show(store.get());
+  return [select, note];
 }

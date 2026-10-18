@@ -127,3 +127,8 @@ def test_makes_a_fixed_frequency_a_ratio_of_middle_c() -> None:
     # Coarse 2, fine 51: 10^2.51 Hz, about 323.6 Hz.
     op = convert_operator(operator(fixed=True, coarse=2, fine=51))
     assert op["ratio"] == pytest.approx(10**2.51 / 261.6256, abs=1e-3)
+
+
+def test_holds_a_fixed_frequency_within_the_sandboxs_ratios() -> None:
+    # 1 Hz (coarse 0, fine 0) is far under half of middle C.
+    assert convert_operator(operator(fixed=True, coarse=0))["ratio"] == 0.5

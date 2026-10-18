@@ -23,6 +23,7 @@ export const sandbox: Chapter = {
   // No Carrier slider: the keyboard sets the pitch of every note.
   controls: ['volume', 'dxFeedback'],
   presets: DX7_VOICES,
+  presetMenu: true,
   hasPiano: true,
   sharesSound: true,
   patch: {

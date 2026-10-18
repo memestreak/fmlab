@@ -7,8 +7,10 @@ units src/dsp/dx7.ts uses: ratios, cents, dB and seconds. Run once, by
 hand; the .syx itself is never committed or shipped. The formulas follow
 msfa, the DX7 engine in Dexed (source/msfa/dx7note.cc and env.cc).
 
-    scripts/dx7_voices.py ROM1A.SYX src/chapters/dx7Factory.ts \\
-        "E.PIANO 1" "BRASS 1" "BASS 1" "TUB BELLS" "MARIMBA" "STRINGS 1"
+    scripts/dx7_voices.py ROM1A.SYX src/chapters/dx7Factory.ts
+
+converts all 32, in the bank's order; name voices after the paths to
+convert only those, in that order.
 """
 
 import json
@@ -41,6 +43,9 @@ DB_PER_DEPTH = 329 / 4096 * 0.75
 BREAK_POINT_NOTE = 21
 # The envelope's times, kept to four places; its levels to two.
 TIMES = ("attack", "decay1", "decay2", "release")
+# The sandbox's ratios, which a fixed frequency's ratio is held within.
+RATIO_MIN = 0.5
+RATIO_MAX = 61.69
 # Middle C, which a fixed-frequency operator is made a ratio of.
 MIDDLE_C_HZ = 440 * 2 ** (-9 / 12)
 
@@ -281,10 +286,12 @@ def operator_ratio(op: RawOperator) -> float:
 
     Returns:
         Coarse (0 is a half) times 1 + fine / 100; or, fixed, 10 to the
-        (coarse mod 4) + fine / 100 Hz over middle C (osc_freq).
+        (coarse mod 4) + fine / 100 Hz over middle C (osc_freq), held
+        within the sandbox's 0.5 to 61.69.
     """
     if op.fixed:
-        return 10 ** ((op.coarse & 3) + op.fine / 100) / MIDDLE_C_HZ
+        ratio = 10 ** ((op.coarse & 3) + op.fine / 100) / MIDDLE_C_HZ
+        return min(RATIO_MAX, max(RATIO_MIN, ratio))
     return (0.5 if op.coarse == 0 else op.coarse) * (1 + op.fine / 100)
 
 
@@ -407,16 +414,19 @@ def main(argv: list[str]) -> int:
     """Convert the named voices of a bank into a TypeScript module.
 
     Args:
-        argv: The bank's path, the output path, then the voices' names.
+        argv: The bank's path, the output path, then the voices' names
+            (none for all 32, in the bank's order).
 
     Returns:
         0 on success, 2 for bad arguments or a voice not in the bank.
     """
-    if len(argv) < 3:
+    if len(argv) < 2:
         print(__doc__, file=sys.stderr)
         return 2
     bank_path, out_path, *names = argv
-    voices = {v.name: v for v in unpack_bank(Path(bank_path).read_bytes())}
+    bank = unpack_bank(Path(bank_path).read_bytes())
+    voices = {v.name: v for v in bank}
+    names = names or [v.name for v in bank]
     unknown = [name for name in names if name not in voices]
     if unknown:
         print(f"not in the bank: {', '.join(unknown)}", file=sys.stderr)

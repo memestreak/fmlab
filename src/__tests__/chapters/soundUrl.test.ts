@@ -69,7 +69,7 @@ describe('which chapters keep their sound in the URL', () => {
 
 describe('the sandbox in a link', () => {
   const sandbox = chapterById('sandbox')!;
-  const piano = chapterById('sandbox')!.presets.find(p => p.label === 'E.PIANO 1')!.patch;
+  const piano = chapterById('sandbox')!.presets.find(p => p.label === '11 E.PIANO 1')!.patch;
   const six: LabState = {
     ...DEFAULTS,
     ...sandbox.patch,

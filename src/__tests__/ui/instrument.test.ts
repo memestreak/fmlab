@@ -1,4 +1,6 @@
 import { CHAPTERS } from '../../chapters';
+import { DEFAULTS } from '../../model/lab';
+import { presetOf } from '../../ui/chapterView';
 import { PLACES, stepAlgorithm } from '../../ui/instrument';
 
 describe('the instrument page', () => {
@@ -18,8 +20,8 @@ describe('the instrument page', () => {
     expect(sandbox.patch.voiceModel).toBe('dx7');
     expect(sandbox.controls).toEqual(['volume', 'dxFeedback']);
     expect(Object.keys(sandbox.figures)).toEqual(['algorithm', 'spectrum']);
-    expect(sandbox.presets[0].label).toBe('E.PIANO 1');
-    expect(sandbox.patch.dxOperators).toEqual(sandbox.presets[0].patch.dxOperators);
+    expect(sandbox.presets[10].label).toBe('11 E.PIANO 1');
+    expect(sandbox.patch.dxOperators).toEqual(sandbox.presets[10].patch.dxOperators);
     expect(sandbox.hasPiano && sandbox.sharesSound).toBe(true);
     expect(sandbox.patch.algorithm).toBe(5);
   });
@@ -52,5 +54,20 @@ describe('the instrument page', () => {
     expect(stepAlgorithm(5, -1)).toBe(4);
     expect(stepAlgorithm(32, 1)).toBe(1);
     expect(stepAlgorithm(1, -1)).toBe(32);
+  });
+});
+
+describe('the sandbox\'s voice menu', () => {
+  const sandbox = CHAPTERS.find(c => c.id === 'sandbox')!;
+  const opening = { ...DEFAULTS, ...sandbox.patch };
+
+  it('shows the voice the sound is, and none once it is edited', () => {
+    expect(presetOf(sandbox.presets, opening)).toBe(10);
+    const edited = {
+      ...opening,
+      dxOperators: opening.dxOperators.map((o, i) => (i === 0 ? { ...o, level: -5 } : o)),
+    };
+    expect(presetOf(sandbox.presets, edited)).toBe(-1);
+    expect(presetOf(sandbox.presets, { ...opening, ...sandbox.presets[25].patch })).toBe(25);
   });
 });

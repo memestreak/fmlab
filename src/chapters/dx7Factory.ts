@@ -15,6 +15,1556 @@ export interface FactoryVoice {
 
 export const FACTORY_VOICES: FactoryVoice[] = [
   {
+    'name': 'BRASS 1',
+    'algorithm': 22,
+    'dxFeedback': 6.2831,
+    'dxOperators': [
+      {
+        'ratio': 0.5,
+        'detune': 6.31,
+        'level': -0.75,
+        'envelope': {
+          'attack': 0.0122,
+          'peak': 0.0,
+          'decay1': 0.0073,
+          'brk': -7.53,
+          'decay2': 0.0001,
+          'sustain': -1.51,
+          'release': 0.1481
+        },
+        'breakKey': 60,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.843
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 0.5,
+        'detune': 6.31,
+        'level': -9.75,
+        'envelope': {
+          'attack': 0.016,
+          'peak': -12.04,
+          'decay1': 0.0288,
+          'brk': -3.01,
+          'decay2': 0.0619,
+          'sustain': -1.51,
+          'release': 0.1481
+        },
+        'breakKey': 48,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'exp',
+          'depth': -0.422
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 1.0,
+        'detune': -1.8,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.0076,
+          'peak': 0.0,
+          'decay1': 0.0,
+          'brk': 0.0,
+          'decay2': 0.0,
+          'sustain': 0.0,
+          'release': 0.1481
+        },
+        'breakKey': 60,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 1.0,
+        'detune': 0.0,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.0076,
+          'peak': 0.0,
+          'decay1': 0.0,
+          'brk': 0.0,
+          'decay2': 0.0,
+          'sustain': 0.0,
+          'release': 0.1481
+        },
+        'breakKey': 60,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 1.0,
+        'detune': 0.9,
+        'level': -0.75,
+        'envelope': {
+          'attack': 0.0073,
+          'peak': 0.0,
+          'decay1': 0.0,
+          'brk': 0.0,
+          'decay2': 0.0,
+          'sustain': 0.0,
+          'release': 0.1481
+        },
+        'breakKey': 60,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 1.0,
+        'detune': 0.0,
+        'level': -12.75,
+        'envelope': {
+          'attack': 0.0971,
+          'peak': 0.0,
+          'decay1': 0.0,
+          'brk': 0.0,
+          'decay2': 1.1889,
+          'sustain': -6.02,
+          'release': 0.2116
+        },
+        'breakKey': 60,
+        'left': {
+          'curve': 'exp',
+          'depth': -3.253
+        },
+        'right': {
+          'curve': 'exp',
+          'depth': -3.012
+        },
+        'rateScaling': 1.4142
+      }
+    ],
+    'missing': [
+      'tremolo',
+      'velocity'
+    ]
+  },
+  {
+    'name': 'BRASS 2',
+    'algorithm': 22,
+    'dxFeedback': 6.2831,
+    'dxOperators': [
+      {
+        'ratio': 0.5,
+        'detune': 6.31,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 0.0,
+          'brk': 0.0,
+          'decay2': 1.6719,
+          'sustain': -13.55,
+          'release': 0.1481
+        },
+        'breakKey': 72,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 2.289
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 0.5,
+        'detune': 6.31,
+        'level': -11.25,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 0.0,
+          'brk': 0.0,
+          'decay2': 1.6719,
+          'sustain': -13.55,
+          'release': 0.1481
+        },
+        'breakKey': 72,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 2.289
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 0.5,
+        'detune': -2.7,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 0.0,
+          'brk': 0.0,
+          'decay2': 1.6719,
+          'sustain': -13.55,
+          'release': 0.1481
+        },
+        'breakKey': 60,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 0.5,
+        'detune': -1.8,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 0.0,
+          'brk': 0.0,
+          'decay2': 1.6719,
+          'sustain': -13.55,
+          'release': 0.1481
+        },
+        'breakKey': 60,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 0.5,
+        'detune': 0.9,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 0.0,
+          'brk': 0.0,
+          'decay2': 1.6719,
+          'sustain': -13.55,
+          'release': 0.1481
+        },
+        'breakKey': 60,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 0.5,
+        'detune': 0.0,
+        'level': -14.25,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 0.0,
+          'brk': 0.0,
+          'decay2': 0.9288,
+          'sustain': -7.53,
+          'release': 0.1481
+        },
+        'breakKey': 72,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      }
+    ],
+    'missing': []
+  },
+  {
+    'name': 'BRASS 3',
+    'algorithm': 18,
+    'dxFeedback': 3.1415,
+    'dxOperators': [
+      {
+        'ratio': 1.0,
+        'detune': 0.0,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.087,
+          'peak': 0.0,
+          'decay1': 2.5476,
+          'brk': -9.03,
+          'decay2': 0.0,
+          'sustain': -9.03,
+          'release': 0.8463
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.1892
+      },
+      {
+        'ratio': 1.0,
+        'detune': 0.0,
+        'level': -21.75,
+        'envelope': {
+          'attack': 0.1417,
+          'peak': -10.54,
+          'decay1': 5.6844,
+          'brk': -96.0,
+          'decay2': 0.0,
+          'sustain': -96.0,
+          'release': 0.1851
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.1892
+      },
+      {
+        'ratio': 1.0,
+        'detune': 0.0,
+        'level': -16.5,
+        'envelope': {
+          'attack': 0.115,
+          'peak': 0.0,
+          'decay1': 0.7431,
+          'brk': -9.03,
+          'decay2': 0.0,
+          'sustain': -9.03,
+          'release': 1.481
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0905
+      },
+      {
+        'ratio': 1.0,
+        'detune': 0.0,
+        'level': -15.0,
+        'envelope': {
+          'attack': 0.001,
+          'peak': -34.62,
+          'decay1': 0.0001,
+          'brk': -28.6,
+          'decay2': 0.0543,
+          'sustain': -27.09,
+          'release': 1.481
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 3.18,
+        'detune': -0.9,
+        'level': -21.75,
+        'envelope': {
+          'attack': 0.0749,
+          'peak': 0.0,
+          'decay1': 0.2521,
+          'brk': -28.6,
+          'decay2': 0.0334,
+          'sustain': -27.09,
+          'release': 1.481
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 8.47,
+        'detune': 0.0,
+        'level': -15.0,
+        'envelope': {
+          'attack': 0.0038,
+          'peak': 0.0,
+          'decay1': 0.6601,
+          'brk': -96.0,
+          'decay2': 0.0,
+          'sustain': -96.0,
+          'release': 0.1851
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.834
+      }
+    ],
+    'missing': [
+      'tremolo',
+      'velocity',
+      'transpose'
+    ]
+  },
+  {
+    'name': 'STRINGS 1',
+    'algorithm': 2,
+    'dxFeedback': 6.2831,
+    'dxOperators': [
+      {
+        'ratio': 1.0,
+        'detune': 0.0,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.3044,
+          'peak': 0.0,
+          'decay1': 2.9723,
+          'brk': -10.54,
+          'decay2': 5.2014,
+          'sustain': -21.07,
+          'release': 3.9494
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.1892
+      },
+      {
+        'ratio': 1.0,
+        'detune': 0.0,
+        'level': -12.0,
+        'envelope': {
+          'attack': 0.0031,
+          'peak': -12.04,
+          'decay1': 0.0022,
+          'brk': -4.52,
+          'decay2': 14.8613,
+          'sustain': -27.09,
+          'release': 1.6926
+        },
+        'breakKey': 75,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0905
+      },
+      {
+        'ratio': 1.0,
+        'detune': 0.0,
+        'level': -9.75,
+        'envelope': {
+          'attack': 0.1939,
+          'peak': 0.0,
+          'decay1': 0.3251,
+          'brk': -10.54,
+          'decay2': 0.7431,
+          'sustain': -12.04,
+          'release': 0.9874
+        },
+        'breakKey': 77,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': -5.843
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 1.0,
+        'detune': 0.0,
+        'level': -16.5,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 2.2292,
+          'brk': -4.52,
+          'decay2': 2.2292,
+          'sustain': -9.03,
+          'release': 0.9874
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.1892
+      },
+      {
+        'ratio': 3.0,
+        'detune': 0.0,
+        'level': -11.25,
+        'envelope': {
+          'attack': 0.0483,
+          'peak': -9.03,
+          'decay1': 0.4467,
+          'brk': -4.52,
+          'decay2': 2.2292,
+          'sustain': -9.03,
+          'release': 0.9874
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.1892
+      },
+      {
+        'ratio': 14.0,
+        'detune': 0.0,
+        'level': -34.5,
+        'envelope': {
+          'attack': 0.0211,
+          'peak': 0.0,
+          'decay1': 2.2292,
+          'brk': -4.52,
+          'decay2': 2.2292,
+          'sustain': -9.03,
+          'release': 0.9874
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.1892
+      }
+    ],
+    'missing': [
+      'tremolo',
+      'velocity'
+    ]
+  },
+  {
+    'name': 'STRINGS 2',
+    'algorithm': 2,
+    'dxFeedback': 6.2831,
+    'dxOperators': [
+      {
+        'ratio': 2.0,
+        'detune': 0.0,
+        'level': -5.25,
+        'envelope': {
+          'attack': 0.158,
+          'peak': 0.0,
+          'decay1': 0.0,
+          'brk': 0.0,
+          'decay2': 40.0,
+          'sustain': -46.66,
+          'release': 1.9747
+        },
+        'breakKey': 119,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 2.0,
+        'detune': -5.4,
+        'level': -18.75,
+        'envelope': {
+          'attack': 0.0023,
+          'peak': 0.0,
+          'decay1': 4.4584,
+          'brk': -4.52,
+          'decay2': 40.0,
+          'sustain': -52.68,
+          'release': 23.6967
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 2.0,
+        'detune': 5.4,
+        'level': -5.25,
+        'envelope': {
+          'attack': 0.1185,
+          'peak': 0.0,
+          'decay1': 3.5667,
+          'brk': -4.52,
+          'decay2': 40.0,
+          'sustain': -96.0,
+          'release': 1.9747
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 2.0,
+        'detune': 0.0,
+        'level': -17.25,
+        'envelope': {
+          'attack': 0.0794,
+          'peak': 0.0,
+          'decay1': 0.0,
+          'brk': 0.0,
+          'decay2': 40.0,
+          'sustain': -46.66,
+          'release': 11.8483
+        },
+        'breakKey': 119,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 2.0,
+        'detune': 0.0,
+        'level': -24.75,
+        'envelope': {
+          'attack': 0.003,
+          'peak': 0.0,
+          'decay1': 0.0058,
+          'brk': -4.52,
+          'decay2': 40.0,
+          'sustain': -96.0,
+          'release': 18.9573
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 8.0,
+        'detune': 0.0,
+        'level': -21.75,
+        'envelope': {
+          'attack': 0.0047,
+          'peak': 0.0,
+          'decay1': 0.0044,
+          'brk': -4.52,
+          'decay2': 40.0,
+          'sustain': -96.0,
+          'release': 11.8483
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      }
+    ],
+    'missing': [
+      'vibrato',
+      'tremolo',
+      'transpose'
+    ]
+  },
+  {
+    'name': 'STRINGS 3',
+    'algorithm': 15,
+    'dxFeedback': 6.2831,
+    'dxOperators': [
+      {
+        'ratio': 1.0,
+        'detune': 0.0,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.1218,
+          'peak': 0.0,
+          'decay1': 0.6369,
+          'brk': -4.52,
+          'decay2': 0.3715,
+          'sustain': -6.02,
+          'release': 3.3852
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.1892
+      },
+      {
+        'ratio': 1.0,
+        'detune': 0.0,
+        'level': -9.75,
+        'envelope': {
+          'attack': 0.001,
+          'peak': -12.04,
+          'decay1': 0.0023,
+          'brk': -4.52,
+          'decay2': 0.3715,
+          'sustain': -9.03,
+          'release': 1.481
+        },
+        'breakKey': 75,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0905
+      },
+      {
+        'ratio': 1.0,
+        'detune': 0.0,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.1522,
+          'peak': 0.0,
+          'decay1': 0.0557,
+          'brk': -4.52,
+          'decay2': 0.1238,
+          'sustain': -6.02,
+          'release': 3.9494
+        },
+        'breakKey': 72,
+        'left': {
+          'curve': 'lin',
+          'depth': 5.904
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': -3.615
+        },
+        'rateScaling': 1.1892
+      },
+      {
+        'ratio': 1.0,
+        'detune': 0.0,
+        'level': -18.0,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 2.2292,
+          'brk': -4.52,
+          'decay2': 1.4861,
+          'sustain': -7.53,
+          'release': 0.9874
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.1892
+      },
+      {
+        'ratio': 3.0,
+        'detune': 0.0,
+        'level': -11.25,
+        'envelope': {
+          'attack': 0.0483,
+          'peak': -9.03,
+          'decay1': 0.0023,
+          'brk': -4.52,
+          'decay2': 0.8359,
+          'sustain': -18.06,
+          'release': 0.9874
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.1892
+      },
+      {
+        'ratio': 14.0,
+        'detune': 0.0,
+        'level': -33.75,
+        'envelope': {
+          'attack': 0.0223,
+          'peak': 0.0,
+          'decay1': 0.0139,
+          'brk': -4.52,
+          'decay2': 0.8359,
+          'sustain': -31.61,
+          'release': 0.9874
+        },
+        'breakKey': 76,
+        'left': {
+          'curve': 'lin',
+          'depth': 1.506
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.1892
+      }
+    ],
+    'missing': [
+      'vibrato',
+      'tremolo',
+      'velocity',
+      'transpose'
+    ]
+  },
+  {
+    'name': 'ORCHESTRA',
+    'algorithm': 2,
+    'dxFeedback': 6.2831,
+    'dxOperators': [
+      {
+        'ratio': 1.0,
+        'detune': 0.0,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.0054,
+          'peak': 0.0,
+          'decay1': 0.0,
+          'brk': 0.0,
+          'decay2': 40.0,
+          'sustain': -46.66,
+          'release': 2.9621
+        },
+        'breakKey': 119,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 1.0,
+        'detune': -5.4,
+        'level': -12.0,
+        'envelope': {
+          'attack': 0.0703,
+          'peak': 0.0,
+          'decay1': 0.1115,
+          'brk': -4.52,
+          'decay2': 0.1858,
+          'sustain': -6.02,
+          'release': 0.4232
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 2.0,
+        'detune': 5.4,
+        'level': -2.25,
+        'envelope': {
+          'attack': 0.0908,
+          'peak': 0.0,
+          'decay1': 3.5667,
+          'brk': -4.52,
+          'decay2': 40.0,
+          'sustain': -96.0,
+          'release': 1.9747
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 2.0,
+        'detune': 0.0,
+        'level': -20.25,
+        'envelope': {
+          'attack': 0.0345,
+          'peak': 0.0,
+          'decay1': 0.0,
+          'brk': 0.0,
+          'decay2': 40.0,
+          'sustain': -46.66,
+          'release': 2.9621
+        },
+        'breakKey': 119,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 2.0,
+        'detune': 0.0,
+        'level': -14.25,
+        'envelope': {
+          'attack': 0.005,
+          'peak': 0.0,
+          'decay1': 0.0058,
+          'brk': -4.52,
+          'decay2': 40.0,
+          'sustain': -96.0,
+          'release': 0.8463
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 2.0,
+        'detune': 0.0,
+        'level': -12.75,
+        'envelope': {
+          'attack': 0.0071,
+          'peak': 0.0,
+          'decay1': 0.0044,
+          'brk': -4.52,
+          'decay2': 40.0,
+          'sustain': -96.0,
+          'release': 11.8483
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      }
+    ],
+    'missing': [
+      'vibrato',
+      'tremolo',
+      'transpose'
+    ]
+  },
+  {
+    'name': 'PIANO 1',
+    'algorithm': 19,
+    'dxFeedback': 3.1415,
+    'dxOperators': [
+      {
+        'ratio': 1.0,
+        'detune': -1.8,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.0054,
+          'peak': 0.0,
+          'decay1': 2.9723,
+          'brk': -12.04,
+          'decay2': 38.4536,
+          'sustain': -96.0,
+          'release': 1.9747
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 5.121
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.4142
+      },
+      {
+        'ratio': 1.0,
+        'detune': 1.8,
+        'level': -9.0,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 40.0,
+          'brk': -18.06,
+          'decay2': 15.5115,
+          'sustain': -96.0,
+          'release': 40.0
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': -0.783
+        },
+        'rateScaling': 1.5422
+      },
+      {
+        'ratio': 3.0,
+        'detune': 0.0,
+        'level': -31.5,
+        'envelope': {
+          'attack': 0.0012,
+          'peak': 0.0,
+          'decay1': 0.0,
+          'brk': 0.0,
+          'decay2': 0.0,
+          'sustain': 0.0,
+          'release': 40.0
+        },
+        'breakKey': 68,
+        'left': {
+          'curve': 'lin',
+          'depth': 1.928
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': -4.458
+        },
+        'rateScaling': 1.5422
+      },
+      {
+        'ratio': 1.0,
+        'detune': 0.9,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.0054,
+          'peak': 0.0,
+          'decay1': 4.9538,
+          'brk': -15.05,
+          'decay2': 24.6449,
+          'sustain': -96.0,
+          'release': 2.9621
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.5422
+      },
+      {
+        'ratio': 1.58,
+        'detune': -0.9,
+        'level': -4.5,
+        'envelope': {
+          'attack': 0.0044,
+          'peak': 0.0,
+          'decay1': 0.4087,
+          'brk': -66.23,
+          'decay2': 1.3534,
+          'sustain': -96.0,
+          'release': 5.9242
+        },
+        'breakKey': 69,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': -3.976
+        },
+        'rateScaling': 1.5422
+      },
+      {
+        'ratio': 1.0,
+        'detune': -0.9,
+        'level': -12.75,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 40.0,
+          'brk': -18.06,
+          'decay2': 14.5826,
+          'sustain': -96.0,
+          'release': 40.0
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': -0.602
+        },
+        'rateScaling': 1.5422
+      }
+    ],
+    'missing': [
+      'velocity'
+    ]
+  },
+  {
+    'name': 'PIANO 2',
+    'algorithm': 18,
+    'dxFeedback': 1.5707,
+    'dxOperators': [
+      {
+        'ratio': 1.0,
+        'detune': 0.0,
+        'level': -3.75,
+        'envelope': {
+          'attack': 0.0045,
+          'peak': 0.0,
+          'decay1': 7.6429,
+          'brk': -27.09,
+          'decay2': 40.0,
+          'sustain': -96.0,
+          'release': 1.481
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.2968
+      },
+      {
+        'ratio': 1.0,
+        'detune': 1.8,
+        'level': -9.75,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 40.0,
+          'brk': -18.06,
+          'decay2': 15.3257,
+          'sustain': -96.0,
+          'release': 40.0
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': -0.602
+        },
+        'rateScaling': 1.1892
+      },
+      {
+        'ratio': 5.0,
+        'detune': 0.9,
+        'level': -12.0,
+        'envelope': {
+          'attack': 0.0011,
+          'peak': 0.0,
+          'decay1': 2.0806,
+          'brk': -10.54,
+          'decay2': 33.2521,
+          'sustain': -96.0,
+          'release': 1.481
+        },
+        'breakKey': 53,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': -1.627
+        },
+        'rateScaling': 1.5422
+      },
+      {
+        'ratio': 1.0,
+        'detune': -0.9,
+        'level': -11.25,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 1.7834,
+          'brk': -9.03,
+          'decay2': 37.6486,
+          'sustain': -37.63,
+          'release': 23.6967
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.2968
+      },
+      {
+        'ratio': 0.5,
+        'detune': 0.0,
+        'level': -3.75,
+        'envelope': {
+          'attack': 0.0016,
+          'peak': 0.0,
+          'decay1': 0.1329,
+          'brk': -96.0,
+          'decay2': 0.0,
+          'sustain': -96.0,
+          'release': 13.541
+        },
+        'breakKey': 48,
+        'left': {
+          'curve': 'exp',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': -1.566
+        },
+        'rateScaling': 1.2968
+      },
+      {
+        'ratio': 0.5,
+        'detune': 0.9,
+        'level': -15.75,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 0.1144,
+          'brk': -96.0,
+          'decay2': 0.0,
+          'sustain': -96.0,
+          'release': 6.7705
+        },
+        'breakKey': 57,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': -5.904
+        },
+        'rateScaling': 1.2968
+      }
+    ],
+    'missing': [
+      'velocity',
+      'transpose'
+    ]
+  },
+  {
+    'name': 'PIANO 3',
+    'algorithm': 3,
+    'dxFeedback': 0.7853,
+    'dxOperators': [
+      {
+        'ratio': 1.0,
+        'detune': -3.6,
+        'level': -9.75,
+        'envelope': {
+          'attack': 0.0012,
+          'peak': 0.0,
+          'decay1': 0.4246,
+          'brk': -3.01,
+          'decay2': 15.2328,
+          'sustain': -96.0,
+          'release': 2.9621
+        },
+        'breakKey': 53,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.2968
+      },
+      {
+        'ratio': 1.0,
+        'detune': 3.6,
+        'level': -10.5,
+        'envelope': {
+          'attack': 0.001,
+          'peak': -6.02,
+          'decay1': 0.0,
+          'brk': -6.02,
+          'decay2': 40.0,
+          'sustain': -96.0,
+          'release': 11.8483
+        },
+        'breakKey': 71,
+        'left': {
+          'curve': 'lin',
+          'depth': 1.325
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': -3.012
+        },
+        'rateScaling': 1.1892
+      },
+      {
+        'ratio': 7.0,
+        'detune': -2.7,
+        'level': -1.5,
+        'envelope': {
+          'attack': 0.001,
+          'peak': -12.04,
+          'decay1': 0.0066,
+          'brk': -24.08,
+          'decay2': 31.766,
+          'sustain': -96.0,
+          'release': 40.0
+        },
+        'breakKey': 64,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.542
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': -1.205
+        },
+        'rateScaling': 1.2968
+      },
+      {
+        'ratio': 1.0,
+        'detune': 2.7,
+        'level': -3.0,
+        'envelope': {
+          'attack': 0.0016,
+          'peak': 0.0,
+          'decay1': 0.0046,
+          'brk': -1.51,
+          'decay2': 16.8675,
+          'sustain': -96.0,
+          'release': 2.9621
+        },
+        'breakKey': 67,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.2968
+      },
+      {
+        'ratio': 1.0,
+        'detune': -1.8,
+        'level': -9.0,
+        'envelope': {
+          'attack': 0.001,
+          'peak': -6.02,
+          'decay1': 0.0,
+          'brk': -6.02,
+          'decay2': 40.0,
+          'sustain': -96.0,
+          'release': 40.0
+        },
+        'breakKey': 62,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': -1.627
+        },
+        'rateScaling': 1.1892
+      },
+      {
+        'ratio': 0.5,
+        'detune': 1.8,
+        'level': -11.25,
+        'envelope': {
+          'attack': 0.0032,
+          'peak': 0.0,
+          'decay1': 0.0774,
+          'brk': -60.21,
+          'decay2': 14.564,
+          'sustain': -96.0,
+          'release': 40.0
+        },
+        'breakKey': 74,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.2968
+      }
+    ],
+    'missing': [
+      'velocity'
+    ]
+  },
+  {
     'name': 'E.PIANO 1',
     'algorithm': 5,
     'dxFeedback': 3.1415,
@@ -170,64 +1720,171 @@ export const FACTORY_VOICES: FactoryVoice[] = [
     ]
   },
   {
-    'name': 'BRASS 1',
-    'algorithm': 22,
+    'name': 'GUITAR 1',
+    'algorithm': 8,
     'dxFeedback': 6.2831,
     'dxOperators': [
       {
-        'ratio': 0.5,
-        'detune': 6.31,
-        'level': -0.75,
+        'ratio': 1.0,
+        'detune': 0.0,
+        'level': 0.0,
         'envelope': {
-          'attack': 0.0122,
+          'attack': 0.0109,
           'peak': 0.0,
-          'decay1': 0.0073,
-          'brk': -7.53,
-          'decay2': 0.0001,
-          'sustain': -1.51,
-          'release': 0.1481
+          'decay1': 0.001,
+          'brk': -3.01,
+          'decay2': 17.1648,
+          'sustain': -96.0,
+          'release': 0.1851
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.4142
+      },
+      {
+        'ratio': 3.0,
+        'detune': 0.0,
+        'level': -4.5,
+        'envelope': {
+          'attack': 0.0013,
+          'peak': 0.0,
+          'decay1': 2.2292,
+          'brk': -9.03,
+          'decay2': 4.7138,
+          'sustain': -96.0,
+          'release': 0.4937
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': -3.916
+        },
+        'rateScaling': 1.1892
+      },
+      {
+        'ratio': 1.0,
+        'detune': 0.0,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.0076,
+          'peak': 0.0,
+          'decay1': 0.0012,
+          'brk': -4.52,
+          'decay2': 28.1126,
+          'sustain': -96.0,
+          'release': 0.0926
+        },
+        'breakKey': 55,
+        'left': {
+          'curve': 'lin',
+          'depth': -0.542
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.2968
+      },
+      {
+        'ratio': 3.0,
+        'detune': 0.0,
+        'level': -7.5,
+        'envelope': {
+          'attack': 0.0038,
+          'peak': 0.0,
+          'decay1': 0.0012,
+          'brk': -4.52,
+          'decay2': 25.6357,
+          'sustain': -96.0,
+          'release': 0.0926
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': -0.843
+        },
+        'rateScaling': 1.4142
+      },
+      {
+        'ratio': 3.0,
+        'detune': 0.0,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.0054,
+          'peak': 0.0,
+          'decay1': 0.0012,
+          'brk': -4.52,
+          'decay2': 28.1126,
+          'sustain': -96.0,
+          'release': 0.0926
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': -0.904
+        },
+        'rateScaling': 1.4142
+      },
+      {
+        'ratio': 12.0,
+        'detune': 0.0,
+        'level': -31.5,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 0.4499,
+          'brk': -96.0,
+          'decay2': 0.0,
+          'sustain': -96.0,
+          'release': 0.0926
         },
         'breakKey': 60,
         'left': {
           'curve': 'lin',
-          'depth': 0.0
+          'depth': -3.193
         },
         'right': {
           'curve': 'lin',
-          'depth': 0.843
+          'depth': -1.205
         },
         'rateScaling': 1.0
-      },
+      }
+    ],
+    'missing': [
+      'tremolo',
+      'velocity'
+    ]
+  },
+  {
+    'name': 'GUITAR 2',
+    'algorithm': 16,
+    'dxFeedback': 6.2831,
+    'dxOperators': [
       {
-        'ratio': 0.5,
-        'detune': 6.31,
+        'ratio': 3.0,
+        'detune': 0.0,
         'level': -9.75,
         'envelope': {
-          'attack': 0.016,
-          'peak': -12.04,
-          'decay1': 0.0288,
-          'brk': -3.01,
-          'decay2': 0.0619,
-          'sustain': -1.51,
-          'release': 0.1481
-        },
-        'breakKey': 48,
-        'left': {
-          'curve': 'lin',
-          'depth': 0.0
-        },
-        'right': {
-          'curve': 'exp',
-          'depth': -0.422
-        },
-        'rateScaling': 1.0
-      },
-      {
-        'ratio': 1.0,
-        'detune': -1.8,
-        'level': 0.0,
-        'envelope': {
-          'attack': 0.0076,
+          'attack': 0.001,
           'peak': 0.0,
           'decay1': 0.0,
           'brk': 0.0,
@@ -235,10 +1892,10 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'sustain': 0.0,
           'release': 0.1481
         },
-        'breakKey': 60,
+        'breakKey': 21,
         'left': {
           'curve': 'lin',
-          'depth': 0.0
+          'depth': 4.94
         },
         'right': {
           'curve': 'lin',
@@ -249,9 +1906,33 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       {
         'ratio': 1.0,
         'detune': 0.0,
+        'level': -9.0,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 0.0,
+          'brk': 0.0,
+          'decay2': 0.0,
+          'sustain': 0.0,
+          'release': 3.9494
+        },
+        'breakKey': 69,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0905
+      },
+      {
+        'ratio': 1.5,
+        'detune': 0.0,
         'level': 0.0,
         'envelope': {
-          'attack': 0.0076,
+          'attack': 0.001,
           'peak': 0.0,
           'decay1': 0.0,
           'brk': 0.0,
@@ -260,6 +1941,30 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'release': 0.1481
         },
         'breakKey': 60,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': -2.41
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 0.5,
+        'detune': 0.0,
+        'level': -21.75,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 0.0001,
+          'brk': -1.51,
+          'decay2': 13.0779,
+          'sustain': -18.06,
+          'release': 0.1481
+        },
+        'breakKey': 81,
         'left': {
           'curve': 'lin',
           'depth': 0.0
@@ -271,19 +1976,19 @@ export const FACTORY_VOICES: FactoryVoice[] = [
         'rateScaling': 1.0
       },
       {
-        'ratio': 1.0,
-        'detune': 0.9,
-        'level': -0.75,
+        'ratio': 0.5,
+        'detune': 0.0,
+        'level': -10.5,
         'envelope': {
-          'attack': 0.0073,
+          'attack': 0.001,
           'peak': 0.0,
           'decay1': 0.0,
           'brk': 0.0,
-          'decay2': 0.0,
-          'sustain': 0.0,
-          'release': 0.1481
+          'decay2': 18.6827,
+          'sustain': -16.56,
+          'release': 40.0
         },
-        'breakKey': 60,
+        'breakKey': 81,
         'left': {
           'curve': 'lin',
           'depth': 0.0
@@ -293,35 +1998,190 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0
+      },
+      {
+        'ratio': 3.0,
+        'detune': 0.0,
+        'level': -19.5,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 0.0464,
+          'brk': -1.51,
+          'decay2': 40.0,
+          'sustain': -18.06,
+          'release': 0.1481
+        },
+        'breakKey': 81,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': -2.771
+        },
+        'rateScaling': 1.0
+      }
+    ],
+    'missing': [
+      'velocity',
+      'an envelope ending above silence'
+    ]
+  },
+  {
+    'name': 'SYN-LEAD 1',
+    'algorithm': 18,
+    'dxFeedback': 6.2831,
+    'dxOperators': [
+      {
+        'ratio': 1.0,
+        'detune': 0.9,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 11.889,
+          'brk': -3.01,
+          'decay2': 0.0,
+          'sustain': -3.01,
+          'release': 0.1851
+        },
+        'breakKey': 53,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0905
+      },
+      {
+        'ratio': 1.0,
+        'detune': -0.9,
+        'level': -21.0,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 0.0002,
+          'brk': -1.51,
+          'decay2': 23.778,
+          'sustain': -7.53,
+          'release': 40.0
+        },
+        'breakKey': 53,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.2968
       },
       {
         'ratio': 1.0,
         'detune': 0.0,
         'level': -12.75,
         'envelope': {
-          'attack': 0.0971,
+          'attack': 0.001,
+          'peak': -4.52,
+          'decay1': 0.0004,
+          'brk': -6.02,
+          'decay2': 40.0,
+          'sustain': -96.0,
+          'release': 40.0
+        },
+        'breakKey': 53,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': -1.265
+        },
+        'rateScaling': 1.2968
+      },
+      {
+        'ratio': 2.0,
+        'detune': 1.8,
+        'level': -21.0,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 0.001,
+          'brk': -6.02,
+          'decay2': 12.4092,
+          'sustain': -96.0,
+          'release': 0.4937
+        },
+        'breakKey': 69,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': -3.615
+        },
+        'rateScaling': 1.6818
+      },
+      {
+        'ratio': 3.0,
+        'detune': -1.8,
+        'level': -42.0,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 0.0018,
+          'brk': -25.59,
+          'decay2': 0.0002,
+          'sustain': -28.6,
+          'release': 40.0
+        },
+        'breakKey': 53,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0905
+      },
+      {
+        'ratio': 17.0,
+        'detune': 0.0,
+        'level': -39.0,
+        'envelope': {
+          'attack': 0.001,
           'peak': 0.0,
           'decay1': 0.0,
           'brk': 0.0,
-          'decay2': 1.1889,
-          'sustain': -6.02,
-          'release': 0.2116
+          'decay2': 0.0077,
+          'sustain': -1.51,
+          'release': 40.0
         },
-        'breakKey': 60,
+        'breakKey': 53,
         'left': {
-          'curve': 'exp',
-          'depth': -3.253
+          'curve': 'lin',
+          'depth': 0.0
         },
         'right': {
-          'curve': 'exp',
-          'depth': -3.012
+          'curve': 'lin',
+          'depth': -1.265
         },
-        'rateScaling': 1.4142
+        'rateScaling': 1.2968
       }
     ],
     'missing': [
-      'tremolo',
-      'velocity'
+      'vibrato',
+      'transpose'
     ]
   },
   {
@@ -480,118 +2340,70 @@ export const FACTORY_VOICES: FactoryVoice[] = [
     ]
   },
   {
-    'name': 'TUB BELLS',
-    'algorithm': 5,
+    'name': 'BASS 2',
+    'algorithm': 17,
     'dxFeedback': 6.2831,
     'dxOperators': [
       {
-        'ratio': 1.0,
-        'detune': 1.8,
-        'level': -3.0,
-        'envelope': {
-          'attack': 0.001,
-          'peak': 0.0,
-          'decay1': 8.5824,
-          'brk': -96.0,
-          'decay2': 0.0,
-          'sustain': -49.67,
-          'release': 23.6967
-        },
-        'breakKey': 21,
-        'left': {
-          'curve': 'lin',
-          'depth': 0.0
-        },
-        'right': {
-          'curve': 'lin',
-          'depth': 0.0
-        },
-        'rateScaling': 1.1892
-      },
-      {
-        'ratio': 3.5,
-        'detune': 2.7,
-        'level': -15.75,
-        'envelope': {
-          'attack': 0.001,
-          'peak': 0.0,
-          'decay1': 40.0,
-          'brk': -96.0,
-          'decay2': 0.0,
-          'sustain': -49.67,
-          'release': 18.9573
-        },
-        'breakKey': 21,
-        'left': {
-          'curve': 'lin',
-          'depth': 0.0
-        },
-        'right': {
-          'curve': 'lin',
-          'depth': 0.0
-        },
-        'rateScaling': 1.1892
-      },
-      {
-        'ratio': 1.0,
-        'detune': -4.5,
-        'level': 0.0,
-        'envelope': {
-          'attack': 0.0012,
-          'peak': 0.0,
-          'decay1': 8.8796,
-          'brk': -96.0,
-          'decay2': 0.0,
-          'sustain': -49.67,
-          'release': 23.6967
-        },
-        'breakKey': 21,
-        'left': {
-          'curve': 'lin',
-          'depth': 0.0
-        },
-        'right': {
-          'curve': 'lin',
-          'depth': 0.0
-        },
-        'rateScaling': 1.1892
-      },
-      {
-        'ratio': 3.5,
-        'detune': -1.8,
-        'level': -18.0,
-        'envelope': {
-          'attack': 0.001,
-          'peak': 0.0,
-          'decay1': 40.0,
-          'brk': -96.0,
-          'decay2': 0.0,
-          'sustain': -49.67,
-          'release': 18.9573
-        },
-        'breakKey': 21,
-        'left': {
-          'curve': 'lin',
-          'depth': 0.0
-        },
-        'right': {
-          'curve': 'lin',
-          'depth': 0.0
-        },
-        'rateScaling': 1.1892
-      },
-      {
-        'ratio': 1.2369,
+        'ratio': 0.505,
         'detune': 0.0,
         'level': 0.0,
         'envelope': {
           'attack': 0.0095,
           'peak': 0.0,
-          'decay1': 0.0694,
+          'decay1': 1.4861,
+          'brk': -21.07,
+          'decay2': 38.8516,
+          'sustain': -96.0,
+          'release': 0.3703
+        },
+        'breakKey': 69,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': -1.928
+        },
+        'rateScaling': 1.2968
+      },
+      {
+        'ratio': 0.515,
+        'detune': 0.0,
+        'level': -14.25,
+        'envelope': {
+          'attack': 1.0176,
+          'peak': 0.0,
+          'decay1': 5.3341,
           'brk': -96.0,
           'decay2': 0.0,
           'sustain': -96.0,
-          'release': 0.1851
+          'release': 1.481
+        },
+        'breakKey': 62,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': -2.108
+        },
+        'rateScaling': 1.0905
+      },
+      {
+        'ratio': 1.0,
+        'detune': 6.31,
+        'level': -23.25,
+        'envelope': {
+          'attack': 0.004,
+          'peak': -1.51,
+          'decay1': 3.3438,
+          'brk': -15.05,
+          'decay2': 6.3625,
+          'sustain': -96.0,
+          'release': 13.541
         },
         'breakKey': 21,
         'left': {
@@ -602,22 +2414,462 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.1892
+        'rateScaling': 1.2968
+      },
+      {
+        'ratio': 0.5,
+        'detune': 0.0,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.0044,
+          'peak': -4.52,
+          'decay1': 1.6719,
+          'brk': -31.61,
+          'decay2': 11.5175,
+          'sustain': -96.0,
+          'release': 1.1848
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.2968
+      },
+      {
+        'ratio': 1.01,
+        'detune': 0.0,
+        'level': -18.0,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 0.2786,
+          'brk': -18.06,
+          'decay2': 40.0,
+          'sustain': -96.0,
+          'release': 40.0
+        },
+        'breakKey': 55,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': -1.928
+        },
+        'rateScaling': 1.4142
+      },
+      {
+        'ratio': 0.5,
+        'detune': 0.9,
+        'level': -9.0,
+        'envelope': {
+          'attack': 1.5011,
+          'peak': -1.51,
+          'decay1': 0.0,
+          'brk': -1.51,
+          'decay2': 22.3981,
+          'sustain': -96.0,
+          'release': 0.8463
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.2968
+      }
+    ],
+    'missing': [
+      'vibrato',
+      'velocity',
+      'transpose'
+    ]
+  },
+  {
+    'name': 'E.ORGAN 1',
+    'algorithm': 32,
+    'dxFeedback': 0.0,
+    'dxOperators': [
+      {
+        'ratio': 0.5,
+        'detune': -1.8,
+        'level': -3.75,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 0.0,
+          'brk': 0.0,
+          'decay2': 0.0,
+          'sustain': 0.0,
+          'release': 0.0185
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 1.01,
+        'detune': -5.4,
+        'level': -3.75,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 0.0,
+          'brk': 0.0,
+          'decay2': 0.4954,
+          'sustain': -1.51,
+          'release': 0.0185
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': -0.602
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 1.5,
+        'detune': 3.6,
+        'level': -3.75,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 0.0,
+          'brk': 0.0,
+          'decay2': 0.0,
+          'sustain': 0.0,
+          'release': 0.0463
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 0.5,
+        'detune': 4.5,
+        'level': -3.75,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 0.0,
+          'brk': 0.0,
+          'decay2': 0.0,
+          'sustain': 0.0,
+          'release': 0.0185
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 1.0,
+        'detune': 1.8,
+        'level': -3.75,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 0.0,
+          'brk': 0.0,
+          'decay2': 0.0,
+          'sustain': 0.0,
+          'release': 0.0185
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 3.0,
+        'detune': 0.0,
+        'level': -3.75,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 0.8863,
+          'brk': -96.0,
+          'decay2': 0.0,
+          'sustain': -96.0,
+          'release': 0.0185
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      }
+    ],
+    'missing': []
+  },
+  {
+    'name': 'PIPES 1',
+    'algorithm': 19,
+    'dxFeedback': 6.2831,
+    'dxOperators': [
+      {
+        'ratio': 0.5,
+        'detune': 0.0,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.3044,
+          'peak': 0.0,
+          'decay1': 0.0,
+          'brk': 0.0,
+          'decay2': 0.0,
+          'sustain': 0.0,
+          'release': 6.7705
+        },
+        'breakKey': 62,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': -3.012
+        },
+        'rateScaling': 1.5422
+      },
+      {
+        'ratio': 0.5,
+        'detune': 0.0,
+        'level': -6.75,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 0.0,
+          'brk': 0.0,
+          'decay2': 0.0265,
+          'sustain': -6.02,
+          'release': 1.9747
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.4142
+      },
+      {
+        'ratio': 1.0,
+        'detune': 0.0,
+        'level': -18.0,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 0.0,
+          'brk': 0.0,
+          'decay2': 0.0265,
+          'sustain': -6.02,
+          'release': 1.9747
+        },
+        'breakKey': 67,
+        'left': {
+          'curve': 'lin',
+          'depth': 1.024
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': -2.41
+        },
+        'rateScaling': 1.5422
+      },
+      {
+        'ratio': 4.0,
+        'detune': 0.0,
+        'level': -8.25,
+        'envelope': {
+          'attack': 0.0296,
+          'peak': 0.0,
+          'decay1': 0.0,
+          'brk': 0.0,
+          'decay2': 0.3715,
+          'sustain': -1.51,
+          'release': 1.481
+        },
+        'breakKey': 81,
+        'left': {
+          'curve': 'lin',
+          'depth': -0.602
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': -0.602
+        },
+        'rateScaling': 1.2968
       },
       {
         'ratio': 2.0,
-        'detune': -6.31,
+        'detune': 0.0,
+        'level': -1.5,
+        'envelope': {
+          'attack': 0.0404,
+          'peak': 0.0,
+          'decay1': 0.0,
+          'brk': 0.0,
+          'decay2': 1.1146,
+          'sustain': -4.52,
+          'release': 0.4232
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.2968
+      },
+      {
+        'ratio': 10.0,
+        'detune': 0.0,
+        'level': -17.25,
+        'envelope': {
+          'attack': 0.0058,
+          'peak': 0.0,
+          'decay1': 0.0,
+          'brk': 0.0,
+          'decay2': 0.0,
+          'sustain': 0.0,
+          'release': 0.1851
+        },
+        'breakKey': 67,
+        'left': {
+          'curve': 'lin',
+          'depth': -0.602
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.06
+        },
+        'rateScaling': 1.2968
+      }
+    ],
+    'missing': [
+      'vibrato',
+      'velocity',
+      'transpose'
+    ]
+  },
+  {
+    'name': 'HARPSICH 1',
+    'algorithm': 5,
+    'dxFeedback': 0.0981,
+    'dxOperators': [
+      {
+        'ratio': 4.0,
+        'detune': 0.0,
+        'level': -7.5,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 1.1889,
+          'brk': -6.02,
+          'decay2': 15.0842,
+          'sustain': -96.0,
+          'release': 1.9747
+        },
+        'breakKey': 70,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.2968
+      },
+      {
+        'ratio': 0.5,
+        'detune': 0.0,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 0.0019,
+          'brk': -1.51,
+          'decay2': 0.007,
+          'sustain': -6.02,
+          'release': 0.0066
+        },
+        'breakKey': 70,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0905
+      },
+      {
+        'ratio': 1.0,
+        'detune': -0.9,
         'level': -10.5,
         'envelope': {
           'attack': 0.001,
           'peak': 0.0,
-          'decay1': 0.0128,
-          'brk': -96.0,
-          'decay2': 0.0,
+          'decay1': 1.1889,
+          'brk': -6.02,
+          'decay2': 14.4897,
           'sustain': -96.0,
-          'release': 18.9573
+          'release': 1.9747
         },
-        'breakKey': 21,
+        'breakKey': 70,
         'left': {
           'curve': 'lin',
           'depth': 0.0
@@ -626,12 +2878,392 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.1892
+        'rateScaling': 1.2968
+      },
+      {
+        'ratio': 3.0,
+        'detune': 0.0,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 0.0019,
+          'brk': -1.51,
+          'decay2': 0.007,
+          'sustain': -6.02,
+          'release': 0.0066
+        },
+        'breakKey': 85,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': -2.771
+        },
+        'rateScaling': 1.0905
+      },
+      {
+        'ratio': 4.0,
+        'detune': -0.9,
+        'level': -12.0,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 1.1889,
+          'brk': -6.02,
+          'decay2': 14.1925,
+          'sustain': -96.0,
+          'release': 1.9747
+        },
+        'breakKey': 70,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.2968
+      },
+      {
+        'ratio': 6.0,
+        'detune': 0.0,
+        'level': -9.0,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 0.0019,
+          'brk': -1.51,
+          'decay2': 0.007,
+          'sustain': -6.02,
+          'release': 0.0066
+        },
+        'breakKey': 85,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': -3.313
+        },
+        'rateScaling': 1.0905
       }
     ],
     'missing': [
       'velocity',
-      'fixed frequency (played as a ratio from middle C)'
+      'an envelope ending above silence'
+    ]
+  },
+  {
+    'name': 'CLAV 1',
+    'algorithm': 3,
+    'dxFeedback': 1.5707,
+    'dxOperators': [
+      {
+        'ratio': 0.5,
+        'detune': 0.9,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.0012,
+          'peak': 0.0,
+          'decay1': 0.001,
+          'brk': -6.02,
+          'decay2': 16.5703,
+          'sustain': -96.0,
+          'release': 0.4937
+        },
+        'breakKey': 53,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.2968
+      },
+      {
+        'ratio': 0.5,
+        'detune': -0.9,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.0012,
+          'peak': 0.0,
+          'decay1': 0.0002,
+          'brk': -1.51,
+          'decay2': 23.778,
+          'sustain': -7.53,
+          'release': 40.0
+        },
+        'breakKey': 53,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.2968
+      },
+      {
+        'ratio': 6.0,
+        'detune': 0.0,
+        'level': -21.0,
+        'envelope': {
+          'attack': 0.001,
+          'peak': -9.03,
+          'decay1': 0.0,
+          'brk': -9.03,
+          'decay2': 40.0,
+          'sustain': -96.0,
+          'release': 40.0
+        },
+        'breakKey': 53,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': -1.265
+        },
+        'rateScaling': 1.2968
+      },
+      {
+        'ratio': 2.0,
+        'detune': 0.0,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.0012,
+          'peak': 0.0,
+          'decay1': 0.001,
+          'brk': -6.02,
+          'decay2': 16.5703,
+          'sustain': -96.0,
+          'release': 0.4937
+        },
+        'breakKey': 53,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.2968
+      },
+      {
+        'ratio': 0.5,
+        'detune': -1.8,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.0012,
+          'peak': 0.0,
+          'decay1': 0.0002,
+          'brk': -1.51,
+          'decay2': 23.778,
+          'sustain': -7.53,
+          'release': 40.0
+        },
+        'breakKey': 53,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.2968
+      },
+      {
+        'ratio': 8.0,
+        'detune': 0.0,
+        'level': -15.75,
+        'envelope': {
+          'attack': 0.001,
+          'peak': -9.03,
+          'decay1': 0.0,
+          'brk': -9.03,
+          'decay2': 40.0,
+          'sustain': -96.0,
+          'release': 40.0
+        },
+        'breakKey': 53,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': -1.265
+        },
+        'rateScaling': 1.2968
+      }
+    ],
+    'missing': [
+      'velocity'
+    ]
+  },
+  {
+    'name': 'VIBE 1',
+    'algorithm': 23,
+    'dxFeedback': 1.5707,
+    'dxOperators': [
+      {
+        'ratio': 4.0,
+        'detune': 0.0,
+        'level': -36.75,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 10.4772,
+          'brk': -55.69,
+          'decay2': 0.0,
+          'sustain': -96.0,
+          'release': 1.481
+        },
+        'breakKey': 60,
+        'left': {
+          'curve': 'lin',
+          'depth': -0.723
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.723
+        },
+        'rateScaling': 1.1892
+      },
+      {
+        'ratio': 1.0,
+        'detune': 0.0,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.0054,
+          'peak': 0.0,
+          'decay1': 0.0019,
+          'brk': -6.02,
+          'decay2': 23.6719,
+          'sustain': -96.0,
+          'release': 1.481
+        },
+        'breakKey': 60,
+        'left': {
+          'curve': 'lin',
+          'depth': -0.241
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.723
+        },
+        'rateScaling': 1.1892
+      },
+      {
+        'ratio': 3.0,
+        'detune': 0.0,
+        'level': -20.25,
+        'envelope': {
+          'attack': 0.0022,
+          'peak': 0.0,
+          'decay1': 0.0058,
+          'brk': -18.06,
+          'decay2': 1.8179,
+          'sustain': -96.0,
+          'release': 1.481
+        },
+        'breakKey': 60,
+        'left': {
+          'curve': 'lin',
+          'depth': -0.723
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.723
+        },
+        'rateScaling': 1.4142
+      },
+      {
+        'ratio': 1.0,
+        'detune': -6.31,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.0054,
+          'peak': 0.0,
+          'decay1': 0.0019,
+          'brk': -6.02,
+          'decay2': 23.6719,
+          'sustain': -96.0,
+          'release': 1.481
+        },
+        'breakKey': 30,
+        'left': {
+          'curve': 'exp',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'exp',
+          'depth': 0.0
+        },
+        'rateScaling': 1.2968
+      },
+      {
+        'ratio': 1.0,
+        'detune': 6.31,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.0054,
+          'peak': 0.0,
+          'decay1': 0.0019,
+          'brk': -6.02,
+          'decay2': 10.1906,
+          'sustain': -42.14,
+          'release': 1.481
+        },
+        'breakKey': 30,
+        'left': {
+          'curve': 'exp',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'exp',
+          'depth': 0.0
+        },
+        'rateScaling': 1.2968
+      },
+      {
+        'ratio': 14.0,
+        'detune': 0.0,
+        'level': -31.5,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 1.0217,
+          'brk': -49.67,
+          'decay2': 0.0006,
+          'sustain': -96.0,
+          'release': 1.481
+        },
+        'breakKey': 60,
+        'left': {
+          'curve': 'lin',
+          'depth': -0.723
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.723
+        },
+        'rateScaling': 1.5422
+      }
+    ],
+    'missing': [
+      'velocity'
     ]
   },
   {
@@ -789,22 +3421,22 @@ export const FACTORY_VOICES: FactoryVoice[] = [
     ]
   },
   {
-    'name': 'STRINGS 1',
+    'name': 'KOTO',
     'algorithm': 2,
     'dxFeedback': 6.2831,
     'dxOperators': [
       {
         'ratio': 1.0,
         'detune': 0.0,
-        'level': 0.0,
+        'level': -6.75,
         'envelope': {
-          'attack': 0.3044,
+          'attack': 0.001,
           'peak': 0.0,
-          'decay1': 2.9723,
-          'brk': -10.54,
-          'decay2': 5.2014,
-          'sustain': -21.07,
-          'release': 3.9494
+          'decay1': 0.0199,
+          'brk': -4.52,
+          'decay2': 0.4853,
+          'sustain': -96.0,
+          'release': 9.4787
         },
         'breakKey': 21,
         'left': {
@@ -815,67 +3447,176 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.1892
+        'rateScaling': 1.6818
+      },
+      {
+        'ratio': 4.0,
+        'detune': 0.0,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 0.0265,
+          'brk': -12.04,
+          'decay2': 15.3814,
+          'sustain': -96.0,
+          'release': 1.9747
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': -0.602
+        },
+        'rateScaling': 1.6818
       },
       {
         'ratio': 1.0,
+        'detune': 0.0,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.0012,
+          'peak': 0.0,
+          'decay1': 0.0139,
+          'brk': -4.52,
+          'decay2': 12.0482,
+          'sustain': -96.0,
+          'release': 9.4787
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.5422
+      },
+      {
+        'ratio': 1.0,
+        'detune': 0.0,
+        'level': -12.75,
+        'envelope': {
+          'attack': 0.0011,
+          'peak': 0.0,
+          'decay1': 3.2695,
+          'brk': -16.56,
+          'decay2': 39.8778,
+          'sustain': -96.0,
+          'release': 5.9242
+        },
+        'breakKey': 31,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'exp',
+          'depth': -1.024
+        },
+        'rateScaling': 1.6818
+      },
+      {
+        'ratio': 4.0,
         'detune': 0.0,
         'level': -12.0,
         'envelope': {
-          'attack': 0.0031,
-          'peak': -12.04,
-          'decay1': 0.0022,
-          'brk': -4.52,
-          'decay2': 14.8613,
-          'sustain': -27.09,
-          'release': 1.6926
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 0.4246,
+          'brk': -6.02,
+          'decay2': 11.8271,
+          'sustain': -96.0,
+          'release': 15.7978
         },
-        'breakKey': 75,
+        'breakKey': 21,
         'left': {
           'curve': 'lin',
           'depth': 0.0
         },
         'right': {
           'curve': 'lin',
-          'depth': 0.0
+          'depth': -0.301
         },
-        'rateScaling': 1.0905
+        'rateScaling': 1.6818
       },
       {
-        'ratio': 1.0,
+        'ratio': 3.0,
         'detune': 0.0,
-        'level': -9.75,
+        'level': -13.5,
         'envelope': {
-          'attack': 0.1939,
+          'attack': 0.0026,
           'peak': 0.0,
-          'decay1': 0.3251,
-          'brk': -10.54,
-          'decay2': 0.7431,
-          'sustain': -12.04,
-          'release': 0.9874
+          'decay1': 0.1672,
+          'brk': -13.55,
+          'decay2': 4.4318,
+          'sustain': -96.0,
+          'release': 1.9747
         },
-        'breakKey': 77,
+        'breakKey': 21,
         'left': {
           'curve': 'lin',
           'depth': 0.0
         },
         'right': {
           'curve': 'lin',
-          'depth': -5.843
+          'depth': -0.301
+        },
+        'rateScaling': 1.6818
+      }
+    ],
+    'missing': [
+      'vibrato',
+      'tremolo',
+      'pitch envelope',
+      'velocity'
+    ]
+  },
+  {
+    'name': 'FLUTE 1',
+    'algorithm': 16,
+    'dxFeedback': 1.5707,
+    'dxOperators': [
+      {
+        'ratio': 1.0,
+        'detune': -1.8,
+        'level': -0.75,
+        'envelope': {
+          'attack': 0.0339,
+          'peak': -4.52,
+          'decay1': 0.0077,
+          'brk': -7.53,
+          'decay2': 0.0054,
+          'sustain': 0.0,
+          'release': 0.2962
+        },
+        'breakKey': 62,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
         },
         'rateScaling': 1.0
       },
       {
         'ratio': 1.0,
-        'detune': 0.0,
-        'level': -16.5,
+        'detune': 3.6,
+        'level': -18.0,
         'envelope': {
           'attack': 0.001,
           'peak': 0.0,
-          'decay1': 2.2292,
-          'brk': -4.52,
-          'decay2': 2.2292,
-          'sustain': -9.03,
+          'decay1': 0.0,
+          'brk': 0.0,
+          'decay2': 0.0265,
+          'sustain': -6.02,
           'release': 0.9874
         },
         'breakKey': 21,
@@ -887,22 +3628,22 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.1892
+        'rateScaling': 1.4142
       },
       {
-        'ratio': 3.0,
-        'detune': 0.0,
-        'level': -11.25,
+        'ratio': 1.0,
+        'detune': -2.7,
+        'level': -17.25,
         'envelope': {
-          'attack': 0.0483,
-          'peak': -9.03,
-          'decay1': 0.4467,
-          'brk': -4.52,
-          'decay2': 2.2292,
-          'sustain': -9.03,
-          'release': 0.9874
+          'attack': 0.0386,
+          'peak': -7.53,
+          'decay1': 2.0434,
+          'brk': -40.64,
+          'decay2': 0.0145,
+          'sustain': -55.69,
+          'release': 0.4232
         },
-        'breakKey': 21,
+        'breakKey': 67,
         'left': {
           'curve': 'lin',
           'depth': 0.0
@@ -911,20 +3652,379 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.1892
+        'rateScaling': 1.0
       },
       {
-        'ratio': 14.0,
+        'ratio': 2.0,
         'detune': 0.0,
-        'level': -34.5,
+        'level': null,
         'envelope': {
-          'attack': 0.0211,
+          'attack': 0.001,
           'peak': 0.0,
-          'decay1': 2.2292,
-          'brk': -4.52,
-          'decay2': 2.2292,
-          'sustain': -9.03,
-          'release': 0.9874
+          'decay1': 0.0,
+          'brk': 0.0,
+          'decay2': 0.0,
+          'sustain': -1.51,
+          'release': 0.4937
+        },
+        'breakKey': 81,
+        'left': {
+          'curve': 'lin',
+          'depth': -0.602
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': -0.602
+        },
+        'rateScaling': 1.2968
+      },
+      {
+        'ratio': 2.0,
+        'detune': 0.0,
+        'level': -32.25,
+        'envelope': {
+          'attack': 0.0062,
+          'peak': 0.0,
+          'decay1': 3.5528,
+          'brk': -96.0,
+          'decay2': 0.0,
+          'sustain': -96.0,
+          'release': 0.4232
+        },
+        'breakKey': 74,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': -2.59
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 1.53,
+        'detune': 3.6,
+        'level': -12.0,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 0.0743,
+          'brk': -24.08,
+          'decay2': 0.0008,
+          'sustain': -34.62,
+          'release': 0.4232
+        },
+        'breakKey': 67,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      }
+    ],
+    'missing': [
+      'vibrato',
+      'tremolo',
+      'velocity'
+    ]
+  },
+  {
+    'name': 'ORCH-CHIME',
+    'algorithm': 5,
+    'dxFeedback': 6.2831,
+    'dxOperators': [
+      {
+        'ratio': 0.5,
+        'detune': 4.5,
+        'level': -1.5,
+        'envelope': {
+          'attack': 0.9041,
+          'peak': 0.0,
+          'decay1': 0.0,
+          'brk': 0.0,
+          'decay2': 0.0,
+          'sustain': 0.0,
+          'release': 9.4787
+        },
+        'breakKey': 36,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'exp',
+          'depth': 0.0
+        },
+        'rateScaling': 1.2968
+      },
+      {
+        'ratio': 0.5,
+        'detune': 4.5,
+        'level': -9.0,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 0.0,
+          'brk': 0.0,
+          'decay2': 0.0,
+          'sustain': 0.0,
+          'release': 40.0
+        },
+        'breakKey': 36,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'exp',
+          'depth': 0.0
+        },
+        'rateScaling': 1.834
+      },
+      {
+        'ratio': 0.5,
+        'detune': 0.0,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.0054,
+          'peak': 0.0,
+          'decay1': 0.0531,
+          'brk': -3.01,
+          'decay2': 40.0,
+          'sustain': -96.0,
+          'release': 13.541
+        },
+        'breakKey': 36,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'exp',
+          'depth': 0.0
+        },
+        'rateScaling': 1.2968
+      },
+      {
+        'ratio': 3.14,
+        'detune': 0.0,
+        'level': -6.0,
+        'envelope': {
+          'attack': 0.0029,
+          'peak': -7.53,
+          'decay1': 0.0116,
+          'brk': -13.55,
+          'decay2': 40.0,
+          'sustain': -96.0,
+          'release': 40.0
+        },
+        'breakKey': 36,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'exp',
+          'depth': 0.0
+        },
+        'rateScaling': 1.2968
+      },
+      {
+        'ratio': 1.0,
+        'detune': 6.31,
+        'level': -0.75,
+        'envelope': {
+          'attack': 0.3909,
+          'peak': 0.0,
+          'decay1': 0.0,
+          'brk': 0.0,
+          'decay2': 0.0,
+          'sustain': 0.0,
+          'release': 9.4787
+        },
+        'breakKey': 36,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'exp',
+          'depth': 0.0
+        },
+        'rateScaling': 1.2968
+      },
+      {
+        'ratio': 1.0,
+        'detune': -6.31,
+        'level': -18.0,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 0.0,
+          'brk': 0.0,
+          'decay2': 0.0,
+          'sustain': 0.0,
+          'release': 40.0
+        },
+        'breakKey': 36,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'exp',
+          'depth': 0.0
+        },
+        'rateScaling': 1.834
+      }
+    ],
+    'missing': [
+      'tremolo',
+      'velocity'
+    ]
+  },
+  {
+    'name': 'TUB BELLS',
+    'algorithm': 5,
+    'dxFeedback': 6.2831,
+    'dxOperators': [
+      {
+        'ratio': 1.0,
+        'detune': 1.8,
+        'level': -3.0,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 8.5824,
+          'brk': -96.0,
+          'decay2': 0.0,
+          'sustain': -49.67,
+          'release': 23.6967
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.1892
+      },
+      {
+        'ratio': 3.5,
+        'detune': 2.7,
+        'level': -15.75,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 40.0,
+          'brk': -96.0,
+          'decay2': 0.0,
+          'sustain': -49.67,
+          'release': 18.9573
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.1892
+      },
+      {
+        'ratio': 1.0,
+        'detune': -4.5,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.0012,
+          'peak': 0.0,
+          'decay1': 8.8796,
+          'brk': -96.0,
+          'decay2': 0.0,
+          'sustain': -49.67,
+          'release': 23.6967
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.1892
+      },
+      {
+        'ratio': 3.5,
+        'detune': -1.8,
+        'level': -18.0,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 40.0,
+          'brk': -96.0,
+          'decay2': 0.0,
+          'sustain': -49.67,
+          'release': 18.9573
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.1892
+      },
+      {
+        'ratio': 1.2369,
+        'detune': 0.0,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.0095,
+          'peak': 0.0,
+          'decay1': 0.0694,
+          'brk': -96.0,
+          'decay2': 0.0,
+          'sustain': -96.0,
+          'release': 0.1851
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.1892
+      },
+      {
+        'ratio': 2.0,
+        'detune': -6.31,
+        'level': -10.5,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 0.0128,
+          'brk': -96.0,
+          'decay2': 0.0,
+          'sustain': -96.0,
+          'release': 18.9573
         },
         'breakKey': 21,
         'left': {
@@ -939,8 +4039,944 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       }
     ],
     'missing': [
+      'velocity',
+      'fixed frequency (played as a ratio from middle C)'
+    ]
+  },
+  {
+    'name': 'STEEL DRUM',
+    'algorithm': 15,
+    'dxFeedback': 1.5707,
+    'dxOperators': [
+      {
+        'ratio': 1.0,
+        'detune': 0.0,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 0.2229,
+          'brk': -4.52,
+          'decay2': 8.4338,
+          'sustain': -96.0,
+          'release': 5.9242
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.4142
+      },
+      {
+        'ratio': 1.7,
+        'detune': 0.0,
+        'level': -26.25,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 4.4584,
+          'brk': -9.03,
+          'decay2': 26.9361,
+          'sustain': -96.0,
+          'release': 40.0
+        },
+        'breakKey': 78,
+        'left': {
+          'curve': 'exp',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': -4.277
+        },
+        'rateScaling': 1.1892
+      },
+      {
+        'ratio': 1.0,
+        'detune': 0.0,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 0.6369,
+          'brk': -4.52,
+          'decay2': 7.0281,
+          'sustain': -96.0,
+          'release': 3.9494
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.2968
+      },
+      {
+        'ratio': 2.0,
+        'detune': 6.31,
+        'level': -8.25,
+        'envelope': {
+          'attack': 0.001,
+          'peak': -6.02,
+          'decay1': 0.1858,
+          'brk': -12.04,
+          'decay2': 1.074,
+          'sustain': -96.0,
+          'release': 37.9147
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.2968
+      },
+      {
+        'ratio': 5.32,
+        'detune': 0.0,
+        'level': -26.25,
+        'envelope': {
+          'attack': 0.001,
+          'peak': -6.02,
+          'decay1': 0.2972,
+          'brk': -12.04,
+          'decay2': 3.1812,
+          'sustain': -96.0,
+          'release': 40.0
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.2968
+      },
+      {
+        'ratio': 1.5217,
+        'detune': 0.0,
+        'level': -37.5,
+        'envelope': {
+          'attack': 0.001,
+          'peak': -6.02,
+          'decay1': 0.1062,
+          'brk': -12.04,
+          'decay2': 7.9508,
+          'sustain': -96.0,
+          'release': 40.0
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.2968
+      }
+    ],
+    'missing': [
       'tremolo',
+      'velocity',
+      'fixed frequency (played as a ratio from middle C)'
+    ]
+  },
+  {
+    'name': 'TIMPANI',
+    'algorithm': 16,
+    'dxFeedback': 6.2831,
+    'dxOperators': [
+      {
+        'ratio': 0.5,
+        'detune': 0.0,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 6.3426,
+          'brk': -96.0,
+          'decay2': 0.0,
+          'sustain': -96.0,
+          'release': 9.4787
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.2968
+      },
+      {
+        'ratio': 0.5,
+        'detune': 2.7,
+        'level': -9.75,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 0.0883,
+          'brk': -96.0,
+          'decay2': 0.0,
+          'sustain': -96.0,
+          'release': 40.0
+        },
+        'breakKey': 62,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'exp',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0905
+      },
+      {
+        'ratio': 0.68,
+        'detune': -2.7,
+        'level': -10.5,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 0.0151,
+          'brk': -19.57,
+          'decay2': 14.7684,
+          'sustain': -96.0,
+          'release': 31.5956
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'exp',
+          'depth': 0.0
+        },
+        'rateScaling': 1.2968
+      },
+      {
+        'ratio': 0.875,
+        'detune': 0.0,
+        'level': -9.0,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 2.5476,
+          'brk': -18.06,
+          'decay2': 40.0,
+          'sustain': -96.0,
+          'release': 13.541
+        },
+        'breakKey': 101,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'exp',
+          'depth': 0.0
+        },
+        'rateScaling': 1.834
+      },
+      {
+        'ratio': 0.5,
+        'detune': 0.0,
+        'level': -19.5,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 1.0856,
+          'brk': -96.0,
+          'decay2': 0.0,
+          'sustain': -96.0,
+          'release': 40.0
+        },
+        'breakKey': 101,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'exp',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 0.78,
+        'detune': 0.0,
+        'level': -19.5,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 40.0,
+          'brk': -96.0,
+          'decay2': 0.0,
+          'sustain': -96.0,
+          'release': 18.9573
+        },
+        'breakKey': 24,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'exp',
+          'depth': 0.0
+        },
+        'rateScaling': 1.2968
+      }
+    ],
+    'missing': [
+      'tremolo',
+      'pitch envelope',
       'velocity'
+    ]
+  },
+  {
+    'name': 'REFS WHISL',
+    'algorithm': 18,
+    'dxFeedback': 0.1963,
+    'dxOperators': [
+      {
+        'ratio': 7.9858,
+        'detune': 0.0,
+        'level': -6.75,
+        'envelope': {
+          'attack': 0.0369,
+          'peak': 0.0,
+          'decay1': 0.0,
+          'brk': 0.0,
+          'decay2': 0.0,
+          'sustain': 0.0,
+          'release': 1.6926
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.4142
+      },
+      {
+        'ratio': 0.5,
+        'detune': 0.0,
+        'level': -4.5,
+        'envelope': {
+          'attack': 0.0409,
+          'peak': 0.0,
+          'decay1': 0.0,
+          'brk': 0.0,
+          'decay2': 0.0,
+          'sustain': 0.0,
+          'release': 2.9621
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.4142
+      },
+      {
+        'ratio': 0.5,
+        'detune': 0.0,
+        'level': -24.75,
+        'envelope': {
+          'attack': 0.0161,
+          'peak': 0.0,
+          'decay1': 0.0,
+          'brk': 0.0,
+          'decay2': 0.0,
+          'sustain': 0.0,
+          'release': 40.0
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.4142
+      },
+      {
+        'ratio': 25.2534,
+        'detune': 0.0,
+        'level': -18.0,
+        'envelope': {
+          'attack': 0.001,
+          'peak': -1.51,
+          'decay1': 0.0133,
+          'brk': -7.53,
+          'decay2': 18.152,
+          'sustain': -96.0,
+          'release': 0.8463
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0905
+      },
+      {
+        'ratio': 0.5,
+        'detune': 0.0,
+        'level': -26.25,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 40.0,
+          'brk': -96.0,
+          'decay2': 0.0,
+          'sustain': -96.0,
+          'release': 40.0
+        },
+        'breakKey': 62,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 0.5,
+        'detune': 0.0,
+        'level': -15.75,
+        'envelope': {
+          'attack': 0.001,
+          'peak': -1.51,
+          'decay1': 0.1194,
+          'brk': -15.05,
+          'decay2': 16.6659,
+          'sustain': -96.0,
+          'release': 0.8463
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0905
+      }
+    ],
+    'missing': [
+      'pitch envelope',
+      'velocity',
+      'fixed frequency (played as a ratio from middle C)'
+    ]
+  },
+  {
+    'name': 'VOICE 1',
+    'algorithm': 7,
+    'dxFeedback': 6.2831,
+    'dxOperators': [
+      {
+        'ratio': 1.0,
+        'detune': -6.31,
+        'level': -9.0,
+        'envelope': {
+          'attack': 0.6415,
+          'peak': 0.0,
+          'decay1': 1.4861,
+          'brk': -3.01,
+          'decay2': 0.0048,
+          'sustain': -1.51,
+          'release': 0.7405
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 1.0,
+        'detune': 0.0,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.001,
+          'peak': -36.12,
+          'decay1': 0.2525,
+          'brk': -28.6,
+          'decay2': 0.0261,
+          'sustain': -16.56,
+          'release': 23.6967
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 1.0,
+        'detune': 6.31,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.9741,
+          'peak': 0.0,
+          'decay1': 1.4861,
+          'brk': -3.01,
+          'decay2': 0.0078,
+          'sustain': -1.51,
+          'release': 5.9242
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 1.02,
+        'detune': 2.7,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.0017,
+          'peak': -37.63,
+          'decay1': 0.4884,
+          'brk': -30.1,
+          'decay2': 1.1765,
+          'sustain': -58.7,
+          'release': 40.0
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 1.01,
+        'detune': -0.9,
+        'level': -34.5,
+        'envelope': {
+          'attack': 0.1408,
+          'peak': 0.0,
+          'decay1': 2.3778,
+          'brk': -6.02,
+          'decay2': 0.3185,
+          'sustain': -10.54,
+          'release': 0.3703
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 5.1,
+        'detune': 0.9,
+        'level': -33.0,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 0.0,
+          'brk': 0.0,
+          'decay2': 0.0,
+          'sustain': 0.0,
+          'release': 40.0
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      }
+    ],
+    'missing': [
+      'vibrato',
+      'tremolo',
+      'pitch envelope',
+      'velocity',
+      'an envelope ending above silence'
+    ]
+  },
+  {
+    'name': 'TRAIN',
+    'algorithm': 5,
+    'dxFeedback': 6.2831,
+    'dxOperators': [
+      {
+        'ratio': 1.64,
+        'detune': 0.0,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.0304,
+          'peak': 0.0,
+          'decay1': 2.9723,
+          'brk': -10.54,
+          'decay2': 0.0,
+          'sustain': -10.54,
+          'release': 0.7405
+        },
+        'breakKey': 60,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': -5.904
+        },
+        'rateScaling': 1.2968
+      },
+      {
+        'ratio': 3.03,
+        'detune': 0.0,
+        'level': -20.25,
+        'envelope': {
+          'attack': 0.2415,
+          'peak': 0.0,
+          'decay1': 28.2364,
+          'brk': -28.6,
+          'decay2': 0.5229,
+          'sustain': -24.08,
+          'release': 0.1234
+        },
+        'breakKey': 73,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.5422
+      },
+      {
+        'ratio': 1.4201,
+        'detune': 1.8,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 14.7994,
+          'brk': -96.0,
+          'decay2': 0.0,
+          'sustain': -96.0,
+          'release': 9.4787
+        },
+        'breakKey': 120,
+        'left': {
+          'curve': 'exp',
+          'depth': -5.904
+        },
+        'right': {
+          'curve': 'exp',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 3.7353,
+        'detune': -1.8,
+        'level': -7.5,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 13.5609,
+          'brk': -96.0,
+          'decay2': 0.0,
+          'sustain': -96.0,
+          'release': 18.9573
+        },
+        'breakKey': 41,
+        'left': {
+          'curve': 'exp',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'exp',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 9.0,
+        'detune': 2.7,
+        'level': -12.0,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 0.0,
+          'brk': 0.0,
+          'decay2': 0.0,
+          'sustain': 0.0,
+          'release': 1.1848
+        },
+        'breakKey': 57,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 5.0,
+        'detune': 0.0,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.001,
+          'peak': 0.0,
+          'decay1': 0.0,
+          'brk': 0.0,
+          'decay2': 0.0,
+          'sustain': 0.0,
+          'release': 1.1848
+        },
+        'breakKey': 57,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      }
+    ],
+    'missing': [
+      'fixed frequency (played as a ratio from middle C)',
+      'an envelope ending above silence'
+    ]
+  },
+  {
+    'name': 'TAKE OFF',
+    'algorithm': 10,
+    'dxFeedback': 0.0,
+    'dxOperators': [
+      {
+        'ratio': 4.04,
+        'detune': 0.0,
+        'level': 0.0,
+        'envelope': {
+          'attack': 4.0166,
+          'peak': -28.6,
+          'decay1': 6.5307,
+          'brk': -1.51,
+          'decay2': 40.0,
+          'sustain': -96.0,
+          'release': 9.4787
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 1.0,
+        'detune': 0.0,
+        'level': -2.25,
+        'envelope': {
+          'attack': 0.0023,
+          'peak': -13.55,
+          'decay1': 0.0016,
+          'brk': -3.01,
+          'decay2': 40.0,
+          'sustain': -96.0,
+          'release': 40.0
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 6.06,
+        'detune': 0.0,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.0031,
+          'peak': -24.08,
+          'decay1': 1.7338,
+          'brk': -45.15,
+          'decay2': 0.0002,
+          'sustain': -19.57,
+          'release': 40.0
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 0.5,
+        'detune': 0.0,
+        'level': 0.0,
+        'envelope': {
+          'attack': 9.7412,
+          'peak': 0.0,
+          'decay1': 2.9723,
+          'brk': -3.01,
+          'decay2': 0.6632,
+          'sustain': 0.0,
+          'release': 13.541
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 2.02,
+        'detune': 0.0,
+        'level': -2.25,
+        'envelope': {
+          'attack': 0.0021,
+          'peak': 0.0,
+          'decay1': 1.6984,
+          'brk': -6.02,
+          'decay2': 26.8741,
+          'sustain': -96.0,
+          'release': 6.7705
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      },
+      {
+        'ratio': 0.5,
+        'detune': 0.0,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.0019,
+          'peak': 0.0,
+          'decay1': 1.4861,
+          'brk': -4.52,
+          'decay2': 40.0,
+          'sustain': -96.0,
+          'release': 3.9494
+        },
+        'breakKey': 21,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0
+      }
+    ],
+    'missing': [
+      'pitch envelope',
+      'transpose'
     ]
   }
 ];

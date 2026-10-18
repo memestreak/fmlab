@@ -112,13 +112,19 @@ describe('the sandbox', () => {
     expect(CHAPTERS.filter(c => c.hasPiano).map(c => c.id)).toEqual(['sandbox']);
   });
 
-  it('starts from six DX7 factory voices, each marked as an approximation', () => {
-    expect(sandbox.presets.map(preset => preset.label)).toEqual(
-      ['E.PIANO 1', 'BRASS 1', 'BASS 1', 'TUB BELLS', 'MARIMBA', 'STRINGS 1'],
-    );
+  it('starts from the DX7\'s 32 factory voices, numbered, each marked as an approximation', () => {
+    expect(sandbox.presetMenu).toBe(true);
+    expect(sandbox.presets).toHaveLength(32);
+    expect(sandbox.presets[0].label).toBe('1 BRASS 1');
+    expect(sandbox.presets[10].label).toBe('11 E.PIANO 1');
+    expect(sandbox.presets[31].label).toBe('32 TAKE OFF');
     for (const preset of sandbox.presets) {
       expect(preset.hint).toMatch(/^the DX7's factory .*, a close approximation/);
+      expect(preset.note).toMatch(/^approximate/);
     }
-    expect(sandbox.presets[0].hint).toContain('without its vibrato and velocity');
+    expect(sandbox.presets[10].hint).toContain('without its vibrato and velocity');
+    expect(sandbox.presets[10].note).toBe('approximate · no vibrato, velocity');
+    // A fixed frequency is played as a ratio, and says so.
+    expect(sandbox.presets[25].hint).toContain('fixed frequency (played as a ratio from middle C)');
   });
 });

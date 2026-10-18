@@ -134,7 +134,8 @@ export function operatorsParam(operators: readonly Dx7Operator[]): string {
 const FIELDS = 14;
 const STAGE = { min: 0, max: MAX_STAGE_SECONDS };
 const ENV_LEVEL = { min: SILENCE_DB, max: 0 };
-const KEYS = { min: 21, max: 108 };
+/** The DX7's break points: A-1 to C8 (MIDI 21 to 120). */
+const KEYS = { min: 21, max: 120 };
 
 /**
  * The six operators a link's "o" describes, each value held inside its

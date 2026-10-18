@@ -17,7 +17,7 @@ import {
   type ScalingSide,
 } from '../dsp/dx7';
 import type { LabState, LabStore } from '../model/lab';
-import { describeKeyScaling, depthAt, drawKeyScaling } from '../viz/keyScalingPlot';
+import { describeKeyScaling, depthAt, drawKeyScaling, xOfKey } from '../viz/keyScalingPlot';
 import { drawVoiceEnvelope } from '../viz/voiceEnvelopePlot';
 import { roleOf } from './operators';
 import { createParam, typedNumber } from './paramControl';
@@ -175,15 +175,15 @@ export function mountVoiceTable(store: LabStore): void {
     const breakBox = createParam({
       name: `${name} break point`,
       min: 21,
-      max: 108,
+      max: 120,
       step: 1,
       slider: false,
       get: () => get().breakKey,
-      set: value => value !== null && setDxOperator(store, op, { breakKey: within(Math.round(value), { min: 21, max: 108 }) }),
+      set: value => value !== null && setDxOperator(store, op, { breakKey: within(Math.round(value), { min: 21, max: 120 }) }),
       show: value => noteName(value ?? 60),
       parse: parseNote,
       say: value => `break point ${noteName(value ?? 60)}`,
-      scrub: (start, pixels) => within(Math.round((start ?? 60) + pixels / 6), { min: 21, max: 108 }),
+      scrub: (start, pixels) => within(Math.round((start ?? 60) + pixels / 6), { min: 21, max: 120 }),
     });
     const speed = createParam({
       name: `${name} envelope speed-up per octave`,
@@ -224,7 +224,7 @@ export function mountVoiceTable(store: LabStore): void {
     let drag: { side: 'left' | 'right'; x: number; y: number; moved: boolean } | null = null;
     const sideAt = (x: number) => {
       const box = keys.getBoundingClientRect();
-      const breakX = ((get().breakKey - 24) / (108 - 24)) * box.width;
+      const breakX = xOfKey(box.width, get().breakKey);
       return x - box.left < breakX ? 'left' : 'right';
     };
     keys.addEventListener('pointerdown', event => {

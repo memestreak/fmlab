@@ -11,9 +11,11 @@ github.com/mmontag/dx7-synth-js). The .syx is Yamaha's and is never
 committed; only the converted numbers are.
 
 ```sh
-scripts/dx7_voices.py ROM1A.SYX src/chapters/dx7Factory.ts \
-    "E.PIANO 1" "BRASS 1" "BASS 1" "TUB BELLS" "MARIMBA" "STRINGS 1"
+scripts/dx7_voices.py ROM1A.SYX src/chapters/dx7Factory.ts
 ```
+
+converts all 32 voices in the bank's order (the sandbox's dropdown);
+names after the paths convert only those.
 
 Standard library only. Its tests use pytest:
 
