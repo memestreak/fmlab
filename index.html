@@ -360,7 +360,7 @@
             <h2 id="inst-title" class="inst-title" tabindex="-1"></h2>
             <p id="inst-lede" class="inst-lede"></p>
           </div>
-          <!-- Volume, Play and Copy link. -->
+          <!-- Volume. -->
           <div id="inst-tools" class="inst-tools"></div>
         </div>
         <div class="inst-body">
@@ -368,9 +368,28 @@
                the left, the spectrum the full height on the right. -->
           <div class="inst-six">
             <div class="inst-left">
+              <h3 class="panel-title inst-section-title">Algorithms</h3>
               <div class="inst-row">
-                <span class="inst-label" aria-hidden="true">Algorithm</span>
-                <div id="inst-algorithm"></div>
+                <!-- The DX7's list, with a step either way round it. -->
+                <div class="inst-alg-step">
+                  <button
+                    id="inst-alg-prev"
+                    type="button"
+                    class="round-step"
+                    aria-label="Previous algorithm"
+                  >
+                    ‹
+                  </button>
+                  <div id="inst-algorithm"></div>
+                  <button
+                    id="inst-alg-next"
+                    type="button"
+                    class="round-step"
+                    aria-label="Next algorithm"
+                  >
+                    ›
+                  </button>
+                </div>
                 <span class="inst-label" aria-hidden="true">Start from</span>
                 <div id="inst-dx7-presets"></div>
               </div>

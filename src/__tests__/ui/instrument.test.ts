@@ -1,5 +1,5 @@
 import { CHAPTERS } from '../../chapters';
-import { PLACES } from '../../ui/instrument';
+import { PLACES, stepAlgorithm } from '../../ui/instrument';
 
 describe('the instrument page', () => {
   const sandbox = CHAPTERS.find(c => c.id === 'sandbox')!;
@@ -36,5 +36,12 @@ describe('the instrument page', () => {
     for (const node of ['#play', '#share']) {
       expect(PLACES.some(p => p.node === node), node).toBe(false);
     }
+  });
+
+  it('steps through the 32 algorithms either way, round the ends', () => {
+    expect(stepAlgorithm(1, 1)).toBe(2);
+    expect(stepAlgorithm(5, -1)).toBe(4);
+    expect(stepAlgorithm(32, 1)).toBe(1);
+    expect(stepAlgorithm(1, -1)).toBe(32);
   });
 });

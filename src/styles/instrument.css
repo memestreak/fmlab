@@ -132,6 +132,27 @@
 }
 
 /* The algorithm and the presets, a "Start from" row of sounds. */
+.inst-section-title {
+  flex: none;
+}
+
+.inst-alg-step {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.round-step {
+  flex: none;
+  line-height: 1;
+}
+
+/* Round on a phone too: no square flash behind a tapped button. */
+.piano-octave,
+.round-step {
+  -webkit-tap-highlight-color: transparent;
+}
+
 .inst-row {
   display: flex;
   flex-wrap: wrap;
@@ -195,12 +216,7 @@
 }
 
 .inst .panel-operators .panel-title {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
+  margin-bottom: 0.15rem;
 }
 
 .inst .op-table {
@@ -343,7 +359,8 @@
   text-align: center;
 }
 
-.piano-octave {
+.piano-octave,
+.round-step {
   width: 2rem;
   height: 2rem;
   padding: 0;
@@ -355,7 +372,8 @@
   cursor: pointer;
 }
 
-.piano-octave:hover:not(:disabled) {
+.piano-octave:hover:not(:disabled),
+.round-step:hover:not(:disabled) {
   box-shadow: 0 0 0 1px var(--ink);
 }
 

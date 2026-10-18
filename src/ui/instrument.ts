@@ -1,4 +1,6 @@
 import type { Chapter } from '../chapters/types';
+import { DX7_COUNT } from '../dsp/algorithms';
+import type { LabStore } from '../model/lab';
 
 /**
  * Where each of the lab's nodes goes on the instrument page: the id of the
@@ -55,4 +57,23 @@ export function mountInstrument(): {
   };
 
   return { place };
+}
+
+/**
+ * The DX7 algorithm one step from `number` in `direction` (1 or -1),
+ * round from 32 to 1 and from 1 to 32.
+ */
+export function stepAlgorithm(number: number, direction: number): number {
+  return ((number - 1 + direction + DX7_COUNT) % DX7_COUNT) + 1;
+}
+
+/** The ‹ and › either side of the instrument page's algorithm list. */
+export function mountAlgorithmSteps(store: LabStore): void {
+  const step = (id: string, direction: number) => {
+    document.getElementById(id)?.addEventListener('click', () => {
+      store.set({ algorithm: stepAlgorithm(store.get().algorithm, direction) });
+    });
+  };
+  step('inst-alg-prev', -1);
+  step('inst-alg-next', 1);
 }
