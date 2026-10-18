@@ -1,6 +1,8 @@
 import { type Envelope, noteSeconds, TIME_CONSTANTS } from '../dsp/envelope';
-import { noteHold, operatorEnvelope } from '../dsp/operators';
-import { envelopeOf, type LabState, type LabStore } from '../model/lab';
+import { noteHold, OPERATOR_RELEASE } from '../dsp/operators';
+import type { VoiceMessage, VoicePatch } from '../dsp/voicePool';
+import { midiToHz } from '../dsp/voices';
+import { envelopeOf, type LabState, type LabStore, noteSounding } from '../model/lab';
 import type { Measurement } from '../viz/liveSpectrum';
 import { unlockIosAudio } from './iosUnlock';
 import { PROCESSOR_NAME } from './processorName';
@@ -24,6 +26,16 @@ const SCENE_GAP_MS = 100;
 export const NOTE_LEAD_SECONDS = 0.02;
 /** Time constant of that bringing down: gone well inside the lead. */
 const DIP_SECONDS = 0.003;
+/**
+ * The voice Play note and the space bar strike, six operators: not a key
+ * on the keyboard (those are MIDI numbers, 0 to 127).
+ */
+export const PLAYED_NOTE = 128;
+
+/** What every note of six operators is struck with, from the state. */
+export function voicePatch(state: LabState): VoicePatch {
+  return { algorithm: state.algorithm, feedback: state.feedback, operators: state.operators };
+}
 
 /** The nodes, once there is a context. */
 interface Graph {
@@ -51,10 +63,12 @@ const FFT_SIZE = 8192;
  *   worklet (the synth) -> note gain -> master gain -> limiter -> speakers
  *                                  \-> analyser (the live spectrum)
  *
- * There are two ways of playing. Most chapters hold one steady sound while
- * `playing` is true. A chapter in `noteMode` plays one note each time
- * `notes` changes, its loudness (the note gain) and its index shaped by
- * the envelope.
+ * There are three ways of playing. Most chapters hold one steady sound
+ * while `playing` is true. A chapter in `noteMode` plays one note each
+ * time `notes` changes, its loudness (the note gain) and its index shaped
+ * by the envelope. Six operators (`ops`) play notes too, several at once,
+ * in the worklet's voice pool: the engine tells it which keys are down
+ * (`held`) and which note Play note strikes, and the pool shapes them.
  *
  * Nothing is created until the first sound is asked for, which has to
  * happen inside a click or key press: browsers refuse to start audio
@@ -69,9 +83,14 @@ export class AudioEngine {
   private sceneTimer: number | undefined;
   /** True while faded out between two chapters' patches. */
   private changingScene = false;
+  /** Messages to the voice pool, in the order they were asked for. */
+  private voiceQueue: Promise<void> = Promise.resolve();
 
   constructor(private readonly store: LabStore) {
     store.subscribe((state, previous) => {
+      if (state.mode === 'ops' && this.followVoices(state, previous)) return;
+      // Out of six operators: whatever they were playing stops.
+      if (previous.mode === 'ops' && state.mode !== 'ops') this.tell({ type: 'allOff' });
       if (state.notes !== previous.notes) {
         void this.playNote();
       } else if (state.stops !== previous.stops) {
@@ -95,6 +114,84 @@ export class AudioEngine {
         this.tuneNote(state);
       }
     });
+  }
+
+  /**
+   * Six operators: keys struck and let go, Play note, Stop, a new chapter
+   * and the patch, all told to the voice pool. Returns whether that was
+   * all that changed that matters here.
+   */
+  private followVoices(state: LabState, previous: LabState): boolean {
+    if (state.chapter !== previous.chapter || state.stops !== previous.stops) {
+      // A note may still be ringing from the chapter left behind, too.
+      if (state.chapter !== previous.chapter) this.hush();
+      this.tell({ type: 'allOff' });
+      this.suspendSoon(SUSPEND_AFTER_MS);
+    }
+    if (state.held !== previous.held) {
+      for (const note of state.held) {
+        if (!previous.held.includes(note)) this.strike(note, midiToHz(note), Infinity);
+      }
+      for (const note of previous.held) {
+        if (!state.held.includes(note)) this.tell({ type: 'noteOff', note });
+      }
+      if (state.held.length === 0) this.suspendSoon((OPERATOR_RELEASE + 1) * 1000);
+    }
+    if (state.notes !== previous.notes) {
+      // Play note, or the space bar: held as long as the slowest
+      // operator needs, then let go, as chapter 8's notes always were.
+      const seconds = noteSeconds(envelopeOf(state));
+      this.strike(PLAYED_NOTE, state.carrierHz, noteHold(state.operators), () => {
+        this.store.set({ noteStartedAt: performance.now() / 1000, noteLength: seconds });
+        this.suspendSoon((seconds + 1) * 1000);
+      });
+    }
+    if (
+      state.algorithm !== previous.algorithm ||
+      state.feedback !== previous.feedback ||
+      state.operators !== previous.operators
+    ) {
+      // Taken up by the next note struck.
+      this.tell({ type: 'patch', patch: voicePatch(state) });
+    }
+    if (state.volume !== previous.volume) this.tuneNote(state);
+    return true;
+  }
+
+  /**
+   * Strikes a note in the voice pool. Called inside the key press, so the
+   * engine may start audio; the patch goes with it, so the note has it.
+   */
+  private strike(note: number, hz: number, hold: number, started?: () => void): void {
+    const ready = this.wake();
+    this.voiceQueue = this.voiceQueue
+      .then(async () => {
+        const { context, synth, note: noteGain, master } = await ready;
+        const state = this.store.get();
+        if (state.mode !== 'ops') return;
+        const now = context.currentTime;
+        synth.parameters.get('mode')?.setValueAtTime(2, now);
+        noteGain.gain.cancelScheduledValues(now);
+        noteGain.gain.setValueAtTime(1, now);
+        master.gain.cancelScheduledValues(now);
+        master.gain.setTargetAtTime(state.volume, now, FADE_SECONDS);
+        synth.port.postMessage({ type: 'patch', patch: voicePatch(state) } satisfies VoiceMessage);
+        synth.port.postMessage({ type: 'noteOn', note, hz, hold } satisfies VoiceMessage);
+        started?.();
+      })
+      .catch(error => {
+        console.error('fmlab: audio failed to start', error);
+        this.loading = null;
+      });
+  }
+
+  /** Tells the voice pool something, once there is one; never starts audio. */
+  private tell(message: VoiceMessage): void {
+    const loading = this.loading;
+    if (!loading) return;
+    this.voiceQueue = this.voiceQueue
+      .then(async () => (await loading).synth.port.postMessage(message))
+      .catch(() => {});
   }
 
   /**
@@ -180,12 +277,17 @@ export class AudioEngine {
     if (!graph) return;
     window.clearTimeout(this.suspendTimer);
     this.suspendTimer = window.setTimeout(() => {
-      if (!this.store.get().playing) void graph.context.suspend();
+      const state = this.store.get();
+      const quiet =
+        !state.playing &&
+        state.held.length === 0 &&
+        !noteSounding(state, performance.now() / 1000);
+      if (quiet) void graph.context.suspend();
     }, ms);
   }
 
   /**
-   * Plays one note of the current patch: its loudness and, if the patch
+   * Plays one note of a two-operator patch: its loudness and, if the patch
    * says so, its index following the envelope. The curves scheduled here
    * are the ones dsp/envelope.ts describes, which the figures draw.
    */
@@ -227,28 +329,12 @@ export class AudioEngine {
 
       // The pitch changes in the silence between notes, not through one.
       jump('frequency', state.carrierHz);
-      if (state.mode === 'ops') {
-        // Six operators, each level shaped by its own envelope; the note
-        // gain stays open and the operators do the shaping.
-        const hold = noteHold(state.operators);
-        jump('mode', 2);
-        jump('algorithm', state.algorithm);
-        jump('feedback', state.feedback);
-        state.operators.forEach((op, i) => {
-          jump(`ratio${i + 1}`, op.ratio);
-          const level = synth.parameters.get(`level${i + 1}`);
-          if (level) shape(level, op.level, operatorEnvelope(op, hold));
-        });
-        note.gain.cancelScheduledValues(now);
-        note.gain.setValueAtTime(1, now);
-      } else {
-        shape(note.gain, 1);
-        const index = synth.parameters.get('index');
-        if (index && state.indexFollows) shape(index, state.index);
-        else jump('index', state.index);
-        jump('ratio', state.ratio);
-        jump('mode', 0);
-      }
+      shape(note.gain, 1);
+      const index = synth.parameters.get('index');
+      if (index && state.indexFollows) shape(index, state.index);
+      else jump('index', state.index);
+      jump('ratio', state.ratio);
+      jump('mode', 0);
       master.gain.cancelScheduledValues(now);
       master.gain.setTargetAtTime(state.volume, now, FADE_SECONDS);
 

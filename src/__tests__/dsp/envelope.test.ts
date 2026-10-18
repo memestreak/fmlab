@@ -104,3 +104,23 @@ describe('the envelope in the lab state', () => {
     for (const t of [0, 0.05, 0.5, 0.7]) expect(indexAtTime(steady, t)).toBe(5);
   });
 });
+
+describe('an envelope held until it is let go', () => {
+  // Let go mid-attack, mid-decay and while sustaining: the release starts
+  // from wherever the curve had got to, so there is no jump.
+  it.each([0.05, 0.15, 1.5])('is continuous when let go at %s s', at => {
+    const held: Envelope = { ...brass, hold: Infinity };
+    const letGo: Envelope = { ...brass, hold: at };
+    const before = envelopeAt(held, at);
+    expect(envelopeAt(letGo, at)).toBeCloseTo(before, 12);
+    expect(envelopeAt(letGo, at + 1e-6)).toBeCloseTo(before, 4);
+    // And is the held envelope until then.
+    expect(envelopeAt(letGo, at / 2)).toBe(envelopeAt(held, at / 2));
+  });
+
+  it('never ends while held', () => {
+    expect(envelopeAt({ ...brass, hold: Infinity }, 100)).toBeCloseTo(brass.sustain, 12);
+    expect(noteSeconds({ ...brass, hold: Infinity })).toBe(Infinity);
+  });
+});
+

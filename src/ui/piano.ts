@@ -1,17 +1,15 @@
+import { OPERATOR_RELEASE } from '../dsp/operators';
+import { midiToHz } from '../dsp/voices';
 import { CARRIER_HZ, type LabStore } from '../model/lab';
 
-// A one-voice keyboard for the sandbox: on screen, and on the computer's
-// own keys laid out the way music software does it. Holding a key plays
-// the patch at that key's pitch; letting go stops it. One note at a time:
-// the design spec leaves polyphony out.
+// The sandbox's keyboard: on screen, and on the computer's own keys laid
+// out the way music software does it. Every key held sounds, at its own
+// pitch, for as long as it is held; letting go releases it.
 
-/** MIDI note numbers: 69 is A4, 440 Hz. */
-const A4 = 69;
+export { midiToHz };
 
-/** A note's frequency in equal temperament, A4 = 440 Hz. */
-export function midiToHz(midi: number): number {
-  return 440 * 2 ** ((midi - A4) / 12);
-}
+/** The page's clock in seconds, the one notes are timed on. */
+const now = () => performance.now() / 1000;
 
 const NAMES = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
 
@@ -92,20 +90,12 @@ export function shiftStart(start: number, octaves: number): number {
 }
 
 /**
- * Which note should be sounding, given the keys held down in the order
- * they were pressed: the one pressed last. Letting go of it falls back to
- * the one before, as a one-voice synth does.
- */
-export function sounding(held: readonly number[]): number | null {
-  return held.length === 0 ? null : held[held.length - 1];
-}
-
-/**
  * Builds the on-screen keyboard in `container` and listens to the
- * computer's keys while `active()` says the sandbox is showing. Pressing
- * starts the sound at the key's pitch; letting go of every key stops it,
- * unless the sound was already playing from the Play button, in which case
- * it is left playing at the last pitch.
+ * computer's keys while `active()` says the sandbox is showing. A key
+ * pressed is added to the store's `held`, and the audio engine strikes it;
+ * let go, it is taken out, and the engine releases it. The figures follow
+ * the key struck last: its pitch is the carrier's, and its moment the
+ * note's.
  */
 export function mountPiano(
   container: HTMLElement,
@@ -114,8 +104,8 @@ export function mountPiano(
 ): void {
   let start = FIRST_START;
   const held: number[] = [];
-  /** Whether the piano started the sound, and so should stop it. */
-  let ownsSound = false;
+  /** The key struck last, which the figures follow; null once let go. */
+  let last: number | null = null;
   const keys = new Map<number, HTMLButtonElement>();
 
   const board = document.createElement('div');
@@ -147,47 +137,46 @@ export function mountPiano(
     '<span class="piano-oct-hint" aria-hidden="true"><kbd>Z</kbd> <kbd>X</kbd> on the keyboard</span>';
   control.querySelector('.piano-oct-row')?.append(down, range, up);
 
+  /** Every key held is drawn down. */
   const update = () => {
-    const note = sounding(held);
     for (const [midi, key] of keys) {
-      key.setAttribute('aria-pressed', String(midi === note));
+      key.setAttribute('aria-pressed', String(held.includes(midi)));
     }
   };
 
-  /** @param struck whether a key was just pressed, not let go of */
-  const play = (struck: boolean) => {
-    const note = sounding(held);
-    if (store.get().noteMode) {
-      // Six operators play notes: a key strikes one at its pitch, which
-      // dies away by itself as chapter 8's do. Letting go strikes nothing.
-      if (struck && note !== null) {
-        const { notes } = store.get();
-        store.set({ carrierHz: midiToHz(note), notes: notes + 1 });
-      }
-    } else if (note === null) {
-      if (ownsSound) store.set({ playing: false });
-      ownsSound = false;
-    } else {
-      if (!store.get().playing) ownsSound = true;
-      // Inside the key press, so the engine may start audio.
-      store.set({ carrierHz: midiToHz(note), playing: true });
-    }
-    update();
-  };
   const press = (midi: number) => {
     if (!playable(midi) || held.includes(midi)) return;
     held.push(midi);
-    play(true);
+    last = midi;
+    // Inside the key press, so the engine may start audio. Held for as
+    // long as the key is: the note's length is not known yet.
+    store.set({
+      held: [...held],
+      carrierHz: midiToHz(midi),
+      noteStartedAt: now(),
+      noteLength: Infinity,
+    });
+    update();
   };
   const release = (midi: number) => {
     const at = held.indexOf(midi);
     if (at === -1) return;
     held.splice(at, 1);
-    play(false);
+    const { noteStartedAt } = store.get();
+    if (midi === last && noteStartedAt !== null) {
+      // The note the figures follow is let go: now its length is known.
+      last = null;
+      store.set({
+        held: [...held],
+        noteLength: Math.max(0, now() - noteStartedAt) + OPERATOR_RELEASE,
+      });
+    } else {
+      store.set({ held: [...held] });
+    }
+    update();
   };
   const releaseAll = () => {
-    held.length = 0;
-    play(false);
+    for (const midi of [...held]) release(midi);
   };
 
   const draw = () => {
@@ -228,6 +217,7 @@ export function mountPiano(
       });
       key.addEventListener('pointerup', () => release(midi));
       key.addEventListener('pointercancel', () => release(midi));
+      key.addEventListener('lostpointercapture', () => release(midi));
       // From the keyboard, Enter or Space on a focused key holds it too.
       key.addEventListener('keydown', event => {
         if ((event.key === 'Enter' || event.key === ' ') && !event.repeat) {
@@ -278,14 +268,19 @@ export function mountPiano(
     const midi = noteForCode(event.code, start);
     if (midi !== null) release(midi);
   });
-  // A key let go of in another window would otherwise sound for ever.
+  // A key let go of in another window, or with the tab hidden, would
+  // otherwise sound for ever.
   window.addEventListener('blur', releaseAll);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) releaseAll();
+  });
   store.subscribe((state, previous) => {
     if (state.chapter !== previous.chapter) releaseAll();
-    // Stopped by Play or space: the piano no longer holds the sound.
-    if (!state.playing && previous.playing) {
-      ownsSound = false;
+    // Stopped by the space bar: every voice is silenced, so no key is down.
+    if (state.stops !== previous.stops && held.length > 0) {
       held.length = 0;
+      last = null;
+      store.set({ held: [] });
       update();
     }
   });

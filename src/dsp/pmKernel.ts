@@ -62,6 +62,16 @@ export class PmKernel {
     this.pull = 1 / Math.max(1, lockSamples);
   }
 
+  /** Back to how it was made: every operator's phase at 0, for a new note. */
+  reset(): void {
+    this.baseCycles = 0;
+    this.phases.fill(0);
+    this.lastRatios.fill(NaN);
+    this.outputs.fill(0);
+    this.fbLast = 0;
+    this.fbBefore = 0;
+  }
+
   /** Rewires the operators, between notes; their phases carry on. */
   setAlgorithm(algorithm: Algorithm): void {
     this.algorithm = algorithm;
