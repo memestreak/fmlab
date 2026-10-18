@@ -162,7 +162,7 @@
 }
 
 /* Carrier and modulator, at a glance: a carrier's tag is filled in its
-   pen, a modulator's dashed; in the table a carrier's row sits on a shaded
+   pen, a modulator's outlined; in the table a carrier's row sits on a shaded
    band, and each row's sliders take its pen. The row is marked by its
    tag's role, so it follows the algorithm. */
 [data-view='instrument'] .op-tag[data-role='carrier'] {
@@ -172,7 +172,7 @@
 }
 
 [data-view='instrument'] .op-tag[data-role='modulator'] {
-  border: 2px dashed var(--pen-green);
+  border: 2px solid var(--pen-green);
 }
 
 [data-view='instrument'] .op-row:has(.op-tag[data-role='carrier']) {

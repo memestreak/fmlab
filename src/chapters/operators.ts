@@ -50,8 +50,8 @@ const STEPS: Step[] = [
     patch: PAIR,
     body: [
       `You have been using a wiring all along. Fig. 1 draws the two operators you have used since ${sectionLink('index')} the way the DX7 draws them. OP2, the
-       modulator, a dashed green box, sits above OP1, the carrier, a solid
-       blue one, and a line
+       modulator, a green outline, sits above OP1, the carrier, a filled
+       blue box, and a line
        runs down from one to the other because OP2 modulates OP1. Only OP1
        has a line down to <em>out</em>: it is the one you hear.`,
       `The lab has two panels, one above the other. Algorithm is the

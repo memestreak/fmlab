@@ -171,10 +171,11 @@ export function operatorAt(
  * modulators above in --pen-green, ink lines from each modulator down to
  * what it modulates and from the carriers down to the output, and the
  * feedback loop as an ink line out of the top of one box and back into
- * the top of another (or the same). A box's level dims it, so a silent
- * operator reads as one. An operator the algorithm leaves out is not
- * drawn. At `time`, while a note sounds, each box is filled in its colour
- * as strongly as the operator sounds at that moment.
+ * the top of another (or the same). Every carrier is drawn alike, and
+ * every modulator, whatever its level. An operator the algorithm leaves
+ * out is not drawn. At `time`, while a note sounds, each modulator's box
+ * is filled in its colour as strongly as the operator sounds at that
+ * moment.
  */
 export function drawAlgorithm(
   state: LabState,
@@ -254,17 +255,12 @@ export function drawAlgorithm(
   for (const op of used) {
     const p = places[op];
     const carrier = alg.carriers.includes(op);
-    const level = state.operators[op]?.level ?? 1;
     const pen = token(carrier ? '--pen-blue' : '--pen-green');
-    // Dimmer as the operator is quieter, so a silent one reads as one.
-    const strength = 0.35 + 0.65 * level;
     ctx.fillStyle = token('--paper');
     ctx.fillRect(boxX(p), boxY(p), box, box);
-    // A carrier, which is heard, is a solid box filled in its pen; a
-    // modulator, which is not, is a dashed outline. The two read apart
-    // without colour too.
+    // A carrier, which is heard, is a box filled in its pen; a modulator,
+    // which is not, an outline. The two read apart without colour too.
     if (carrier) {
-      ctx.globalAlpha = strength;
       ctx.fillStyle = pen;
       ctx.fillRect(boxX(p), boxY(p), box, box);
     } else if (now && now[op] > 0) {
@@ -274,15 +270,12 @@ export function drawAlgorithm(
       ctx.fillStyle = pen;
       ctx.fillRect(boxX(p), boxY(p), box, box);
     }
-    ctx.globalAlpha = strength;
+    ctx.globalAlpha = 1;
     ctx.strokeStyle = pen;
     ctx.lineWidth = carrier ? 3 : 2;
-    ctx.setLineDash(carrier ? [] : [4, 3]);
     ctx.strokeRect(boxX(p), boxY(p), box, box);
-    ctx.setLineDash([]);
-    ctx.globalAlpha = 1;
-    // Paper on a carrier's fill, unless the fill is too faint to carry it.
-    ctx.fillStyle = carrier && strength >= 0.6 ? token('--paper') : ink;
+    // Paper on a carrier's fill.
+    ctx.fillStyle = carrier ? token('--paper') : ink;
     ctx.fillText(String(op + 1), centreX(p), boxY(p) + box / 2 + 1);
     // The operator pointed at in the table, or here: ringed in ink.
     if (state.hoverOp === op) {

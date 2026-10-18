@@ -213,8 +213,8 @@ figures subscribe to it. Nothing else passes values around.
   where that leaves a box of at least `STEADY_BOX` (the sandbox); in the
   chapter lab's short diagram each wiring is fitted on its own; a
   carrier's box is filled in --pen-blue with its number in paper, a
-  modulator's a dashed --pen-green outline, both dimmer as the operator's
-  level is lower, so the two read apart without colour too. While a note
+  modulator's a solid --pen-green outline, the same at any level, so the
+  two read apart without colour too. While a note
   sounds a modulator's box fills as strongly as it sounds (a carrier is
   filled already).
   `liveSpectrum.ts` is
@@ -338,7 +338,7 @@ title bar (title and lede, then Volume, Play note and Copy link), the
 algorithm and Start from row, the wiring diagram with Feedback beside it
 and the operator table under it, the spectrum the full height on the
 right, the keyboard across the foot. Carriers are solid blue and
-modulators dashed green in the table (filled or dashed tags, carrier rows
+modulators green outlines in the table (filled or outlined tags, carrier rows
 shaded) and the diagram. On a wide screen it is one window high and
 nothing scrolls; under 52rem high the diagram's caption is for screen
 readers only and the table's rows tighten. Below 62rem it is one column:
