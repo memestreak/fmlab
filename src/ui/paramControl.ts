@@ -105,6 +105,16 @@ export function createParam(spec: ParamSpec): {
     if (document.activeElement !== box) box.value = spec.show(value);
   };
 
+  // A box with no slider steps with the up and down arrows, where it
+  // says how.
+  box.addEventListener('keydown', event => {
+    const direction = { ArrowUp: 1, ArrowDown: -1 }[event.key] as 1 | -1 | undefined;
+    if (spec.slider || !spec.stepKey || direction === undefined) return;
+    event.preventDefault();
+    spec.set(spec.stepKey(spec.get(), direction));
+    box.value = spec.show(spec.get());
+  });
+
   box.addEventListener('input', () => {
     const typed = spec.parse(box.value);
     if (typed !== undefined) spec.set(typed);

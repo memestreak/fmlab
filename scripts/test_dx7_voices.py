@@ -8,15 +8,23 @@ import pytest
 from dx7_voices import (
     BANK_BYTES,
     HEADER,
+    VOICE_BYTES,
     RawOperator,
+    convert_lfo,
     convert_operator,
     envelope_level_db,
+    lfo_delay_seconds,
+    lfo_hz,
+    missing,
     output_level_db,
     rate_speed,
     scaling_side,
     stage_seconds,
+    tremolo_db,
     unpack_bank,
     unpack_operator,
+    unpack_voice,
+    vibrato_cents,
 )
 
 
@@ -32,6 +40,7 @@ def operator(**changes: object) -> RawOperator:
         "right_curve": 0,
         "rate_scaling": 0,
         "detune": 7,
+        "amp_sensitivity": 0,
         "velocity": 0,
         "output_level": 99,
         "fixed": False,
@@ -46,8 +55,10 @@ def test_unpacks_an_operators_packed_bytes() -> None:
     # Arrange: rates 1-4, levels 5-8, break point 39, depths 10 and 20,
     # curves 1 (left) and 2 (right), rate scaling 3 and detune 9, output
     # level 80, coarse 14 and fine 50.
+    # AMS 2 and velocity sensitivity 5 share byte 13.
     data = bytes([1, 2, 3, 4, 5, 6, 7, 8, 39, 10, 20,
-                  (2 << 2) | 1, (9 << 3) | 3, 0, 80, 14 << 1, 50])
+                  (2 << 2) | 1, (9 << 3) | 3, (5 << 2) | 2, 80, 14 << 1,
+                  50])
     # Act
     op = unpack_operator(data)
     # Assert
@@ -56,6 +67,81 @@ def test_unpacks_an_operators_packed_bytes() -> None:
     assert (op.left_curve, op.right_curve) == (1, 2)
     assert (op.rate_scaling, op.detune) == (3, 9)
     assert (op.coarse, op.fine, op.fixed) == (14, 50, False)
+    assert (op.amp_sensitivity, op.velocity) == (2, 5)
+
+
+def lfo_voice(speed: int, delay: int, pmd: int, amd: int,
+              byte116: int) -> bytes:
+    """A packed voice, all zero but its LFO bytes, 112 to 116."""
+    data = bytearray(VOICE_BYTES)
+    data[112:117] = bytes([speed, delay, pmd, amd, byte116])
+    data[117] = 24
+    data[118:128] = b"LFO TEST  "
+    return bytes(data)
+
+
+def test_unpacks_the_lfo_from_bytes_112_to_116() -> None:
+    # Speed 35, delay 50, PMD 20, AMD 30; sync on, sine (4), PMS 3.
+    voice = unpack_voice(lfo_voice(35, 50, 20, 30, (3 << 4) | (4 << 1) | 1))
+    assert (voice.lfo_speed, voice.lfo_delay) == (35, 50)
+    assert (voice.lfo_pitch_depth, voice.lfo_amp_depth) == (20, 30)
+    assert (voice.lfo_sync, voice.lfo_wave, voice.pitch_sensitivity) == (
+        True, 4, 3)
+
+
+def test_lfo_speeds_at_the_dx7s_steps() -> None:
+    # msfa's lfo.cc: 0.065 Hz to 23.9 Hz.
+    for step, hz in ((0, 0.065), (1, 0.13), (10, 1.6), (35, 5.8),
+                     (50, 8.3), (70, 12.7), (99, 23.9)):
+        assert lfo_hz(step) == pytest.approx(hz, abs=0.05)
+
+
+def test_lfo_delays_at_the_dx7s_steps() -> None:
+    assert lfo_delay_seconds(0) == 0
+    for step, seconds in ((30, 0.13), (50, 0.31), (70, 0.74), (99, 2.66)):
+        assert lfo_delay_seconds(step) == pytest.approx(seconds, abs=0.01)
+
+
+def test_vibrato_in_cents_from_pmd_and_pms() -> None:
+    assert vibrato_cents(0, 7) == 0
+    assert vibrato_cents(99, 0) == 0
+    # 255 × 255 / 65536 of an octave: about 1190 cents.
+    assert vibrato_cents(99, 7) == pytest.approx(1190.6, abs=0.1)
+    # PMD 99 and PMS 1: 255 × 10 / 65536 octave, 46.7 cents.
+    assert vibrato_cents(99, 1) == pytest.approx(46.7, abs=0.1)
+
+
+def test_tremolo_in_db_from_amd() -> None:
+    assert tremolo_db(0) == 0
+    assert tremolo_db(99) == pytest.approx(91.7, abs=0.1)
+    # It grows faster and faster: half the depth is far under half the dB.
+    assert tremolo_db(50) < tremolo_db(99) / 5
+
+
+def test_converts_a_voices_lfo() -> None:
+    voice = unpack_voice(lfo_voice(35, 50, 99, 0, (1 << 4) | (2 << 1)))
+    lfo = convert_lfo(voice)
+    assert lfo["wave"] == "sawUp"
+    assert lfo["sync"] is False
+    assert lfo["speed"] == pytest.approx(5.8, abs=0.05)
+    assert lfo["delay"] == pytest.approx(0.31, abs=0.01)
+    assert lfo["vibrato"] == pytest.approx(46.7, abs=0.1)
+    assert lfo["tremolo"] == 0
+
+
+def test_an_lfo_is_no_longer_missing() -> None:
+    voice = unpack_voice(lfo_voice(35, 0, 99, 99, (7 << 4)))
+    assert "vibrato" not in missing(voice)
+    assert "tremolo" not in missing(voice)
+
+
+def test_an_operators_tremolo_share_from_its_ams() -> None:
+    shares = [convert_operator(operator(amp_sensitivity=ams))["tremolo"]
+              for ams in range(4)]
+    assert shares[0] == 0
+    assert shares[1] == pytest.approx(66 / 255, abs=0.001)
+    assert shares[2] == pytest.approx(109 / 255, abs=0.001)
+    assert shares[3] == 1
 
 
 def test_refuses_what_is_not_a_bank() -> None:

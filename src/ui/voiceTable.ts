@@ -1,6 +1,7 @@
 // The sandbox's operator table: a row per operator of its DX7 voice, the
 // full width of the page. Each row has the operator's tag and role, its
 // ratio (slider and box), detune in cents, level in dB (slider and box),
+// its share of the LFO's tremolo (a box stepping between the DX7's four),
 // and two small drawings, to compare at a glance: its envelope and its
 // level across the keyboard. A row clicked or focused is the selected
 // one, outlined, and the operator panel above shows it; a click on a
@@ -11,6 +12,7 @@ import { DETUNE_CENTS, DX7_RATIO, type Dx7Envelope, type Dx7Operator, LEVEL_DB }
 import type { LabState, LabStore, VoiceTab } from '../model/lab';
 import { describeKeyScaling, drawKeyScaling } from '../viz/keyScalingPlot';
 import { drawVoiceEnvelope } from '../viz/voiceEnvelopePlot';
+import { AMS_SHARES } from '../dsp/lfo';
 import { roleOf } from './operators';
 import { createParam, typedNumber } from './paramControl';
 import { formatCents, formatDb, noteName } from './voiceFormat';
@@ -48,6 +50,27 @@ export function setDxOperator(store: LabStore, op: number, patch: Partial<Dx7Ope
 export function setDxEnvelope(store: LabStore, op: number, patch: Partial<Dx7Envelope>): void {
   const envelope = { ...store.get().dxOperators[op].envelope, ...patch };
   setDxOperator(store, op, { envelope });
+}
+
+/** A tremolo share as the box shows it: "off", "26 %", "43 %", "100 %". */
+export function formatShare(share: number): string {
+  return share === 0 ? 'off' : `${Math.round(share * 100)} %`;
+}
+
+/** The DX7 share (AMS step) nearest `share`, and the one a step up or down from it. */
+export function nearestStep(share: number): number {
+  let best = 0;
+  AMS_SHARES.forEach((step, i) => {
+    if (Math.abs(step - share) < Math.abs(AMS_SHARES[best] - share)) best = i;
+  });
+  return best;
+}
+
+/** A share typed: "off" or "0" is none, a number is a percentage, snapped to the nearest step. */
+export function parseShare(text: string): number | undefined {
+  if (/^\s*off\s*$/i.test(text)) return 0;
+  const value = typedNumber(text.replace('%', ''));
+  return value === undefined ? undefined : AMS_SHARES[nearestStep(value / 100)];
 }
 
 const within = (value: number, { min, max }: { min: number; max: number }) =>
@@ -154,6 +177,24 @@ export function mountVoiceTable(store: LabStore): void {
       },
     });
 
+    // Its share of the LFO's tremolo: one of the DX7's four steps.
+    const tremolo = createParam({
+      name: `${name} tremolo share`,
+      min: 0,
+      max: 1,
+      step: 1,
+      slider: false,
+      get: () => get().tremolo,
+      set: value => value !== null && setDxOperator(store, op, { tremolo: value }),
+      show: value => formatShare(value ?? 0),
+      parse: parseShare,
+      say: value => `${formatShare(value ?? 0)} of the tremolo`,
+      stepKey: (value, direction) =>
+        AMS_SHARES[Math.min(AMS_SHARES.length - 1, Math.max(0, nearestStep(value ?? 0) + direction))],
+      scrub: (start, pixels) =>
+        AMS_SHARES[Math.min(AMS_SHARES.length - 1, Math.max(0, nearestStep(start ?? 0) + Math.trunc(pixels / 12)))],
+    });
+
     // The two drawings, small and read only: a click on one (or Enter or
     // Space on it) selects the row and opens that tab of the panel.
     const drawing = (className: string, tab: VoiceTab) => {
@@ -176,6 +217,7 @@ export function mountVoiceTable(store: LabStore): void {
       cell('voice-ratio', 'Ratio', ratio.element),
       cell('voice-detune', 'Detune ¢', detune.element),
       cell('voice-level', 'Level dB', level.element),
+      cell('voice-tremolo', 'Tremolo', tremolo.element),
       cell('voice-env', 'Envelope', envelope.button),
       cell('voice-scaling', 'Across the keyboard', keys.button),
     );
@@ -201,6 +243,7 @@ export function mountVoiceTable(store: LabStore): void {
       ratio.update();
       detune.update();
       level.update();
+      tremolo.update();
       drawVoiceEnvelope(envelope.canvas, o.envelope, penOf(r), false);
       envelope.button.setAttribute('aria-label', `${name} envelope: edit it above`);
       drawKeyScaling(keys.canvas, o, penOf(r));

@@ -14,6 +14,12 @@ export interface KnobSpec {
   /** Turned on a log scale: equal turns are equal ratios (for times). */
   log?: boolean;
   /**
+   * 0 at the bottom: turned all the way down it is 0, and from just above
+   * there the scale runs from `min` to `max`. For a log knob that can be
+   * off, as a delay or a depth.
+   */
+  zero?: boolean;
+  /**
    * The value its arc starts from, for a value either side of it (a
    * depth from -6 to 6 dB about 0); the arc starts at the bottom otherwise.
    */
@@ -32,7 +38,7 @@ export const KNOB_DRAG_PIXELS = 200;
 const SWEEP = 135;
 
 /** Where a value sits on a knob, 0 (all the way down) to 1. */
-export function knobPosition(spec: Pick<KnobSpec, 'min' | 'max' | 'log'>, value: number): number {
+export function knobPosition(spec: Pick<KnobSpec, 'min' | 'max' | 'log' | 'zero'>, value: number): number {
   const { min, max } = spec;
   if (value <= min) return 0;
   if (value >= max) return 1;
@@ -40,9 +46,10 @@ export function knobPosition(spec: Pick<KnobSpec, 'min' | 'max' | 'log'>, value:
 }
 
 /** The value at a position on a knob, 0 to 1. */
-export function knobValue(spec: Pick<KnobSpec, 'min' | 'max' | 'log'>, position: number): number {
+export function knobValue(spec: Pick<KnobSpec, 'min' | 'max' | 'log' | 'zero'>, position: number): number {
   const p = Math.min(1, Math.max(0, position));
   const { min, max } = spec;
+  if (spec.zero && p === 0) return 0;
   return spec.log ? min * (max / min) ** p : min + (max - min) * p;
 }
 

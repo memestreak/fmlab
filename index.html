@@ -375,13 +375,41 @@
                 <h3 class="panel-title inst-section-title">Presets</h3>
                 <div id="inst-dx7-presets"></div>
               </div>
-              <!-- Its title, over the row of its chooser and diagram. -->
+              <!-- The voice: its title, and a switch between two tabs, the
+                   algorithm and the LFO (ui/lfoView.ts). -->
               <div class="inst-alg-head">
-                <h3 class="panel-title inst-section-title">Algorithms</h3>
+                <h3 class="panel-title inst-section-title">Voice</h3>
+                <div class="pill-tabs" role="tablist" aria-label="Voice">
+                  <button
+                    type="button"
+                    id="inst-tab-algorithm"
+                    class="pill-tab"
+                    role="tab"
+                    aria-controls="inst-algorithm-panel"
+                    data-tab="algorithm"
+                  >
+                    Algorithm
+                  </button>
+                  <button
+                    type="button"
+                    id="inst-tab-lfo"
+                    class="pill-tab"
+                    role="tab"
+                    aria-controls="inst-lfo-panel"
+                    data-tab="lfo"
+                  >
+                    LFO<span class="pill-mark" aria-hidden="true"></span>
+                  </button>
+                </div>
               </div>
               <!-- The algorithm chooser, the diagram and the Feedback knob,
                    the chooser and the knob mirrored either side. -->
-              <div class="inst-diagram">
+              <div
+                id="inst-algorithm-panel"
+                class="inst-diagram"
+                role="tabpanel"
+                aria-labelledby="inst-tab-algorithm"
+              >
                 <div class="inst-row inst-alg-step-row">
                   <button
                     id="inst-alg-prev"
@@ -406,6 +434,33 @@
                 </div>
                 <div id="inst-feedback"></div>
               </div>
+              <!-- The LFO: its wave, a drawing of it after a key goes down,
+                   its four knobs and its key sync. -->
+              <div
+                id="inst-lfo-panel"
+                class="inst-lfo"
+                role="tabpanel"
+                aria-labelledby="inst-tab-lfo"
+                hidden
+              >
+                <div class="inst-lfo-wave">
+                  <span id="inst-lfo-wave-label" class="inst-lfo-label">Wave</span>
+                  <div
+                    id="inst-lfo-waves"
+                    class="lfo-waves"
+                    role="radiogroup"
+                    aria-labelledby="inst-lfo-wave-label"
+                  ></div>
+                  <canvas id="inst-lfo-plot" class="inst-lfo-plot" role="img"></canvas>
+                </div>
+                <div class="inst-lfo-controls">
+                  <div id="inst-lfo-knobs" class="inst-lfo-knobs"></div>
+                  <label class="inst-lfo-sync">
+                    <input id="inst-lfo-sync" type="checkbox" />
+                    Restart on each key
+                  </label>
+                </div>
+              </div>
             </div>
             <div class="inst-right">
               <!-- The selected operator's panel, two tabs: its envelope
@@ -415,11 +470,11 @@
                 <div class="voice-envelope-head">
                   <span id="voice-envelope-tag" class="op-tag"></span>
                   <span id="voice-envelope-role" class="op-role"></span>
-                  <div class="voice-tabs" role="tablist" aria-label="Show">
+                  <div class="pill-tabs voice-tabs" role="tablist" aria-label="Show">
                     <button
                       type="button"
                       id="voice-tab-envelope"
-                      class="voice-tab"
+                      class="pill-tab"
                       role="tab"
                       aria-controls="voice-envelope-panel"
                       data-tab="envelope"
@@ -429,7 +484,7 @@
                     <button
                       type="button"
                       id="voice-tab-keys"
-                      class="voice-tab"
+                      class="pill-tab"
                       role="tab"
                       aria-controls="voice-keys-panel"
                       data-tab="keys"
@@ -476,6 +531,7 @@
                   <th scope="col">Ratio</th>
                   <th scope="col">Detune ¢</th>
                   <th scope="col">Level dB</th>
+                  <th scope="col">Tremolo</th>
                   <th scope="col">Envelope</th>
                   <th scope="col">Across the keyboard</th>
                 </tr>

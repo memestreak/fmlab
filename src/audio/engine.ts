@@ -42,7 +42,13 @@ export const PLAYED_NOTE = 128;
 /** What every note of six operators is struck with, from the state. */
 export function voicePatch(state: LabState): VoicePatch {
   return state.voiceModel === 'dx7'
-    ? { kind: 'dx7', algorithm: state.algorithm, feedback: state.dxFeedback, operators: state.dxOperators }
+    ? {
+        kind: 'dx7',
+        algorithm: state.algorithm,
+        feedback: state.dxFeedback,
+        operators: state.dxOperators,
+        lfo: state.dxLfo,
+      }
     : { algorithm: state.algorithm, feedback: state.feedback, operators: state.operators };
 }
 
@@ -173,9 +179,10 @@ export class AudioEngine {
       state.operators !== previous.operators ||
       state.voiceModel !== previous.voiceModel ||
       state.dxFeedback !== previous.dxFeedback ||
-      state.dxOperators !== previous.dxOperators
+      state.dxOperators !== previous.dxOperators ||
+      state.dxLfo !== previous.dxLfo
     ) {
-      // Taken up by the next note struck.
+      // Taken up by the next note struck; the LFO at once.
       this.tell({ type: 'patch', patch: voicePatch(state) });
     }
     if (state.volume !== previous.volume) this.tuneNote(state);

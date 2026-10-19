@@ -9,6 +9,7 @@ import {
   soundParams,
   upgradeHash,
 } from '../../chapters/route';
+import { LFO_DELAY, LFO_SPEED, LFO_TREMOLO, LFO_VIBRATO } from '../../dsp/dx7';
 import { DEFAULTS, hzToSemitones, type LabState } from '../../model/lab';
 
 const IDS = CHAPTERS.map(chapter => chapter.id);
@@ -83,7 +84,7 @@ describe('the sandbox in a link', () => {
     ...soundFromParams(paramsFromHash(`#/sandbox?${params}`)),
   });
 
-  it('is readable, each operator in fourteen short fields', () => {
+  it('is readable, each operator in fifteen short fields, the LFO in six', () => {
     const params = new URLSearchParams(soundParams(six));
     expect(params.get('c')).toBe('146.83');
     expect(params.get('a')).toBe('5');
@@ -92,8 +93,11 @@ describe('the sandbox in a link', () => {
     expect(ops).toHaveLength(6);
     // E.PIANO 1's OP2: ratio 14, no detune, -30.75 dB; attack 1 ms to
     // 0 dB, 279 ms to the break at -18.06 dB, 3.37 s to silence; break
-    // point A-1, no level scaling, 1.3 times faster an octave up.
-    expect(ops[1]).toBe('14_0_-30.75_0.001_0_0.2786_-18.06_3.3747_-96_0.0741_21_l0_l0_1.2968');
+    // point A-1, no level scaling, 1.3 times faster an octave up; none of
+    // the tremolo.
+    expect(ops[1]).toBe('14_0_-30.75_0.001_0_0.2786_-18.06_3.3747_-96_0.0741_21_l0_l0_1.2968_0');
+    // Its LFO: a sine at 5.61 Hz, 0.15 s late, no vibrato or tremolo.
+    expect(params.get('l')).toBe('sine_5.613_0.148_0_0_0');
   });
 
   it('leaves the volume out: that is the listener\'s', () => {
@@ -117,8 +121,8 @@ describe('the sandbox in a link', () => {
   });
 
   it('holds every value inside its range', () => {
-    const wild = '99_9_5_99_9_-1_-200_0_0_-5_0_e99_l-99_9';
-    const back = reopened(`a=40&f=9&o=${[wild, ...Array(5).fill(wild)].join('~')}`);
+    const wild = '99_9_5_99_9_-1_-200_0_0_-5_0_e99_l-99_9_40';
+    const back = reopened(`a=40&f=9&o=${[wild, ...Array(5).fill(wild)].join('~')}&l=square_99_9_5000_500_1`);
     expect(back.algorithm).toBe(32);
     expect(back.dxFeedback).toBeCloseTo(2 * Math.PI, 9);
     const op = back.dxOperators[0];
@@ -134,6 +138,18 @@ describe('the sandbox in a link', () => {
     expect(op.left.depth).toBeCloseTo(5.96, 2);
     expect(op.right.depth).toBeCloseTo(-5.96, 2);
     expect(op.rateScaling).toBeCloseTo(2 ** (7 / 8), 9);
+    // A share snaps to the nearest of the DX7's four: 40 % is AMS 2's 43 %.
+    expect(op.tremolo).toBeCloseTo(109 / 255, 3);
+    expect(back.dxLfo).toEqual({
+      wave: 'square',
+      speed: LFO_SPEED.max,
+      delay: LFO_DELAY.max,
+      vibrato: LFO_VIBRATO.max,
+      tremolo: LFO_TREMOLO.max,
+      sync: true,
+    });
+    // An LFO that is not one is passed over.
+    expect(reopened('l=wobble_1_0_0_0_1').dxLfo).toEqual(sandbox.patch.dxLfo);
     expect(reopened('a=0').algorithm).toBe(1);
     expect(reopened('a=2.6').algorithm).toBe(3);
   });

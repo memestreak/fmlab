@@ -48,6 +48,13 @@ RATIO_MIN = 0.5
 RATIO_MAX = 61.69
 # Middle C, which a fixed-frequency operator is made a ratio of.
 MIDDLE_C_HZ = 440 * 2 ** (-9 / 12)
+# The LFO's waves, in the DX7's order (byte 116, bits 1 to 3).
+LFO_WAVES = ("triangle", "sawDown", "sawUp", "square", "sine", "sampleHold")
+# msfa's pitch modulation sensitivity weights, PMS 0 to 7 (dx7note.cc).
+PMS_WEIGHTS = (0, 10, 20, 33, 55, 92, 153, 255)
+# Dexed's amplitude modulation sensitivities, AMS 0 to 3, over 2^24
+# (dx7note.cc, ampmodsenstab): 0, 66, 109 and 255 of 255.
+AMS_SHARES = (0.0, 4342338 / 2**24, 7171437 / 2**24, 1.0)
 
 
 @dataclass(frozen=True)
@@ -63,6 +70,7 @@ class RawOperator:
     right_curve: int
     rate_scaling: int
     detune: int
+    amp_sensitivity: int
     velocity: int
     output_level: int
     fixed: bool
@@ -79,8 +87,12 @@ class RawVoice:
     pitch_levels: tuple[int, int, int, int]
     algorithm: int
     feedback: int
+    lfo_speed: int
+    lfo_delay: int
     lfo_pitch_depth: int
     lfo_amp_depth: int
+    lfo_sync: bool
+    lfo_wave: int
     pitch_sensitivity: int
     transpose: int
 
@@ -104,6 +116,7 @@ def unpack_operator(data: bytes) -> RawOperator:
         right_curve=(data[11] >> 2) & 3,
         rate_scaling=data[12] & 7,
         detune=(data[12] >> 3) & 15,
+        amp_sensitivity=data[13] & 3,
         velocity=(data[13] >> 2) & 7,
         output_level=data[14],
         fixed=bool(data[15] & 1),
@@ -131,8 +144,14 @@ def unpack_voice(data: bytes) -> RawVoice:
         pitch_levels=(data[106], data[107], data[108], data[109]),
         algorithm=(data[110] & 31) + 1,
         feedback=data[111] & 7,
-        lfo_pitch_depth=data[113],
-        lfo_amp_depth=data[114],
+        # As Dexed's Cartridge::unpackProgram: 112 speed, 113 delay,
+        # 114 PMD, 115 AMD; 116 sync (bit 0), wave (1-3) and PMS (4-6).
+        lfo_speed=data[112],
+        lfo_delay=data[113],
+        lfo_pitch_depth=data[114],
+        lfo_amp_depth=data[115],
+        lfo_sync=bool(data[116] & 1),
+        lfo_wave=(data[116] >> 1) & 7,
         pitch_sensitivity=(data[116] >> 4) & 7,
         transpose=data[117],
     )
@@ -330,6 +349,96 @@ def convert_operator(op: RawOperator) -> dict[str, object]:
         "left": scaling_side(op.left_depth, op.left_curve),
         "right": scaling_side(op.right_depth, op.right_curve),
         "rateScaling": round(2 ** (op.rate_scaling / 8), 4),
+        "tremolo": AMS_SHARES[op.amp_sensitivity],
+    }
+
+
+def lfo_hz(speed: int) -> float:
+    """The LFO's speed in Hz, as msfa's lfo.cc has it.
+
+    Args:
+        speed: The patch's LFO speed, 0 to 99.
+
+    Returns:
+        sr × 25190424 / 2^32, where sr = (165 × speed) >> 6 (1 at 0),
+        times 11, or by 11 + ((sr - 160) >> 4) from 160.
+    """
+    sr = (165 * speed) >> 6 if speed else 1
+    sr *= 11 if sr < 160 else 11 + ((sr - 160) >> 4)
+    return sr * 25190424 / 2**32
+
+
+def lfo_delay_seconds(delay: int) -> float:
+    """How long the LFO is held back after a key, in seconds (lfo.cc).
+
+    Args:
+        delay: The patch's LFO delay, 0 to 99.
+
+    Returns:
+        0 at 0; else 2^31 / (25190424 × step), with a = 99 - delay and
+        step = (16 + (a & 15)) << (1 + (a >> 4)).
+    """
+    if delay == 0:
+        return 0.0
+    a = 99 - delay
+    step = (16 + (a & 15)) << (1 + (a >> 4))
+    return 2**31 / (25190424 * step)
+
+
+def vibrato_cents(depth: int, sensitivity: int) -> float:
+    """The LFO's peak pitch swing in cents (dx7note.cc).
+
+    Args:
+        depth: The patch's PMD, 0 to 99.
+        sensitivity: The patch's PMS, 0 to 7.
+
+    Returns:
+        1200 × ((PMD × 165) >> 6) × weight / 65536.
+    """
+    return 1200 * ((depth * 165) >> 6) * PMS_WEIGHTS[sensitivity] / 65536
+
+
+def tremolo_db(depth: int) -> float:
+    """How far the LFO pulls a full-level operator down, at most, in dB.
+
+    Dexed (dx7note.cc) takes a share pt / 2^24 of an operator's level in
+    its log units (15 doublings at full), with pt = exp(0.0175 ×
+    ((AMD × 165) >> 6) + 12.2), at the bottom of the wave with AMS 3. The
+    share at AMD 0 is taken away, so 0 is none.
+
+    Args:
+        depth: The patch's AMD, 0 to 99.
+
+    Returns:
+        About 91.7 dB at 99.
+    """
+    scaled = (depth * 165) >> 6
+
+    def share(pt: float) -> float:
+        return pt * 16 / 2**28
+
+    pulled = share(math.exp(0.0175 * scaled + 12.2)) - share(math.exp(12.2))
+    return 15 * 20 * math.log10(2) * pulled
+
+
+def convert_lfo(voice: RawVoice) -> dict[str, object]:
+    """The voice's LFO in the sandbox's units (src/dsp/dx7.ts, Dx7Lfo).
+
+    Args:
+        voice: The voice as the patch stores it.
+
+    Returns:
+        Its wave, speed in Hz, delay in seconds, vibrato in cents,
+        tremolo in dB and key sync.
+    """
+    return {
+        "wave": LFO_WAVES[min(voice.lfo_wave, len(LFO_WAVES) - 1)],
+        "speed": round(lfo_hz(voice.lfo_speed), 4),
+        "delay": round(lfo_delay_seconds(voice.lfo_delay), 4),
+        "vibrato": round(vibrato_cents(voice.lfo_pitch_depth,
+                                       voice.pitch_sensitivity), 2),
+        "tremolo": round(tremolo_db(voice.lfo_amp_depth), 2),
+        "sync": voice.lfo_sync,
     }
 
 
@@ -343,10 +452,7 @@ def missing(voice: RawVoice) -> list[str]:
         Each feature it uses that the conversion leaves out.
     """
     lost: list[str] = []
-    vibrato = voice.lfo_pitch_depth > 0 and voice.pitch_sensitivity > 0
     checks = (
-        (vibrato, "vibrato"),
-        (voice.lfo_amp_depth > 0, "tremolo"),
         (voice.pitch_levels != (50, 50, 50, 50), "pitch envelope"),
         (any(op.velocity > 0 for op in voice.operators), "velocity"),
         (any(op.fixed for op in voice.operators),
@@ -367,7 +473,7 @@ def convert_voice(voice: RawVoice) -> dict[str, object]:
 
     Returns:
         Its name, algorithm, feedback (radians, 2π at 7, halving each
-        step down), operators and what the sandbox cannot play.
+        step down), operators, LFO and what the sandbox cannot play.
     """
     feedback = 0.0 if voice.feedback == 0 else (
         2 * math.pi / 2 ** (7 - voice.feedback)
@@ -378,6 +484,7 @@ def convert_voice(voice: RawVoice) -> dict[str, object]:
         # Four places, down, so full feedback stays at or under 2π.
         "dxFeedback": math.floor(feedback * 10**4) / 10**4,
         "dxOperators": [convert_operator(op) for op in voice.operators],
+        "dxLfo": convert_lfo(voice),
         "missing": missing(voice),
     }
 
@@ -396,7 +503,7 @@ def to_typescript(voices: list[dict[str, object]]) -> str:
         "// Generated by scripts/dx7_voices.py from Yamaha's DX7 factory\n"
         "// voices (ROM1A); do not edit by hand. Factory voices © Yamaha.\n"
         "// Numbers in the sandbox's units (src/dsp/dx7.ts).\n\n"
-        "import type { Dx7Operator } from '../dsp/dx7';\n\n"
+        "import type { Dx7Lfo, Dx7Operator } from '../dsp/dx7';\n\n"
         "/** A DX7 factory voice, and what the sandbox cannot play of it. "
         "*/\n"
         "export interface FactoryVoice {\n"
@@ -404,6 +511,7 @@ def to_typescript(voices: list[dict[str, object]]) -> str:
         "  algorithm: number;\n"
         "  dxFeedback: number;\n"
         "  dxOperators: Dx7Operator[];\n"
+        "  dxLfo: Dx7Lfo;\n"
         "  missing: string[];\n"
         "}\n\n"
         f"export const FACTORY_VOICES: FactoryVoice[] = {body};\n"

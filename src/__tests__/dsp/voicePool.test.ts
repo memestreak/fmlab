@@ -1,5 +1,5 @@
 import { algorithm } from '../../dsp/algorithms';
-import { dx7EnvelopeAt, dx7Note, heldOperator } from '../../dsp/dx7';
+import { type Dx7Lfo, dx7EnvelopeAt, dx7Note, HELD_LFO, heldOperator } from '../../dsp/dx7';
 import { envelopeAt } from '../../dsp/envelope';
 import { kernelLevels, type Operator, operatorEnvelope } from '../../dsp/operators';
 import { MAX_OPERATORS, PmKernel } from '../../dsp/pmKernel';
@@ -165,6 +165,7 @@ describe('the voice pool, playing a DX7 voice', () => {
     algorithm: 32,
     feedback: 0,
     operators: [held(1, 0), held(2, -6), held(3, null), held(4, null), held(5, null), held(6, null)],
+    lfo: HELD_LFO,
   };
 
   it('with one voice plays exactly what dx7Note and the kernel give', () => {
@@ -202,5 +203,68 @@ describe('the voice pool, playing a DX7 voice', () => {
     voices.setPatch(silent);
     voices.noteOn(60, 261.63);
     expect(render(voices, 2400).every(sample => sample === 0)).toBe(true);
+  });
+});
+
+describe('the voice pool\'s LFO', () => {
+  // OP1 alone, a sine, at full level: a sixth of full scale (algorithm 32).
+  const sine = (lfo: Partial<Dx7Lfo>, tremolo = 0): Dx7Patch => ({
+    kind: 'dx7',
+    algorithm: 32,
+    feedback: 0,
+    operators: [
+      { ...heldOperator(1, 0), tremolo },
+      ...[2, 3, 4, 5, 6].map(r => heldOperator(r, null)),
+    ],
+    // A square, synced, very slow: from a key on it sits at its bottom,
+    // which swings the pitch down and pulls levels hardest, for seconds.
+    lfo: { ...HELD_LFO, wave: 'square', speed: 0.065, sync: true, ...lfo },
+  });
+  const peak = (samples: Float32Array) => Math.max(...samples.map(Math.abs));
+  /** Rising zero crossings a second. */
+  const pitchOf = (samples: Float32Array) => {
+    let crossings = 0;
+    for (let i = 1; i < samples.length; i++) if (samples[i - 1] < 0 && samples[i] >= 0) crossings++;
+    return (crossings * SAMPLE_RATE) / samples.length;
+  };
+
+  it('swings every note\'s pitch by the vibrato, in cents', () => {
+    const voices = new VoicePool(1, SAMPLE_RATE, LOCK_SAMPLES);
+    voices.setPatch(sine({ vibrato: 1200 }));
+    voices.noteOn(69, 440);
+    render(voices, SAMPLE_RATE * 0.1);
+    // An octave down at the wave's bottom.
+    expect(pitchOf(render(voices, SAMPLE_RATE))).toBeCloseTo(220, -1);
+  });
+
+  it('pulls an operator down by its share of the tremolo, in dB', () => {
+    const level = (tremolo: number, share: number) => {
+      const voices = new VoicePool(1, SAMPLE_RATE, LOCK_SAMPLES);
+      voices.setPatch(sine({ tremolo }, share));
+      voices.noteOn(69, 440);
+      render(voices, SAMPLE_RATE * 0.1);
+      return peak(render(voices, 4800));
+    };
+    expect(level(0, 1)).toBeCloseTo(1 / 6, 2);
+    // 20 dB: a tenth.
+    expect(level(20, 1) / level(0, 1)).toBeCloseTo(0.1, 2);
+    // A quarter of 20 dB on an operator taking a quarter.
+    expect(level(20, 0.25) / level(0, 1)).toBeCloseTo(10 ** (-5 / 20), 2);
+    // An operator taking none is untouched.
+    expect(level(20, 0)).toBeCloseTo(level(0, 1), 6);
+  });
+
+  it('holds the LFO back for its delay after every key, for the notes held too', () => {
+    const voices = new VoicePool(2, SAMPLE_RATE, LOCK_SAMPLES);
+    voices.setPatch(sine({ tremolo: 20, delay: 0.5 }, 1));
+    voices.noteOn(60, 261.63);
+    // Through the delay, untouched; once faded in, a tenth.
+    expect(peak(render(voices, SAMPLE_RATE * 0.4))).toBeCloseTo(1 / 6, 2);
+    render(voices, SAMPLE_RATE * 0.7);
+    expect(peak(render(voices, 4800))).toBeCloseTo(1 / 60, 2);
+    // A second key: the held note is let go of the LFO again too.
+    voices.noteOn(72, 523.25);
+    render(voices, SAMPLE_RATE * 0.05);
+    expect(peak(render(voices, SAMPLE_RATE * 0.3))).toBeGreaterThan(0.25);
   });
 });
