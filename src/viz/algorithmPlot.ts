@@ -118,11 +118,14 @@ function fitBox(columns: number, rows: number, width: number, height: number): n
 /**
  * How wide a canvas of `height` must be for the widest wiring (six
  * across) to keep the box size its height gives: `box × 9.6 + 40`, from
- * `fitBox`. Never so narrow that the box would fall under STEADY_BOX.
+ * `fitBox`; no wider than `room`, where the box is then sized by the
+ * width instead. Never so narrow that the box would fall under
+ * STEADY_BOX.
  */
-export function steadyDiagramWidth(height: number): number {
+export function steadyDiagramWidth(height: number, room = Infinity): number {
   const box = Math.max(STEADY_BOX, Math.min(BOX, (height - 18) / (LARGEST.rows * 1.7 + 0.25)));
-  return box * LARGEST.columns * 1.6 + 40;
+  const across = (side: number) => side * LARGEST.columns * 1.6 + 40;
+  return Math.max(across(STEADY_BOX), Math.min(across(box), room));
 }
 
 /**

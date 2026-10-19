@@ -104,11 +104,26 @@ export function mountFeedbackKnob(store: LabStore): void {
     if (state.dxFeedback !== previous.dxFeedback) knob.update();
   });
 
+  // The diagram as wide as the widest wiring needs, but leaving room for
+  // the algorithm chooser and the knob, mirrored either side of it.
   const row = document.querySelector<HTMLElement>('.inst-diagram');
   const canvas = document.querySelector<HTMLCanvasElement>('#algorithm-plot');
-  if (!row || !canvas) return;
-  new ResizeObserver(() => {
-    const { height } = canvas.getBoundingClientRect();
-    row.style.setProperty('--diagram-width', `${steadyDiagramWidth(height).toFixed(1)}px`);
-  }).observe(canvas);
+  const chooser = document.querySelector<HTMLElement>('.inst-alg-step-row');
+  if (!row || !canvas || !chooser) return;
+  // Where the page is laid out wide (the breakpoint is instrument.css's).
+  const wide = window.matchMedia('(min-width: 62rem)');
+  const size = () => {
+    const gap = parseFloat(getComputedStyle(row).columnGap) || 0;
+    const side = Math.max(chooser.offsetWidth, knob.element.offsetWidth);
+    // The chooser shares the diagram's line on a wide screen only (the
+    // breakpoint is instrument.css's); on a phone it sits above.
+    const room = wide.matches
+      ? row.clientWidth - 2 * (side + gap)
+      : row.clientWidth - knob.element.offsetWidth - gap;
+    const width = steadyDiagramWidth(canvas.getBoundingClientRect().height, room);
+    row.style.setProperty('--diagram-width', `${width.toFixed(1)}px`);
+  };
+  const watch = new ResizeObserver(size);
+  watch.observe(row);
+  watch.observe(canvas);
 }

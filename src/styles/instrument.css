@@ -178,7 +178,12 @@
 }
 
 .inst-alg-step-row {
-  gap: 0.6rem;
+  justify-self: end;
+  gap: 0.4rem;
+}
+
+#inst-feedback {
+  justify-self: start;
 }
 
 .round-step {
@@ -550,14 +555,15 @@ body[data-envelope='open'] #inst-figures .figure:not([hidden]) {
 }
 
 /* The diagram's own plate: Fig. 1 on the left, Feedback on the right. */
-/* The diagram and its Feedback knob, centred together: the diagram's
-   column as wide as the widest wiring needs (--diagram-width, set in
-   ui/instrument.ts), so the knob sits just clear of it and holds still. */
+/* The algorithm chooser, the diagram and its Feedback knob, the diagram
+   in the middle and the other two mirrored either side of it, centred
+   on it. The diagram's column is as wide as the widest wiring needs
+   (--diagram-width, set in ui/instrument.ts), so the chooser and the
+   knob sit just clear of it and hold still. */
 .inst-diagram {
   display: grid;
-  grid-template-columns: var(--diagram-width, 15.2rem) auto;
+  grid-template-columns: minmax(0, 1fr) var(--diagram-width, 15.2rem) minmax(0, 1fr);
   grid-template-rows: minmax(0, 1fr);
-  justify-content: center;
   column-gap: 0.75rem;
   align-items: center;
   border-bottom: 1px solid var(--ink);
@@ -1071,8 +1077,19 @@ body[data-envelope='open'] #inst-figures .figure:not([hidden]) {
     gap: 1rem;
   }
 
+  /* No room for three across: the chooser over the diagram and its
+     knob, which stay side by side. */
   .inst-diagram {
+    grid-template-columns: var(--diagram-width, 15.2rem) auto;
+    grid-template-rows: auto auto;
+    justify-content: center;
+    row-gap: 0.5rem;
     padding-bottom: 0.5rem;
+  }
+
+  .inst-alg-step-row {
+    grid-column: 1 / -1;
+    justify-self: start;
   }
 
   #inst-diagram-figure .plot-frame {
