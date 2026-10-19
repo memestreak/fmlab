@@ -418,16 +418,12 @@
                   <span id="voice-envelope-tag" class="op-tag"></span>
                   <span id="voice-envelope-role" class="op-role"></span>
                   <h3 id="voice-envelope-title" class="voice-envelope-title">Envelope</h3>
-                  <button id="voice-envelope-close" type="button" class="btn btn-quiet">
-                    Close
-                  </button>
                 </div>
                 <div class="voice-envelope-body">
                   <canvas id="voice-envelope-curve" class="voice-envelope-curve" role="img"></canvas>
                   <div id="voice-envelope-knobs" class="voice-envelope-knobs"></div>
                 </div>
               </section>
-              <div id="inst-figures" class="inst-plate"></div>
             </div>
           </div>
           <!-- A row per operator of the DX7 voice (ui/voiceTable.ts). -->
@@ -449,9 +445,13 @@
             </table>
           </section>
         </div>
-        <!-- The keyboard, across the foot; docked to the screen's foot on
-             a phone. -->
-        <div id="inst-keys" class="inst-keys"></div>
+        <!-- Across the foot, the keyboard and the spectrum beside it;
+             docked to the screen's foot on a phone, the spectrum over the
+             keys. -->
+        <div class="inst-foot">
+          <div id="inst-keys" class="inst-keys"></div>
+          <div id="inst-figures" class="inst-plate"></div>
+        </div>
       </section>
 
       <!-- Every section, by group: opened by the Contents button. -->

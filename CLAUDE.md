@@ -95,8 +95,8 @@ figures subscribe to it. Nothing else passes values around.
   `voiceModel` says which operators six-operator chapters play: `basic`
   (`operators`, `feedback`: ratio, level 0 to 1, one decay; `algorithms`)
   or `dx7` (`dxOperators`, `dxFeedback`; the sandbox), the DX7 voice of
-  `src/dsp/dx7.ts`. `selectedOp` is the operator whose envelope view is
-  open in the sandbox.
+  `src/dsp/dx7.ts`. `selectedOp` is the operator whose envelope view the
+  sandbox shows; one always is, OP1 when it opens.
   `momentOf(state, time)` is what a figure should draw at a time on the
   page's clock: the patch as set, or, while a note sounds, that moment's
   index and loudness.
@@ -349,14 +349,16 @@ figures subscribe to it. Nothing else passes values around.
   keys, the break point ruled: a drag up or down at either side sets its
   depth, a click turns its curve, and from the keyboard up and down, with
   Shift the left side, C to turn); a row clicked or focused is selected
-  (`selectedOp`), outlined, and only it shows its break point and speed-up
-  boxes. `paramControl.ts` is its box (type, or drag up or right for
+  (`selectedOp`; one always is, and presets, links and stepping keep it),
+  outlined, and only it shows its break point and speed-up boxes; the
+  other rows keep their room (`is-off`, hidden but laid out) so the
+  columns never change width. `paramControl.ts` is its box (type, or drag up or right for
   more) with an optional slider; `voiceFormat.ts` writes times, dB, cents
   and keys the same everywhere. `envelopeView.ts` is the selected
-  operator's envelope, over the spectrum: its tag, role and "Envelope"
-  with Close (and Escape), the curve with a dot to drag at the end of
+  operator's envelope, always open: its tag, role and "Envelope", the
+  curve with a dot to drag at the end of
   each part (across for the time, up and down for the level), and seven
-  knobs. `knob.ts` is the knob: a `role="slider"` turned by dragging up
+  knobs under it. `knob.ts` is the knob: a `role="slider"` turned by dragging up
   or down or with the keys the Bessel plot answers to, drawn ink on paper
   with its value arc in `--knob-pen`, its name and its `.num` value
   under it, time knobs on a log scale;
@@ -429,17 +431,19 @@ wiring diagram it draws beside them (Jeremy,
 2026-10-19). The diagram's column is as wide as six boxes need at the
 box size its height gives, within what the pair leaves
 (`steadyDiagramWidth`), so the pair holds still; on a phone the chooser
-sits above, the knob beside the diagram. On the right the spectrum, with the selected
-operator's envelope view over it (`#voice-envelope`) while one is open.
+sits above, the knob beside the diagram. On the right the selected
+operator's envelope view (`#voice-envelope`) alone, its curve filling it.
 Under the band the operator table (`#voice-table`) the full width, then
-the keyboard across the foot. Carriers are solid blue and modulators
+the foot (`.inst-foot`): the octave control and keyboard on the left, the
+spectrum (`#inst-figures`) filling the rest of the row, no taller than
+the keyboard. Carriers are solid blue and modulators
 green outlines in the table (filled or outlined tags, carrier rows
 shaded) and the diagram. On a wide screen it is one window high and
 nothing scrolls, at 1440 × 900 and 1280 × 800; the figures' captions are
 for screen readers only there, and under 52rem high the rows, drawings,
 knobs and gaps tighten. Below 62rem it is one column: the keyboard
-docked to the screen's foot, the spectrum held at the top with the
-envelope view under it, the controls scrolling under them, and the
+and the spectrum over it docked to the screen's foot, the envelope view
+first, the controls scrolling under it, and the
 operator table as cards, each with its drawings.
 
 ## Styling
