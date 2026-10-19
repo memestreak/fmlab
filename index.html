@@ -381,14 +381,11 @@
                 <h3 class="panel-title inst-section-title">Presets</h3>
                 <div id="inst-dx7-presets"></div>
               </div>
-              <!-- The algorithm list over the diagram it draws. -->
-              <div class="inst-row inst-section-head inst-alg-head">
+              <!-- Its title, then the algorithm list with a step either
+                   side, over the diagram it draws. -->
+              <div class="inst-alg-head">
                 <h3 class="panel-title inst-section-title">Algorithms</h3>
-                <div id="inst-algorithm"></div>
-              </div>
-              <div class="inst-diagram">
-                <!-- The diagram, with a step to the algorithm either side. -->
-                <div class="inst-alg-step">
+                <div class="inst-row inst-alg-step-row">
                   <button
                     id="inst-alg-prev"
                     type="button"
@@ -397,7 +394,7 @@
                   >
                     ‹
                   </button>
-                  <div id="inst-diagram-figure"></div>
+                  <div id="inst-algorithm"></div>
                   <button
                     id="inst-alg-next"
                     type="button"
@@ -406,6 +403,11 @@
                   >
                     ›
                   </button>
+                </div>
+              </div>
+              <div class="inst-diagram">
+                <div class="inst-alg-step">
+                  <div id="inst-diagram-figure"></div>
                 </div>
                 <div id="inst-feedback"></div>
               </div>

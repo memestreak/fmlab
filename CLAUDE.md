@@ -420,11 +420,9 @@ title bar (title and lede, then Volume; no Play or Copy link: the
 keyboard and the space bar play, and the address bar keeps the sound),
 then, in layout F (Jeremy, 2026-10-18), a top band: on the left, the
 title Presets with the voice menu between ‹ › (`stepPreset`, round the
-32) and its note on one line, then the title Algorithms with the
-algorithm list on the next, over the wiring diagram it draws, with ‹ ›
-just clear of its widest wiring
-(`steadyHalfWidth`) stepping round the 32 (`stepAlgorithm`) with
-Feedback beside it; on the right the spectrum, with the selected
+32) and its note on one line, then the title Algorithms over the
+algorithm list between ‹ › (`stepAlgorithm`, round the 32), over the
+wiring diagram it draws, with Feedback beside it; on the right the spectrum, with the selected
 operator's envelope view over it (`#voice-envelope`) while one is open.
 Under the band the operator table (`#voice-table`) the full width, then
 the keyboard across the foot. Carriers are solid blue and modulators
