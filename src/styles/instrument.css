@@ -189,7 +189,7 @@
   grid-column: 1;
   justify-self: center;
   /* A little above its share, nearer the chooser. */
-  transform: translateY(-0.65rem);
+  transform: translateY(-1.3rem);
 }
 
 .inst-alg-step {
