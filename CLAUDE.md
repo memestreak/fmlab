@@ -422,10 +422,10 @@ then, in layout F (Jeremy, 2026-10-18), a top band: on the left, the
 title Presets with the voice menu between ‹ › (`stepPreset`, round the
 32) and its note on one line, then the title Algorithms on its own line
 at the top left, over one row: on the left the algorithm list between
-‹ › (`stepAlgorithm`, round the 32), level with the top of the
-diagram's area, and the Feedback knob (`mountFeedbackKnob`, 0 to 2π)
-under it, level with its bottom, and the wiring diagram it draws beside
-them (Jeremy,
+‹ › (`stepAlgorithm`, round the 32) a little in from the top of the
+diagram's area, and the Feedback knob (`mountFeedbackKnob`, 0 to 2π) a
+little in from its bottom (the height left shared 1 : 3 : 1), and the
+wiring diagram it draws beside them (Jeremy,
 2026-10-19). The diagram's column is as wide as six boxes need at the
 box size its height gives, within what the pair leaves
 (`steadyDiagramWidth`), so the pair holds still; on a phone the chooser
