@@ -188,6 +188,8 @@
   grid-row: 4;
   grid-column: 1;
   justify-self: center;
+  /* A little above its share, nearer the chooser. */
+  transform: translateY(-0.65rem);
 }
 
 .inst-alg-step {
@@ -1113,6 +1115,7 @@ body[data-envelope='open'] #inst-figures .figure:not([hidden]) {
     grid-row: 2;
     grid-column: 2;
     margin-top: 0;
+    transform: none;
   }
 
   #inst-diagram-figure .plot-frame {
