@@ -422,7 +422,10 @@ then, in layout F (Jeremy, 2026-10-18), a top band: on the left, the
 title Presets with the voice menu between ‹ › (`stepPreset`, round the
 32) and its note on one line, then the title Algorithms over the
 algorithm list between ‹ › (`stepAlgorithm`, round the 32), over the
-wiring diagram it draws, with Feedback beside it; on the right the spectrum, with the selected
+wiring diagram it draws, with the Feedback knob (`mountFeedbackKnob`,
+0 to 2π) beside it, just clear of its widest wiring: the diagram's
+column is as wide as six boxes need at its box size
+(`steadyDiagramWidth`), so the knob holds still; on the right the spectrum, with the selected
 operator's envelope view over it (`#voice-envelope`) while one is open.
 Under the band the operator table (`#voice-table`) the full width, then
 the keyboard across the foot. Carriers are solid blue and modulators

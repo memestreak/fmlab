@@ -21,7 +21,8 @@ export const sandbox: Chapter = {
   // The factory voices it starts from are Yamaha's, and say so.
   lede: "Six operators, wired by any of the DX7's 32 algorithms, starting from its factory voices (© Yamaha).",
   // No Carrier slider: the keyboard sets the pitch of every note.
-  controls: ['volume', 'dxFeedback'],
+  // Its Feedback is a knob beside the diagram (ui/instrument.ts).
+  controls: ['volume'],
   presets: DX7_VOICES,
   presetMenu: true,
   hasPiano: true,
