@@ -406,36 +406,47 @@ canvas.voice-keys {
   gap: 0.6rem;
 }
 
-/* The tabs: words, the one showing in bold and underlined in ink. */
+/* The tabs: a switch at the header's right-hand end, apart from the
+   operator's tag and role, drawn as the lab's switches are (.switch):
+   two pills joined, the one showing filled in ink. */
 .voice-tabs {
-  display: flex;
-  gap: 0.9rem;
-  margin-left: 0.4rem;
+  display: inline-flex;
+  margin-left: auto;
 }
 
 .voice-tab {
-  padding: 0.1rem 0 0.15rem;
-  border: 0;
-  border-bottom: 2px solid transparent;
-  background: none;
+  min-height: 1.9rem;
+  padding: 0 0.8rem;
+  border: 1px solid var(--ink);
+  background: var(--paper);
   color: var(--ink);
   font: inherit;
-  font-size: 1rem;
+  font-size: 0.85rem;
   white-space: nowrap;
   cursor: pointer;
 }
 
+.voice-tab:first-child {
+  border-radius: 999px 0 0 999px;
+}
+
+.voice-tab:last-child {
+  margin-left: -1px;
+  border-radius: 0 999px 999px 0;
+}
+
 .voice-tab:hover {
-  border-bottom-color: var(--rule);
+  background: var(--paper-sunken);
 }
 
 .voice-tab[aria-selected='true'] {
-  border-bottom-color: var(--ink);
-  color: var(--ink);
-  font-weight: 700;
+  background: var(--ink);
+  color: var(--paper);
+  font-weight: 600;
 }
 
 .voice-tab:focus-visible {
+  position: relative;
   outline: 2px solid var(--ink);
   outline-offset: 2px;
 }

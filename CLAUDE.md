@@ -359,7 +359,9 @@ figures subscribe to it. Nothing else passes values around.
   more) with an optional slider; `voiceFormat.ts` writes times, dB, cents
   and keys the same everywhere. `envelopeView.ts` is the operator panel,
   always open: the selected operator's tag and role and two tabs,
-  Envelope and Across the keyboard (`role="tab"`, arrows between them),
+  Envelope and Across the keyboard (`role="tab"`, arrows between them;
+  drawn as the lab's two-pill switch at the header's right-hand end, so
+  they read apart from the tag and role),
   and the Envelope tab: the curve with a dot to drag at the end of each
   part (across for the time, up and down for the level), and seven knobs
   under it. `keyScalingView.ts` is the Across the keyboard tab: the curve
