@@ -171,10 +171,194 @@
   padding: 0 0 0.1rem;
 }
 
-/* Under the Algorithms title, the list between ‹ and ›. */
+/* The Voice title at the left, its Algorithm | LFO switch at the right. */
 .inst-alg-head {
-  display: grid;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 0.6rem;
+}
+
+/* A switch between tabs, drawn as the lab's switches are (.switch): two
+   pills joined, the one showing filled in ink. The Voice's Algorithm |
+   LFO and the operator panel's Envelope | Across the keyboard. */
+.pill-tabs {
+  display: inline-flex;
+  flex: none;
+}
+
+.pill-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 1.9rem;
+  padding: 0 0.8rem;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.pill-tab:first-child {
+  border-radius: 999px 0 0 999px;
+}
+
+.pill-tab:last-child {
+  margin-left: -1px;
+  border-radius: 0 999px 999px 0;
+}
+
+.pill-tab:hover {
+  background: var(--paper-sunken);
+}
+
+.pill-tab[aria-selected='true'] {
+  background: var(--ink);
+  color: var(--paper);
+  font-weight: 600;
+}
+
+.pill-tab:focus-visible {
+  position: relative;
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* The LFO's mark: a small ink dot after its name while the LFO is on and
+   its tab is closed. */
+.pill-mark {
+  display: none;
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.pill-tab.is-marked .pill-mark {
+  display: inline-block;
+}
+
+.inst-diagram[hidden],
+.inst-lfo[hidden] {
+  display: none;
+}
+
+/* The LFO tab, as tall as the Algorithm tab: the wave's buttons over its
+   drawing on the left, the knobs and key sync on the right. */
+.inst-lfo {
+  display: grid;
+  flex: 1 1 auto;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 1.25rem;
+  align-items: stretch;
+  min-height: 0;
+  padding: 0.2rem 0 0.4rem;
+}
+
+.inst-lfo-wave {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  justify-items: start;
+  gap: 0.35rem;
+  min-height: 0;
+}
+
+.inst-lfo-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* The six waves, joined in a row: each a small drawing of its shape in
+   ink; the chosen one filled in ink, its drawing in paper. */
+.lfo-waves {
+  display: inline-flex;
+}
+
+.lfo-wave {
+  display: grid;
+  place-items: center;
+  width: 2.3rem;
+  height: 1.8rem;
+  padding: 0;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.lfo-wave + .lfo-wave {
+  margin-left: -1px;
+}
+
+.lfo-wave:first-child {
+  border-radius: 0.4rem 0 0 0.4rem;
+}
+
+.lfo-wave:last-child {
+  border-radius: 0 0.4rem 0.4rem 0;
+}
+
+.lfo-wave:hover {
+  background: var(--paper-sunken);
+}
+
+.lfo-wave[aria-checked='true'] {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.lfo-wave:focus-visible {
+  position: relative;
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.lfo-wave svg {
+  display: block;
+  width: 1.5rem;
+  height: 1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.inst-lfo-plot {
+  display: block;
+  align-self: stretch;
+  width: 100%;
+  height: 100%;
+  min-height: 5rem;
+}
+
+.inst-lfo-controls {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 0.6rem;
+}
+
+.inst-lfo-knobs {
+  display: grid;
+  grid-template-columns: repeat(2, 4.4rem);
+  gap: 0.5rem 0.25rem;
+}
+
+.inst-lfo-sync {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.inst-lfo-sync input {
+  accent-color: var(--ink);
 }
 
 .inst-alg-step-row {
@@ -336,7 +520,7 @@
 
 .voice-table .voice-ratio,
 .voice-table .voice-level {
-  width: 24%;
+  width: 22%;
 }
 
 .voice-table .voice-env {
@@ -378,6 +562,15 @@ canvas.voice-keys {
   width: 3.6rem;
 }
 
+/* The tremolo share: a narrow box, the sliders giving up the width. */
+.voice-table .voice-tremolo {
+  width: 4.5rem;
+}
+
+.inst .voice-tremolo .op-input {
+  width: 3.6rem;
+}
+
 /* The selected row: outlined in ink, the operator whose envelope is open. */
 [data-view='instrument'] .voice-row.is-selected {
   outline: 2px solid var(--ink);
@@ -406,49 +599,10 @@ canvas.voice-keys {
   gap: 0.6rem;
 }
 
-/* The tabs: a switch at the header's right-hand end, apart from the
-   operator's tag and role, drawn as the lab's switches are (.switch):
-   two pills joined, the one showing filled in ink. */
+/* The operator panel's tabs: the switch at the header's right-hand end,
+   apart from the operator's tag and role. */
 .voice-tabs {
-  display: inline-flex;
   margin-left: auto;
-}
-
-.voice-tab {
-  min-height: 1.9rem;
-  padding: 0 0.8rem;
-  border: 1px solid var(--ink);
-  background: var(--paper);
-  color: var(--ink);
-  font: inherit;
-  font-size: 0.85rem;
-  white-space: nowrap;
-  cursor: pointer;
-}
-
-.voice-tab:first-child {
-  border-radius: 999px 0 0 999px;
-}
-
-.voice-tab:last-child {
-  margin-left: -1px;
-  border-radius: 0 999px 999px 0;
-}
-
-.voice-tab:hover {
-  background: var(--paper-sunken);
-}
-
-.voice-tab[aria-selected='true'] {
-  background: var(--ink);
-  color: var(--paper);
-  font-weight: 600;
-}
-
-.voice-tab:focus-visible {
-  position: relative;
-  outline: 2px solid var(--ink);
-  outline-offset: 2px;
 }
 
 .voice-envelope-body[hidden] {
@@ -979,7 +1133,8 @@ canvas.voice-keys {
     flex: none;
   }
 
-  .inst-diagram {
+  .inst-diagram,
+  .inst-lfo {
     flex: 1 1 auto;
     min-height: 9rem;
   }
@@ -1018,7 +1173,8 @@ canvas.voice-keys {
     padding: 0.1rem 0.3rem;
   }
 
-  .inst-diagram {
+  .inst-diagram,
+  .inst-lfo {
     min-height: 7rem;
   }
 
@@ -1224,6 +1380,21 @@ canvas.voice-keys {
     grid-column: 2;
     margin-top: 0;
     transform: none;
+  }
+
+  /* The LFO's wave and drawing above, its knobs and key sync under. */
+  .inst-lfo {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 0.75rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .inst-lfo-plot {
+    height: 7rem;
+  }
+
+  .inst-lfo-knobs {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   #inst-diagram-figure .plot-frame {

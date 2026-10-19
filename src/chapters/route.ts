@@ -11,14 +11,22 @@ import {
   DETUNE_CENTS,
   DX7_FEEDBACK,
   DX7_RATIO,
+  type Dx7Lfo,
   type Dx7Operator,
   LEVEL_DB,
+  LFO_DELAY,
+  LFO_SPEED,
+  LFO_TREMOLO,
+  LFO_VIBRATO,
+  LFO_WAVES,
+  type LfoWave,
   MAX_STAGE_SECONDS,
   RATE_SCALING,
   SCALING_DEPTH,
   type ScalingSide,
   SILENCE_DB,
 } from '../dsp/dx7';
+import { AMS_SHARES } from '../dsp/lfo';
 import { CARRIER_HZ, clamp, hzToSemitones, type LabState, semitonesToHz } from '../model/lab';
 import { GLOSSARY, LANDING, type SectionId } from './outline';
 
@@ -103,8 +111,9 @@ function brief(value: number, places: number): string {
  * The six operators of a DX7 voice in a link, short: each as its ratio,
  * detune, level ("x" for off), its envelope (attack, peak, decay 1, break,
  * decay 2, sustain, release), its break point, left and right scaling
- * (curve "l" or "e" then depth) and rate scaling, joined by "_", and the
- * six joined by "~". Characters a URL keeps as they are.
+ * (curve "l" or "e" then depth), rate scaling and its share of the
+ * LFO's tremolo as a percentage, joined by "_", and the six joined by
+ * "~". Characters a URL keeps as they are.
  */
 export function operatorsParam(operators: readonly Dx7Operator[]): string {
   const side = ({ curve, depth }: ScalingSide) => `${curve === 'lin' ? 'l' : 'e'}${brief(depth, 3)}`;
@@ -126,12 +135,13 @@ export function operatorsParam(operators: readonly Dx7Operator[]): string {
         side(op.left),
         side(op.right),
         brief(op.rateScaling, 4),
+        brief(op.tremolo * 100, 1),
       ].join('_');
     })
     .join('~');
 }
 
-const FIELDS = 14;
+const FIELDS = 15;
 const STAGE = { min: 0, max: MAX_STAGE_SECONDS };
 const ENV_LEVEL = { min: SILENCE_DB, max: 0 };
 /** The DX7's break points: A-1 to C8 (MIDI 21 to 120). */
@@ -139,7 +149,7 @@ const KEYS = { min: 21, max: 120 };
 
 /**
  * The six operators a link's "o" describes, each value held inside its
- * range; null unless it is exactly six operators of fourteen fields each,
+ * range; null unless it is exactly six operators of fifteen fields each,
  * all readable, so a damaged or old link keeps the voice the sandbox
  * starts with.
  */
@@ -158,14 +168,14 @@ export function operatorsFromParam(raw: string | null): Dx7Operator[] | null {
   for (const row of rows) {
     const f = row.split('_');
     if (f.length !== FIELDS) return null;
-    const values = [0, 1, ...[3, 4, 5, 6, 7, 8, 9, 10, 13]].map(i => number(f[i]));
+    const values = [0, 1, ...[3, 4, 5, 6, 7, 8, 9, 10, 13, 14]].map(i => number(f[i]));
     if (!values.every(Number.isFinite)) return null;
     const level = f[2] === 'x' ? null : number(f[2]);
     if (level !== null && !Number.isFinite(level)) return null;
     const left = side(f[11]);
     const right = side(f[12]);
     if (!left || !right) return null;
-    const [ratio, detune, attack, peak, decay1, brk, decay2, sustain, release, breakKey, rate] = values;
+    const [ratio, detune, attack, peak, decay1, brk, decay2, sustain, release, breakKey, rate, share] = values;
     operators.push({
       ratio: clamp(ratio, DX7_RATIO),
       detune: clamp(detune, DETUNE_CENTS),
@@ -183,14 +193,49 @@ export function operatorsFromParam(raw: string | null): Dx7Operator[] | null {
       left,
       right,
       rateScaling: clamp(rate, RATE_SCALING),
+      tremolo: nearestShare(share / 100),
     });
   }
   return operators;
 }
 
+/** The DX7 tremolo share (AMS) nearest `share`. */
+export function nearestShare(share: number): number {
+  return AMS_SHARES.reduce((best, step) => (Math.abs(step - share) < Math.abs(best - share) ? step : best));
+}
+
+/** The LFO in a link: wave, speed, delay, vibrato, tremolo and sync, joined by "_". */
+export function lfoParam(lfo: Dx7Lfo): string {
+  return [
+    lfo.wave,
+    brief(lfo.speed, 3),
+    brief(lfo.delay, 3),
+    brief(lfo.vibrato, 1),
+    brief(lfo.tremolo, 1),
+    lfo.sync ? '1' : '0',
+  ].join('_');
+}
+
+/** The LFO a link's "l" describes, each number held inside its range; null if it is not one. */
+export function lfoFromParam(raw: string | null): Dx7Lfo | null {
+  if (raw === null) return null;
+  const f = raw.split('_');
+  if (f.length !== 6 || !(LFO_WAVES as readonly string[]).includes(f[0])) return null;
+  const [speed, delay, vibrato, tremolo] = f.slice(1, 5).map(text => (text.trim() === '' ? NaN : Number(text)));
+  if (![speed, delay, vibrato, tremolo].every(Number.isFinite) || !['0', '1'].includes(f[5])) return null;
+  return {
+    wave: f[0] as LfoWave,
+    speed: clamp(speed, LFO_SPEED),
+    delay: clamp(delay, LFO_DELAY),
+    vibrato: clamp(vibrato, LFO_VIBRATO),
+    tremolo: clamp(tremolo, LFO_TREMOLO),
+    sync: f[5] === '1',
+  };
+}
+
 /**
  * The parameters that carry a sandbox sound: the base pitch, the
- * algorithm, the feedback and the six operators. Volume stays the
+ * algorithm, the feedback, the six operators and the LFO. Volume stays the
  * listener's own, and is left out.
  */
 export function soundParams(state: LabState): string {
@@ -199,6 +244,7 @@ export function soundParams(state: LabState): string {
     a: String(state.algorithm),
     f: brief(state.dxFeedback, 4),
     o: operatorsParam(state.dxOperators),
+    l: lfoParam(state.dxLfo),
   }).toString();
 }
 
@@ -233,5 +279,7 @@ export function soundFromParams(params: URLSearchParams): Partial<LabState> {
   if (feedback !== null) patch.dxFeedback = clamp(feedback, DX7_FEEDBACK);
   const operators = operatorsFromParam(params.get('o'));
   if (operators) patch.dxOperators = operators;
+  const lfo = lfoFromParam(params.get('l'));
+  if (lfo) patch.dxLfo = lfo;
   return patch;
 }

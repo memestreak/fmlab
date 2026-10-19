@@ -6,8 +6,8 @@ import type { ChapterPatch, Preset } from './types';
 // converted into the sandbox's units by
 // scripts/dx7_voices.py (dx7Factory.ts). Close approximations: the
 // sandbox plays everything they set that it has, and leaves out what it
-// has not (velocity, vibrato and tremolo, the pitch envelope, fixed
-// frequencies, transpose), which each hint names.
+// has not (velocity, the pitch envelope, fixed frequencies, transpose,
+// an envelope ending above silence), which each hint names.
 
 /** A factory voice as a preset's patch. */
 function patchOf(voice: FactoryVoice): Partial<ChapterPatch> {
@@ -15,6 +15,7 @@ function patchOf(voice: FactoryVoice): Partial<ChapterPatch> {
     algorithm: voice.algorithm,
     dxFeedback: voice.dxFeedback,
     dxOperators: voice.dxOperators,
+    dxLfo: voice.dxLfo,
   };
 }
 
@@ -29,7 +30,7 @@ function list(items: readonly string[]): string {
   return items.length < 2 ? items.join('') : `${items.slice(0, -1).join(', ')} and ${items.at(-1)}`;
 }
 
-/** The line beside the menu: "approximate · no vibrato, velocity". */
+/** The line beside the menu: "approximate · no velocity, transpose". */
 export function factoryNote(voice: FactoryVoice): string {
   const short = voice.missing.map(what => what.replace(/ \(.*\)$/, ''));
   return short.length > 0 ? `approximate · no ${short.join(', ')}` : 'approximate';

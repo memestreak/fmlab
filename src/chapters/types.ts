@@ -57,6 +57,7 @@ export type ChapterPatch = Pick<
   | 'voiceModel'
   | 'dxOperators'
   | 'dxFeedback'
+  | 'dxLfo'
   | 'compare'
 >;
 

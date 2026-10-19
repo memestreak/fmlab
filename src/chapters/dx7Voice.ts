@@ -169,9 +169,21 @@ export const dx7Voice: Chapter = {
      ${define('breakPoint')}: each side of it gets its own curve, linear (an even
      slope, of up to about 6 dB every three semitones) or exponential
      (starting gently and then steepening). Here the break point is middle C, and only
-     the side above it slopes, down. None of these numbers can be changed
-     in this section; in ${sectionLink('sandbox', 'the sandbox')} every one
-     of them can, and a keyboard plays the voice at every pitch.`,
+     the side above it slopes, down.`,
+    `An ${define('lfo', 'LFO')}, a low-frequency oscillator, is a wave too
+     slow to hear as a note, from one cycle in fifteen seconds to two dozen
+     a second. The DX7 has one for the whole instrument, so every note you
+     hold moves with it together. Turned to pitch it is ${use('vibrato')}:
+     all six operators bend together, so the note's pitch swings and its
+     timbre stays the same.`,
+    `Turned to level it is ${define('tremolo')}: the LFO pulls levels down
+     and back, and each operator takes as much of that as you give it. On a
+     carrier you hear the note grow softer and louder; on a modulator it is
+     the index that moves, and the note grows darker and brighter. A delay
+     holds both back each time a key goes down, then fades them in.`,
+    `None of these numbers can be changed in this section; in
+     ${sectionLink('sandbox', 'the sandbox')} every one of them can, and a
+     keyboard plays the voice at every pitch.`,
   ],
   maths: [
     {

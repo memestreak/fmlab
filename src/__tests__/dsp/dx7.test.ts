@@ -41,6 +41,7 @@ const operator = (o: Partial<Dx7Operator> = {}): Dx7Operator => ({
   left: { curve: 'lin', depth: 0 },
   right: { curve: 'lin', depth: 0 },
   rateScaling: 1,
+  tremolo: 0,
   ...o,
 });
 

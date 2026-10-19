@@ -2,7 +2,7 @@
 // voices (ROM1A); do not edit by hand. Factory voices © Yamaha.
 // Numbers in the sandbox's units (src/dsp/dx7.ts).
 
-import type { Dx7Operator } from '../dsp/dx7';
+import type { Dx7Lfo, Dx7Operator } from '../dsp/dx7';
 
 /** A DX7 factory voice, and what the sandbox cannot play of it. */
 export interface FactoryVoice {
@@ -10,6 +10,7 @@ export interface FactoryVoice {
   algorithm: number;
   dxFeedback: number;
   dxOperators: Dx7Operator[];
+  dxLfo: Dx7Lfo;
   missing: string[];
 }
 
@@ -41,7 +42,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.843
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 0.5,
@@ -65,7 +67,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'exp',
           'depth': -0.422
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -89,7 +92,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -113,7 +117,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -137,7 +142,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -161,11 +167,19 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'exp',
           'depth': -3.012
         },
-        'rateScaling': 1.4142
+        'rateScaling': 1.4142,
+        'tremolo': 0.0
       }
     ],
+    'dxLfo': {
+      'wave': 'sine',
+      'speed': 6.129,
+      'delay': 0.0,
+      'vibrato': 7.25,
+      'tremolo': 0.0,
+      'sync': false
+    },
     'missing': [
-      'tremolo',
       'velocity'
     ]
   },
@@ -196,7 +210,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 2.289
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 0.5,
@@ -220,7 +235,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 2.289
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 0.5,
@@ -244,7 +260,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 0.5,
@@ -268,7 +285,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 0.5,
@@ -292,7 +310,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 0.5,
@@ -316,9 +335,18 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       }
     ],
+    'dxLfo': {
+      'wave': 'sine',
+      'speed': 6.129,
+      'delay': 0.0,
+      'vibrato': 0.0,
+      'tremolo': 0.0,
+      'sync': false
+    },
     'missing': []
   },
   {
@@ -348,7 +376,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.1892
+        'rateScaling': 1.1892,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -372,7 +401,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.1892
+        'rateScaling': 1.1892,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -396,7 +426,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0905
+        'rateScaling': 1.0905,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -420,7 +451,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 3.18,
@@ -444,7 +476,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 8.47,
@@ -468,11 +501,19 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.834
+        'rateScaling': 1.834,
+        'tremolo': 0.0
       }
     ],
+    'dxLfo': {
+      'wave': 'triangle',
+      'speed': 5.8065,
+      'delay': 0.0,
+      'vibrato': 7.25,
+      'tremolo': 0.0,
+      'sync': false
+    },
     'missing': [
-      'tremolo',
       'velocity',
       'transpose'
     ]
@@ -504,7 +545,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.1892
+        'rateScaling': 1.1892,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -528,7 +570,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0905
+        'rateScaling': 1.0905,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -552,7 +595,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -5.843
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -576,7 +620,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.1892
+        'rateScaling': 1.1892,
+        'tremolo': 0.0
       },
       {
         'ratio': 3.0,
@@ -600,7 +645,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.1892
+        'rateScaling': 1.1892,
+        'tremolo': 0.0
       },
       {
         'ratio': 14.0,
@@ -624,11 +670,19 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.1892
+        'rateScaling': 1.1892,
+        'tremolo': 0.0
       }
     ],
+    'dxLfo': {
+      'wave': 'triangle',
+      'speed': 4.9677,
+      'delay': 0.0,
+      'vibrato': 7.32,
+      'tremolo': 0.0,
+      'sync': false
+    },
     'missing': [
-      'tremolo',
       'velocity'
     ]
   },
@@ -659,7 +713,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 2.0,
@@ -683,7 +738,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 2.0,
@@ -707,7 +763,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 2.0,
@@ -731,7 +788,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 2.0,
@@ -755,7 +813,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 8.0,
@@ -779,12 +838,19 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       }
     ],
+    'dxLfo': {
+      'wave': 'sine',
+      'speed': 4.9677,
+      'delay': 1.184,
+      'vibrato': 7.32,
+      'tremolo': 0.0,
+      'sync': false
+    },
     'missing': [
-      'vibrato',
-      'tremolo',
       'transpose'
     ]
   },
@@ -815,7 +881,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.1892
+        'rateScaling': 1.1892,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -839,7 +906,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0905
+        'rateScaling': 1.0905,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -863,7 +931,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -3.615
         },
-        'rateScaling': 1.1892
+        'rateScaling': 1.1892,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -887,7 +956,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.1892
+        'rateScaling': 1.1892,
+        'tremolo': 0.0
       },
       {
         'ratio': 3.0,
@@ -911,7 +981,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.1892
+        'rateScaling': 1.1892,
+        'tremolo': 0.0
       },
       {
         'ratio': 14.0,
@@ -935,12 +1006,19 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.1892
+        'rateScaling': 1.1892,
+        'tremolo': 0.0
       }
     ],
+    'dxLfo': {
+      'wave': 'sine',
+      'speed': 4.6452,
+      'delay': 0.2537,
+      'vibrato': 14.1,
+      'tremolo': 0.0,
+      'sync': false
+    },
     'missing': [
-      'vibrato',
-      'tremolo',
       'velocity',
       'transpose'
     ]
@@ -972,7 +1050,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -996,7 +1075,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 2.0,
@@ -1020,7 +1100,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 2.0,
@@ -1044,7 +1125,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 2.0,
@@ -1068,7 +1150,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 2.0,
@@ -1092,12 +1175,19 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       }
     ],
+    'dxLfo': {
+      'wave': 'sine',
+      'speed': 4.9677,
+      'delay': 0.5328,
+      'vibrato': 9.06,
+      'tremolo': 0.0,
+      'sync': false
+    },
     'missing': [
-      'vibrato',
-      'tremolo',
       'transpose'
     ]
   },
@@ -1128,7 +1218,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.4142
+        'rateScaling': 1.4142,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -1152,7 +1243,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -0.783
         },
-        'rateScaling': 1.5422
+        'rateScaling': 1.5422,
+        'tremolo': 0.0
       },
       {
         'ratio': 3.0,
@@ -1176,7 +1268,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -4.458
         },
-        'rateScaling': 1.5422
+        'rateScaling': 1.5422,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -1200,7 +1293,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.5422
+        'rateScaling': 1.5422,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.58,
@@ -1224,7 +1318,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -3.976
         },
-        'rateScaling': 1.5422
+        'rateScaling': 1.5422,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -1248,9 +1343,18 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -0.602
         },
-        'rateScaling': 1.5422
+        'rateScaling': 1.5422,
+        'tremolo': 0.0
       }
     ],
+    'dxLfo': {
+      'wave': 'triangle',
+      'speed': 5.8065,
+      'delay': 0.0,
+      'vibrato': 0.0,
+      'tremolo': 0.0,
+      'sync': false
+    },
     'missing': [
       'velocity'
     ]
@@ -1282,7 +1386,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -1306,7 +1411,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -0.602
         },
-        'rateScaling': 1.1892
+        'rateScaling': 1.1892,
+        'tremolo': 0.0
       },
       {
         'ratio': 5.0,
@@ -1330,7 +1436,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -1.627
         },
-        'rateScaling': 1.5422
+        'rateScaling': 1.5422,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -1354,7 +1461,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 0.5,
@@ -1378,7 +1486,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -1.566
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 0.5,
@@ -1402,9 +1511,18 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -5.904
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       }
     ],
+    'dxLfo': {
+      'wave': 'triangle',
+      'speed': 4.9677,
+      'delay': 0.0,
+      'vibrato': 0.0,
+      'tremolo': 0.0,
+      'sync': false
+    },
     'missing': [
       'velocity',
       'transpose'
@@ -1437,7 +1555,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -1461,7 +1580,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -3.012
         },
-        'rateScaling': 1.1892
+        'rateScaling': 1.1892,
+        'tremolo': 0.0
       },
       {
         'ratio': 7.0,
@@ -1485,7 +1605,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -1.205
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -1509,7 +1630,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -1533,7 +1655,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -1.627
         },
-        'rateScaling': 1.1892
+        'rateScaling': 1.1892,
+        'tremolo': 0.0
       },
       {
         'ratio': 0.5,
@@ -1557,9 +1680,18 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       }
     ],
+    'dxLfo': {
+      'wave': 'triangle',
+      'speed': 7.4839,
+      'delay': 0.0,
+      'vibrato': 0.0,
+      'tremolo': 0.0,
+      'sync': false
+    },
     'missing': [
       'velocity'
     ]
@@ -1591,7 +1723,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 14.0,
@@ -1615,7 +1748,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -1639,7 +1773,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -1663,7 +1798,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -1687,7 +1823,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -1711,11 +1848,19 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -1.145
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       }
     ],
+    'dxLfo': {
+      'wave': 'sine',
+      'speed': 5.6129,
+      'delay': 0.148,
+      'vibrato': 0.0,
+      'tremolo': 0.0,
+      'sync': false
+    },
     'missing': [
-      'vibrato',
       'velocity'
     ]
   },
@@ -1746,7 +1891,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.4142
+        'rateScaling': 1.4142,
+        'tremolo': 0.0
       },
       {
         'ratio': 3.0,
@@ -1770,7 +1916,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -3.916
         },
-        'rateScaling': 1.1892
+        'rateScaling': 1.1892,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -1794,7 +1941,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 3.0,
@@ -1818,7 +1966,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -0.843
         },
-        'rateScaling': 1.4142
+        'rateScaling': 1.4142,
+        'tremolo': 0.0
       },
       {
         'ratio': 3.0,
@@ -1842,7 +1991,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -0.904
         },
-        'rateScaling': 1.4142
+        'rateScaling': 1.4142,
+        'tremolo': 0.0
       },
       {
         'ratio': 12.0,
@@ -1866,11 +2016,19 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -1.205
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 1.0
       }
     ],
+    'dxLfo': {
+      'wave': 'sine',
+      'speed': 5.8065,
+      'delay': 0.0,
+      'vibrato': 1.21,
+      'tremolo': 0.14,
+      'sync': false
+    },
     'missing': [
-      'tremolo',
       'velocity'
     ]
   },
@@ -1901,7 +2059,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -1925,7 +2084,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0905
+        'rateScaling': 1.0905,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.5,
@@ -1949,7 +2109,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -2.41
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 0.5,
@@ -1973,7 +2134,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 0.5,
@@ -1997,7 +2159,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 3.0,
@@ -2021,9 +2184,18 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -2.771
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       }
     ],
+    'dxLfo': {
+      'wave': 'triangle',
+      'speed': 5.8065,
+      'delay': 0.0,
+      'vibrato': 0.0,
+      'tremolo': 0.0,
+      'sync': false
+    },
     'missing': [
       'velocity',
       'an envelope ending above silence'
@@ -2056,7 +2228,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0905
+        'rateScaling': 1.0905,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -2080,7 +2253,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -2104,7 +2278,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -1.265
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 2.0,
@@ -2128,7 +2303,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -3.615
         },
-        'rateScaling': 1.6818
+        'rateScaling': 1.6818,
+        'tremolo': 0.0
       },
       {
         'ratio': 3.0,
@@ -2152,7 +2328,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0905
+        'rateScaling': 1.0905,
+        'tremolo': 0.0
       },
       {
         'ratio': 17.0,
@@ -2176,11 +2353,19 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -1.265
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       }
     ],
+    'dxLfo': {
+      'wave': 'sine',
+      'speed': 6.129,
+      'delay': 0.2131,
+      'vibrato': 0.0,
+      'tremolo': 91.71,
+      'sync': false
+    },
     'missing': [
-      'vibrato',
       'transpose'
     ]
   },
@@ -2211,7 +2396,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -0.843
         },
-        'rateScaling': 1.834
+        'rateScaling': 1.834,
+        'tremolo': 0.0
       },
       {
         'ratio': 0.5,
@@ -2235,7 +2421,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.834
+        'rateScaling': 1.834,
+        'tremolo': 0.0
       },
       {
         'ratio': 0.5,
@@ -2259,7 +2446,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.6818
+        'rateScaling': 1.6818,
+        'tremolo': 0.0
       },
       {
         'ratio': 5.0,
@@ -2283,7 +2471,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.5422
+        'rateScaling': 1.5422,
+        'tremolo': 0.0
       },
       {
         'ratio': 0.5,
@@ -2307,7 +2496,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.834
+        'rateScaling': 1.834,
+        'tremolo': 0.0
       },
       {
         'ratio': 9.0,
@@ -2331,9 +2521,18 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0905
+        'rateScaling': 1.0905,
+        'tremolo': 0.0
       }
     ],
+    'dxLfo': {
+      'wave': 'triangle',
+      'speed': 5.8065,
+      'delay': 0.0,
+      'vibrato': 0.0,
+      'tremolo': 0.0,
+      'sync': false
+    },
     'missing': [
       'velocity',
       'transpose'
@@ -2366,7 +2565,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -1.928
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 0.515,
@@ -2390,7 +2590,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -2.108
         },
-        'rateScaling': 1.0905
+        'rateScaling': 1.0905,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -2414,7 +2615,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 0.5,
@@ -2438,7 +2640,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.01,
@@ -2462,7 +2665,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -1.928
         },
-        'rateScaling': 1.4142
+        'rateScaling': 1.4142,
+        'tremolo': 0.0
       },
       {
         'ratio': 0.5,
@@ -2486,11 +2690,19 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       }
     ],
+    'dxLfo': {
+      'wave': 'sine',
+      'speed': 5.0968,
+      'delay': 0.148,
+      'vibrato': 0.0,
+      'tremolo': 0.0,
+      'sync': false
+    },
     'missing': [
-      'vibrato',
       'velocity',
       'transpose'
     ]
@@ -2522,7 +2734,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.01,
@@ -2546,7 +2759,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -0.602
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.5,
@@ -2570,7 +2784,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 0.5,
@@ -2594,7 +2809,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -2618,7 +2834,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 3.0,
@@ -2642,9 +2859,18 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       }
     ],
+    'dxLfo': {
+      'wave': 'triangle',
+      'speed': 5.8065,
+      'delay': 0.0,
+      'vibrato': 0.0,
+      'tremolo': 0.0,
+      'sync': false
+    },
     'missing': []
   },
   {
@@ -2674,7 +2900,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -3.012
         },
-        'rateScaling': 1.5422
+        'rateScaling': 1.5422,
+        'tremolo': 0.0
       },
       {
         'ratio': 0.5,
@@ -2698,7 +2925,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.4142
+        'rateScaling': 1.4142,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -2722,7 +2950,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -2.41
         },
-        'rateScaling': 1.5422
+        'rateScaling': 1.5422,
+        'tremolo': 0.0
       },
       {
         'ratio': 4.0,
@@ -2746,7 +2975,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -0.602
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 2.0,
@@ -2770,7 +3000,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 10.0,
@@ -2794,11 +3025,19 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.06
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       }
     ],
+    'dxLfo': {
+      'wave': 'sine',
+      'speed': 5.6129,
+      'delay': 0.148,
+      'vibrato': 0.0,
+      'tremolo': 0.0,
+      'sync': false
+    },
     'missing': [
-      'vibrato',
       'velocity',
       'transpose'
     ]
@@ -2830,7 +3069,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 0.5,
@@ -2854,7 +3094,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0905
+        'rateScaling': 1.0905,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -2878,7 +3119,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 3.0,
@@ -2902,7 +3144,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -2.771
         },
-        'rateScaling': 1.0905
+        'rateScaling': 1.0905,
+        'tremolo': 0.0
       },
       {
         'ratio': 4.0,
@@ -2926,7 +3169,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 6.0,
@@ -2950,9 +3194,18 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -3.313
         },
-        'rateScaling': 1.0905
+        'rateScaling': 1.0905,
+        'tremolo': 0.0
       }
     ],
+    'dxLfo': {
+      'wave': 'triangle',
+      'speed': 5.8065,
+      'delay': 0.0,
+      'vibrato': 0.0,
+      'tremolo': 0.0,
+      'sync': false
+    },
     'missing': [
       'velocity',
       'an envelope ending above silence'
@@ -2985,7 +3238,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 0.5,
@@ -3009,7 +3263,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 6.0,
@@ -3033,7 +3288,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -1.265
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 2.0,
@@ -3057,7 +3313,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 0.5,
@@ -3081,7 +3338,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 8.0,
@@ -3105,9 +3363,18 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -1.265
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       }
     ],
+    'dxLfo': {
+      'wave': 'sine',
+      'speed': 4.9677,
+      'delay': 0.0,
+      'vibrato': 0.0,
+      'tremolo': 0.0,
+      'sync': false
+    },
     'missing': [
       'velocity'
     ]
@@ -3139,7 +3406,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.723
         },
-        'rateScaling': 1.1892
+        'rateScaling': 1.1892,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -3163,7 +3431,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.723
         },
-        'rateScaling': 1.1892
+        'rateScaling': 1.1892,
+        'tremolo': 0.0
       },
       {
         'ratio': 3.0,
@@ -3187,7 +3456,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.723
         },
-        'rateScaling': 1.4142
+        'rateScaling': 1.4142,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -3211,7 +3481,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'exp',
           'depth': 0.0
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -3235,7 +3506,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'exp',
           'depth': 0.0
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 14.0,
@@ -3259,9 +3531,18 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.723
         },
-        'rateScaling': 1.5422
+        'rateScaling': 1.5422,
+        'tremolo': 0.0
       }
     ],
+    'dxLfo': {
+      'wave': 'triangle',
+      'speed': 4.3226,
+      'delay': 0.0,
+      'vibrato': 0.0,
+      'tremolo': 0.0,
+      'sync': true
+    },
     'missing': [
       'velocity'
     ]
@@ -3293,7 +3574,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 3.0,
@@ -3317,7 +3599,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -2.771
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 0.5,
@@ -3341,7 +3624,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 5.0,
@@ -3365,7 +3649,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -2.771
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 0.75,
@@ -3389,7 +3674,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -2.771
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 4.52,
@@ -3413,9 +3699,18 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       }
     ],
+    'dxLfo': {
+      'wave': 'triangle',
+      'speed': 5.8065,
+      'delay': 0.0,
+      'vibrato': 0.0,
+      'tremolo': 0.0,
+      'sync': true
+    },
     'missing': [
       'velocity'
     ]
@@ -3447,7 +3742,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.6818
+        'rateScaling': 1.6818,
+        'tremolo': 0.0
       },
       {
         'ratio': 4.0,
@@ -3471,7 +3767,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -0.602
         },
-        'rateScaling': 1.6818
+        'rateScaling': 1.6818,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -3495,7 +3792,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.5422
+        'rateScaling': 1.5422,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -3519,7 +3817,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'exp',
           'depth': -1.024
         },
-        'rateScaling': 1.6818
+        'rateScaling': 1.6818,
+        'tremolo': 0.0
       },
       {
         'ratio': 4.0,
@@ -3543,7 +3842,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -0.301
         },
-        'rateScaling': 1.6818
+        'rateScaling': 1.6818,
+        'tremolo': 0.0
       },
       {
         'ratio': 3.0,
@@ -3567,12 +3867,19 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -0.301
         },
-        'rateScaling': 1.6818
+        'rateScaling': 1.6818,
+        'tremolo': 0.0
       }
     ],
+    'dxLfo': {
+      'wave': 'sine',
+      'speed': 4.9677,
+      'delay': 0.1973,
+      'vibrato': 15.75,
+      'tremolo': 1.01,
+      'sync': true
+    },
     'missing': [
-      'vibrato',
-      'tremolo',
       'pitch envelope',
       'velocity'
     ]
@@ -3604,7 +3911,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -3628,7 +3936,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.4142
+        'rateScaling': 1.4142,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -3652,7 +3961,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.2588235139846802
       },
       {
         'ratio': 2.0,
@@ -3676,7 +3986,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -0.602
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 2.0,
@@ -3700,7 +4011,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -2.59
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.53,
@@ -3724,12 +4036,19 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       }
     ],
+    'dxLfo': {
+      'wave': 'triangle',
+      'speed': 4.9677,
+      'delay': 0.0951,
+      'vibrato': 3.66,
+      'tremolo': 0.84,
+      'sync': false
+    },
     'missing': [
-      'vibrato',
-      'tremolo',
       'velocity'
     ]
   },
@@ -3760,7 +4079,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'exp',
           'depth': 0.0
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 0.5,
@@ -3784,7 +4104,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'exp',
           'depth': 0.0
         },
-        'rateScaling': 1.834
+        'rateScaling': 1.834,
+        'tremolo': 0.0
       },
       {
         'ratio': 0.5,
@@ -3808,7 +4129,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'exp',
           'depth': 0.0
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 3.14,
@@ -3832,7 +4154,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'exp',
           'depth': 0.0
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -3856,7 +4179,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'exp',
           'depth': 0.0
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -3880,11 +4204,19 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'exp',
           'depth': 0.0
         },
-        'rateScaling': 1.834
+        'rateScaling': 1.834,
+        'tremolo': 0.0
       }
     ],
+    'dxLfo': {
+      'wave': 'triangle',
+      'speed': 4.9677,
+      'delay': 0.0,
+      'vibrato': 7.25,
+      'tremolo': 0.0,
+      'sync': false
+    },
     'missing': [
-      'tremolo',
       'velocity'
     ]
   },
@@ -3915,7 +4247,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.1892
+        'rateScaling': 1.1892,
+        'tremolo': 0.0
       },
       {
         'ratio': 3.5,
@@ -3939,7 +4272,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.1892
+        'rateScaling': 1.1892,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -3963,7 +4297,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.1892
+        'rateScaling': 1.1892,
+        'tremolo': 0.0
       },
       {
         'ratio': 3.5,
@@ -3987,7 +4322,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.1892
+        'rateScaling': 1.1892,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.2369,
@@ -4011,7 +4347,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.1892
+        'rateScaling': 1.1892,
+        'tremolo': 0.0
       },
       {
         'ratio': 2.0,
@@ -4035,9 +4372,18 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.1892
+        'rateScaling': 1.1892,
+        'tremolo': 0.0
       }
     ],
+    'dxLfo': {
+      'wave': 'sawDown',
+      'speed': 5.8065,
+      'delay': 0.0,
+      'vibrato': 0.0,
+      'tremolo': 0.0,
+      'sync': false
+    },
     'missing': [
       'velocity',
       'fixed frequency (played as a ratio from middle C)'
@@ -4070,7 +4416,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.4142
+        'rateScaling': 1.4142,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.7,
@@ -4094,7 +4441,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -4.277
         },
-        'rateScaling': 1.1892
+        'rateScaling': 1.1892,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -4118,7 +4466,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 2.0,
@@ -4142,7 +4491,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 5.32,
@@ -4166,7 +4516,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.5217,
@@ -4190,11 +4541,19 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       }
     ],
+    'dxLfo': {
+      'wave': 'sine',
+      'speed': 4.129,
+      'delay': 0.0,
+      'vibrato': 9.16,
+      'tremolo': 91.71,
+      'sync': false
+    },
     'missing': [
-      'tremolo',
       'velocity',
       'fixed frequency (played as a ratio from middle C)'
     ]
@@ -4226,7 +4585,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 0.5,
@@ -4250,7 +4610,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'exp',
           'depth': 0.0
         },
-        'rateScaling': 1.0905
+        'rateScaling': 1.0905,
+        'tremolo': 0.0
       },
       {
         'ratio': 0.68,
@@ -4274,7 +4635,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'exp',
           'depth': 0.0
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 0.875,
@@ -4298,7 +4660,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'exp',
           'depth': 0.0
         },
-        'rateScaling': 1.834
+        'rateScaling': 1.834,
+        'tremolo': 0.0
       },
       {
         'ratio': 0.5,
@@ -4322,7 +4685,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'exp',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 0.78,
@@ -4346,11 +4710,19 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'exp',
           'depth': 0.0
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       }
     ],
+    'dxLfo': {
+      'wave': 'triangle',
+      'speed': 1.8065,
+      'delay': 0.0,
+      'vibrato': 15.01,
+      'tremolo': 0.0,
+      'sync': false
+    },
     'missing': [
-      'tremolo',
       'pitch envelope',
       'velocity'
     ]
@@ -4382,7 +4754,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.4142
+        'rateScaling': 1.4142,
+        'tremolo': 0.0
       },
       {
         'ratio': 0.5,
@@ -4406,7 +4779,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.4142
+        'rateScaling': 1.4142,
+        'tremolo': 0.0
       },
       {
         'ratio': 0.5,
@@ -4430,7 +4804,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.4142
+        'rateScaling': 1.4142,
+        'tremolo': 0.0
       },
       {
         'ratio': 25.2534,
@@ -4454,7 +4829,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0905
+        'rateScaling': 1.0905,
+        'tremolo': 0.0
       },
       {
         'ratio': 0.5,
@@ -4478,7 +4854,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 0.5,
@@ -4502,9 +4879,18 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0905
+        'rateScaling': 1.0905,
+        'tremolo': 0.0
       }
     ],
+    'dxLfo': {
+      'wave': 'sampleHold',
+      'speed': 23.9296,
+      'delay': 0.0,
+      'vibrato': 0.0,
+      'tremolo': 0.0,
+      'sync': true
+    },
     'missing': [
       'pitch envelope',
       'velocity',
@@ -4538,7 +4924,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -4562,7 +4949,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.427450954914093
       },
       {
         'ratio': 1.0,
@@ -4586,7 +4974,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.02,
@@ -4610,7 +4999,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.01,
@@ -4634,7 +5024,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 5.1,
@@ -4658,12 +5049,19 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       }
     ],
+    'dxLfo': {
+      'wave': 'triangle',
+      'speed': 5.8065,
+      'delay': 0.1665,
+      'vibrato': 28.2,
+      'tremolo': 0.1,
+      'sync': false
+    },
     'missing': [
-      'vibrato',
-      'tremolo',
       'pitch envelope',
       'velocity',
       'an envelope ending above silence'
@@ -4696,7 +5094,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': -5.904
         },
-        'rateScaling': 1.2968
+        'rateScaling': 1.2968,
+        'tremolo': 0.0
       },
       {
         'ratio': 3.03,
@@ -4720,7 +5119,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.5422
+        'rateScaling': 1.5422,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.4201,
@@ -4744,7 +5144,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'exp',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 3.7353,
@@ -4768,7 +5169,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'exp',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 9.0,
@@ -4792,7 +5194,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 1.0
       },
       {
         'ratio': 5.0,
@@ -4816,9 +5219,18 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       }
     ],
+    'dxLfo': {
+      'wave': 'triangle',
+      'speed': 6.4516,
+      'delay': 0.0,
+      'vibrato': 0.0,
+      'tremolo': 91.71,
+      'sync': false
+    },
     'missing': [
       'fixed frequency (played as a ratio from middle C)',
       'an envelope ending above silence'
@@ -4851,7 +5263,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 1.0,
@@ -4875,7 +5288,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 6.06,
@@ -4899,7 +5313,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 0.5,
@@ -4923,7 +5338,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 2.02,
@@ -4947,7 +5363,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       },
       {
         'ratio': 0.5,
@@ -4971,9 +5388,18 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'curve': 'lin',
           'depth': 0.0
         },
-        'rateScaling': 1.0
+        'rateScaling': 1.0,
+        'tremolo': 0.0
       }
     ],
+    'dxLfo': {
+      'wave': 'sawUp',
+      'speed': 10.7742,
+      'delay': 0.0,
+      'vibrato': 0.0,
+      'tremolo': 0.0,
+      'sync': true
+    },
     'missing': [
       'pitch envelope',
       'transpose'

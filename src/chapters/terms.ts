@@ -398,6 +398,21 @@ export const TERMS = {
     section: 'dx7-voice',
     match: /\bbreak points?\b/i,
   },
+  lfo: {
+    name: 'LFO',
+    plain: `An LFO is a slow oscillator, below the pitches we hear, that moves
+      another setting up and down.`,
+    section: 'dx7-voice',
+    wiki: 'Low-frequency_oscillation',
+    match: /\bLFOs?\b/,
+  },
+  tremolo: {
+    name: 'tremolo',
+    plain: `Tremolo is a regular rise and fall in loudness.`,
+    section: 'dx7-voice',
+    wiki: 'Tremolo',
+    match: /\btremolo\b/i,
+  },
   fft: {
     name: 'fast Fourier transform',
     plain: `The fast Fourier transform (FFT) is the standard way to take a

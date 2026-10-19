@@ -6,6 +6,7 @@
 // Operators and algorithms keeps its simpler operator (operators.ts).
 
 import { algorithm } from './algorithms';
+import { dx7LfoDelay, dx7LfoHz, dx7TremoloDb, dx7VibratoCents } from './lfo';
 import { type Algorithm, MAX_OPERATORS } from './pmKernel';
 
 /** A level at or below this is silence: the envelope's floor. */
@@ -72,6 +73,48 @@ export interface ScalingSide {
   depth: number;
 }
 
+/** The LFO's six waves, in the DX7's order. */
+export const LFO_WAVES = ['triangle', 'sawDown', 'sawUp', 'square', 'sine', 'sampleHold'] as const;
+export type LfoWave = (typeof LFO_WAVES)[number];
+
+/**
+ * The voice's LFO (dsp/lfo.ts): one for the whole instrument. Its speed
+ * in Hz; its delay in seconds after a key goes down, before it fades in;
+ * how far it swings every operator's pitch, in cents (the DX7's PMD and
+ * PMS in one); how far it pulls levels down, in dB, for an operator that
+ * takes all of it (the DX7's AMD); and key sync, which starts the wave
+ * again on each key.
+ */
+export interface Dx7Lfo {
+  wave: LfoWave;
+  speed: number;
+  delay: number;
+  vibrato: number;
+  tremolo: number;
+  sync: boolean;
+}
+
+/** The LFO's ranges: the DX7's 0 to 99 (and PMS 7), in these units. */
+export const LFO_SPEED = { min: dx7LfoHz(0), max: dx7LfoHz(99) };
+export const LFO_DELAY = { min: 0, max: dx7LfoDelay(99) };
+export const LFO_VIBRATO = { min: 0, max: dx7VibratoCents(99, 7) };
+export const LFO_TREMOLO = { min: 0, max: dx7TremoloDb(99) };
+
+/** An LFO that does nothing: no vibrato or tremolo, a triangle at 5.8 Hz (speed 35), synced. */
+export const HELD_LFO: Dx7Lfo = {
+  wave: 'triangle',
+  speed: Number(dx7LfoHz(35).toFixed(4)),
+  delay: 0,
+  vibrato: 0,
+  tremolo: 0,
+  sync: true,
+};
+
+/** Whether an LFO does anything: vibrato or tremolo above zero. */
+export function lfoOn(lfo: Dx7Lfo): boolean {
+  return lfo.vibrato > 0 || lfo.tremolo > 0;
+}
+
 /** One of the sandbox's six operators. */
 export interface Dx7Operator {
   ratio: number;
@@ -88,6 +131,11 @@ export interface Dx7Operator {
   right: ScalingSide;
   /** How much faster the envelope runs per octave up, ×1 to ×1.83. */
   rateScaling: number;
+  /**
+   * Its share of the LFO's tremolo, 0 to 1: one of the DX7's four AMS
+   * steps (`AMS_SHARES`), none, about a quarter, about two fifths, all.
+   */
+  tremolo: number;
 }
 
 /** A level in dB as an amplitude, 0 to 1; silence is 0. */
@@ -233,6 +281,8 @@ export interface Dx7Note {
   envelopes: Dx7Envelope[];
   /** Feedback as the kernel takes it: on the source's kernel output. */
   feedback: number;
+  /** Each operator's share of the LFO's tremolo, 0 to 1. */
+  tremolo: Float64Array;
 }
 
 /** A note of `operators` at `key`, through algorithm `number`. */
@@ -245,6 +295,7 @@ export function dx7Note(
   const alg = algorithm(number);
   const ratios = new Float64Array(MAX_OPERATORS);
   const gains = new Float64Array(MAX_OPERATORS);
+  const tremolo = new Float64Array(MAX_OPERATORS);
   const envelopes: Dx7Envelope[] = [];
   const unit = (op: number) =>
     alg.carriers.includes(op) ? 1 / alg.carriers.length : FULL_INDEX;
@@ -256,6 +307,7 @@ export function dx7Note(
       continue;
     }
     ratios[op] = detuned(o.ratio, o.detune);
+    tremolo[op] = o.tremolo;
     const db = levelAtKey(o, key);
     gains[op] = db === null ? 0 : unit(op) * dbToAmp(db);
     envelopes.push(fasterEnvelope(o.envelope, rateScalingFactor(o.rateScaling, key)));
@@ -263,7 +315,7 @@ export function dx7Note(
   // msfa feeds back the source's own output, full level being ±1: so on
   // the kernel's output, which is scaled by `unit`, divide by it.
   const loop = alg.feedback;
-  return { alg, ratios, gains, envelopes, feedback: loop ? feedback / unit(loop.from) : 0 };
+  return { alg, ratios, gains, envelopes, feedback: loop ? feedback / unit(loop.from) : 0, tremolo };
 }
 
 const SILENT_ENVELOPE: Dx7Envelope = {
@@ -316,5 +368,6 @@ export function heldOperator(ratio: number, level: number | null): Dx7Operator {
     left: { curve: 'lin', depth: 0 },
     right: { curve: 'lin', depth: 0 },
     rateScaling: 1,
+    tremolo: 0,
   };
 }

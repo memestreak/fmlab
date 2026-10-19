@@ -3,10 +3,12 @@ import { type Envelope, envelopeAt } from '../dsp/envelope';
 import {
   dbToAmp,
   dx7EnvelopeAt,
+  type Dx7Lfo,
   type Dx7Note,
   dx7Note,
   type Dx7Operator,
   dx7ReleaseSeconds,
+  HELD_LFO,
   heldOperator,
   keyOf,
   levelAtKey,
@@ -140,6 +142,8 @@ export interface LabState {
   dxOperators: Dx7Operator[];
   /** `dx7`: feedback in radians on the source's own output, 0 to 2π. */
   dxFeedback: number;
+  /** `dx7`: the voice's LFO, its vibrato and tremolo (dsp/lfo.ts). */
+  dxLfo: Dx7Lfo;
   /**
    * `dx7`: the operator selected in the table, whose envelope view is
    * open. One always is: OP1 when the sandbox opens.
@@ -237,6 +241,7 @@ export const DEFAULTS: LabState = {
     heldOperator(1, -22),
   ],
   dxFeedback: 0,
+  dxLfo: HELD_LFO,
   selectedOp: 0,
   voiceTab: 'envelope',
   compare: false,

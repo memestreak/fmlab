@@ -122,8 +122,11 @@ describe('the sandbox', () => {
       expect(preset.hint).toMatch(/^the DX7's factory .*, a close approximation/);
       expect(preset.note).toMatch(/^approximate/);
     }
-    expect(sandbox.presets[10].hint).toContain('without its vibrato and velocity');
-    expect(sandbox.presets[10].note).toBe('approximate · no vibrato, velocity');
+    expect(sandbox.presets[10].hint).toContain('without its velocity');
+    expect(sandbox.presets[10].note).toBe('approximate · no velocity');
+    // The LFO is played now: STRINGS 2's vibrato, a delay of 1.18 s.
+    expect(sandbox.presets[4].hint).not.toContain('vibrato');
+    expect(sandbox.presets[4].patch.dxLfo).toMatchObject({ wave: 'sine', delay: 1.184 });
     // A fixed frequency is played as a ratio, and says so.
     expect(sandbox.presets[25].hint).toContain('fixed frequency (played as a ratio from middle C)');
   });

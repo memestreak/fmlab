@@ -1,6 +1,15 @@
 import { algorithm } from './algorithms';
-import { type Dx7Envelope, dx7EnvelopeAt, type Dx7Note, dx7Note, type Dx7Operator, keyOf } from './dx7';
+import {
+  type Dx7Envelope,
+  dx7EnvelopeAt,
+  type Dx7Lfo,
+  type Dx7Note,
+  dx7Note,
+  type Dx7Operator,
+  keyOf,
+} from './dx7';
 import { type Envelope, envelopeAt } from './envelope';
+import { Lfo } from './lfo';
 import { kernelLevels, type Operator, operatorEnvelope } from './operators';
 import { type Algorithm, MAX_OPERATORS, PmKernel } from './pmKernel';
 import { chooseVoice, type VoiceState } from './voices';
@@ -32,6 +41,8 @@ export interface Dx7Patch {
   /** In radians on the source's own output (dsp/dx7.ts). */
   feedback: number;
   operators: readonly Dx7Operator[];
+  /** The LFO, which every sounding note shares. */
+  lfo: Dx7Lfo;
 }
 
 /** What the main thread tells the pool, over the worklet's port. */
@@ -103,6 +114,12 @@ export class VoicePool {
   private patch: VoicePatch = { algorithm: 1, feedback: 0, operators: [] };
   /** Samples rendered: the clock voices are chosen by. */
   private now = 0;
+  /** The DX7 voice's LFO, one for every note, as on the DX7. */
+  private readonly lfo = new Lfo();
+  /** This sample's vibrato, as a factor on every note's frequency. */
+  private pitch = 1;
+  /** This sample's tremolo, in dB, for an operator that takes all of it. */
+  private pull = 0;
 
   constructor(
     count: number,
@@ -122,10 +139,13 @@ export class VoicePool {
 
   setPatch(patch: VoicePatch): void {
     this.patch = structuredCloneOf(patch);
+    if (this.patch.kind === 'dx7') this.lfo.set(this.patch.lfo, this.sampleRate);
   }
 
   /** Strikes `note` at `hz`; it lets itself go after `hold` seconds. */
   noteOn(note: number, hz: number, hold = Infinity): void {
+    // Every key restarts the LFO's delay, for the notes already held too.
+    this.lfo.keyDown();
     const voice = this.voices[chooseVoice(this.voices, note)];
     voice.note = note;
     voice.struckAt = this.now;
@@ -178,7 +198,15 @@ export class VoicePool {
   /** Fills `out` with the sum of every voice. */
   render(out: Float32Array): void {
     const { voices, sampleRate } = this;
+    const dx7 = this.patch.kind === 'dx7';
+    const { vibrato, tremolo } = dx7 ? (this.patch as Dx7Patch).lfo : { vibrato: 0, tremolo: 0 };
     for (let i = 0; i < out.length; i++) {
+      // The LFO once a sample, before the voices, which all share it.
+      if (dx7) {
+        const lfo = this.lfo.next();
+        this.pitch = 2 ** ((vibrato * lfo.pitch) / 1200);
+        this.pull = tremolo * lfo.amp;
+      }
       let sample = 0;
       for (const voice of voices) {
         if (voice.sounding) sample += this.tick(voice, sampleRate);
@@ -195,10 +223,15 @@ export class VoicePool {
     let sample: number;
     const dx7 = voice.dx7;
     if (dx7) {
+      const pull = this.pull;
       for (let op = 0; op < MAX_OPERATORS; op++) {
-        voice.scaled[op] = dx7.gains[op] * dx7EnvelopeAt(dx7.envelopes[op], time, voice.hold);
+        let level = dx7.gains[op] * dx7EnvelopeAt(dx7.envelopes[op], time, voice.hold);
+        // Tremolo only ever lowers a level, by the operator's share.
+        const share = dx7.tremolo[op];
+        if (share > 0 && pull > 0) level *= 10 ** ((-pull * share) / 20);
+        voice.scaled[op] = level;
       }
-      sample = voice.kernel.tick(voice.baseFreq, dx7.ratios, voice.scaled, dx7.feedback);
+      sample = voice.kernel.tick(voice.baseFreq * this.pitch, dx7.ratios, voice.scaled, dx7.feedback);
     } else {
       for (let op = 0; op < MAX_OPERATORS; op++) {
         voice.heard[op] = voice.levels[op] * envelopeAt(voice.envelopes[op], time);
