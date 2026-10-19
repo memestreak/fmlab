@@ -137,8 +137,11 @@ export interface LabState {
   dxOperators: Dx7Operator[];
   /** `dx7`: feedback in radians on the source's own output, 0 to 2π. */
   dxFeedback: number;
-  /** `dx7`: the operator whose envelope view is open; null for none. */
-  selectedOp: number | null;
+  /**
+   * `dx7`: the operator selected in the table, whose envelope view is
+   * open. One always is: OP1 when the sandbox opens.
+   */
+  selectedOp: number;
   /**
    * Chapter 9: phase and frequency modulation side by side, both set by
    * `ratio` and `index`. `mode` says which is heard.
@@ -225,7 +228,7 @@ export const DEFAULTS: LabState = {
     heldOperator(1, -22),
   ],
   dxFeedback: 0,
-  selectedOp: null,
+  selectedOp: 0,
   compare: false,
   // Low on purpose: FM gets bright, and loud, quickly.
   volume: 0.2,

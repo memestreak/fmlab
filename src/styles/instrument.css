@@ -374,8 +374,10 @@ canvas.voice-keys {
   margin-left: 0.6rem;
 }
 
-.voice-extras[hidden] {
-  display: none;
+/* The break point and speed-up: on the selected row only, but taking
+   their room on every row, so selecting a row moves no column. */
+.voice-extras.is-off {
+  visibility: hidden;
 }
 
 .voice-times {
@@ -404,8 +406,9 @@ canvas.voice-keys {
 
 .voice-envelope {
   display: flex;
-  flex: none;
+  flex: 1 1 auto;
   flex-direction: column;
+  min-height: 0;
   gap: 0.25rem;
   padding: 0.4rem 0 0.4rem;
   border-top: 1px solid var(--ink);
@@ -433,29 +436,52 @@ canvas.voice-keys {
   margin-left: auto;
 }
 
+/* The curve the full width, as tall as the view leaves it; the knobs in
+   a row under it. */
 .voice-envelope-body {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 1rem;
+  flex: 1 1 auto;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto;
+  justify-items: center;
+  gap: 0.5rem;
+  min-height: 0;
 }
 
 .voice-envelope-curve {
   display: block;
+  align-self: stretch;
   width: 100%;
-  height: 5.6rem;
+  height: 100%;
+  min-height: 4rem;
   touch-action: none;
 }
 
-/* The spectrum keeps room for its plot under its two rows of labels,
-   however much the envelope view takes; with the view open its plate
-   gives up its padding. */
-#inst-figures .plot-frame {
-  min-height: 8.5rem;
+/* The foot: the keyboard at the left, the octave control on its left,
+   and the spectrum taking the rest of the width. The spectrum keeps room
+   for its plot under its two rows of labels. */
+.inst-foot {
+  display: flex;
+  flex: none;
+  align-items: stretch;
+  gap: 1.5rem;
 }
 
-body[data-envelope='open'] #inst-figures .figure:not([hidden]) {
-  padding: 0.35rem 0 0.15rem;
+.inst-foot .inst-keys {
+  justify-content: flex-start;
+}
+
+.inst-foot #inst-figures {
+  flex: 1 1 auto;
+}
+
+/* As tall as the keyboard: the foot's height is the keyboard's. */
+#inst-figures .figure:not([hidden]) {
+  padding: 0.2rem 0 0;
+}
+
+#inst-figures .plot-frame {
+  min-height: 0;
 }
 
 .voice-envelope-knobs {
@@ -852,10 +878,6 @@ body[data-envelope='open'] #inst-figures .figure:not([hidden]) {
     column-gap: 2.5rem;
   }
 
-  #inst-figures {
-    flex: 1 1 auto;
-  }
-
   .inst-left {
     display: flex;
     flex-direction: column;
@@ -915,13 +937,7 @@ body[data-envelope='open'] #inst-figures .figure:not([hidden]) {
     height: 1.4rem;
   }
 
-  .voice-envelope-curve {
-    height: 4.75rem;
-  }
 
-  #inst-figures .plot-frame {
-    min-height: 7.5rem;
-  }
 
   .knob-dial {
     width: 2rem;
@@ -967,12 +983,12 @@ body[data-envelope='open'] #inst-figures .figure:not([hidden]) {
   display: none;
 }
 
-/* Phones and tablets: one column. The keyboard docks to the foot of the
-   screen; the figures stick to the top while the controls scroll under
-   them. */
+/* Phones and tablets: one column. The foot docks to the foot of the
+   screen, the spectrum over the keyboard, while the controls scroll
+   above them. */
 @media (max-width: 61.99rem) {
   [data-view='instrument'] .page {
-    padding-bottom: calc(11rem + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(19rem + env(safe-area-inset-bottom, 0px));
   }
 
   .inst-bar {
@@ -1012,23 +1028,17 @@ body[data-envelope='open'] #inst-figures .figure:not([hidden]) {
     white-space: normal;
   }
 
-  /* The right column's parts as the column's own: the figures first,
-     held at the top as the controls scroll, the envelope view under
-     them. */
+  /* The envelope view first, over the algorithms. */
   .inst-right {
     display: contents;
   }
 
-  #inst-figures {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-    order: -2;
-    background: var(--paper);
-  }
-
   .voice-envelope {
     order: -1;
+  }
+
+  .voice-envelope-curve {
+    height: 7rem;
   }
 
   .voice-envelope-body {
@@ -1063,6 +1073,12 @@ body[data-envelope='open'] #inst-figures .figure:not([hidden]) {
     margin: 0.4rem 0 0;
   }
 
+  /* A card has no columns to keep: an unselected one has no room for
+     them. */
+  .voice-extras.is-off {
+    display: none;
+  }
+
   /* Each figure as tall as its plot here: there is no window height to
      share out. (The diagram's figure is in a row, so it keeps growing
      across; its frame sets its height.) */
@@ -1073,7 +1089,7 @@ body[data-envelope='open'] #inst-figures .figure:not([hidden]) {
 
   .inst-plate .plot-frame {
     flex: none;
-    height: 8rem;
+    height: 5.5rem;
   }
 
   .inst-plate figcaption,
@@ -1187,17 +1203,28 @@ body[data-envelope='open'] #inst-figures .figure:not([hidden]) {
     height: 2rem;
   }
 
-  /* The keyboard, docked: the octave control above the keys, which fill
-   the width. */
-  .inst-keys {
+  /* The foot, docked: the spectrum, then the octave control over the
+     keys, which fill the width. */
+  .inst-foot {
     position: fixed;
     right: 0;
     bottom: 0;
     left: 0;
     z-index: 5;
-    padding: 0.5rem 1rem calc(0.5rem + env(safe-area-inset-bottom, 0px));
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0 1rem calc(0.5rem + env(safe-area-inset-bottom, 0px));
     border-top: 1px solid var(--ink);
     background: var(--paper);
+  }
+
+  .inst-foot #inst-figures {
+    order: -1;
+    border-top: 0;
+  }
+
+  .inst-foot .inst-keys {
+    justify-content: center;
   }
 
   .piano {

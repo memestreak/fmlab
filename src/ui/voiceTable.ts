@@ -74,14 +74,12 @@ export function mountVoiceTable(store: LabStore): void {
   };
 
   const updates: (() => void)[] = [];
-  const rows: HTMLTableRowElement[] = [];
 
   for (let op = 0; op < 6; op++) {
     const name = `OP${op + 1}`;
     const get = () => store.get().dxOperators[op];
     const row = document.createElement('tr');
     row.className = 'op-row voice-row';
-    rows.push(row);
 
     const head = document.createElement('th');
     head.scope = 'row';
@@ -273,9 +271,7 @@ export function mountVoiceTable(store: LabStore): void {
       if (store.get().hoverOp === op) point(null);
     });
     row.addEventListener('pointerdown', () => select(op));
-    row.addEventListener('focusin', () => {
-      if (!suppressFocus) select(op);
-    });
+    row.addEventListener('focusin', () => select(op));
 
     updates.push(() => {
       const state = store.get();
@@ -287,7 +283,9 @@ export function mountVoiceTable(store: LabStore): void {
       tag.dataset.role = r;
       row.classList.toggle('is-selected', state.selectedOp === op);
       row.classList.toggle('is-pointed', state.hoverOp === op);
-      extras.hidden = state.selectedOp !== op;
+      // Kept in the layout on every row, shown on the selected one only, so
+      // the columns keep their widths whichever row is selected.
+      extras.classList.toggle('is-off', state.selectedOp !== op);
       ratio.update();
       detune.update();
       level.update();
@@ -302,15 +300,6 @@ export function mountVoiceTable(store: LabStore): void {
       );
     });
   }
-
-  let suppressFocus = false;
-  /** Focus a row's first control without selecting it again (after Close). */
-  window.addEventListener('fmlab:voice-row-focus', event => {
-    const op = (event as CustomEvent<number>).detail;
-    suppressFocus = true;
-    rows[op]?.querySelector<HTMLElement>('input')?.focus();
-    suppressFocus = false;
-  });
 
   const show = () => updates.forEach(update => update());
   const changed = (state: LabState, previous: LabState) =>

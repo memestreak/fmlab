@@ -406,7 +406,8 @@ export function mountChapters(store: LabStore): void {
       ...openingFromUrl(chapter),
       hover: null,
       hoverOp: null,
-      selectedOp: null,
+      // The sandbox opens on OP1 selected.
+      selectedOp: 0,
       pinned: null,
       noteStartedAt: null,
       // The glossary has no lab to stop a sound from.

@@ -1,6 +1,7 @@
 // The sandbox's envelope view: the selected operator's envelope, large,
-// over a shorter spectrum. Its header names the operator, its role and
-// "Envelope", with Close; under it the curve, with a dot at the end of
+// over a shorter spectrum. An operator is always selected (OP1 to begin
+// with), so the view is always open. Its header names the operator, its
+// role and "Envelope"; under it the curve, with a dot at the end of
 // each part to drag, and seven knobs, one for each part's time or level:
 // Attack, Peak, Decay 1, Break, Decay 2, Sustain, Release.
 
@@ -39,8 +40,7 @@ export function mountEnvelopeView(store: LabStore): void {
   const role = document.querySelector<HTMLElement>('#voice-envelope-role');
   const canvas = document.querySelector<HTMLCanvasElement>('#voice-envelope-curve');
   const knobs = document.querySelector<HTMLElement>('#voice-envelope-knobs');
-  const close = document.querySelector<HTMLButtonElement>('#voice-envelope-close');
-  if (!view || !tag || !role || !canvas || !knobs || !close) return;
+  if (!view || !tag || !role || !canvas || !knobs) return;
 
   const op = () => store.get().selectedOp;
   const envelope = () => {
@@ -113,20 +113,6 @@ export function mountEnvelopeView(store: LabStore): void {
     }
   });
 
-  close.addEventListener('click', () => {
-    const at = op();
-    store.set({ selectedOp: null });
-    // Back to the row it was opened from, without opening it again.
-    if (at !== null) window.dispatchEvent(new CustomEvent('fmlab:voice-row-focus', { detail: at }));
-  });
-  // Escape closes it from the view, from the table, or with nothing
-  // focused (after a click on a row).
-  document.addEventListener('keydown', event => {
-    if (event.key !== 'Escape' || store.get().selectedOp === null) return;
-    const from = event.target instanceof Element ? event.target : document.body;
-    if (from === document.body || from.closest('#voice-envelope, #inst-operators')) close.click();
-  });
-
   const draw = () => {
     const state = store.get();
     const at = state.selectedOp;
@@ -138,7 +124,6 @@ export function mountEnvelopeView(store: LabStore): void {
   const show = (state: LabState) => {
     const at = state.voiceModel === 'dx7' ? state.selectedOp : null;
     view.hidden = at === null;
-    document.body.dataset.envelope = at === null ? 'closed' : 'open';
     if (at === null) return;
     const name = `OP${at + 1}`;
     const r = roleOf(state.algorithm, at);
