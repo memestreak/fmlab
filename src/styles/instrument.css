@@ -484,6 +484,30 @@ canvas.voice-keys {
   min-height: 0;
 }
 
+/* The spectrum's title, "frequency: …", shows only under the pointer, on
+   the line the canvas leaves blank for it (viz/plot.ts drawFrame). */
+#inst-figures .plot {
+  --plot-title: hover;
+}
+
+#inst-figures .plot-frame[data-x-title]::after {
+  content: attr(data-x-title);
+  position: absolute;
+  left: 40px;
+  right: 22px;
+  bottom: 4px;
+  font: 12px / 1 var(--font-sans);
+  color: var(--ink);
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+#inst-figures .plot-frame[data-x-title]:hover::after {
+  opacity: 1;
+}
+
 .voice-envelope-knobs {
   display: grid;
   grid-template-columns: repeat(7, 3.6rem);

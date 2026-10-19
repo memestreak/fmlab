@@ -161,6 +161,14 @@ export function drawFrame(
     if (keepsLabel(i, ticks.length, stride)) ctx.fillText(sub, x(at), bottom + 23);
   });
 
+  // Where the canvas's --plot-title is "hover" (the sandbox's spectrum),
+  // its frame shows the title only under the pointer, so the canvas leaves
+  // the title's line blank and hands the frame the text.
+  const frame = ctx.canvas.parentElement;
+  if (token('--plot-title') === 'hover' && frame) {
+    frame.dataset.xTitle = xTitle;
+    return;
+  }
   ctx.font = `${LABEL_SIZE}px ${token('--font-sans')}`;
   ctx.fillText(xTitle, (left + right) / 2, bottom + 44);
 }
