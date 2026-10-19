@@ -80,11 +80,11 @@ export function mountAlgorithmSteps(store: LabStore): void {
 }
 
 /**
- * The sandbox's Feedback, a knob just beside the diagram: the diagram's
- * column is as wide as the widest wiring needs at its box size, so the
- * knob sits just clear of algorithm 32 and never moves as the algorithm
- * changes. Ink on paper, as the DX7's feedback belongs to no one
- * operator's role.
+ * The sandbox's Feedback, a knob under the algorithm chooser, the pair
+ * beside the diagram. The diagram's column is as wide as the widest
+ * wiring needs at its box size, so the pair sits just clear of algorithm
+ * 32 and never moves as the algorithm changes. Ink on paper, as the
+ * DX7's feedback belongs to no one operator's role.
  */
 export function mountFeedbackKnob(store: LabStore): void {
   const home = document.getElementById('inst-feedback');
@@ -105,7 +105,7 @@ export function mountFeedbackKnob(store: LabStore): void {
   });
 
   // The diagram as wide as the widest wiring needs, but leaving room for
-  // the algorithm chooser and the knob, mirrored either side of it.
+  // the chooser and the knob beside it (on a phone, the knob alone).
   const row = document.querySelector<HTMLElement>('.inst-diagram');
   const canvas = document.querySelector<HTMLCanvasElement>('#algorithm-plot');
   const chooser = document.querySelector<HTMLElement>('.inst-alg-step-row');
@@ -114,12 +114,13 @@ export function mountFeedbackKnob(store: LabStore): void {
   const wide = window.matchMedia('(min-width: 62rem)');
   const size = () => {
     const gap = parseFloat(getComputedStyle(row).columnGap) || 0;
-    const side = Math.max(chooser.offsetWidth, knob.element.offsetWidth);
-    // The chooser shares the diagram's line on a wide screen only (the
-    // breakpoint is instrument.css's); on a phone it sits above.
-    const room = wide.matches
-      ? row.clientWidth - 2 * (side + gap)
-      : row.clientWidth - knob.element.offsetWidth - gap;
+    // On a wide screen the chooser and the knob stand together beside
+    // the diagram (the breakpoint is instrument.css's); on a phone the
+    // chooser sits above, and the knob alone is beside it.
+    const side = wide.matches
+      ? Math.max(chooser.offsetWidth, knob.element.offsetWidth)
+      : knob.element.offsetWidth;
+    const room = row.clientWidth - side - gap;
     const width = steadyDiagramWidth(canvas.getBoundingClientRect().height, room);
     row.style.setProperty('--diagram-width', `${width.toFixed(1)}px`);
   };

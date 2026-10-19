@@ -420,14 +420,15 @@ title bar (title and lede, then Volume; no Play or Copy link: the
 keyboard and the space bar play, and the address bar keeps the sound),
 then, in layout F (Jeremy, 2026-10-18), a top band: on the left, the
 title Presets with the voice menu between ‹ › (`stepPreset`, round the
-32) and its note on one line, then the title Algorithms over one row:
-the algorithm list between ‹ › (`stepAlgorithm`, round the 32), the
-wiring diagram it draws, and the Feedback knob (`mountFeedbackKnob`,
-0 to 2π), the chooser and the knob mirrored either side of the diagram
-at the same height, just clear of its widest wiring. The diagram's
-column is as wide as six boxes need at its box size, less what the two
-sides need (`steadyDiagramWidth`), so they hold still; on a phone the
-chooser sits above. On the right the spectrum, with the selected
+32) and its note on one line, then the title Algorithms on its own line
+at the top left, over one row: on the left the algorithm list between
+‹ › (`stepAlgorithm`, round the 32) with the Feedback knob
+(`mountFeedbackKnob`, 0 to 2π) centred under it, the pair centred on
+the diagram, and the wiring diagram it draws beside them (Jeremy,
+2026-10-19). The diagram's column is as wide as six boxes need at the
+box size its height gives, within what the pair leaves
+(`steadyDiagramWidth`), so the pair holds still; on a phone the chooser
+sits above, the knob beside the diagram. On the right the spectrum, with the selected
 operator's envelope view over it (`#voice-envelope`) while one is open.
 Under the band the operator table (`#voice-table`) the full width, then
 the keyboard across the foot. Carriers are solid blue and modulators
