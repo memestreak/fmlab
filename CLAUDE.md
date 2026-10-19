@@ -436,7 +436,8 @@ operator's envelope view (`#voice-envelope`) alone, its curve filling it.
 Under the band the operator table (`#voice-table`) the full width, then
 the foot (`.inst-foot`): the octave control and keyboard on the left, the
 spectrum (`#inst-figures`) filling the rest of the row, no taller than
-the keyboard. Carriers are solid blue and modulators
+the keyboard, its x-axis title shown only under the pointer (its canvas's
+`--plot-title: hover`; `drawFrame` leaves the line to the frame). Carriers are solid blue and modulators
 green outlines in the table (filled or outlined tags, carrier rows
 shaded) and the diagram. On a wide screen it is one window high and
 nothing scrolls, at 1440 × 900 and 1280 × 800; the figures' captions are
