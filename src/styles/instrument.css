@@ -385,7 +385,8 @@ canvas.voice-keys {
 }
 
 /* The operator panel: a header with its two tabs, then the tab showing:
-   a curve with its knobs under it. */
+   a curve with its knobs under it. No rule of its own: the page bar's
+   is just above it. */
 .voice-envelope[hidden] {
   display: none;
 }
@@ -397,7 +398,6 @@ canvas.voice-keys {
   min-height: 0;
   gap: 0.25rem;
   padding: 0.4rem 0 0.4rem;
-  border-top: 1px solid var(--ink);
 }
 
 .voice-envelope-head {
@@ -688,7 +688,8 @@ canvas.voice-keys {
    together. The
    diagram's column is as wide as the widest wiring needs at the box size
    its height gives (--diagram-width, set in ui/instrument.ts), so the
-   pair sits just clear of it and holds still. */
+   pair sits just clear of it and holds still. No rule under it: the
+   Operators panel's rule is just below. */
 .inst-diagram {
   display: grid;
   grid-template-columns: auto var(--diagram-width, 15.2rem);
@@ -696,7 +697,6 @@ canvas.voice-keys {
   justify-content: center;
   column-gap: 0.75rem;
   align-items: center;
-  border-bottom: 1px solid var(--ink);
 }
 
 #inst-diagram-figure,
