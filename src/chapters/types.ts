@@ -58,6 +58,7 @@ export type ChapterPatch = Pick<
   | 'dxOperators'
   | 'dxFeedback'
   | 'dxLfo'
+  | 'dxPitchEnvelope'
   | 'compare'
 >;
 

@@ -48,6 +48,7 @@ export function voicePatch(state: LabState): VoicePatch {
         feedback: state.dxFeedback,
         operators: state.dxOperators,
         lfo: state.dxLfo,
+        pitchEnvelope: state.dxPitchEnvelope,
       }
     : { algorithm: state.algorithm, feedback: state.feedback, operators: state.operators };
 }
@@ -180,7 +181,8 @@ export class AudioEngine {
       state.voiceModel !== previous.voiceModel ||
       state.dxFeedback !== previous.dxFeedback ||
       state.dxOperators !== previous.dxOperators ||
-      state.dxLfo !== previous.dxLfo
+      state.dxLfo !== previous.dxLfo ||
+      state.dxPitchEnvelope !== previous.dxPitchEnvelope
     ) {
       // Taken up by the next note struck; the LFO at once.
       this.tell({ type: 'patch', patch: voicePatch(state) });

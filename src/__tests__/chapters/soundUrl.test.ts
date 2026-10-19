@@ -9,7 +9,7 @@ import {
   soundParams,
   upgradeHash,
 } from '../../chapters/route';
-import { LFO_DELAY, LFO_SPEED, LFO_TREMOLO, LFO_VIBRATO } from '../../dsp/dx7';
+import { LFO_DELAY, LFO_SPEED, LFO_TREMOLO, LFO_VIBRATO, PITCH_EG_SPEED } from '../../dsp/dx7';
 import { DEFAULTS, hzToSemitones, type LabState } from '../../model/lab';
 
 const IDS = CHAPTERS.map(chapter => chapter.id);
@@ -98,6 +98,9 @@ describe('the sandbox in a link', () => {
     expect(ops[1]).toBe('14_0_-30.75_0.001_0_0.2786_-18.06_3.3747_-96_0.0741_21_l0_l0_1.2968_0');
     // Its LFO: a sine at 5.61 Hz, 0.15 s late, no vibrato or tremolo.
     expect(params.get('l')).toBe('sine_5.613_0.148_0_0_0');
+    // Its pitch envelope, flat, with the factory's speeds: levels in cents,
+    // speeds in cents a second.
+    expect(params.get('p')).toBe('0_11380.28_0_4056.34_0_11887.32_0_3267.61');
   });
 
   it('leaves the volume out: that is the listener\'s', () => {
@@ -112,6 +115,7 @@ describe('the sandbox in a link', () => {
     expect(back.algorithm).toBe(5);
     expect(back.dxFeedback).toBeCloseTo(Math.PI, 3);
     expect(back.dxOperators).toEqual(six.dxOperators);
+    expect(back.dxPitchEnvelope).toEqual(six.dxPitchEnvelope);
     expect(back.carrierHz).toBeCloseTo(146.83, 1);
   });
 
@@ -148,6 +152,19 @@ describe('the sandbox in a link', () => {
       tremolo: LFO_TREMOLO.max,
       sync: true,
     });
+    // The pitch envelope's levels to four octaves, its speeds to msfa's.
+    const bent = reopened('p=9000_1_-9000_99999_120_300_-50_600').dxPitchEnvelope;
+    expect(bent).toEqual({
+      start: 4800,
+      attack: PITCH_EG_SPEED.min,
+      peak: -4800,
+      decay1: PITCH_EG_SPEED.max,
+      brk: 120,
+      decay2: 300,
+      sustain: -50,
+      release: 600,
+    });
+    expect(reopened('p=1_2_3').dxPitchEnvelope).toEqual(sandbox.patch.dxPitchEnvelope);
     // An LFO that is not one is passed over.
     expect(reopened('l=wobble_1_0_0_0_1').dxLfo).toEqual(sandbox.patch.dxLfo);
     expect(reopened('a=0').algorithm).toBe(1);

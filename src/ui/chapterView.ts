@@ -100,7 +100,8 @@ function mountSoundInUrl(store: LabStore): void {
         state.algorithm !== previous.algorithm ||
         state.dxFeedback !== previous.dxFeedback ||
         state.dxOperators !== previous.dxOperators ||
-        state.dxLfo !== previous.dxLfo)
+        state.dxLfo !== previous.dxLfo ||
+        state.dxPitchEnvelope !== previous.dxPitchEnvelope)
     ) {
       window.clearTimeout(timer);
       timer = window.setTimeout(write, URL_DELAY_MS);
@@ -455,7 +456,7 @@ function showTermInUrl(): void {
 /** The voice a state is, of `presets`: the one whose sound it is exactly. */
 export function presetOf(presets: readonly Preset[], state: LabState): number {
   const sound = (s: Partial<LabState>) =>
-    JSON.stringify([s.algorithm, s.dxFeedback, s.dxOperators, s.dxLfo]);
+    JSON.stringify([s.algorithm, s.dxFeedback, s.dxOperators, s.dxLfo, s.dxPitchEnvelope]);
   const now = sound(state);
   return presets.findIndex(preset => sound(preset.patch) === now);
 }
@@ -532,7 +533,8 @@ function presetMenu(presets: readonly Preset[], store: LabStore): HTMLElement[] 
       state.dxOperators !== previous.dxOperators ||
       state.algorithm !== previous.algorithm ||
       state.dxFeedback !== previous.dxFeedback ||
-      state.dxLfo !== previous.dxLfo
+      state.dxLfo !== previous.dxLfo ||
+      state.dxPitchEnvelope !== previous.dxPitchEnvelope
     ) {
       show(state);
     }

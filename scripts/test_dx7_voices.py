@@ -12,11 +12,14 @@ from dx7_voices import (
     RawOperator,
     convert_lfo,
     convert_operator,
+    convert_pitch_envelope,
     envelope_level_db,
     lfo_delay_seconds,
     lfo_hz,
     missing,
     output_level_db,
+    pitch_cents,
+    pitch_speed,
     rate_speed,
     scaling_side,
     stage_seconds,
@@ -218,3 +221,64 @@ def test_makes_a_fixed_frequency_a_ratio_of_middle_c() -> None:
 def test_holds_a_fixed_frequency_within_the_sandboxs_ratios() -> None:
     # 1 Hz (coarse 0, fine 0) is far under half of middle C.
     assert convert_operator(operator(fixed=True, coarse=0))["ratio"] == 0.5
+
+
+def test_unpacks_the_pitch_envelope_from_bytes_102_to_109() -> None:
+    data = bytearray(lfo_voice(35, 0, 0, 0, 0))
+    data[102:110] = bytes([99, 70, 50, 40, 62, 50, 50, 38])
+    voice = unpack_voice(bytes(data))
+    assert voice.pitch_rates == (99, 70, 50, 40)
+    assert voice.pitch_levels == (62, 50, 50, 38)
+
+
+def test_pitch_levels_in_cents() -> None:
+    assert pitch_cents(50) == 0
+    assert pitch_cents(0) == -4800
+    # Level 62 is 12 / 32 of an octave up: 450 cents.
+    assert pitch_cents(62) == 450
+    assert pitch_cents(99) == pytest.approx(127 / 32 * 1200)
+
+
+def test_pitch_rates_in_octaves_a_second() -> None:
+    assert pitch_speed(99) == pytest.approx(255 / 21.3)
+    assert pitch_speed(0) == pytest.approx(1 / 21.3)
+
+
+def test_a_known_pitch_speed() -> None:
+    # Rate 50: pitchenv_rate[50] = 41, 41 / 21.3 octaves a second, about
+    # 23.1 semitones a second.
+    assert pitch_speed(50) * 12 == pytest.approx(23.1, abs=0.05)
+
+
+def test_converts_a_voices_pitch_envelope() -> None:
+    # TAKE OFF's: rates 32, 30, 94, 16; levels 50, 7, 81, 99.
+    data = bytearray(lfo_voice(35, 0, 0, 0, 0))
+    data[102:110] = bytes([32, 30, 94, 16, 50, 7, 81, 99])
+    env = convert_pitch_envelope(unpack_voice(bytes(data)))
+    assert env["start"] == pytest.approx(4762.5)
+    assert env["peak"] == 0
+    assert env["brk"] == pytest.approx(-2287.5)
+    assert env["sustain"] == pytest.approx(1162.5)
+    # Rate 32: pitchenv_rate[32] = 19, 19 / 21.3 octaves a second.
+    assert env["attack"] == pytest.approx(19 / 21.3 * 1200, abs=0.01)
+    assert "pitch envelope" not in missing(unpack_voice(bytes(data)))
+
+
+@pytest.mark.parametrize(("rates", "levels", "semitones"), [
+    # ROM1A's voices that bend, start / peak / break / sustain.
+    ((85, 99, 75, 0), (49, 50, 50, 50), (0, -0.38, 0, 0)),          # KOTO
+    ((99, 98, 75, 60), (50, 51, 50, 50), (0, 0, 0.38, 0)),          # TIMPANI
+    ((38, 67, 95, 60), (39, 50, 50, 50), (0, -4.12, 0, 0)),         # REFS WHISL
+    ((18, 60, 95, 60), (48, 51, 50, 50), (0, -0.75, 0.38, 0)),      # VOICE 1
+    ((32, 30, 94, 16), (50, 7, 81, 99), (47.62, 0, -22.88, 11.62)),  # TAKE OFF
+])
+def test_the_factory_voices_pitch_envelopes(
+    rates: tuple[int, int, int, int],
+    levels: tuple[int, int, int, int],
+    semitones: tuple[float, float, float, float],
+) -> None:
+    data = bytearray(lfo_voice(35, 0, 0, 0, 0))
+    data[102:110] = bytes([*rates, *levels])
+    env = convert_pitch_envelope(unpack_voice(bytes(data)))
+    got = [env[key] / 100 for key in ("start", "peak", "brk", "sustain")]
+    assert got == pytest.approx(semitones, abs=0.01)
