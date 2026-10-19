@@ -1,27 +1,19 @@
 // The sandbox's operator table: a row per operator of its DX7 voice, the
 // full width of the page. Each row has the operator's tag and role, its
 // ratio (slider and box), detune in cents, level in dB (slider and box),
-// a small drawing of its envelope, and its level across the keyboard. A
-// row clicked or focused is the selected one: outlined, its envelope
-// opened in the envelope view, and its break point and envelope speed-up
-// boxes shown.
+// and two small drawings, to compare at a glance: its envelope and its
+// level across the keyboard. A row clicked or focused is the selected
+// one, outlined, and the operator panel above shows it; a click on a
+// drawing also opens that drawing's tab there, where it is edited.
 
 import { algorithm, operatorsUsed } from '../dsp/algorithms';
-import {
-  DETUNE_CENTS,
-  DX7_RATIO,
-  type Dx7Envelope,
-  type Dx7Operator,
-  LEVEL_DB,
-  RATE_SCALING,
-  type ScalingSide,
-} from '../dsp/dx7';
-import type { LabState, LabStore } from '../model/lab';
-import { describeKeyScaling, depthAt, drawKeyScaling, xOfKey } from '../viz/keyScalingPlot';
+import { DETUNE_CENTS, DX7_RATIO, type Dx7Envelope, type Dx7Operator, LEVEL_DB } from '../dsp/dx7';
+import type { LabState, LabStore, VoiceTab } from '../model/lab';
+import { describeKeyScaling, drawKeyScaling } from '../viz/keyScalingPlot';
 import { drawVoiceEnvelope } from '../viz/voiceEnvelopePlot';
 import { roleOf } from './operators';
 import { createParam, typedNumber } from './paramControl';
-import { formatCents, formatDb, noteName, parseNote } from './voiceFormat';
+import { formatCents, formatDb, noteName } from './voiceFormat';
 
 /** The ratios the Ratio slider snaps to: a half and 1 to 31, the DX7's coarse ratios. */
 export const DX7_RATIO_STOPS: readonly number[] = [0.5, ...Array.from({ length: 31 }, (_, i) => i + 1)];
@@ -71,6 +63,10 @@ export function mountVoiceTable(store: LabStore): void {
   };
   const select = (op: number) => {
     if (store.get().selectedOp !== op) store.set({ selectedOp: op });
+  };
+  const open = (op: number, voiceTab: VoiceTab) => {
+    const state = store.get();
+    if (state.selectedOp !== op || state.voiceTab !== voiceTab) store.set({ selectedOp: op, voiceTab });
   };
 
   const updates: (() => void)[] = [];
@@ -158,52 +154,21 @@ export function mountVoiceTable(store: LabStore): void {
       },
     });
 
-    // The envelope, small; a click on it opens it in the envelope view.
-    const envelope = document.createElement('canvas');
-    envelope.className = 'voice-env-mini';
-    envelope.setAttribute('role', 'img');
-
-    // Across the keyboard: the curve, which a drag sets (see below).
-    const keys = document.createElement('canvas');
-    keys.className = 'voice-keys';
-    keys.tabIndex = 0;
-    keys.setAttribute('role', 'img');
-
-    // Only on the selected row: the break point and the speed-up.
-    const breakBox = createParam({
-      name: `${name} break point`,
-      min: 21,
-      max: 120,
-      step: 1,
-      slider: false,
-      get: () => get().breakKey,
-      set: value => value !== null && setDxOperator(store, op, { breakKey: within(Math.round(value), { min: 21, max: 120 }) }),
-      show: value => noteName(value ?? 60),
-      parse: parseNote,
-      say: value => `break point ${noteName(value ?? 60)}`,
-      scrub: (start, pixels) => within(Math.round((start ?? 60) + pixels / 6), { min: 21, max: 120 }),
-    });
-    const speed = createParam({
-      name: `${name} envelope speed-up per octave`,
-      min: RATE_SCALING.min,
-      max: RATE_SCALING.max,
-      step: 0.01,
-      slider: false,
-      get: () => get().rateScaling,
-      set: value => value !== null && setDxOperator(store, op, { rateScaling: within(value, RATE_SCALING) }),
-      show: value => (value ?? 1).toFixed(2),
-      parse: text => typedNumber(text.replace(/^[×x]/, '')),
-      say: value => `${(value ?? 1).toFixed(2)} times faster an octave up`,
-      scrub: (start, pixels, fine) =>
-        within(Number(((start ?? 1) + pixels * (fine ? 0.001 : 0.005)).toFixed(2)), RATE_SCALING),
-    });
-    const extras = document.createElement('div');
-    extras.className = 'voice-extras';
-    const times = document.createElement('span');
-    times.className = 'voice-times';
-    times.textContent = '×';
-    times.setAttribute('aria-hidden', 'true');
-    extras.append(breakBox.element, times, speed.element);
+    // The two drawings, small and read only: a click on one (or Enter or
+    // Space on it) selects the row and opens that tab of the panel.
+    const drawing = (className: string, tab: VoiceTab) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'voice-mini';
+      const canvas = document.createElement('canvas');
+      canvas.className = className;
+      canvas.setAttribute('aria-hidden', 'true');
+      button.append(canvas);
+      button.addEventListener('click', () => open(op, tab));
+      return { button, canvas };
+    };
+    const envelope = drawing('voice-env-mini', 'envelope');
+    const keys = drawing('voice-keys', 'keys');
 
     row.append(
       head,
@@ -211,60 +176,10 @@ export function mountVoiceTable(store: LabStore): void {
       cell('voice-ratio', 'Ratio', ratio.element),
       cell('voice-detune', 'Detune ¢', detune.element),
       cell('voice-level', 'Level dB', level.element),
-      cell('voice-env', 'Envelope', envelope),
-      cell('voice-scaling', 'Across the keyboard', keys, extras),
+      cell('voice-env', 'Envelope', envelope.button),
+      cell('voice-scaling', 'Across the keyboard', keys.button),
     );
     body.append(row);
-
-    // Dragging in the curve: up or down at either side of the break point
-    // sets that side's depth; a click that does not move turns its curve
-    // from linear to exponential or back.
-    let drag: { side: 'left' | 'right'; x: number; y: number; moved: boolean } | null = null;
-    const sideAt = (x: number) => {
-      const box = keys.getBoundingClientRect();
-      const breakX = xOfKey(box.width, get().breakKey);
-      return x - box.left < breakX ? 'left' : 'right';
-    };
-    keys.addEventListener('pointerdown', event => {
-      if (event.button !== 0) return;
-      keys.setPointerCapture(event.pointerId);
-      drag = { side: sideAt(event.clientX), x: event.clientX, y: event.clientY, moved: false };
-      select(op);
-    });
-    keys.addEventListener('pointermove', event => {
-      if (!drag) return;
-      if (!drag.moved && Math.hypot(event.clientX - drag.x, event.clientY - drag.y) < 3) return;
-      drag.moved = true;
-      const box = keys.getBoundingClientRect();
-      const depth = depthAt(get(), drag.side, box.height, event.clientY - box.top);
-      setDxOperator(store, op, { [drag.side]: { ...get()[drag.side], depth } });
-    });
-    const toggle = (side: 'left' | 'right') => {
-      const now: ScalingSide = get()[side];
-      setDxOperator(store, op, { [side]: { ...now, curve: now.curve === 'lin' ? 'exp' : 'lin' } });
-    };
-    keys.addEventListener('pointerup', () => {
-      if (drag && !drag.moved) toggle(drag.side);
-      drag = null;
-    });
-    keys.addEventListener('pointercancel', () => {
-      drag = null;
-    });
-    // From the keyboard: up and down for the right side's depth, with
-    // Shift the left's; C turns the right's curve, Shift+C the left's.
-    keys.addEventListener('keydown', event => {
-      const side = event.shiftKey ? 'left' : 'right';
-      const now = get()[side];
-      const step = { ArrowUp: 0.25, ArrowDown: -0.25 }[event.key];
-      if (step !== undefined) {
-        event.preventDefault();
-        const depth = Number(within(now.depth + step, { min: -6, max: 6 }).toFixed(2));
-        setDxOperator(store, op, { [side]: { ...now, depth } });
-      } else if (event.key.toLowerCase() === 'c') {
-        event.preventDefault();
-        toggle(side);
-      }
-    });
 
     row.addEventListener('pointerenter', () => point(op));
     row.addEventListener('pointerleave', () => {
@@ -283,20 +198,15 @@ export function mountVoiceTable(store: LabStore): void {
       tag.dataset.role = r;
       row.classList.toggle('is-selected', state.selectedOp === op);
       row.classList.toggle('is-pointed', state.hoverOp === op);
-      // Kept in the layout on every row, shown on the selected one only, so
-      // the columns keep their widths whichever row is selected.
-      extras.classList.toggle('is-off', state.selectedOp !== op);
       ratio.update();
       detune.update();
       level.update();
-      breakBox.update();
-      speed.update();
-      drawVoiceEnvelope(envelope, o.envelope, penOf(r), false);
-      envelope.setAttribute('aria-label', `${name} envelope`);
-      drawKeyScaling(keys, o, penOf(r));
-      keys.setAttribute(
+      drawVoiceEnvelope(envelope.canvas, o.envelope, penOf(r), false);
+      envelope.button.setAttribute('aria-label', `${name} envelope: edit it above`);
+      drawKeyScaling(keys.canvas, o, penOf(r));
+      keys.button.setAttribute(
         'aria-label',
-        `${name} across the keyboard. ${describeKeyScaling(o, noteName)} Up and down arrows set the right side's depth, with Shift the left's; C changes its curve.`,
+        `${name} across the keyboard. ${describeKeyScaling(o, noteName)} Edit it above.`,
       );
     });
   }

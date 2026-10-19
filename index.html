@@ -408,20 +408,59 @@
               </div>
             </div>
             <div class="inst-right">
-              <section
-                id="voice-envelope"
-                class="voice-envelope"
-                aria-labelledby="voice-envelope-title"
-                hidden
-              >
+              <!-- The selected operator's panel, two tabs: its envelope
+                   (ui/envelopeView.ts) and its level across the keyboard
+                   (ui/keyScalingView.ts). -->
+              <section id="voice-envelope" class="voice-envelope" aria-labelledby="voice-envelope-tag" hidden>
                 <div class="voice-envelope-head">
                   <span id="voice-envelope-tag" class="op-tag"></span>
                   <span id="voice-envelope-role" class="op-role"></span>
-                  <h3 id="voice-envelope-title" class="voice-envelope-title">Envelope</h3>
+                  <div class="voice-tabs" role="tablist" aria-label="Show">
+                    <button
+                      type="button"
+                      id="voice-tab-envelope"
+                      class="voice-tab"
+                      role="tab"
+                      aria-controls="voice-envelope-panel"
+                      data-tab="envelope"
+                    >
+                      Envelope
+                    </button>
+                    <button
+                      type="button"
+                      id="voice-tab-keys"
+                      class="voice-tab"
+                      role="tab"
+                      aria-controls="voice-keys-panel"
+                      data-tab="keys"
+                    >
+                      Across the keyboard
+                    </button>
+                  </div>
                 </div>
-                <div class="voice-envelope-body">
+                <div
+                  id="voice-envelope-panel"
+                  class="voice-envelope-body"
+                  role="tabpanel"
+                  aria-labelledby="voice-tab-envelope"
+                >
                   <canvas id="voice-envelope-curve" class="voice-envelope-curve" role="img"></canvas>
                   <div id="voice-envelope-knobs" class="voice-envelope-knobs"></div>
+                </div>
+                <div
+                  id="voice-keys-panel"
+                  class="voice-envelope-body"
+                  role="tabpanel"
+                  aria-labelledby="voice-tab-keys"
+                  hidden
+                >
+                  <canvas
+                    id="voice-keys-curve"
+                    class="voice-envelope-curve voice-keys-curve"
+                    role="img"
+                    tabindex="0"
+                  ></canvas>
+                  <div id="voice-keys-knobs" class="voice-envelope-knobs voice-keys-knobs"></div>
                 </div>
               </section>
             </div>
