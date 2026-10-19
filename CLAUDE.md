@@ -95,8 +95,10 @@ figures subscribe to it. Nothing else passes values around.
   `voiceModel` says which operators six-operator chapters play: `basic`
   (`operators`, `feedback`: ratio, level 0 to 1, one decay; `algorithms`)
   or `dx7` (`dxOperators`, `dxFeedback`; the sandbox), the DX7 voice of
-  `src/dsp/dx7.ts`. `selectedOp` is the operator whose envelope view the
-  sandbox shows; one always is, OP1 when it opens.
+  `src/dsp/dx7.ts`. `selectedOp` is the operator the sandbox's operator
+  panel shows; one always is, OP1 when it opens. `voiceTab` is that
+  panel's tab, `envelope` (the default) or `keys`, and stays as it is
+  when another operator is selected.
   `momentOf(state, time)` is what a figure should draw at a time on the
   page's clock: the patch as set, or, while a note sounds, that moment's
   index and loudness.
@@ -266,7 +268,10 @@ figures subscribe to it. Nothing else passes values around.
   of its own and its end sits in the slot as far as its time is on a log
   scale (`timePosition`), so short and long parts both show and a dot
   holds still as it is dragged (`dotDragged`). `keyScalingPlot.ts` draws
-  an operator's level across the keyboard. `plot.ts`'s `drawFrame` takes the horizontal rows a plot
+  an operator's level across a piano's 88 keys (A0 to C8), small in each
+  table row and large in the panel's Across the keyboard tab (`keysArea`:
+  dB at the left, the break point named over its line, the Cs under the
+  keys). `plot.ts`'s `drawFrame` takes the horizontal rows a plot
   wants; amplitude from -1 to 1 is only the default. `algorithmPlot.ts` draws an algorithm as the DX7 does (`layoutAlgorithm`:
   carriers on the bottom row, each modulator above what it modulates),
   with boxes sized for the largest of the wirings (6 columns, 4 rows) so
@@ -344,24 +349,32 @@ figures subscribe to it. Nothing else passes values around.
   `voiceTable.ts` is the sandbox's operator table (in `#voice-table`, its
   own, not the lab's): per row the tag and role, Ratio (slider snapping
   to `DX7_RATIO_STOPS`, 0.5 and 1 to 31, and a box to 61.69), Detune ¢,
-  Level dB (its slider's bottom is off), a small drawing of the envelope
-  and Across the keyboard (the level scaling's curve over a strip of
-  keys, the break point ruled: a drag up or down at either side sets its
-  depth, a click turns its curve, and from the keyboard up and down, with
-  Shift the left side, C to turn); a row clicked or focused is selected
-  (`selectedOp`; one always is, and presets, links and stepping keep it),
-  outlined, and only it shows its break point and speed-up boxes; the
-  other rows keep their room (`is-off`, hidden but laid out) so the
-  columns never change width. `paramControl.ts` is its box (type, or drag up or right for
+  Level dB (its slider's bottom is off), and two small read-only drawings
+  to compare the operators by, the envelope and Across the keyboard
+  (`.voice-mini` buttons: a click selects the row and opens that tab of
+  the operator panel, where each is edited); a row clicked or focused is
+  selected (`selectedOp`; one always is, and presets, links and stepping
+  keep it) and outlined, and nothing else on a row changes with the
+  selection, so the columns never change width. `paramControl.ts` is its box (type, or drag up or right for
   more) with an optional slider; `voiceFormat.ts` writes times, dB, cents
-  and keys the same everywhere. `envelopeView.ts` is the selected
-  operator's envelope, always open: its tag, role and "Envelope", the
-  curve with a dot to drag at the end of
-  each part (across for the time, up and down for the level), and seven
-  knobs under it. `knob.ts` is the knob: a `role="slider"` turned by dragging up
+  and keys the same everywhere. `envelopeView.ts` is the operator panel,
+  always open: the selected operator's tag and role and two tabs,
+  Envelope and Across the keyboard (`role="tab"`, arrows between them;
+  drawn as the lab's two-pill switch at the header's right-hand end, so
+  they read apart from the tag and role),
+  and the Envelope tab: the curve with a dot to drag at the end of each
+  part (across for the time, up and down for the level), and seven knobs
+  under it. `keyScalingView.ts` is the Across the keyboard tab: the curve
+  large (a drag up or down at either side of the break point sets its
+  depth, a click turns its curve, the break point's line drags sideways;
+  from the keyboard up and down, with Shift the left side, left and
+  right for the break point, C to turn), and under it Left curve (a
+  lin / exp button), Left depth, Break point, Right depth, Right curve
+  and Speed-up (the envelope's, per octave). `knob.ts` is the knob: a `role="slider"` turned by dragging up
   or down or with the keys the Bessel plot answers to, drawn ink on paper
   with its value arc in `--knob-pen`, its name and its `.num` value
-  under it, time knobs on a log scale;
+  under it, time knobs on a log scale, and a two-sided one's arc from its
+  `centre`;
   `besselControls.ts` makes the Bessel plot a control: the canvas is a
   `role="slider"` for the index (drag, or arrows, Page Up / Down, Home,
   End), pointing at a curve, a spectrum stem or a J button sets `hover`,
@@ -431,8 +444,8 @@ wiring diagram it draws beside them (Jeremy,
 2026-10-19). The diagram's column is as wide as six boxes need at the
 box size its height gives, within what the pair leaves
 (`steadyDiagramWidth`), so the pair holds still; on a phone the chooser
-sits above, the knob beside the diagram. On the right the selected
-operator's envelope view (`#voice-envelope`) alone, its curve filling it.
+sits above, the knob beside the diagram. On the right the operator
+panel (`#voice-envelope`) alone, the showing tab's curve filling it.
 Under the band the operator table (`#voice-table`) the full width, then
 the foot (`.inst-foot`): the octave control and keyboard on the left, the
 spectrum (`#inst-figures`) filling the rest of the row, no taller than
@@ -443,8 +456,8 @@ shaded) and the diagram. On a wide screen it is one window high and
 nothing scrolls, at 1440 × 900 and 1280 × 800; the figures' captions are
 for screen readers only there, and under 52rem high the rows, drawings,
 knobs and gaps tighten. Below 62rem it is one column: the keyboard
-and the spectrum over it docked to the screen's foot, the envelope view
-first, the controls scrolling under it, and the
+and the spectrum over it docked to the screen's foot, the operator panel
+first (its tabs on a line of their own), the controls scrolling under it, and the
 operator table as cards, each with its drawings.
 
 ## Styling

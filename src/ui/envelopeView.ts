@@ -1,12 +1,14 @@
-// The sandbox's envelope view: the selected operator's envelope, large,
-// over a shorter spectrum. An operator is always selected (OP1 to begin
-// with), so the view is always open. Its header names the operator, its
-// role and "Envelope"; under it the curve, with a dot at the end of
-// each part to drag, and seven knobs, one for each part's time or level:
-// Attack, Peak, Decay 1, Break, Decay 2, Sustain, Release.
+// The sandbox's operator panel, at the top right: the selected operator,
+// which one always is (OP1 to begin with), so the panel is always open.
+// Its header names the operator and its role, then two tabs, Envelope (the
+// first) and Across the keyboard (ui/keyScalingView.ts); the tab stays
+// as it is when another operator is selected. This file draws the header,
+// the tabs and the Envelope tab: the curve, large, with a dot at the end
+// of each part to drag, and seven knobs, one for each part's time or
+// level: Attack, Peak, Decay 1, Break, Decay 2, Sustain, Release.
 
 import { type Dx7Envelope, MAX_STAGE_SECONDS, SILENCE_DB } from '../dsp/dx7';
-import type { LabState, LabStore } from '../model/lab';
+import type { LabState, LabStore, VoiceTab } from '../model/lab';
 import {
   dotAt,
   dotDragged,
@@ -41,6 +43,33 @@ export function mountEnvelopeView(store: LabStore): void {
   const canvas = document.querySelector<HTMLCanvasElement>('#voice-envelope-curve');
   const knobs = document.querySelector<HTMLElement>('#voice-envelope-knobs');
   if (!view || !tag || !role || !canvas || !knobs) return;
+
+  // The tabs: a click, or the arrow keys between them (Home and End to the
+  // ends), choose one.
+  const tabs = [...view.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+  const choose = (tab: VoiceTab) => {
+    if (store.get().voiceTab !== tab) store.set({ voiceTab: tab });
+  };
+  tabs.forEach((button, i) => {
+    button.addEventListener('click', () => choose(button.dataset.tab as VoiceTab));
+    button.addEventListener('keydown', event => {
+      const to = { ArrowLeft: i - 1, ArrowRight: i + 1, Home: 0, End: tabs.length - 1 }[event.key];
+      if (to === undefined) return;
+      event.preventDefault();
+      const next = tabs[(to + tabs.length) % tabs.length];
+      choose(next.dataset.tab as VoiceTab);
+      next.focus();
+    });
+  });
+  const showTab = (tab: VoiceTab) => {
+    for (const button of tabs) {
+      const on = button.dataset.tab === tab;
+      button.setAttribute('aria-selected', String(on));
+      button.tabIndex = on ? 0 : -1;
+      const panel = document.getElementById(button.getAttribute('aria-controls') ?? '');
+      if (panel) panel.hidden = !on;
+    }
+  };
 
   const op = () => store.get().selectedOp;
   const envelope = () => {
@@ -125,6 +154,7 @@ export function mountEnvelopeView(store: LabStore): void {
     const at = state.voiceModel === 'dx7' ? state.selectedOp : null;
     view.hidden = at === null;
     if (at === null) return;
+    showTab(state.voiceTab);
     const name = `OP${at + 1}`;
     const r = roleOf(state.algorithm, at);
     tag.textContent = name;
@@ -145,6 +175,7 @@ export function mountEnvelopeView(store: LabStore): void {
       state.dxOperators !== previous.dxOperators ||
       state.algorithm !== previous.algorithm ||
       state.voiceModel !== previous.voiceModel ||
+      state.voiceTab !== previous.voiceTab ||
       state.theme !== previous.theme
     ) {
       show(state);

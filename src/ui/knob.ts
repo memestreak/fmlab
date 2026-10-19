@@ -13,6 +13,11 @@ export interface KnobSpec {
   max: number;
   /** Turned on a log scale: equal turns are equal ratios (for times). */
   log?: boolean;
+  /**
+   * The value its arc starts from, for a value either side of it (a
+   * depth from -6 to 6 dB about 0); the arc starts at the bottom otherwise.
+   */
+  centre?: number;
   /** The value to show. */
   get: () => number;
   /** Takes a new value, already inside the range. */
@@ -126,7 +131,9 @@ export function createKnob(spec: KnobSpec): { element: HTMLElement; update: () =
     const now = spec.get();
     const position = knobPosition(spec, now);
     const angle = -SWEEP + 2 * SWEEP * position;
-    value.setAttribute('d', position > 0.002 ? arc(-SWEEP, angle, 15) : '');
+    const from = spec.centre === undefined ? -SWEEP : -SWEEP + 2 * SWEEP * knobPosition(spec, spec.centre);
+    const [a, b] = angle < from ? [angle, from] : [from, angle];
+    value.setAttribute('d', b - a > 0.6 ? arc(a, b, 15) : '');
     const rad = (angle * Math.PI) / 180;
     pointer.setAttribute('x2', (20 + 8 * Math.sin(rad)).toFixed(2));
     pointer.setAttribute('y2', (20 - 8 * Math.cos(rad)).toFixed(2));
