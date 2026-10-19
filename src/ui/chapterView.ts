@@ -458,9 +458,20 @@ export function presetOf(presets: readonly Preset[], state: LabState): number {
 }
 
 /**
- * The sandbox's presets as one dropdown, with a line beside it saying
- * what the chosen voice plays without. It shows the voice the sound is,
- * or "Edited" once it has been changed.
+ * The voice `steps` along from `at` in a list of `count`, round from the
+ * last to the first and back; from no voice (-1), the first or the last.
+ */
+export function stepPreset(at: number, steps: number, count: number): number {
+  if (at < 0) return steps > 0 ? 0 : count - 1;
+  return (((at + steps) % count) + count) % count;
+}
+
+/**
+ * The sandbox's presets as one dropdown with ‹ › either side, stepping
+ * round the voices as the diagram's step round the algorithms, and a
+ * line beside it saying what the chosen voice plays without. It shows
+ * the voice the sound is, or "Edited" once it has been changed; the steps
+ * then go on from the voice last chosen.
  */
 function presetMenu(presets: readonly Preset[], store: LabStore): HTMLElement[] {
   const select = document.createElement('select');
@@ -483,8 +494,26 @@ function presetMenu(presets: readonly Preset[], store: LabStore): HTMLElement[] 
   note.className = 'preset-note';
   note.id = 'preset-note';
   select.setAttribute('aria-describedby', note.id);
+  /** The voice last chosen, which the steps go on from. */
+  let last = -1;
+  const choose = (at: number) => {
+    const preset = presets[at];
+    if (!preset) return;
+    last = at;
+    store.set(preset.patch);
+  };
+  const step = (label: string, glyph: string, steps: number) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'round-step';
+    button.textContent = glyph;
+    button.setAttribute('aria-label', label);
+    button.addEventListener('click', () => choose(stepPreset(last, steps, presets.length)));
+    return button;
+  };
   const show = (state: LabState) => {
     const at = presetOf(presets, state);
+    if (at >= 0) last = at;
     select.value = at < 0 ? '' : String(at);
     edited.hidden = at >= 0;
     // Beside it, briefly, what the voice plays without; in full in its
@@ -493,10 +522,7 @@ function presetMenu(presets: readonly Preset[], store: LabStore): HTMLElement[] 
     note.textContent = preset ? (preset.note ?? preset.hint) : 'your own, from a factory voice';
     note.title = preset ? preset.hint : note.textContent;
   };
-  select.addEventListener('change', () => {
-    const preset = presets[Number(select.value)];
-    if (preset) store.set(preset.patch);
-  });
+  select.addEventListener('change', () => choose(Number(select.value)));
   const stop = store.subscribe((state, previous) => {
     if (!select.isConnected) return stop();
     if (
@@ -508,5 +534,5 @@ function presetMenu(presets: readonly Preset[], store: LabStore): HTMLElement[] 
     }
   });
   show(store.get());
-  return [select, note];
+  return [step('Previous preset', '‹', -1), select, step('Next preset', '›', 1), note];
 }

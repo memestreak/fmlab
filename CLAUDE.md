@@ -127,7 +127,9 @@ figures subscribe to it. Nothing else passes values around.
   voice (`voiceModel: 'dx7'`) from the keyboard, its presets in
   `dx7Voices.ts`: all 32 of Yamaha's DX7 factory voices (ROM1A), numbered
   as on the DX7 ("11 E.PIANO 1", which it opens on), in one dropdown
-  (`presetMenu`; Jeremy, 2026-10-18) with a short note beside it for the
+  under the title Presets, with ‹ › either side that step round them
+  from the voice last chosen (`presetMenu`, `stepPreset`; Jeremy,
+  2026-10-18) and a short note beside it for the
   chosen voice ("approximate · no vibrato, velocity"; `note`) and
   "Edited" once the sound is changed (`presetOf`). They are credited
   "© Yamaha" in its lede, and each hint says it is a close approximation
@@ -416,9 +418,11 @@ Jeremy approved it on 2026-10-18: "the existing app, just full page and
 with a better looking keyboard", six operators only): no text column, a
 title bar (title and lede, then Volume; no Play or Copy link: the
 keyboard and the space bar play, and the address bar keeps the sound),
-then, in layout F (Jeremy, 2026-10-18), a top band: on the left, under
-the title Algorithms, the algorithm list, Start from and the presets on
-one line, the wiring diagram with ‹ › just clear of its widest wiring
+then, in layout F (Jeremy, 2026-10-18), a top band: on the left, the
+title Presets with the voice menu between ‹ › (`stepPreset`, round the
+32) and its note on one line, then the title Algorithms with the
+algorithm list on the next, over the wiring diagram it draws, with ‹ ›
+just clear of its widest wiring
 (`steadyHalfWidth`) stepping round the 32 (`stepAlgorithm`) with
 Feedback beside it; on the right the spectrum, with the selected
 operator's envelope view over it (`#voice-envelope`) while one is open.
