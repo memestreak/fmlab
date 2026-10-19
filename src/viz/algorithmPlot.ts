@@ -102,7 +102,7 @@ const LARGEST = ALGORITHMS.map(layoutAlgorithm).reduce(
  * The smallest box worth keeping steady: below it, as in the chapter lab's
  * short diagram, each wiring is sized to fit on its own instead.
  */
-const STEADY_BOX = 22;
+const STEADY_BOX = 20;
 
 /**
  * The side of a box that fits a wiring of so many columns and rows on a
@@ -140,18 +140,6 @@ export function diagramGeometry(alg: Algorithm, width: number, height: number) {
   const boxY = (p: Place) => bottom - box - p.row * (box + gapY);
   const centreX = (p: Place) => boxX(p) + box / 2;
   return { places, box, gapX, gapY, outY, bottom, boxX, boxY, centreX };
-}
-
-/**
- * How far the widest wiring reaches either side of the canvas's middle,
- * with its feedback loop and "out", where the boxes are held one size
- * (see diagramGeometry); null where they are not.
- */
-export function steadyHalfWidth(width: number, height: number): number | null {
-  const box = fitBox(LARGEST.columns, LARGEST.rows, width, height);
-  if (box < STEADY_BOX) return null;
-  const span = LARGEST.columns * box + (LARGEST.columns - 1) * box * 0.6;
-  return span / 2 + box * 0.3;
 }
 
 /**
