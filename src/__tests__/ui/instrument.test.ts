@@ -18,7 +18,8 @@ describe('the instrument page', () => {
 
   it('plays a DX7 voice from the keyboard, and opens on E.PIANO 1', () => {
     expect(sandbox.patch.voiceModel).toBe('dx7');
-    expect(sandbox.controls).toEqual(['volume', 'dxFeedback']);
+    // Feedback is a knob beside the diagram, not a slider.
+    expect(sandbox.controls).toEqual(['volume']);
     expect(Object.keys(sandbox.figures)).toEqual(['algorithm', 'spectrum']);
     expect(sandbox.presets[10].label).toBe('11 E.PIANO 1');
     expect(sandbox.patch.dxOperators).toEqual(sandbox.presets[10].patch.dxOperators);

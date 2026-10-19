@@ -30,7 +30,6 @@ const SLIDERS = [
   'sustain',
   'release',
   'feedback',
-  'dxFeedback',
 ];
 const FIGURES = ['algorithm', 'compare', 'waveform', 'envelope', 'spectrum', 'spectrogram', 'bessel'];
 

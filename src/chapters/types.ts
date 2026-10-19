@@ -13,8 +13,7 @@ export type ControlId =
   | 'decay'
   | 'sustain'
   | 'release'
-  | 'feedback'
-  | 'dxFeedback';
+  | 'feedback';
 
 /** A figure on the page, by the id of its canvas in index.html. */
 export type FigureId =

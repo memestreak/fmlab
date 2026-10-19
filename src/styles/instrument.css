@@ -178,7 +178,23 @@
 }
 
 .inst-alg-step-row {
-  gap: 0.6rem;
+  grid-row: 2;
+  grid-column: 1;
+  justify-self: center;
+  gap: 0.4rem;
+}
+
+#inst-feedback {
+  grid-row: 4;
+  grid-column: 1;
+  justify-self: center;
+  /* A little above its share, nearer the chooser. */
+  transform: translateY(-1.3rem);
+}
+
+.inst-alg-step {
+  grid-row: 1 / -1;
+  grid-column: 2;
 }
 
 .round-step {
@@ -550,11 +566,19 @@ body[data-envelope='open'] #inst-figures .figure:not([hidden]) {
 }
 
 /* The diagram's own plate: Fig. 1 on the left, Feedback on the right. */
+/* The algorithm chooser and the Feedback knob on the left of the
+   diagram, a little in from its top and its bottom: the height they
+   leave is shared 1 : 3 : 1 above, between and below them. All centred
+   together. The
+   diagram's column is as wide as the widest wiring needs at the box size
+   its height gives (--diagram-width, set in ui/instrument.ts), so the
+   pair sits just clear of it and holds still. */
 .inst-diagram {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 15rem;
-  grid-template-rows: minmax(0, 1fr);
-  column-gap: 1.5rem;
+  grid-template-columns: auto var(--diagram-width, 15.2rem);
+  grid-template-rows: minmax(0, 1fr) auto minmax(0, 3fr) auto minmax(0, 1fr);
+  justify-content: center;
+  column-gap: 0.75rem;
   align-items: center;
   border-bottom: 1px solid var(--ink);
 }
@@ -573,14 +597,6 @@ body[data-envelope='open'] #inst-figures .figure:not([hidden]) {
 #inst-diagram-figure figcaption {
   grid-row: 2;
   grid-column: 1 / -1;
-}
-
-#inst-feedback .slider-row {
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-areas:
-    'label value'
-    'slider slider';
-  row-gap: 0;
 }
 
 /* The keyboard: shaped like a piano and centred, the octave control on
@@ -1075,10 +1091,31 @@ body[data-envelope='open'] #inst-figures .figure:not([hidden]) {
     gap: 1rem;
   }
 
+  /* Too narrow for the controls beside the diagram: the chooser over it,
+     and the knob beside it. */
   .inst-diagram {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: var(--diagram-width, 15.2rem) auto;
     grid-template-rows: auto auto;
+    row-gap: 0.5rem;
     padding-bottom: 0.5rem;
+  }
+
+  .inst-alg-step-row {
+    grid-row: 1;
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+
+  .inst-alg-step {
+    grid-row: 2;
+    grid-column: 1;
+  }
+
+  #inst-feedback {
+    grid-row: 2;
+    grid-column: 2;
+    margin-top: 0;
+    transform: none;
   }
 
   #inst-diagram-figure .plot-frame {
