@@ -521,6 +521,42 @@ body:not([data-view='instrument']) #inst-tools {
   min-height: 2.25rem;
 }
 
+/* The algorithm's number on a two-place VFD readout, the list over it
+   unseen (ui/instrument.ts): a click opens the list, the keys choose,
+   and keyboard focus shows round the glass (not a click's). */
+#inst-algorithm {
+  position: relative;
+  display: inline-flex;
+}
+
+.op-vfd.inst-alg-vfd {
+  justify-content: center;
+  /* As wide as the list it shows was, so the row and the pair hold still. */
+  width: 74px;
+  height: 2.25rem;
+  padding: 3px 7px;
+}
+
+.op-vfd.inst-alg-vfd svg {
+  width: auto;
+  height: 22px;
+}
+
+.inst #inst-algorithm #algorithm {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  min-height: 0;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+#inst-algorithm:has(#algorithm:focus-visible:not([data-pointer])) .inst-alg-vfd {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
 /* The sandbox's 32 factory voices, one menu with ‹ › either side, and
    beside them what the chosen one plays without, cut short if the line
    is full. */

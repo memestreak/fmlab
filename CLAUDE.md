@@ -528,7 +528,10 @@ neither the link nor storage; while closed, the LFO's pill shows an ink
 dot, "LFO, on", when vibrato or tremolo is above 0, and the Pitch EG's,
 "Pitch EG, on", when the pitch envelope is not flat). The Algorithm tab is
 one row: on the left the algorithm list between
-‹ › (`stepAlgorithm`, round the 32) and, just under it (1.25rem; 0.75rem
+‹ › (`stepAlgorithm`, round the 32), its number shown on a two-place VFD
+readout as wide as the list was, the list unseen over it so a click
+opens it and the keys choose, keyboard focus ringing the glass and a
+click's not (2026-10-20), and, just under it (1.25rem; 0.75rem
 under 52rem high), the Feedback knob (`mountFeedbackKnob`, 0 to 2π), the
 pair centred together on the diagram's height, and the wiring diagram it
 draws beside them (Jeremy, 2026-10-19; the knob tight under the chooser,
@@ -588,7 +591,7 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
 - All text is pure `--ink`, never a grey. Use weight, size and italics for
   hierarchy.
 - Colour appears only in plots, rules and control fills, with one
-  exception: the operator table's VFD readouts glow cyan on dark glass,
+  exception: the VFD readouts (the operator table's, the algorithm's) glow cyan on dark glass,
   in both themes (Jeremy, 2026-10-20; `--vfd-*` tokens, the same in every
   theme). They are a drawn display, not text, so the ink rule above does
   not apply to them.
