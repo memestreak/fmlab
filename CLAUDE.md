@@ -440,8 +440,8 @@ pointer is over the keyboard or keyboard focus is in it) on their left; every he
   and keys the same everywhere. `envelopeView.ts` is the operator panel,
   always open: the selected operator's tag and role and two tabs,
   Envelope and Key scaling (`role="tab"`, arrows between them;
-  drawn as the lab's two-pill switch at the header's right-hand end, so
-  they read apart from the tag and role),
+  push keys with jewel lamps, as the Voice's are, at the header's
+  right-hand end, so they read apart from the tag and role),
   and the Envelope tab: the curve with a dot to drag at the end of each
   part (across for the time, up and down for the level), and seven knobs
   under it. `keyScalingView.ts` is the Key scaling tab: the curve
@@ -534,11 +534,14 @@ and the space bar play, and the address bar keeps the sound. The page's
 title, "Sandbox" (`#inst-title`), is for screen readers only. Then,
 in layout F (Jeremy, 2026-10-18), a top band: on the left, the
 title Voice at the top left, the band's first row, with
-a pill switch, Algorithm | LFO | Pitch EG, at the right of its line (`lfoView.ts`;
-`.pill-tabs`, shared with the operator panel; role tablist, arrows
+a row of tabs, Algorithm | LFO | Pitch EG, at the right of its line (`lfoView.ts`;
+`.pill-tabs`, shared with the operator panel, drawn in the sandbox as an
+8-track player's black push keys in a bezel, the open one pressed in
+with its amber jewel lamp lit and its legend glowing warm, the others
+up with unlit lamps and grey legends; Jeremy, 2026-10-20; role tablist, arrows
 between; the sandbox always opens on Algorithm, and the open tab is in
-neither the link nor storage; while closed, the LFO's pill shows an ink
-dot, "LFO, on", when vibrato or tremolo is above 0, and the Pitch EG's,
+neither the link nor storage; while closed, the LFO's key shows a dot
+(amber in the sandbox), "LFO, on", when vibrato or tremolo is above 0, and the Pitch EG's,
 "Pitch EG, on", when the pitch envelope is not flat). The Algorithm tab is
 one row: on the left the algorithm list between
 ‹ › (`stepAlgorithm`, round the 32), its number shown on a two-place VFD
@@ -621,7 +624,10 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
   `--vfd-*` tokens, the same in every theme but for a faint light edge
   in dark and the faders' scale, in ink). They
   are a drawn display, not text, so the ink rule above does not apply
-  to them.
+  to them. The sandbox's tab keys add a warm lamp light (`--lamp-*`,
+  the same in every theme but the bezel's edge): amber appears only as
+  the light behind those keys, and cyan stays the glass displays'
+  colour.
 - Red means negative phase and nothing else: controls and the focus ring
   are ink. Never let phase rest on colour alone; a negative stem also gets
   a hollow marker. In the sandbox's VFD spectrum, a negative stem is

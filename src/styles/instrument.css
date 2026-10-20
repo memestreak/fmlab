@@ -285,6 +285,117 @@ body:not([data-view='instrument']) #inst-tools {
   display: inline-block;
 }
 
+/* In the sandbox the tabs are an 8-track player's push keys (Jeremy,
+   2026-10-20): black keys in a dark bezel, the open one pressed in, a
+   faceted amber jewel lamp lit before its legend and the legend glowing
+   warm; the others up, their lamps unlit amber glass, their legends
+   grey. Amber is only ever this light behind the keys. Nothing moves
+   between up and down. */
+[data-view='instrument'] .pill-tabs {
+  gap: 3px;
+  padding: 3px 4px 4px;
+  border-radius: 4px;
+  background: linear-gradient(var(--lamp-bezel-1), var(--lamp-bezel-2));
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.8),
+    0 0 0 1px #000,
+    var(--lamp-bezel-edge);
+}
+
+[data-view='instrument'] .pill-tab,
+[data-view='instrument'] .pill-tab:first-child,
+[data-view='instrument'] .pill-tab:last-child {
+  gap: 0.45rem;
+  min-height: 1.65rem;
+  margin-left: 0;
+  padding: 0 0.75rem 0 0.6rem;
+  border: 1px solid #000;
+  border-radius: 2px;
+  background: linear-gradient(var(--lamp-key-1), var(--lamp-key-2) 60%, var(--lamp-key-3));
+  box-shadow:
+    0 2px 0 #000,
+    0 3px 2px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  color: var(--lamp-legend);
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  transform: translateY(-1px);
+}
+
+[data-view='instrument'] .pill-tab:hover {
+  color: var(--lamp-legend-hover);
+}
+
+[data-view='instrument'] .pill-tab[aria-selected='true'] {
+  background: linear-gradient(var(--lamp-key-down-1), var(--lamp-key-down-2));
+  box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.9);
+  color: var(--lamp-legend-lit);
+  text-shadow:
+    0 0 2px var(--lamp-glow),
+    0 0 7px var(--lamp-glow);
+  transform: translateY(1px);
+}
+
+/* The focus ring, light so it shows on the black bezel in either theme
+   (ink would vanish on it in light), and just clear of the key. */
+[data-view='instrument'] .pill-tab:focus-visible {
+  outline: 2px solid var(--lamp-legend-hover);
+  outline-offset: 1px;
+}
+
+/* The jewel lamp: coloured glass in a bright ring, unlit; lit, faceted
+   with a hot spot, glowing. */
+[data-view='instrument'] .pill-tab::before {
+  content: '';
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 20deg,
+    var(--lamp-off-1),
+    var(--lamp-off-2),
+    var(--lamp-off-3),
+    var(--lamp-off-4),
+    var(--lamp-off-3),
+    var(--lamp-off-2),
+    var(--lamp-off-1)
+  );
+  box-shadow:
+    0 0 0 1px #000,
+    0 0 0 1.8px var(--lamp-ring);
+}
+
+[data-view='instrument'] .pill-tab[aria-selected='true']::before {
+  background:
+    radial-gradient(circle at 45% 40%, rgba(255, 250, 235, 0.95) 0 15%, transparent 55%),
+    conic-gradient(
+      from 20deg,
+      var(--lamp-on-1),
+      var(--lamp-on-2),
+      var(--lamp-on-3),
+      var(--lamp-on-4),
+      var(--lamp-on-5),
+      var(--lamp-on-2),
+      var(--lamp-on-1)
+    );
+  box-shadow:
+    0 0 0 1px #000,
+    0 0 0 1.8px var(--lamp-ring),
+    0 0 6px 1px var(--lamp-on-1),
+    0 0 12px 2px rgba(255, 170, 70, 0.35);
+}
+
+[data-view='instrument'] .pill-mark {
+  width: 0.32rem;
+  height: 0.32rem;
+  background: var(--lamp-on-1);
+  box-shadow: 0 0 3px var(--lamp-on-3);
+}
+
 .inst-diagram[hidden],
 .inst-lfo[hidden],
 .inst-pitch[hidden] {
@@ -1629,6 +1740,12 @@ canvas.voice-keys {
   .voice-tabs {
     flex-basis: 100%;
     margin-left: 0;
+  }
+
+  /* On its own line the bezel is the line's width: the keys share it. */
+  [data-view='instrument'] .voice-tabs .pill-tab {
+    flex: 1 1 0;
+    justify-content: center;
   }
 
   #inst-operators {
