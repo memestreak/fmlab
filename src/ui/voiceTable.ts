@@ -4,7 +4,8 @@
 // its share of the LFO's tremolo (a number reel, off to 100 % by tenths),
 // and two small drawings, to compare at a glance: its envelope and its
 // level across the keyboard. A row clicked or focused is the selected
-// one, outlined, and the operator panel above shows it; a click on a
+// one, marked by an ink bar down its left edge, and the operator panel
+// above shows it; a click on a
 // drawing also opens that drawing's tab there, where it is edited.
 
 import { algorithm, operatorsUsed } from '../dsp/algorithms';

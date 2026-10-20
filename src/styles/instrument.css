@@ -666,10 +666,11 @@ canvas.voice-keys {
   outline-offset: 2px;
 }
 
-/* The selected row: outlined in ink, the operator whose envelope is open. */
-[data-view='instrument'] .voice-row.is-selected {
-  outline: 2px solid var(--ink);
-  outline-offset: -2px;
+/* The selected row, the operator the panel shows: an ink bar down its
+   left edge, the one a row pointed at has, and no outline (Jeremy,
+   2026-10-20). A box shadow inside its first cell, so nothing moves. */
+[data-view='instrument'] .voice-row.is-selected > th {
+  box-shadow: inset 3px 0 0 var(--ink);
 }
 
 /* The operator panel: a header with its two tabs, then the tab showing:
@@ -1558,6 +1559,15 @@ canvas.voice-keys {
   [data-view='instrument'] .op-row.is-pointed {
     background: color-mix(in srgb, var(--pen-green) 18%, var(--paper));
     box-shadow: inset 3px 0 0 var(--ink);
+  }
+
+  /* The selected card: the same bar down its left edge. */
+  [data-view='instrument'] .voice-row.is-selected {
+    box-shadow: inset 3px 0 0 var(--ink);
+  }
+
+  [data-view='instrument'] .voice-row.is-selected > th {
+    box-shadow: none;
   }
 
   [data-view='instrument'] .op-row.is-pointed:has(.op-tag[data-role='carrier']) {
