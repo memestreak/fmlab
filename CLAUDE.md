@@ -571,7 +571,8 @@ panel (`#voice-envelope`) alone, the showing tab's curve filling it.
 Under the band the operator table (`#voice-table`) the full width, then
 the foot (`.inst-foot`): the octave control and keyboard on the left, the
 spectrum (`#inst-figures`) filling the rest of the row, no taller than
-the keyboard, its x-axis title shown only under the pointer (its canvas's
+the keyboard, with no ink rules round it (its glass is its frame), its
+x-axis title shown only under the pointer (its canvas's
 `--plot-title: hover`; `drawFrame` leaves the line to the frame). Carriers are solid blue and modulators
 green outlines in the table (filled or outlined tags, carrier rows
 shaded); the diagram is a VFD panel, carriers lit solid and modulators
@@ -628,7 +629,8 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
 - A figure sits between two ink rules (`.figure`) with an italic caption,
   "Fig. n" then an em space then the title. Where the lab is pinned
   beside the text, its figures share one plate instead: an ink rule above
-  the first and below the last, a `--rule` hairline between them.
+  the first and below the last, a `--rule` hairline between them (but
+  not round the sandbox's VFD spectrum).
 - Fonts, self-hosted through `@fontsource` (latin subsets, imported in
   `src/main.ts`): `--font-display` (Fraunces 600: wordmark and headings),
   `--font-sans` (Figtree 400 to 700, italic for figure captions:
