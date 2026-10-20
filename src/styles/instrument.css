@@ -209,7 +209,6 @@ body:not([data-view='instrument']) #inst-tools {
   align-items: center;
   align-self: stretch;
   min-height: 0;
-  padding: 0 0 0.1rem;
 }
 
 /* The Voice title at the left, its Algorithm | LFO switch at the right. */
@@ -395,32 +394,42 @@ body:not([data-view='instrument']) #inst-tools {
   box-shadow: 0 0 3px var(--lamp-on-3);
 }
 
-.inst-diagram[hidden],
-.inst-lfo[hidden],
-.inst-pitch[hidden] {
+.inst-voice-tab[hidden] {
   display: none;
 }
 
-/* The Pitch EG tab, as tall as the others: its name, the curve taking the
-   height left, and its eight knobs in a row under it. */
-.inst-pitch {
+/* Each Voice tab as the operator panel is (Jeremy, 2026-10-20): its
+   display the panel's width, the same size whichever tab is open (the
+   controls' row is one height for all three), over one row of its
+   controls. */
+.inst-voice-tab {
   display: grid;
   flex: 1 1 auto;
-  grid-template-rows: auto minmax(0, 1fr) auto;
-  justify-items: center;
-  gap: 0.15rem;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) 4.6rem;
+  row-gap: 0.5rem;
   min-height: 0;
-  padding: 0 0 0.2rem;
+  padding: 0.2rem 0 0;
 }
 
-.inst-pitch .inst-lfo-label {
-  justify-self: start;
+.inst-voice-display {
+  align-self: stretch;
+  min-width: 0;
+  min-height: 0;
 }
 
+.inst-voice-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  min-width: 0;
+}
+
+/* Pitch EG: the curve, then its eight knobs. Its name is for screen
+   readers only, as the operator panel's curves have none. */
 .inst-pitch-curve {
   display: block;
-  align-self: stretch;
-  justify-self: stretch;
   width: 100%;
   height: 100%;
   min-height: 4rem;
@@ -431,40 +440,21 @@ body:not([data-view='instrument']) #inst-tools {
   display: grid;
   grid-template-columns: repeat(8, 4.2rem);
   gap: 0.1rem;
-  /* Clear of the curve's glass by 0.5rem, as the operator panel's knobs
-     are of theirs. */
-  margin-top: 0.35rem;
 }
 
-/* Its dials as small as a short window's, to leave the curve the height. */
-.inst-pitch .knob-dial {
+/* The LFO's and the pitch envelope's dials as small as a short window's,
+   so each row fits under its display. */
+.inst-pitch .knob-dial,
+.inst-lfo .knob-dial {
   width: 2rem;
   height: 2rem;
 }
 
-/* The LFO tab, as tall as the Algorithm tab: the wave's buttons over its
-   drawing on the left, the knobs and key sync on the right. */
-.inst-lfo {
-  display: grid;
-  flex: 1 1 auto;
-  grid-template-columns: minmax(0, 1fr) auto;
-  column-gap: 1.25rem;
-  align-items: stretch;
-  min-height: 0;
-  padding: 0.2rem 0 0.4rem;
-}
-
-.inst-lfo-wave {
-  display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr);
-  justify-items: start;
-  gap: 0.35rem;
-  min-height: 0;
-}
-
-.inst-lfo-label {
-  font-size: 0.75rem;
-  font-weight: 600;
+/* LFO: the drawing, then the wave, the four knobs and key sync, closer
+   together to fit. The wave's name is for screen readers only: the
+   drawings say it. */
+.inst-lfo .inst-voice-controls {
+  gap: 0.6rem;
 }
 
 /* The six waves, joined in a row: each a small drawing of its shape in
@@ -523,25 +513,68 @@ body:not([data-view='instrument']) #inst-tools {
   stroke-linecap: round;
 }
 
+/* In the sandbox the waves are push keys as the tabs are (Jeremy,
+   2026-10-20): black keys in a bezel, the chosen one pressed in with its
+   wave lit warm, the others up with grey waves. No lamps: the row would
+   not fit at 1280 wide. */
+[data-view='instrument'] .lfo-waves {
+  gap: 3px;
+  padding: 3px 4px 4px;
+  border-radius: 4px;
+  background: linear-gradient(var(--lamp-bezel-1), var(--lamp-bezel-2));
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.8),
+    0 0 0 1px #000,
+    var(--lamp-bezel-edge);
+}
+
+[data-view='instrument'] .lfo-wave,
+[data-view='instrument'] .lfo-wave:first-child,
+[data-view='instrument'] .lfo-wave:last-child {
+  width: 2rem;
+  height: 1.65rem;
+  margin-left: 0;
+  border: 1px solid #000;
+  border-radius: 2px;
+  background: linear-gradient(var(--lamp-key-1), var(--lamp-key-2) 60%, var(--lamp-key-3));
+  box-shadow:
+    0 1px 0 #000,
+    0 2px 1px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  color: var(--lamp-legend);
+}
+
+[data-view='instrument'] .lfo-wave:hover {
+  color: var(--lamp-legend-hover);
+}
+
+[data-view='instrument'] .lfo-wave[aria-checked='true'] {
+  background: linear-gradient(var(--lamp-key-down-1), var(--lamp-key-down-2));
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.8);
+  color: var(--lamp-legend-lit);
+  transform: translateY(1px);
+}
+
+[data-view='instrument'] .lfo-wave[aria-checked='true'] svg {
+  filter: drop-shadow(0 0 1.5px var(--lamp-glow)) drop-shadow(0 0 4px var(--lamp-glow));
+}
+
+[data-view='instrument'] .lfo-wave:focus-visible {
+  outline: 2px solid var(--lamp-legend-hover);
+  outline-offset: 1px;
+}
+
 .inst-lfo-plot {
   display: block;
-  align-self: stretch;
   width: 100%;
   height: 100%;
   min-height: 5rem;
 }
 
-.inst-lfo-controls {
-  display: grid;
-  align-content: center;
-  justify-items: center;
-  gap: 0.6rem;
-}
-
 .inst-lfo-knobs {
   display: grid;
-  grid-template-columns: repeat(2, 4.4rem);
-  gap: 0.5rem 0.25rem;
+  grid-template-columns: repeat(4, 3.6rem);
+  gap: 0.1rem;
 }
 
 .inst-lfo-sync {
@@ -549,7 +582,9 @@ body:not([data-view='instrument']) #inst-tools {
   align-items: center;
   gap: 0.4rem;
   font-size: 0.8rem;
-  white-space: nowrap;
+  /* Wrapped to fit beside the knobs. */
+  max-width: 5.5rem;
+  line-height: 1.2;
   cursor: pointer;
 }
 
@@ -558,24 +593,21 @@ body:not([data-view='instrument']) #inst-tools {
 }
 
 .inst-alg-step-row {
-  grid-row: 2;
-  grid-column: 1;
-  justify-self: center;
   gap: 0.4rem;
 }
 
-/* The knob just under the chooser, the pair centred together on the
-   diagram's height (Jeremy, 2026-10-20). */
-#inst-feedback {
-  grid-row: 3;
-  grid-column: 1;
-  justify-self: center;
-  margin-top: 1.25rem;
+/* Algorithm: the diagram, then ‹ n › and Feedback side by side, the dial
+   level with the buttons, its name beside it. Its value is on the
+   diagram's glass (viz/algorithmPlot.ts); the dial still says it to
+   screen readers. */
+#inst-feedback .knob {
+  grid-auto-flow: column;
+  align-items: center;
+  gap: 0.45rem;
 }
 
-.inst-alg-step {
-  grid-row: 1 / -1;
-  grid-column: 2;
+#inst-feedback .knob-readout {
+  display: none;
 }
 
 .round-step {
@@ -1219,24 +1251,6 @@ canvas.voice-keys {
   line-height: 1.3;
 }
 
-/* The diagram's own plate: Fig. 1 on the left, Feedback on the right. */
-/* The algorithm chooser and the Feedback knob on the left of the
-   diagram, the knob just under the chooser and the pair centred
-   together on the diagram's height (the height they leave shared
-   equally above and below them). The
-   diagram's column is as wide as the widest wiring needs at the box size
-   its height gives (--diagram-width, set in ui/instrument.ts), so the
-   pair sits just clear of it and holds still. No rule under it: the
-   Operators panel's rule is just below. */
-.inst-diagram {
-  display: grid;
-  grid-template-columns: auto var(--diagram-width, 15.2rem);
-  grid-template-rows: minmax(0, 1fr) auto auto minmax(0, 1fr);
-  justify-content: center;
-  column-gap: 0.75rem;
-  align-items: center;
-}
-
 #inst-diagram-figure,
 #inst-diagram-figure .figure:not([hidden]) {
   display: contents;
@@ -1533,9 +1547,7 @@ canvas.voice-keys {
     flex: none;
   }
 
-  .inst-diagram,
-  .inst-lfo,
-  .inst-pitch {
+  .inst-voice-tab {
     flex: 1 1 auto;
     min-height: 9rem;
   }
@@ -1581,15 +1593,8 @@ canvas.voice-keys {
     padding: 0.1rem 0.3rem;
   }
 
-  .inst-diagram,
-  .inst-lfo,
-  .inst-pitch {
+  .inst-voice-tab {
     min-height: 7rem;
-  }
-
-  /* The knob closer under the chooser, as the gaps tighten. */
-  #inst-feedback {
-    margin-top: 0.75rem;
   }
 
   .inst-pitch-knobs {
@@ -1789,62 +1794,32 @@ canvas.voice-keys {
     gap: 1rem;
   }
 
-  /* Too narrow for the controls beside the diagram: the chooser over it,
-     and the knob beside it. */
-  .inst-diagram {
-    grid-template-columns: var(--diagram-width, 15.2rem) auto;
+  /* Each Voice tab's display one fixed height, its controls wrapping
+     under it. */
+  .inst-voice-tab {
     grid-template-rows: auto auto;
-    row-gap: 0.5rem;
-    padding-bottom: 0.5rem;
-  }
-
-  .inst-alg-step-row {
-    grid-row: 1;
-    grid-column: 1 / -1;
-    justify-self: start;
-  }
-
-  .inst-alg-step {
-    grid-row: 2;
-    grid-column: 1;
-  }
-
-  #inst-feedback {
-    grid-row: 2;
-    grid-column: 2;
-    margin-top: 0;
-    transform: none;
-  }
-
-  /* The LFO's wave and drawing above, its knobs and key sync under. */
-  .inst-lfo {
-    grid-template-columns: minmax(0, 1fr);
     row-gap: 0.75rem;
     padding-bottom: 0.5rem;
   }
 
-  .inst-lfo-plot {
-    height: 7rem;
+  .inst-voice-controls {
+    flex-wrap: wrap;
+    row-gap: 0.75rem;
   }
 
-  .inst-lfo-knobs {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-
-  /* The pitch envelope's curve a fixed height, its knobs in two rows. */
+  #inst-diagram-figure .plot-frame,
+  .inst-lfo-plot,
   .inst-pitch-curve {
+    flex: none;
     height: 9rem;
   }
 
+  /* The knobs a row of four, the line's width. */
+  .inst-lfo-knobs,
   .inst-pitch-knobs {
+    flex-basis: 100%;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     row-gap: 0.5rem;
-    width: 100%;
-  }
-
-  #inst-diagram-figure .plot-frame {
-    flex: none;
-    height: 11rem;
   }
 
   /* The operator table as one card per operator. */

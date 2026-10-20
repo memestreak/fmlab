@@ -123,7 +123,6 @@ export function mountVoiceArea(store: LabStore): void {
     button.className = 'lfo-wave';
     button.setAttribute('role', 'radio');
     button.setAttribute('aria-label', WAVES[wave].name);
-    button.title = WAVES[wave].name;
     const svg = document.createElementNS(SVG, 'svg');
     svg.setAttribute('viewBox', '0 0 24 16');
     svg.setAttribute('aria-hidden', 'true');
@@ -131,7 +130,14 @@ export function mountVoiceArea(store: LabStore): void {
     path.setAttribute('d', WAVES[wave].path);
     svg.append(path);
     button.append(svg);
-    button.addEventListener('click', () => setLfo({ wave }));
+    // Chosen on the press, as the tabs are; the click after finds it chosen.
+    const choose = () => {
+      if (lfo().wave !== wave) setLfo({ wave });
+    };
+    button.addEventListener('pointerdown', event => {
+      if (event.button === 0) choose();
+    });
+    button.addEventListener('click', choose);
     return button;
   });
   buttons.forEach((button, i) => {

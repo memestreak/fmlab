@@ -116,19 +116,6 @@ function fitBox(columns: number, rows: number, width: number, height: number): n
 }
 
 /**
- * How wide a canvas of `height` must be for the widest wiring (six
- * across) to keep the box size its height gives: `box × 9.6 + 40`, from
- * `fitBox`; no wider than `room`, where the box is then sized by the
- * width instead. Never so narrow that the box would fall under
- * STEADY_BOX.
- */
-export function steadyDiagramWidth(height: number, room = Infinity): number {
-  const box = Math.max(STEADY_BOX, Math.min(BOX, (height - 18) / (LARGEST.rows * 1.7 + 0.25)));
-  const across = (side: number) => side * LARGEST.columns * 1.6 + 40;
-  return Math.max(across(STEADY_BOX), Math.min(across(box), room));
-}
-
-/**
  * Where everything in the diagram goes on a canvas of a size: the side of
  * a box, the gaps, the output line, and each operator's box. Pure, so the
  * drawing and the pointer agree on where a box is. Where the canvas has
@@ -330,7 +317,7 @@ const DIM_BOX = 0.55;
  * The modulators, outlines, and the wires between them are at about half.
  * The operator pointed at is ringed at full brightness; while a note
  * sounds, a modulator fills as strongly as it sounds, inside its dimmed
- * box.
+ * box. The DX7's Feedback is written at the right, "FB 3.14".
  */
 function drawVfdAlgorithm(state: LabState, canvas: HTMLCanvasElement, time?: number): void {
   const plot = beginPlot(canvas);
@@ -493,5 +480,21 @@ function drawVfdAlgorithm(state: LabState, canvas: HTMLCanvasElement, time?: num
   ctx.textAlign = 'left';
   ctx.fillStyle = lit;
   ctx.fillText('OUT', Math.max(...carrierXs) + 6, outY);
+
+  // The DX7's Feedback, on the glass at the right, halfway down, its
+  // name dimmer (Jeremy, 2026-10-20): the knob under the display has no
+  // readout of its own.
+  if (state.voiceModel === 'dx7') {
+    const value = state.dxFeedback.toFixed(2);
+    ctx.font = `600 14px ${mono}`;
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    const right = width - 28;
+    const middle = height / 2;
+    ctx.fillText(value, right, middle);
+    ctx.globalAlpha = DIM_BOX;
+    ctx.fillText('FB', right - ctx.measureText(value).width - 8, middle);
+    ctx.globalAlpha = 1;
+  }
   plain();
 }

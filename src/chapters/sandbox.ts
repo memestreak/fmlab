@@ -21,7 +21,8 @@ export const sandbox: Chapter = {
   maths: [],
   instrument: true,
   // No Carrier slider: the keyboard sets the pitch of every note.
-  // Its Feedback is a knob beside the diagram (ui/instrument.ts).
+  // Its Feedback is a knob beside the chooser under the diagram
+  // (ui/instrument.ts).
   controls: ['volume'],
   presets: DX7_VOICES,
   presetMenu: true,
