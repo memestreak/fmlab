@@ -27,8 +27,9 @@
   --font-display: 'Fraunces', Georgia, serif;
   --font-sans: 'Figtree', system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
-  /* The VFD readouts and the knobs' VFD dials: the same in either theme
-     (but the dial's faint edge in dark), as a real display is. */
+  /* The VFD readouts, the knobs' VFD dials and the faders: the same in
+     either theme (but the dials' and faders' faint edge in dark), as a
+     real display is. */
   --vfd-glass-1: #0d1d1d;
   --vfd-glass-2: #050a0a;
   --vfd-lit: #b9fff0;
@@ -39,6 +40,14 @@
   --vfd-knob: #151717;
   --vfd-dial-unlit-opacity: 0.08;
   --vfd-dial-edge: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.25));
+  --vfd-fader-slot: #0d0d0d;
+  --vfd-fader-cap-1: #3a3d3d;
+  --vfd-fader-cap-2: #1b1d1d;
+  --vfd-fader-cap-3: #0c0d0d;
+  --vfd-fader-line: #c4fff2;
+  --vfd-fader-edge: 0 0 0 0 transparent;
+  /* The fader's printed scale: 21 ticks in ink, every fifth longer. */
+  --vfd-fader-scale: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' fill='%23000000'><rect x='0%25' width='0.6' height='4' transform='translate(-0.00 0)'/><rect x='5%25' width='0.6' height='2' transform='translate(-0.03 0)'/><rect x='10%25' width='0.6' height='2' transform='translate(-0.06 0)'/><rect x='15%25' width='0.6' height='2' transform='translate(-0.09 0)'/><rect x='20%25' width='0.6' height='2' transform='translate(-0.12 0)'/><rect x='25%25' width='0.6' height='4' transform='translate(-0.15 0)'/><rect x='30%25' width='0.6' height='2' transform='translate(-0.18 0)'/><rect x='35%25' width='0.6' height='2' transform='translate(-0.21 0)'/><rect x='40%25' width='0.6' height='2' transform='translate(-0.24 0)'/><rect x='45%25' width='0.6' height='2' transform='translate(-0.27 0)'/><rect x='50%25' width='0.6' height='4' transform='translate(-0.30 0)'/><rect x='55%25' width='0.6' height='2' transform='translate(-0.33 0)'/><rect x='60%25' width='0.6' height='2' transform='translate(-0.36 0)'/><rect x='65%25' width='0.6' height='2' transform='translate(-0.39 0)'/><rect x='70%25' width='0.6' height='2' transform='translate(-0.42 0)'/><rect x='75%25' width='0.6' height='4' transform='translate(-0.45 0)'/><rect x='80%25' width='0.6' height='2' transform='translate(-0.48 0)'/><rect x='85%25' width='0.6' height='2' transform='translate(-0.51 0)'/><rect x='90%25' width='0.6' height='2' transform='translate(-0.54 0)'/><rect x='95%25' width='0.6' height='2' transform='translate(-0.57 0)'/><rect x='100%25' width='0.6' height='4' transform='translate(-0.60 0)'/></svg>");
 }
 
 /* Dark: follows the system unless the viewer picked Light, or forced by
@@ -54,8 +63,9 @@
     --pen-blue: #94b2ff;
     --pen-green: #7fd18a;
     --pen-red: #ff7a6e;
-    /* The VFD readouts and the knobs' VFD dials: the same in either theme
-       (but the dial's faint edge in dark), as a real display is. */
+    /* The VFD readouts, the knobs' VFD dials and the faders: the same in
+       either theme (but the dials' and faders' faint edge in dark), as a
+       real display is. */
     --vfd-glass-1: #0d1d1d;
     --vfd-glass-2: #050a0a;
     --vfd-lit: #b9fff0;
@@ -66,6 +76,14 @@
     --vfd-knob: #151717;
     --vfd-dial-unlit-opacity: 0.08;
     --vfd-dial-edge: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.25)) drop-shadow(0 0 0.6px rgba(255, 255, 255, 0.45));
+    --vfd-fader-slot: #0d0d0d;
+    --vfd-fader-cap-1: #3a3d3d;
+    --vfd-fader-cap-2: #1b1d1d;
+    --vfd-fader-cap-3: #0c0d0d;
+    --vfd-fader-line: #c4fff2;
+    --vfd-fader-edge: 0 0 0.6px rgba(255, 255, 255, 0.45);
+    /* The fader's printed scale: 21 ticks in ink, every fifth longer. */
+    --vfd-fader-scale: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' fill='%23ffffff'><rect x='0%25' width='0.6' height='4' transform='translate(-0.00 0)'/><rect x='5%25' width='0.6' height='2' transform='translate(-0.03 0)'/><rect x='10%25' width='0.6' height='2' transform='translate(-0.06 0)'/><rect x='15%25' width='0.6' height='2' transform='translate(-0.09 0)'/><rect x='20%25' width='0.6' height='2' transform='translate(-0.12 0)'/><rect x='25%25' width='0.6' height='4' transform='translate(-0.15 0)'/><rect x='30%25' width='0.6' height='2' transform='translate(-0.18 0)'/><rect x='35%25' width='0.6' height='2' transform='translate(-0.21 0)'/><rect x='40%25' width='0.6' height='2' transform='translate(-0.24 0)'/><rect x='45%25' width='0.6' height='2' transform='translate(-0.27 0)'/><rect x='50%25' width='0.6' height='4' transform='translate(-0.30 0)'/><rect x='55%25' width='0.6' height='2' transform='translate(-0.33 0)'/><rect x='60%25' width='0.6' height='2' transform='translate(-0.36 0)'/><rect x='65%25' width='0.6' height='2' transform='translate(-0.39 0)'/><rect x='70%25' width='0.6' height='2' transform='translate(-0.42 0)'/><rect x='75%25' width='0.6' height='4' transform='translate(-0.45 0)'/><rect x='80%25' width='0.6' height='2' transform='translate(-0.48 0)'/><rect x='85%25' width='0.6' height='2' transform='translate(-0.51 0)'/><rect x='90%25' width='0.6' height='2' transform='translate(-0.54 0)'/><rect x='95%25' width='0.6' height='2' transform='translate(-0.57 0)'/><rect x='100%25' width='0.6' height='4' transform='translate(-0.60 0)'/></svg>");
   }
 }
 :root[data-theme='dark'] {
@@ -78,8 +96,9 @@
   --pen-blue: #94b2ff;
   --pen-green: #7fd18a;
   --pen-red: #ff7a6e;
-  /* The VFD readouts and the knobs' VFD dials: the same in either theme
-     (but the dial's faint edge in dark), as a real display is. */
+  /* The VFD readouts, the knobs' VFD dials and the faders: the same in
+     either theme (but the dials' and faders' faint edge in dark), as a
+     real display is. */
   --vfd-glass-1: #0d1d1d;
   --vfd-glass-2: #050a0a;
   --vfd-lit: #b9fff0;
@@ -90,4 +109,12 @@
   --vfd-knob: #151717;
   --vfd-dial-unlit-opacity: 0.08;
   --vfd-dial-edge: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.25)) drop-shadow(0 0 0.6px rgba(255, 255, 255, 0.45));
+  --vfd-fader-slot: #0d0d0d;
+  --vfd-fader-cap-1: #3a3d3d;
+  --vfd-fader-cap-2: #1b1d1d;
+  --vfd-fader-cap-3: #0c0d0d;
+  --vfd-fader-line: #c4fff2;
+  --vfd-fader-edge: 0 0 0.6px rgba(255, 255, 255, 0.45);
+  /* The fader's printed scale: 21 ticks in ink, every fifth longer. */
+  --vfd-fader-scale: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' fill='%23ffffff'><rect x='0%25' width='0.6' height='4' transform='translate(-0.00 0)'/><rect x='5%25' width='0.6' height='2' transform='translate(-0.03 0)'/><rect x='10%25' width='0.6' height='2' transform='translate(-0.06 0)'/><rect x='15%25' width='0.6' height='2' transform='translate(-0.09 0)'/><rect x='20%25' width='0.6' height='2' transform='translate(-0.12 0)'/><rect x='25%25' width='0.6' height='4' transform='translate(-0.15 0)'/><rect x='30%25' width='0.6' height='2' transform='translate(-0.18 0)'/><rect x='35%25' width='0.6' height='2' transform='translate(-0.21 0)'/><rect x='40%25' width='0.6' height='2' transform='translate(-0.24 0)'/><rect x='45%25' width='0.6' height='2' transform='translate(-0.27 0)'/><rect x='50%25' width='0.6' height='4' transform='translate(-0.30 0)'/><rect x='55%25' width='0.6' height='2' transform='translate(-0.33 0)'/><rect x='60%25' width='0.6' height='2' transform='translate(-0.36 0)'/><rect x='65%25' width='0.6' height='2' transform='translate(-0.39 0)'/><rect x='70%25' width='0.6' height='2' transform='translate(-0.42 0)'/><rect x='75%25' width='0.6' height='4' transform='translate(-0.45 0)'/><rect x='80%25' width='0.6' height='2' transform='translate(-0.48 0)'/><rect x='85%25' width='0.6' height='2' transform='translate(-0.51 0)'/><rect x='90%25' width='0.6' height='2' transform='translate(-0.54 0)'/><rect x='95%25' width='0.6' height='2' transform='translate(-0.57 0)'/><rect x='100%25' width='0.6' height='4' transform='translate(-0.60 0)'/></svg>");
 }

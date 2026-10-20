@@ -469,8 +469,14 @@ pointer is over the keyboard or keyboard focus is in it) on their left; every he
 - `src/styles/` — `tokens.css` (colours and fonts), `base.css` (the two
   panes, type, figures and the controls) and `instrument.css` (the
   sandbox's instrument page and its keyboard). A slider takes
-  `--slider-fill` for its filled part and thumb where it is set (the
-  sandbox's carrier and modulator controls), ink otherwise.
+  `--slider-fill` for its filled part and thumb where it is set, ink
+  otherwise. The sandbox's sliders (Ratio, Level and Volume, under
+  `[data-view='instrument']`) are drawn as faders instead (Jeremy,
+  2026-10-20): a dark slot, a black cap with a glowing cyan line, a
+  scale of 21 ticks under the slot (`--vfd-fader-scale`, an SVG), no
+  filled part and no role colour; still the native range input, its
+  size, keys and focus ring. The operator's blue or green stays on the
+  tags, the row shading, the diagram and the plots.
 - The page is hidden (a style in `index.html`) until `main.ts` has
   mounted everything and the fonts are in, then shown by setting
   `data-ready` on `<html>`; a 3 s CSS fallback shows it regardless. This
@@ -592,11 +598,13 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
 - All text is pure `--ink`, never a grey. Use weight, size and italics for
   hierarchy.
 - Colour appears only in plots, rules and control fills, with one
-  exception: the VFD readouts (the operator table's, the algorithm's)
-  and every knob's VFD dial glow cyan on dark glass, in both themes
-  (Jeremy, 2026-10-20; `--vfd-*` tokens, the same in every theme but for
-  the dials' faint light edge in dark). They are a drawn display, not text, so the ink rule above does
-  not apply to them.
+  exception: the VFD readouts (the operator table's, the algorithm's),
+  every knob's VFD dial and the line across the sandbox's fader caps
+  glow cyan on dark glass, in both themes (Jeremy, 2026-10-20;
+  `--vfd-*` tokens, the same in every theme but for the dials' and
+  faders' faint light edge in dark and the faders' scale, in ink). They
+  are a drawn display, not text, so the ink rule above does not apply
+  to them.
 - Red means negative phase and nothing else: controls and the focus ring
   are ink. Never let phase rest on colour alone; a negative stem also gets
   a hollow marker.
@@ -617,7 +625,8 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
   instead, focusable, with its value kept in `aria-valuenow` and
   `aria-valuetext`; anything it offers by hover must also be reachable by
   keyboard and touch (the J buttons).
-- Controls are ink on paper (`.btn`, `.slider` in `base.css`). Give every
+- Controls are ink on paper (`.btn`, `.slider` in `base.css`), but for
+  the sandbox's faders. Give every
   input a visible `<label>`, and a readout in `.num`. Anything that is not
   a control must not look like one.
 - Show real units beside carrier units wherever a frequency or time
