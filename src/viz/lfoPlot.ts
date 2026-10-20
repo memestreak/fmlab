@@ -34,7 +34,7 @@ export function lfoAt(lfo: Dx7Lfo, time: number): number {
 export function drawLfo(canvas: HTMLCanvasElement, lfo: Dx7Lfo): void {
   const plot = beginPlot(canvas);
   if (!plot) return;
-  const { ctx, token } = plot;
+  const { ctx, token, glow } = plot;
   const { width, height } = canvas.getBoundingClientRect();
   const left = MARGIN.left;
   const right = width - MARGIN.right;
@@ -48,6 +48,7 @@ export function drawLfo(canvas: HTMLCanvasElement, lfo: Dx7Lfo): void {
     ctx.fillStyle = token('--paper-sunken');
     ctx.fillRect(left, top, x(Math.min(LFO_SECONDS, lfo.delay)) - left, bottom - top);
   }
+  glow();
 
   // The rows at 1, 0 and -1, numbered at the left; the seconds under.
   ctx.lineWidth = 1;

@@ -576,7 +576,8 @@ the keyboard, its x-axis title shown only under the pointer (its canvas's
 green outlines in the table (filled or outlined tags, carrier rows
 shaded); the diagram is a VFD panel, carriers lit solid and modulators
 dimmer cyan outlines. The envelope, Key scaling and pitch envelope
-graphs, large and the table's small ones, and the spectrum (its
+graphs, large and the table's small ones, the LFO's drawing (its wave
+lit full) and the spectrum (its
 negative stems lit as the rest, the measured curve cyan) are VFDs too (Jeremy,
 2026-10-20): the same drawings, their tokens remapped in CSS to cyan on
 dark glass, everything but the area fills glowing (`--plot-glow`, which
@@ -614,8 +615,8 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
 - Colour appears only in plots, rules and control fills, with one
   exception: the VFD readouts (the operator table's, the algorithm's),
   every knob's VFD dial, the line across the sandbox's fader caps, the
-  sandbox's algorithm diagram, its envelope, Key scaling and pitch
-  envelope graphs, large and small, and its spectrum glow cyan on dark glass, in both themes (Jeremy, 2026-10-20;
+  sandbox's algorithm diagram, its envelope, Key scaling, pitch
+  envelope and LFO graphs, large and small, and its spectrum glow cyan on dark glass, in both themes (Jeremy, 2026-10-20;
   `--vfd-*` tokens, the same in every theme but for a faint light edge
   in dark and the faders' scale, in ink). They
   are a drawn display, not text, so the ink rule above does not apply
