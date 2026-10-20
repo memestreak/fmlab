@@ -1542,6 +1542,13 @@ canvas.voice-keys {
     padding-top: 0;
   }
 
+  /* The LFO's wave keys and Key sync on the knobs' dials' centre line,
+     not the knobs' (dial and name) (Jeremy, 2026-10-20): room under them
+     as tall as a knob's name lifts them by half of it. */
+  .inst-lfo .inst-voice-controls > :is(.lfo-waves, .lamp-keys) {
+    margin-bottom: 1.2rem;
+  }
+
   .voice-envelope {
     padding-bottom: 0;
   }
