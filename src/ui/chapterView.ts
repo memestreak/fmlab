@@ -525,10 +525,27 @@ function presetMenu(presets: readonly Preset[], store: LabStore): HTMLElement[] 
     const preset = at < 0 ? null : presets[at];
     note.textContent = preset ? (preset.note ?? preset.hint) : 'your own, from a factory voice';
     note.title = preset ? preset.hint : note.textContent;
+    fit();
   };
+  // As wide as the name chosen, not the longest of the 32, so ‹ › and
+  // the note sit right after it (a select is otherwise as wide as its
+  // longest option). Measured in its own font, once it is on the page.
+  const measure = document.createElement('canvas').getContext('2d');
+  const fit = () => {
+    if (!select.isConnected || !measure) return;
+    const style = getComputedStyle(select);
+    measure.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+    const text = select.selectedOptions[0]?.textContent ?? '';
+    const room = ['paddingLeft', 'paddingRight', 'borderLeftWidth', 'borderRightWidth'] as const;
+    const extra = room.reduce((sum, side) => sum + (parseFloat(style[side]) || 0), 0);
+    select.style.width = `${Math.ceil(measure.measureText(text).width + extra) + 2}px`;
+  };
+  void document.fonts?.ready.then(fit);
+  window.matchMedia('(min-width: 62rem)').addEventListener('change', fit);
   select.addEventListener('change', () => choose(Number(select.value)));
   const stop = store.subscribe((state, previous) => {
     if (!select.isConnected) return stop();
+    if (state.chapter !== previous.chapter) requestAnimationFrame(fit);
     if (
       state.dxOperators !== previous.dxOperators ||
       state.algorithm !== previous.algorithm ||
@@ -540,5 +557,6 @@ function presetMenu(presets: readonly Preset[], store: LabStore): HTMLElement[] 
     }
   });
   show(store.get());
+  requestAnimationFrame(fit);
   return [step('Previous preset', '‹', -1), select, step('Next preset', '›', 1), note];
 }

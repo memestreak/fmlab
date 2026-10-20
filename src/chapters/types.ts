@@ -143,13 +143,10 @@ export interface Chapter {
   hasPiano?: boolean;
   /**
    * Whether the chapter is an instrument page (the sandbox) rather than a
-   * section: no text column, its controls and figures laid out in
-   * `#instrument` (ui/instrument.ts), and `lede`, one line under its
-   * title, in place of a lesson.
+   * section: no text column and no lesson, its controls and figures laid
+   * out in `#instrument` (ui/instrument.ts).
    */
   instrument?: boolean;
-  /** An instrument page's one line, beside its title. Plain text. */
-  lede?: string;
   /**
    * Whether the chapter keeps its sound (carrier, ratio, index) in the
    * URL, so that a link brings the same sound back.

@@ -4,12 +4,28 @@ import { hashFor } from '../chapters/route';
 import type { LabStore, LabState } from '../model/lab';
 
 /**
+ * The line beside Contents for a view: its group and its title, as
+ * "Explore · Vibrato". Nothing for the sandbox, a synthesizer of its own
+ * whose title bar is its voice's name (Contents still marks it), nor for
+ * a view outside the outline.
+ */
+export function whereLine(id: string): string {
+  const chapter = chapterById(id);
+  if (chapter?.instrument) return '';
+  const section = chapter && OUTLINE.some(g => g.sections.some(s => s.id === chapter.id));
+  if (section) return `${groupOf(chapter.id as SectionId)} · ${chapter.title}`;
+  if (chapter?.id === GLOSSARY || id === GLOSSARY) return 'Glossary';
+  if (id === LANDING) return `Introduction · ${landing.title}`;
+  return '';
+}
+
+/**
  * The header's Contents button and the panel it opens: every group and
  * its sections in order, then the glossary, with the one on screen
  * marked. The panel is a modal <dialog>, so it takes focus, keeps Tab
  * inside it, closes on Escape and hands focus back on closing; on a phone
  * it fills the screen. Choosing a section closes it. Beside the button,
- * where the reader is: the group and the section.
+ * where the reader is: the group and the section (`whereLine`).
  */
 export function mountContents(store: LabStore): void {
   const open = document.querySelector<HTMLButtonElement>('#contents-open');
@@ -36,17 +52,7 @@ export function mountContents(store: LabStore): void {
       if (link.dataset.id === state.chapter) link.setAttribute('aria-current', 'page');
       else link.removeAttribute('aria-current');
     }
-    if (where) {
-      const chapter = chapterById(state.chapter);
-      const section = chapter && OUTLINE.some(g => g.sections.some(s => s.id === chapter.id));
-      where.textContent = section
-        ? `${groupOf(chapter.id as SectionId)} · ${chapter.title}`
-        : chapter?.id === GLOSSARY
-          ? 'Glossary'
-          : chapter?.id === LANDING
-            ? `Introduction · ${landing.title}`
-            : '';
-    }
+    if (where) where.textContent = whereLine(state.chapter);
   };
 
   open.addEventListener('click', () => {

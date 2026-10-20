@@ -100,10 +100,10 @@ describe('the chapters', () => {
   it.each(CHAPTERS)('$title has text and a title', chapter => {
     expect(chapter.title).not.toBe('');
     if (chapter.instrument) {
-      // An instrument page: no lesson, a line beside its title instead.
+      // An instrument page: no lesson; its title bar is its preset menu.
       expect(chapter.body).toEqual([]);
       expect(chapter.maths).toEqual([]);
-      expect(chapter.lede?.trim()).toBeTruthy();
+      expect(chapter.presetMenu).toBe(true);
       return;
     }
     expect(chapter.body.length).toBeGreaterThan(0);

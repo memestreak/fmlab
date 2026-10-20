@@ -355,11 +355,19 @@
            keyboard into it on the way in, and back on the way out, so
            every control keeps its element and id. -->
       <section id="instrument" class="inst" aria-labelledby="inst-title" hidden>
+        <!-- The title bar: the voice's name as the title (the preset menu,
+             a step either side, and what it plays without), the factory
+             voices' credit, then Volume. The page's own title, "Sandbox",
+             is for screen readers. -->
         <div class="inst-bar">
           <div class="inst-head">
-            <h2 id="inst-title" class="inst-title" tabindex="-1"></h2>
-            <p id="inst-lede" class="inst-lede"></p>
+            <h2 id="inst-title" class="inst-title visually-hidden" tabindex="-1"></h2>
+            <div class="inst-row inst-presets" role="group" aria-labelledby="inst-presets-title">
+              <h3 id="inst-presets-title" class="visually-hidden">Presets</h3>
+              <div id="inst-dx7-presets"></div>
+            </div>
           </div>
+          <p class="inst-credit">DX7 factory voices © Yamaha</p>
           <!-- Volume. -->
           <div id="inst-tools" class="inst-tools"></div>
         </div>
@@ -370,11 +378,6 @@
                under both. -->
           <div class="inst-top">
             <div class="inst-left">
-              <!-- The voices to start from, a step either side of the menu. -->
-              <div class="inst-row inst-section-head">
-                <h3 class="panel-title inst-section-title">Presets</h3>
-                <div id="inst-dx7-presets"></div>
-              </div>
               <!-- The voice: its title, and a switch between three tabs,
                    the algorithm, the LFO and the pitch envelope
                    (ui/lfoView.ts). -->

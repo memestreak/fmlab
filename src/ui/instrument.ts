@@ -53,8 +53,6 @@ export function mountInstrument(): {
     if (!on) return;
     const title = document.querySelector('#inst-title');
     if (title) title.textContent = chapter.title;
-    const lede = document.querySelector('#inst-lede');
-    if (lede) lede.textContent = chapter.lede ?? '';
   };
 
   return { place };

@@ -11,9 +11,9 @@ describe('the instrument page', () => {
     expect(CHAPTERS.at(-1)?.id).toBe('sandbox');
     expect(sandbox.patch.mode).toBe('ops');
     expect(sandbox.patch.noteMode).toBe(true);
-    expect(sandbox.lede).toBe(
-      "Six operators, wired by any of the DX7's 32 algorithms, starting from its factory voices (© Yamaha).",
-    );
+    // A synthesizer of its own: no line under a title; the voice's name
+    // heads the page, and the factory voices' credit is in the title bar.
+    expect('lede' in sandbox).toBe(false);
   });
 
   it('plays a DX7 voice from the keyboard, and opens on E.PIANO 1', () => {
