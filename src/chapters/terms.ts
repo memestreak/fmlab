@@ -383,17 +383,17 @@ export const TERMS = {
     wiki: 'Beat_(acoustics)',
     match: /\bbeat(s|ing)?\b/i,
   },
-  keyboardScaling: {
-    name: 'keyboard scaling',
-    plain: `Keyboard scaling changes an operator key by key: its level louder
+  keyScaling: {
+    name: 'key scaling',
+    plain: `Key scaling changes an operator key by key: its level louder
       or quieter away from a break point, and its envelope faster up the
       keyboard.`,
     section: 'dx7-voice',
-    match: /\bkeyboard scaling\b/i,
+    match: /\bkey scaling\b/i,
   },
   breakPoint: {
     name: 'break point',
-    plain: `The break point is the key keyboard scaling works out from, each
+    plain: `The break point is the key that key scaling works out from, each
       side of it with its own curve.`,
     section: 'dx7-voice',
     match: /\bbreak points?\b/i,

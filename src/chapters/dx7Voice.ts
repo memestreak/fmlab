@@ -6,7 +6,7 @@ import type { Chapter, ChapterPatch, Preset } from './types';
 
 // The words the sandbox's DX7 voice (dsp/dx7.ts) puts on screen, defined
 // before the sandbox: levels in dB, the envelope's seven knobs, detune and
-// beating, keyboard scaling. Every preset is algorithm 5, three pairs side
+// beating, key scaling. Every preset is algorithm 5, three pairs side
 // by side, with only the operators it needs switched on, so the diagram
 // stays put while the presets change the sound.
 
@@ -71,7 +71,7 @@ const DETUNED: Partial<ChapterPatch> = {
 };
 
 /**
- * A struck pair with keyboard scaling: from middle C up, OP2 3 dB quieter
+ * A struck pair with key scaling: from middle C up, OP2 3 dB quieter
  * every three semitones, and both envelopes 1.42 times as fast an octave up.
  */
 const scaled = (carrierHz: number): Partial<ChapterPatch> => ({
@@ -97,7 +97,7 @@ const PRESETS: Preset[] = [
   { label: 'Held', hint: 'a held pair, its modulator at −12 dB', patch: HELD },
   { label: 'Struck', hint: 'the pair with two decays: a quick fall, then a slow one', patch: STRUCK },
   { label: 'Detuned pair', hint: 'two pairs 12 cents apart, beating', patch: DETUNED },
-  { label: 'Low note', hint: 'a voice with keyboard scaling, played at A2', patch: scaled(110) },
+  { label: 'Low note', hint: 'a voice with key scaling, played at A2', patch: scaled(110) },
   { label: 'High note', hint: 'the same voice played at A5', patch: scaled(880) },
 ];
 
@@ -159,7 +159,7 @@ export const dx7Voice: Chapter = {
      of what makes the DX7's E.PIANO 1, in the sandbox, shimmer.`,
     `Real instruments do not sound the same all the way up: a piano's high
      notes are thinner than its low ones, and die away sooner. The DX7 copies
-     this with ${define('keyboardScaling')}, which makes an operator louder
+     this with ${define('keyScaling')}, which makes an operator louder
      or quieter key by key, and can make its envelope run faster up the
      keyboard, up to 1.83 times as fast each octave. Press Low note and
      High note and play each: the same voice, its modulator quieter and its

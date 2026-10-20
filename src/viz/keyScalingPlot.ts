@@ -1,8 +1,8 @@
-// "Across the keyboard": how an operator's level changes from key to key
-// with its keyboard level scaling, drawn over a strip of keys with the
-// break point ruled. Small and unlabelled in the sandbox's operator table;
-// large, with its dB and its keys named, in the operator panel's Across
-// the keyboard tab.
+// Key scaling: how an operator's level changes from key to key
+// with its level scaling (the DX7's "keyboard level scaling"), drawn over
+// a strip of keys with the break point ruled. Small and unlabelled in the
+// sandbox's operator table; large, with its dB and its keys named, in the
+// operator panel's Key scaling tab.
 
 import { type Dx7Operator, levelScalingDb, SCALING_DEPTH } from '../dsp/dx7';
 import { type Area, beginPlot } from './plot';

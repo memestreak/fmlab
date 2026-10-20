@@ -28,7 +28,7 @@ import type { ThemeChoice } from './theme';
  */
 export type SynthMode = 'pm' | 'fm' | 'ops';
 
-/** The sandbox's operator panel's tabs: the envelope, or across the keyboard. */
+/** The sandbox's operator panel's tabs: the envelope, or key scaling. */
 export type VoiceTab = 'envelope' | 'keys';
 
 /** Everything the page shows and plays: one carrier, one modulator. */
@@ -155,7 +155,7 @@ export interface LabState {
   selectedOp: number;
   /**
    * `dx7`: which tab of the selected operator's panel is showing, its
-   * envelope or its level across the keyboard. It stays as it is when
+   * envelope or its key scaling. It stays as it is when
    * another operator is selected.
    */
   voiceTab: VoiceTab;

@@ -10,7 +10,7 @@ import type { Chapter } from './types';
  * voices' credit, "© Yamaha" (index.html). Its controls, figures and
  * keyboard are laid out by ui/instrument.ts. Its operators are a DX7
  * voice (dsp/dx7.ts: levels in dB, a four-part envelope, detune and
- * keyboard scaling), edited in its own table and envelope view
+ * key scaling), edited in its own table and envelope view
  * (ui/voiceTable.ts, ui/envelopeView.ts), with the keyboard and its sound
  * in the link.
  */
