@@ -78,8 +78,8 @@ export function mountAlgorithmSteps(store: LabStore): void {
 }
 
 /**
- * The sandbox's Feedback, a knob under the algorithm chooser, the pair
- * beside the diagram. The diagram's column is as wide as the widest
+ * The sandbox's Feedback, a knob just under the algorithm chooser, the
+ * pair centred together beside the diagram. The diagram's column is as wide as the widest
  * wiring needs at its box size, so the pair sits just clear of algorithm
  * 32 and never moves as the algorithm changes. Ink on paper, as the
  * DX7's feedback belongs to no one operator's role.
