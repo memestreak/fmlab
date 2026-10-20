@@ -4,6 +4,7 @@ import { DX7_FEEDBACK } from '../dsp/dx7';
 import type { LabStore } from '../model/lab';
 import { steadyDiagramWidth } from '../viz/algorithmPlot';
 import { createKnob } from './knob';
+import { createVfdReadout } from './vfdReadout';
 
 /**
  * Where each of the lab's nodes goes on the instrument page: the id of the
@@ -66,8 +67,28 @@ export function stepAlgorithm(number: number, direction: number): number {
   return ((number - 1 + direction + DX7_COUNT) % DX7_COUNT) + 1;
 }
 
-/** The ‹ and › either side of the instrument page's algorithm list. */
+/**
+ * The ‹ and › either side of the instrument page's algorithm list, and
+ * the list's number shown on a VFD readout, as the operator table's
+ * ratio and level are (Jeremy, 2026-10-20). The list lies over the
+ * readout, unseen, so a click still opens it and the keys still choose.
+ */
 export function mountAlgorithmSteps(store: LabStore): void {
+  const home = document.getElementById('inst-algorithm');
+  if (home) {
+    const readout = createVfdReadout({ get: () => store.get().algorithm, format: String, places: 2 });
+    readout.element.classList.add('inst-alg-vfd');
+    home.prepend(readout.element);
+    store.subscribe((state, previous) => {
+      if (state.algorithm !== previous.algorithm) readout.update();
+    });
+    // Chrome counts a click on a list as keyboard focus, so the ring
+    // would show on a click too: mark a pointer's focus, and clear the
+    // mark at the next key.
+    const list = document.getElementById('algorithm');
+    list?.addEventListener('pointerdown', () => list.setAttribute('data-pointer', ''));
+    list?.addEventListener('keydown', () => list.removeAttribute('data-pointer'));
+  }
   const step = (id: string, direction: number) => {
     document.getElementById(id)?.addEventListener('click', () => {
       store.set({ algorithm: stepAlgorithm(store.get().algorithm, direction) });

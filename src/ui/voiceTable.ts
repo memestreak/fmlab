@@ -1,7 +1,8 @@
 // The sandbox's operator table: a row per operator of its DX7 voice, the
 // full width of the page. Each row has the operator's tag and role, its
-// ratio (slider and box), detune in cents, level in dB (slider and box),
-// its share of the LFO's tremolo (a number reel, off to 100 % by tenths),
+// ratio (a slider and a VFD readout), detune in cents (a number reel),
+// level in dB (a slider and a VFD readout), its share of the LFO's
+// tremolo (a number reel, off to 100 % by tenths),
 // and two small drawings, to compare at a glance: its envelope and its
 // key scaling (its level across the keyboard). A row clicked or focused
 // is the selected one, marked by an ink bar down its left edge, and the
@@ -16,6 +17,7 @@ import { drawVoiceEnvelope } from '../viz/voiceEnvelopePlot';
 import { createReel } from './numberReel';
 import { roleOf } from './operators';
 import { createSlider } from './paramControl';
+import { createVfdReadout } from './vfdReadout';
 import { formatCents, formatDb, noteName } from './voiceFormat';
 
 /** The ratios the Ratio slider snaps to: a half and 1 to 31, the DX7's coarse ratios. */
@@ -134,10 +136,9 @@ export function mountVoiceTable(store: LabStore): void {
       return td;
     };
 
-    // Ratio and level: a slider and, beside it, a number reel showing the
-    // value, turned rather than typed. Detune is a reel alone. A value
-    // between a reel's stops (a factory ratio of 1.41, a level of
-    // -30.75 dB) is kept until it is turned.
+    // Ratio and level: a slider and, beside it, a VFD readout of the
+    // value. Detune is a number reel alone, turned rather than typed; a
+    // value between its stops is kept until it is turned.
     const ratioSlider = createSlider({
       name: `${name} ratio`,
       min: DX7_RATIO.min,
@@ -150,15 +151,9 @@ export function mountVoiceTable(store: LabStore): void {
       toSlider: value => Math.min(SLIDER_TOP, value ?? 1),
       stepKey: (value, direction) => stepDx7Ratio(value ?? 1, direction),
     });
-    const ratioReel = createReel({
-      name: `${name} ratio`,
-      stops: DX7_RATIO_STOPS,
-      page: 4,
-      get: () => get().ratio,
-      set: value => setDxOperator(store, op, { ratio: value }),
-      format: formatRatio,
-      say: value => `ratio ${formatRatio(value)}`,
-    });
+    // Beside the ratio's and the level's sliders, their values on a VFD
+    // readout, read only: the slider is the control (Jeremy, 2026-10-20).
+    const ratioVfd = createVfdReadout({ get: () => get().ratio, format: formatRatio });
     const detune = createReel({
       name: `${name} detune`,
       stops: DETUNE_STOPS,
@@ -179,15 +174,7 @@ export function mountVoiceTable(store: LabStore): void {
       fromSlider: position => (position <= LEVEL_OFF ? null : position),
       toSlider: value => (value === null ? LEVEL_OFF : value),
     });
-    const levelReel = createReel({
-      name: `${name} level`,
-      stops: LEVEL_STOPS,
-      page: 6,
-      get: () => get().level ?? LEVEL_OFF,
-      set: value => setDxOperator(store, op, { level: value <= LEVEL_OFF ? null : value }),
-      format: formatLevel,
-      say: value => (value <= LEVEL_OFF ? 'off' : formatDb(value)),
-    });
+    const levelVfd = createVfdReadout({ get: () => get().level ?? LEVEL_OFF, format: formatLevel });
     const pair = (...parts: HTMLElement[]) => {
       const box = document.createElement('div');
       box.className = 'op-param';
@@ -228,9 +215,9 @@ export function mountVoiceTable(store: LabStore): void {
     row.append(
       head,
       role,
-      cell('voice-ratio', 'Ratio', pair(ratioSlider.element, ratioReel.element)),
+      cell('voice-ratio', 'Ratio', pair(ratioSlider.element, ratioVfd.element)),
       cell('voice-detune', 'Detune ¢', detune.element),
-      cell('voice-level', 'Level dB', pair(levelSlider.element, levelReel.element)),
+      cell('voice-level', 'Level dB', pair(levelSlider.element, levelVfd.element)),
       cell('voice-tremolo', 'Tremolo', tremolo.element),
       cell('voice-env', 'Envelope', envelope.button),
       cell('voice-scaling', 'Key scaling', keys.button),
@@ -255,10 +242,10 @@ export function mountVoiceTable(store: LabStore): void {
       row.classList.toggle('is-selected', state.selectedOp === op);
       row.classList.toggle('is-pointed', state.hoverOp === op);
       ratioSlider.update();
-      ratioReel.update();
+      ratioVfd.update();
       detune.update();
       levelSlider.update();
-      levelReel.update();
+      levelVfd.update();
       tremolo.update();
       drawVoiceEnvelope(envelope.canvas, o.envelope, penOf(r), false);
       envelope.button.setAttribute('aria-label', `${name} envelope: edit it above`);
