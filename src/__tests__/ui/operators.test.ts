@@ -1,7 +1,7 @@
 import { algorithm, operatorsUsed } from '../../dsp/algorithms';
 import { OP_RATIO } from '../../model/lab';
 import { RATIO_STOPS, scrubTo, snapRatio, stepRatio } from '../../ui/operators';
-import { diagramGeometry, operatorAt, steadyDiagramWidth } from '../../viz/algorithmPlot';
+import { diagramGeometry, operatorAt } from '../../viz/algorithmPlot';
 
 describe('dragging in a box', () => {
   /** A ratio stop's share of the drag, in pixels: 300 across 17 stops. */
@@ -100,28 +100,6 @@ describe('pointing at the wiring diagram', () => {
       }
       expect(sides.size, `${width}×${height}`).toBe(1);
     }
-  });
-
-  it('is just wide enough for the widest wiring, so the Feedback knob can sit beside it', () => {
-    // 166 px high, as at 1440 × 900: 21 px boxes, 21 × 9.6 + 40 wide.
-    expect(steadyDiagramWidth(166)).toBeCloseTo(((166 - 18) / 7.05) * 9.6 + 40, 9);
-    for (const height of [166, 176, 220]) {
-      const width = steadyDiagramWidth(height);
-      // The box is the one the height gives, the same for every wiring.
-      const sides = new Set<number>();
-      for (let number = 1; number <= 32; number++) {
-        const alg = algorithm(number);
-        const { places, box, boxX } = diagramGeometry(alg, width, height);
-        sides.add(Number(box.toFixed(9)));
-        for (const op of operatorsUsed(alg)) {
-          expect(boxX(places[op])).toBeGreaterThanOrEqual(0);
-          expect(boxX(places[op]) + box).toBeLessThanOrEqual(width);
-        }
-      }
-      expect(sides.size).toBe(1);
-    }
-    // Never so narrow that the steady box would be lost.
-    expect(steadyDiagramWidth(60)).toBeCloseTo(20 * 9.6 + 40, 9);
   });
 
   it('fits each wiring on its own where the diagram is short', () => {

@@ -542,32 +542,32 @@ up with unlit lamps and grey legends; Jeremy, 2026-10-20; role tablist, arrows
 between; the sandbox always opens on Algorithm, and the open tab is in
 neither the link nor storage; while closed, the LFO's key shows a dot
 (amber in the sandbox), "LFO, on", when vibrato or tremolo is above 0, and the Pitch EG's,
-"Pitch EG, on", when the pitch envelope is not flat). The Algorithm tab is
-one row: on the left the algorithm list between
-‹ › (`stepAlgorithm`, round the 32), its number shown on a two-place VFD
+"Pitch EG, on", when the pitch envelope is not flat). Each tab is laid
+out as the operator panel is (Jeremy, 2026-10-20; `.inst-voice-tab`):
+its display the panel's width, the same size whichever tab is open (the
+row under it is one height for all three), over one row of its controls;
+on a phone each display is 9rem high and its row wraps. The Algorithm
+tab: the wiring diagram, and under it the algorithm list between ‹ ›
+(`stepAlgorithm`, round the 32), its number shown on a two-place VFD
 readout as wide as the list was, the list unseen over it so a click
 opens it and the keys choose, keyboard focus ringing the glass and a
-click's not (2026-10-20), and, just under it (1.25rem; 0.75rem
-under 52rem high), the Feedback knob (`mountFeedbackKnob`, 0 to 2π), the
-pair centred together on the diagram's height, and the wiring diagram it
-draws beside them (Jeremy, 2026-10-19; the knob tight under the chooser,
-2026-10-20). The diagram's column is as wide as six boxes need at the
-box size its height gives, within what the pair leaves
-(`steadyDiagramWidth`), so the pair holds still; on a phone the chooser
-sits above, the knob beside the diagram. The LFO tab, as tall: on the
-left Wave, six icon buttons (a radiogroup: Triangle, Saw down, Saw up,
-Square, Sine, Sample and hold), over a still drawing of the LFO for two
-seconds after a key (`viz/lfoPlot.ts`, the delay shaded, ±1); on the
-right Speed (log), Delay (log, 0 at the bottom), Vibrato (log, 0 at the
-bottom) and Tremolo knobs, and "Restart on each key" (key sync); on a
-phone the knobs go under. The Pitch EG tab (`pitchEgView.ts`), as tall:
-"Pitch envelope", its curve (`viz/pitchEnvelopePlot.ts`, drawn as the
-operator envelope's, each part's slot ended at its glide's time on the
-log scale; its y scale symmetric, fitting the largest bend and never
-under ±1 st, settled when a drag ends, labelled as the readouts are; a
-dot at Start and at each part's end dragging up and down only), and
-eight knobs in a row: Start, Attack, Peak, Decay 1, Break, Decay 2,
-Sustain, Release (pitches two-sided, ±48 st; speeds log in st/s).
+click's not, and beside them the Feedback knob (`mountFeedbackKnob`, 0
+to 2π), its dial level with ‹ ›, its name beside it and no readout:
+its value is on the diagram's glass, "FB 3.14", at the right halfway
+down. The LFO tab: a still drawing of the LFO for two seconds after a
+key (`viz/lfoPlot.ts`, the delay shaded, ±1), and under it the wave, six
+icon keys (a radiogroup, unlabelled on screen: Triangle, Saw down, Saw
+up, Square, Sine, Sample and hold), drawn in the sandbox as the tabs'
+push keys without lamps, chosen on the press; Speed (log), Delay (log,
+0 at the bottom), Vibrato (log, 0 at the bottom) and Tremolo knobs; and
+"Restart on each key" (key sync). The Pitch EG tab (`pitchEgView.ts`):
+its curve (`viz/pitchEnvelopePlot.ts`, its name, "Pitch envelope", for
+screen readers only; drawn as the operator envelope's, each part's slot
+ended at its glide's time on the log scale; its y scale symmetric,
+fitting the largest bend and never under ±1 st, settled when a drag
+ends, labelled as the readouts are; a dot at Start and at each part's
+end dragging up and down only), and eight knobs in a row: Start,
+Attack, Peak, Decay 1, Break, Decay 2, Sustain, Release (pitches two-sided, ±48 st; speeds log in st/s).
 `formatPitchBend` writes a bend in cents under a semitone, else in
 semitones; `formatGlideSpeed` a speed in st/s. On the right the operator
 panel (`#voice-envelope`) alone, the showing tab's curve filling it.

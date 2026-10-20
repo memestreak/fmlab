@@ -416,58 +416,60 @@
                   </button>
                 </div>
               </div>
-              <!-- The algorithm chooser, the diagram and the Feedback knob,
-                   the chooser and the knob mirrored either side. -->
+              <!-- Each Voice tab as the operator panel is: its display, the
+                   same size whichever is open, over a row of its controls.
+                   The algorithm: the diagram, then the chooser and the
+                   Feedback knob. -->
               <div
                 id="inst-algorithm-panel"
-                class="inst-diagram"
+                class="inst-diagram inst-voice-tab"
                 role="tabpanel"
                 aria-labelledby="inst-tab-algorithm"
               >
-                <div class="inst-row inst-alg-step-row">
-                  <button
-                    id="inst-alg-prev"
-                    type="button"
-                    class="round-step"
-                    aria-label="Previous algorithm"
-                  >
-                    ‹
-                  </button>
-                  <div id="inst-algorithm"></div>
-                  <button
-                    id="inst-alg-next"
-                    type="button"
-                    class="round-step"
-                    aria-label="Next algorithm"
-                  >
-                    ›
-                  </button>
-                </div>
-                <div class="inst-alg-step">
+                <div class="inst-alg-step inst-voice-display">
                   <div id="inst-diagram-figure"></div>
                 </div>
-                <div id="inst-feedback"></div>
+                <div class="inst-voice-controls">
+                  <div class="inst-row inst-alg-step-row">
+                    <button
+                      id="inst-alg-prev"
+                      type="button"
+                      class="round-step"
+                      aria-label="Previous algorithm"
+                    >
+                      ‹
+                    </button>
+                    <div id="inst-algorithm"></div>
+                    <button
+                      id="inst-alg-next"
+                      type="button"
+                      class="round-step"
+                      aria-label="Next algorithm"
+                    >
+                      ›
+                    </button>
+                  </div>
+                  <div id="inst-feedback"></div>
+                </div>
               </div>
-              <!-- The LFO: its wave, a drawing of it after a key goes down,
-                   its four knobs and its key sync. -->
+              <!-- The LFO: a drawing of it after a key goes down, then its
+                   wave, its four knobs and its key sync. -->
               <div
                 id="inst-lfo-panel"
-                class="inst-lfo"
+                class="inst-lfo inst-voice-tab"
                 role="tabpanel"
                 aria-labelledby="inst-tab-lfo"
                 hidden
               >
-                <div class="inst-lfo-wave">
-                  <span id="inst-lfo-wave-label" class="inst-lfo-label">Wave</span>
+                <canvas id="inst-lfo-plot" class="inst-lfo-plot inst-voice-display" role="img"></canvas>
+                <div class="inst-voice-controls">
+                  <span id="inst-lfo-wave-label" class="visually-hidden">Wave</span>
                   <div
                     id="inst-lfo-waves"
                     class="lfo-waves"
                     role="radiogroup"
                     aria-labelledby="inst-lfo-wave-label"
                   ></div>
-                  <canvas id="inst-lfo-plot" class="inst-lfo-plot" role="img"></canvas>
-                </div>
-                <div class="inst-lfo-controls">
                   <div id="inst-lfo-knobs" class="inst-lfo-knobs"></div>
                   <label class="inst-lfo-sync">
                     <input id="inst-lfo-sync" type="checkbox" />
@@ -479,14 +481,16 @@
                    (ui/pitchEgView.ts). -->
               <div
                 id="inst-pitch-panel"
-                class="inst-pitch"
+                class="inst-pitch inst-voice-tab"
                 role="tabpanel"
                 aria-labelledby="inst-tab-pitch"
                 hidden
               >
-                <span class="inst-lfo-label">Pitch envelope</span>
-                <canvas id="inst-pitch-curve" class="inst-pitch-curve" role="img"></canvas>
-                <div id="inst-pitch-knobs" class="inst-pitch-knobs"></div>
+                <span class="visually-hidden">Pitch envelope</span>
+                <canvas id="inst-pitch-curve" class="inst-pitch-curve inst-voice-display" role="img"></canvas>
+                <div class="inst-voice-controls">
+                  <div id="inst-pitch-knobs" class="inst-pitch-knobs"></div>
+                </div>
               </div>
             </div>
             <div class="inst-right">
