@@ -196,13 +196,8 @@ export function mountPiano(
         letter ? `${noteName(midi)}, key ${letter}` : noteName(midi),
       );
       key.setAttribute('aria-pressed', 'false');
-      if (letter) {
-        const mark = document.createElement('span');
-        mark.className = 'piano-letter';
-        mark.textContent = letter;
-        mark.setAttribute('aria-hidden', 'true');
-        key.append(mark);
-      }
+      // The computer key that plays it is in its name, not drawn on it
+      // (Jeremy, 2026-10-20).
       // Every C names itself, so the octave can be read off the keys.
       if (midi % 12 === 0) {
         key.classList.add('piano-is-c');

@@ -529,6 +529,8 @@ function presetMenu(presets: readonly Preset[], store: LabStore): HTMLElement[] 
     const preset = at < 0 ? null : presets[at];
     note.textContent = preset ? (preset.note ?? preset.hint) : 'your own, from a factory voice';
     note.title = preset ? preset.hint : note.textContent;
+    // The name's tip: whose the voices are, then what this one plays without.
+    pick.title = `${FACTORY_CREDIT} · ${note.textContent}`;
     name.textContent = select.selectedOptions[0]?.textContent ?? '';
   };
   select.addEventListener('change', () => choose(Number(select.value)));
@@ -550,7 +552,6 @@ function presetMenu(presets: readonly Preset[], store: LabStore): HTMLElement[] 
   // menu's font, which the heading's would make huge).
   const pick = document.createElement('span');
   pick.className = 'preset-pick';
-  pick.title = FACTORY_CREDIT;
   const name = document.createElement('span');
   name.className = 'preset-name';
   name.setAttribute('aria-hidden', 'true');

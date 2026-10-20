@@ -138,8 +138,9 @@ figures subscribe to it. Nothing else passes values around.
   as on the DX7 ("11 E.PIANO 1", which it opens on), in one dropdown
   that is the page's heading (its group named Presets for screen readers), with ‹ › either side that step round them
   from the voice last chosen (`presetMenu`, `stepPreset`; Jeremy,
-  2026-10-18) and a short note beside it for the
-  chosen voice ("approximate · no velocity"; `note`) and
+  2026-10-18) and a short note for the chosen voice ("approximate · no
+  velocity"; `note`), unseen but read by screen readers and in the
+  name's tip (Jeremy, 2026-10-20), and
   "Edited" once the sound is changed (`presetOf`). They are credited
   "DX7 factory voices © Yamaha" (`FACTORY_CREDIT`) as the open list's
   group label and the name's hover title, not as a line of their own,
@@ -389,7 +390,8 @@ figures subscribe to it. Nothing else passes values around.
   `held`, and the key struck last's pitch into `carrierHz` and its moment
   into `noteStartedAt` / `noteLength`. Keys are let go on blur, a hidden
   tab, a lost pointer capture and a change of chapter, so none sticks.
-  Piano-shaped keys under an ink key slip, every C named, the octave
+  Piano-shaped keys under an ink key slip, every C named (the computer
+  keys that play them are in their names, not drawn on them), the octave
   control (− the range +, and the Z / X hint, shown only while the
 pointer is over the keyboard or keyboard focus is in it) on their left; every held
   key is drawn in --pen-blue. Its key colours are local tokens (`--key-light` and so
@@ -503,8 +505,9 @@ the wordmark (home), then in the place of Contents, which the sandbox
 hides with the crumb, the preset menu as the title: the name chosen in
 the display face at 1.45rem with no box (`.preset-name`), the native
 menu over it unseen in the page's own type, so the list it opens is the
-usual size, between ‹ › (`stepPreset`, round the 32), and its note, cut
-short; then Volume, the glossary and the theme. Their containers
+usual size, between ‹ › (`stepPreset`, round the 32); its note, what
+the voice plays without, is not shown but is the menu's description for
+screen readers and follows the credit in the name's tip; then Volume, the glossary and the theme. Their containers
 (`#inst-dx7-presets` in a group named Presets, `#inst-tools`) are in the
 masthead's markup and shown on the sandbox only; `PLACES` moves the
 lab's nodes into them. The masthead keeps every page's height, and its
@@ -555,7 +558,7 @@ nothing scrolls, at 1440 × 900 and 1280 × 800; the figures' captions are
 for screen readers only there, and under 52rem high the rows, drawings,
 knobs and gaps tighten. Below 62rem it is one column: the masthead
 wraps, the wordmark and the theme, then the presets row (the name at
-1.25rem, the note cut short), then Volume and the glossary; the keyboard
+1.25rem), then Volume and the glossary; the keyboard
 and the spectrum over it docked to the screen's foot, the operator panel
 first (its tabs on a line of their own), the controls scrolling under it, and the
 operator table as cards, each with its drawings.
