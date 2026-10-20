@@ -42,7 +42,9 @@
       <header class="masthead">
         <h1 class="wordmark"><a href="#/">fmlab</a></h1>
         <!-- The way round the guide: the contents panel, where the reader
-             is, and the glossary. Built by ui/contents.ts. -->
+             is, and the glossary. Built by ui/contents.ts. On the sandbox
+             the presets stand in the place of Contents, and Volume before
+             the glossary (ui/instrument.ts moves them in). -->
         <nav class="guide-nav" aria-label="Guide">
           <button
             id="contents-open"
@@ -59,6 +61,13 @@
           <a id="where-prev" class="where-step" href="#/" rel="prev">‹</a>
           <span id="where" class="where"></span>
           <a id="where-next" class="where-step" href="#/" rel="next">›</a>
+          <!-- The sandbox's voice: the preset menu, ‹ › and its note. -->
+          <div class="inst-row inst-presets" role="group" aria-labelledby="inst-presets-title">
+            <h3 id="inst-presets-title" class="visually-hidden">Presets</h3>
+            <div id="inst-dx7-presets"></div>
+          </div>
+          <!-- The sandbox's Volume. -->
+          <div id="inst-tools" class="inst-tools"></div>
           <a href="#/glossary" class="guide-link">Glossary</a>
         </nav>
         <!-- A small icon button, as in frets: ui/themeSwitch.ts draws its
@@ -359,22 +368,9 @@
            keyboard into it on the way in, and back on the way out, so
            every control keeps its element and id. -->
       <section id="instrument" class="inst" aria-labelledby="inst-title" hidden>
-        <!-- The title bar: the voice's name as the title (the preset menu,
-             a step either side, and what it plays without), the factory
-             voices' credit, then Volume. The page's own title, "Sandbox",
-             is for screen readers. -->
-        <div class="inst-bar">
-          <div class="inst-head">
-            <h2 id="inst-title" class="inst-title visually-hidden" tabindex="-1"></h2>
-            <div class="inst-row inst-presets" role="group" aria-labelledby="inst-presets-title">
-              <h3 id="inst-presets-title" class="visually-hidden">Presets</h3>
-              <div id="inst-dx7-presets"></div>
-            </div>
-          </div>
-          <p class="inst-credit">DX7 factory voices © Yamaha</p>
-          <!-- Volume. -->
-          <div id="inst-tools" class="inst-tools"></div>
-        </div>
+        <!-- The page's title, for screen readers: its heading, the voice's
+             name, is the preset menu in the masthead. -->
+        <h2 id="inst-title" class="inst-title visually-hidden" tabindex="-1"></h2>
         <div class="inst-body">
           <!-- Along the top, the wiring on the left and, on the right, the
                spectrum, with the selected operator's envelope view over
