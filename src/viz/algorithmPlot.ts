@@ -193,13 +193,17 @@ export function operatorAt(
  * every modulator, whatever its level. An operator the algorithm leaves
  * out is not drawn. At `time`, while a note sounds, each modulator's box
  * is filled in its colour as strongly as the operator sounds at that
- * moment.
+ * moment. In the sandbox it is a VFD panel instead (`drawVfdAlgorithm`).
  */
 export function drawAlgorithm(
   state: LabState,
   canvas: HTMLCanvasElement,
   time?: number,
 ): void {
+  if (state.chapter === 'sandbox') {
+    drawVfdAlgorithm(state, canvas, time);
+    return;
+  }
   const plot = beginPlot(canvas);
   if (!plot) return;
   const { ctx, token } = plot;
@@ -312,4 +316,182 @@ export function drawAlgorithm(
   // In ink, whatever the last box's number was written in.
   ctx.fillStyle = ink;
   ctx.fillText('out', Math.max(...carrierXs) + 6, outY);
+}
+
+/** How bright a modulator's wires are on the VFD panel, and its box. */
+const DIM_WIRE = 0.5;
+const DIM_BOX = 0.55;
+
+/**
+ * The sandbox's diagram as a vacuum fluorescent display (Jeremy,
+ * 2026-10-20): the same layout as `drawAlgorithm`, glowing cyan on dark
+ * glass in either theme. What is heard is lit full: the carriers, solid,
+ * their wires down to the output, the output line and the feedback loop.
+ * The modulators, outlines, and the wires between them are at about half.
+ * The operator pointed at is ringed at full brightness; while a note
+ * sounds, a modulator fills as strongly as it sounds, inside its dimmed
+ * box.
+ */
+function drawVfdAlgorithm(state: LabState, canvas: HTMLCanvasElement, time?: number): void {
+  const plot = beginPlot(canvas);
+  if (!plot) return;
+  const { ctx, token } = plot;
+  const { width, height } = canvas.getBoundingClientRect();
+  const alg = algorithm(state.algorithm);
+  const used = operatorsUsed(alg);
+  const { places, box, gapX, outY, bottom, boxX, boxY, centreX } = diagramGeometry(
+    alg,
+    width,
+    height,
+  );
+  const lit = token('--vfd-lit');
+  const glow = token('--vfd-glow');
+  const mono = token('--font-mono');
+
+  // The glass: the whole canvas, a 1 px black edge, and in dark a faint
+  // light one outside it so it stands off the paper.
+  const edge = token('--vfd-panel-edge');
+  if (edge && edge !== 'transparent') {
+    ctx.beginPath();
+    ctx.roundRect(0.3, 0.3, width - 0.6, height - 0.6, 5.7);
+    ctx.lineWidth = 0.6;
+    ctx.strokeStyle = edge;
+    ctx.stroke();
+  }
+  const glass = ctx.createRadialGradient(
+    width / 2,
+    height * 0.4,
+    0,
+    width / 2,
+    height * 0.4,
+    0.7 * Math.max(width, height),
+  );
+  glass.addColorStop(0, token('--vfd-dial-1'));
+  glass.addColorStop(1, token('--vfd-dial-2'));
+  ctx.beginPath();
+  ctx.roundRect(1, 1, width - 2, height - 2, 5);
+  ctx.fillStyle = glass;
+  ctx.fill();
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = '#000';
+  ctx.stroke();
+
+  const glowing = (blur: number) => {
+    ctx.shadowColor = glow;
+    ctx.shadowBlur = blur;
+  };
+  const plain = () => {
+    ctx.shadowBlur = 0;
+    ctx.shadowColor = 'transparent';
+  };
+
+  ctx.lineWidth = 1.5;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.strokeStyle = lit;
+  glowing(5);
+
+  // Modulator to modulated, dimmed.
+  ctx.globalAlpha = DIM_WIRE;
+  targetsOf(alg).forEach((tos, from) => {
+    for (const to of tos) {
+      ctx.beginPath();
+      ctx.moveTo(centreX(places[from]), boxY(places[from]) + box);
+      ctx.lineTo(centreX(places[to]), boxY(places[to]));
+      ctx.stroke();
+    }
+  });
+  ctx.globalAlpha = 1;
+
+  // Carriers down to the output line, lit.
+  const carrierXs = alg.carriers.map(op => centreX(places[op]));
+  ctx.beginPath();
+  for (const op of alg.carriers) {
+    ctx.moveTo(centreX(places[op]), bottom);
+    ctx.lineTo(centreX(places[op]), outY);
+  }
+  ctx.moveTo(Math.min(...carrierXs), outY);
+  ctx.lineTo(Math.max(...carrierXs), outY);
+  ctx.stroke();
+
+  // The feedback loop, lit, thicker as it feeds back more.
+  const fb = alg.feedback;
+  if (fb) {
+    const from = places[fb.from];
+    const to = places[fb.to];
+    const loopTop = boxY(to) - box * 0.35;
+    const loopRight = Math.max(boxX(from), boxX(to)) + box + gapX * 0.45;
+    ctx.beginPath();
+    ctx.moveTo(boxX(from) + box, boxY(from) + box / 2);
+    ctx.lineTo(loopRight, boxY(from) + box / 2);
+    ctx.lineTo(loopRight, loopTop);
+    ctx.lineTo(centreX(to), loopTop);
+    ctx.lineTo(centreX(to), boxY(to));
+    const amount = state.voiceModel === 'dx7' ? state.dxFeedback / Math.PI : state.feedback;
+    ctx.lineWidth = 1.5 + Math.max(0, amount) * 1.25;
+    ctx.stroke();
+  }
+
+  const now =
+    time !== undefined && noteSounding(state, time)
+      ? operatorLevelsAt(state, time)
+      : undefined;
+
+  // The boxes, over the lines: dark glass first, so no line shows under.
+  ctx.font = `600 ${Math.round(box * 0.42)}px ${mono}`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  for (const op of used) {
+    const p = places[op];
+    const x = boxX(p);
+    const y = boxY(p);
+    const carrier = alg.carriers.includes(op);
+    plain();
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = token('--vfd-panel-box');
+    ctx.fillRect(x, y, box, box);
+    if (carrier) {
+      glowing(6);
+      ctx.fillStyle = lit;
+      ctx.fillRect(x, y, box, box);
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = lit;
+      ctx.strokeRect(x, y, box, box);
+      plain();
+      ctx.fillStyle = token('--vfd-panel-ink');
+      ctx.fillText(String(op + 1), centreX(p), y + box / 2 + 1);
+    } else {
+      ctx.globalAlpha = DIM_BOX;
+      if (now && now[op] > 0) {
+        ctx.globalAlpha = DIM_BOX * 0.35 * Math.min(1, now[op]);
+        ctx.fillStyle = lit;
+        ctx.fillRect(x, y, box, box);
+        ctx.globalAlpha = DIM_BOX;
+      }
+      glowing(6);
+      ctx.lineWidth = 1.6;
+      ctx.strokeStyle = lit;
+      ctx.strokeRect(x, y, box, box);
+      glowing(4);
+      ctx.fillStyle = lit;
+      ctx.fillText(String(op + 1), centreX(p), y + box / 2 + 1);
+      ctx.globalAlpha = 1;
+    }
+    // The operator pointed at in the table, or here: ringed, lit full.
+    if (state.hoverOp === op) {
+      glowing(5);
+      ctx.strokeStyle = lit;
+      ctx.lineWidth = 2;
+      const ring = Math.max(2, box * 0.18);
+      ctx.strokeRect(x - ring, y - ring, box + 2 * ring, box + 2 * ring);
+    }
+  }
+
+  glowing(4);
+  ctx.globalAlpha = 1;
+  ctx.font = `600 11px ${mono}`;
+  ctx.textAlign = 'left';
+  ctx.fillStyle = lit;
+  ctx.fillText('OUT', Math.max(...carrierXs) + 6, outY);
+  plain();
 }

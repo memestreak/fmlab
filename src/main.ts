@@ -12,6 +12,7 @@ import '@fontsource/figtree/latin-600-italic.css';
 import '@fontsource/figtree/latin-700-italic.css';
 import '@fontsource/ibm-plex-mono/latin-400.css';
 import '@fontsource/ibm-plex-mono/latin-500.css';
+import '@fontsource/ibm-plex-mono/latin-600.css';
 import './styles/tokens.css';
 import './styles/base.css';
 import './styles/instrument.css';
