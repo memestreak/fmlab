@@ -79,13 +79,15 @@ body:not([data-view='instrument']) #inst-tools {
   white-space: nowrap;
 }
 
-.preset-pick:hover {
+/* Focused, as pointed at: the ink line under the name, no box round it
+   (Jeremy, 2026-10-20: the box was distracting). */
+.preset-pick:hover,
+.preset-pick:has(.preset-menu:focus) {
   border-bottom-color: var(--ink);
 }
 
-.preset-pick:has(.preset-menu:focus-visible) {
-  outline: 2px solid var(--ink);
-  outline-offset: 2px;
+[data-view='instrument'] .preset-pick .preset-menu:focus {
+  outline: none;
 }
 
 [data-view='instrument'] .preset-pick .preset-menu {
