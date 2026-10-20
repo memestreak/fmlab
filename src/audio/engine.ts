@@ -93,15 +93,20 @@ const FFT_SIZE = 8192;
  * in the worklet's voice pool: the engine tells it which keys are down
  * (`held`) and which note Play note strikes, and the pool shapes them.
  *
- * Nothing is created until the first sound is asked for, which has to
- * happen inside a click or key press: browsers refuse to start audio
- * otherwise.
+ * Audio can only start inside a click or key press: browsers refuse
+ * otherwise. Most pages create nothing until the first sound is asked
+ * for. The sandbox builds the graph on arrival instead (`warm`), its
+ * context left suspended, so that its first key need only resume it:
+ * loading the worklet takes the better part of 100 ms, which the first
+ * note used to wait for.
  */
 export class AudioEngine {
   private graph: Graph | null = null;
   private loading: Promise<Graph> | null = null;
   /** Looping silence that keeps iOS from muting us; see iosUnlock.ts. */
   private silence: HTMLAudioElement | null = null;
+  /** Whether the iOS unlock has been done, in the first gesture. */
+  private unlocked = false;
   private suspendTimer: number | undefined;
   private sceneTimer: number | undefined;
   /** True while faded out between two chapters' patches. */
@@ -110,7 +115,9 @@ export class AudioEngine {
   private voiceQueue: Promise<void> = Promise.resolve();
 
   constructor(private readonly store: LabStore) {
+    if (store.get().chapter === 'sandbox') this.warm();
     store.subscribe((state, previous) => {
+      if (state.chapter === 'sandbox' && previous.chapter !== 'sandbox') this.warm();
       if (state.mode === 'ops' && this.followVoices(state, previous)) return;
       // Out of six operators: whatever they were playing stops.
       if (previous.mode === 'ops' && state.mode !== 'ops') this.tell({ type: 'allOff' });
@@ -206,8 +213,10 @@ export class AudioEngine {
         synth.parameters.get('mode')?.setValueAtTime(2, now);
         noteGain.gain.cancelScheduledValues(now);
         noteGain.gain.setValueAtTime(1, now);
+        // Straight to the volume, not faded in: the note's own envelope
+        // starts from silence, and a fade would soften its attack.
         master.gain.cancelScheduledValues(now);
-        master.gain.setTargetAtTime(state.volume, now, FADE_SECONDS);
+        master.gain.setValueAtTime(state.volume, now);
         synth.port.postMessage({ type: 'patch', patch: voicePatch(state) } satisfies VoiceMessage);
         synth.port.postMessage({ type: 'noteOn', note, hz, hold } satisfies VoiceMessage);
         started?.();
@@ -255,12 +264,31 @@ export class AudioEngine {
    */
   private async wake(): Promise<Graph> {
     window.clearTimeout(this.suspendTimer);
-    if (!this.loading) this.silence = unlockIosAudio();
+    if (!this.unlocked) {
+      this.unlocked = true;
+      this.silence = unlockIosAudio();
+    }
     this.loading ??= this.load();
     void this.silence?.play().catch(() => {});
     const graph = await this.loading;
     await graph.context.resume();
     return graph;
+  }
+
+  /**
+   * Builds the graph ahead of the first sound, outside any gesture: the
+   * context starts suspended (or is suspended again soon, where the
+   * browser lets it run), and the first key's `wake` resumes it.
+   */
+  private warm(): void {
+    if (this.loading) return;
+    this.loading = this.load();
+    this.loading.then(
+      () => this.suspendSoon(SUSPEND_AFTER_MS),
+      () => {
+        this.loading = null;
+      },
+    );
   }
 
   private async start(): Promise<void> {
