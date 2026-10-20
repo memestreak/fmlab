@@ -645,17 +645,25 @@ canvas.voice-keys {
   outline-offset: 2px;
 }
 
-.inst .voice-level .op-input {
-  width: 3.6rem;
-}
-
-/* The tremolo share: a narrow box, the sliders giving up the width. */
+/* The tremolo share: a reel alone, narrow. */
 .voice-table .voice-tremolo {
   width: 4.5rem;
 }
 
-.inst .voice-tremolo .op-input {
-  width: 3.6rem;
+/* The tremolo share's number reel: as big as the box it replaced, so the
+   rows keep their height, turned by a drag (a finger's turns the reel
+   and does not scroll the page; elsewhere it still does). */
+.op-reel {
+  display: block;
+  width: 3.8rem;
+  height: 1.75rem;
+  cursor: ns-resize;
+  touch-action: none;
+}
+
+.op-reel:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
 }
 
 /* The selected row: outlined in ink, the operator whose envelope is open. */
@@ -909,12 +917,6 @@ canvas.voice-keys {
 
 .inst .op-table .op-slider {
   height: 1.75rem;
-}
-
-.inst .op-input {
-  width: 3rem;
-  height: 1.75rem;
-  font-size: 0.9rem;
 }
 
 .inst .op-tag {
@@ -1248,7 +1250,7 @@ canvas.voice-keys {
     white-space: nowrap;
   }
 
-  .inst .op-input {
+  .op-reel {
     height: 1.4rem;
   }
 
@@ -1570,8 +1572,7 @@ canvas.voice-keys {
     height: 2rem;
   }
 
-  .inst .op-input {
-    width: 3.5rem;
+  .op-reel {
     height: 2rem;
   }
 

@@ -196,15 +196,21 @@ export function operatorsFromParam(raw: string | null): Dx7Operator[] | null {
       left,
       right,
       rateScaling: clamp(rate, RATE_SCALING),
-      tremolo: nearestShare(share / 100),
+      tremolo: shareFromPercent(share),
     });
   }
   return operators;
 }
 
-/** The DX7 tremolo share (AMS) nearest `share`. */
-export function nearestShare(share: number): number {
-  return AMS_SHARES.reduce((best, step) => (Math.abs(step - share) < Math.abs(best - share) ? step : best));
+/**
+ * A tremolo share from a link's percentage: any from 0 to 100, to 0.1 %;
+ * one that is a DX7 step written to 0.1 % (a factory voice's 25.9) is
+ * that step exactly, so a preset survives a link unchanged.
+ */
+export function shareFromPercent(percent: number): number {
+  // In tenths of a percent, a whole number: 33.3 % is 333 / 1000 exactly.
+  const tenths = Math.round(clamp(percent, { min: 0, max: 100 }) * 10);
+  return AMS_SHARES.find(step => Math.abs(step * 1000 - tenths) < 0.51) ?? tenths / 1000;
 }
 
 /** The LFO in a link: wave, speed, delay, vibrato, tremolo and sync, joined by "_". */
