@@ -14,7 +14,7 @@ import { describeKeyScaling, drawKeyScaling } from '../viz/keyScalingPlot';
 import { drawVoiceEnvelope } from '../viz/voiceEnvelopePlot';
 import { createReel } from './numberReel';
 import { roleOf } from './operators';
-import { createParam, typedNumber } from './paramControl';
+import { createSlider } from './paramControl';
 import { formatCents, formatDb, noteName } from './voiceFormat';
 
 /** The ratios the Ratio slider snaps to: a half and 1 to 31, the DX7's coarse ratios. */
@@ -56,6 +56,34 @@ export function setDxEnvelope(store: LabStore, op: number, patch: Partial<Dx7Env
 export function formatShare(share: number): string {
   return share === 0 ? 'off' : `${Math.round(share * 100)} %`;
 }
+
+/** A ratio as the reel shows it: "0.5", "1", "1.41", "14". */
+export function formatRatio(ratio: number): string {
+  return String(Number(ratio.toFixed(2)));
+}
+
+/** A level as the reel shows it: "0.0", "-30.8", "off" at the bottom. */
+export function formatLevel(db: number): string {
+  return db <= LEVEL_OFF ? 'off' : db.toFixed(1);
+}
+
+/**
+ * Detune's reel stops: the DX7's -7 to +7 steps, in cents to two places
+ * towards zero, as the factory voices are converted (-6.31 to +6.31).
+ */
+export const DETUNE_STOPS: readonly number[] = Array.from(
+  { length: 15 },
+  (_, i) => Math.trunc(((i - 7) * DETUNE_CENTS.max * 100) / 7) / 100,
+);
+
+/** Tremolo's reel stops: off to 100 % in tenths. */
+export const TREMOLO_STOPS: readonly number[] = Array.from({ length: 11 }, (_, i) => i / 10);
+
+/** Level's reel stops: off, then whole dB from -72 to 0. */
+export const LEVEL_STOPS: readonly number[] = [
+  LEVEL_OFF,
+  ...Array.from({ length: LEVEL_DB.max - LEVEL_DB.min + 1 }, (_, i) => LEVEL_DB.min + i),
+];
 
 const within = (value: number, { min, max }: { min: number; max: number }) =>
   Math.min(max, Math.max(min, value));
@@ -105,67 +133,75 @@ export function mountVoiceTable(store: LabStore): void {
       return td;
     };
 
-    const ratio = createParam({
+    // Ratio and level: a slider and, beside it, a number reel showing the
+    // value, turned rather than typed. Detune is a reel alone. A value
+    // between a reel's stops (a factory ratio of 1.41, a level of
+    // -30.75 dB) is kept until it is turned.
+    const ratioSlider = createSlider({
       name: `${name} ratio`,
       min: DX7_RATIO.min,
       max: SLIDER_TOP,
       step: 0.01,
-      slider: true,
       get: () => get().ratio,
       set: value => value !== null && setDxOperator(store, op, { ratio: within(value, DX7_RATIO) }),
-      show: value => String(Number((value ?? 1).toFixed(2))),
-      parse: typedNumber,
-      say: value => `ratio ${Number((value ?? 1).toFixed(2))}`,
+      say: value => `ratio ${formatRatio(value ?? 1)}`,
       fromSlider: (position, fine) => (fine ? Number(position.toFixed(2)) : snapDx7Ratio(position)),
       toSlider: value => Math.min(SLIDER_TOP, value ?? 1),
       stepKey: (value, direction) => stepDx7Ratio(value ?? 1, direction),
-      scrub: (start, pixels, fine) => {
-        if (fine) return within(Number(((start ?? 1) + pixels * 0.01).toFixed(2)), DX7_RATIO);
-        let r = start ?? 1;
-        const stops = Math.trunc(pixels / 10);
-        for (let i = 0; i < Math.abs(stops); i++) r = stepDx7Ratio(r, stops > 0 ? 1 : -1);
-        return r;
-      },
     });
-    const detune = createParam({
-      name: `${name} detune in cents`,
-      min: DETUNE_CENTS.min,
-      max: DETUNE_CENTS.max,
-      step: 0.1,
-      slider: false,
+    const ratioReel = createReel({
+      name: `${name} ratio`,
+      stops: DX7_RATIO_STOPS,
+      page: 4,
+      get: () => get().ratio,
+      set: value => setDxOperator(store, op, { ratio: value }),
+      format: formatRatio,
+      say: value => `ratio ${formatRatio(value)}`,
+    });
+    const detune = createReel({
+      name: `${name} detune`,
+      stops: DETUNE_STOPS,
+      page: 7,
       get: () => get().detune,
-      set: value => value !== null && setDxOperator(store, op, { detune: within(value, DETUNE_CENTS) }),
-      show: value => formatCents(value ?? 0),
-      parse: text => typedNumber(text.replace('+', '')),
-      say: value => `${formatCents(value ?? 0)} cents`,
-      scrub: (start, pixels, fine) =>
-        within(Number(((start ?? 0) + pixels * (fine ? 0.02 : 0.1)).toFixed(1)), DETUNE_CENTS),
+      set: value => setDxOperator(store, op, { detune: value }),
+      format: formatCents,
+      say: value => `${formatCents(value)} cents`,
     });
-    const level = createParam({
+    const levelSlider = createSlider({
       name: `${name} level in dB`,
       min: LEVEL_DB.min,
       max: LEVEL_DB.max,
       step: 0.5,
-      slider: true,
       get: () => get().level,
       set: value => setDxOperator(store, op, { level: value === null ? null : within(value, LEVEL_DB) }),
-      show: value => (value === null ? 'off' : value.toFixed(1)),
-      parse: text => (/^\s*off\s*$/i.test(text) ? null : typedNumber(text)),
       say: value => (value === null ? 'off' : formatDb(value)),
       fromSlider: position => (position <= LEVEL_OFF ? null : position),
       toSlider: value => (value === null ? LEVEL_OFF : value),
-      scrub: (start, pixels, fine) => {
-        const from = start ?? LEVEL_OFF;
-        const to = Number((from + pixels * (fine ? 0.05 : 0.25)).toFixed(1));
-        return to <= LEVEL_OFF ? null : within(to, LEVEL_DB);
-      },
     });
+    const levelReel = createReel({
+      name: `${name} level`,
+      stops: LEVEL_STOPS,
+      page: 6,
+      get: () => get().level ?? LEVEL_OFF,
+      set: value => setDxOperator(store, op, { level: value <= LEVEL_OFF ? null : value }),
+      format: formatLevel,
+      say: value => (value <= LEVEL_OFF ? 'off' : formatDb(value)),
+    });
+    const pair = (...parts: HTMLElement[]) => {
+      const box = document.createElement('div');
+      box.className = 'op-param';
+      box.append(...parts);
+      return box;
+    };
 
     // Its share of the LFO's tremolo, on a number reel: off to 100 % in
     // tenths, turned, not typed. A factory voice's share between them
     // (AMS's 26 % and 43 %) is kept until it is turned.
     const tremolo = createReel({
       name: `${name} tremolo share`,
+      stops: TREMOLO_STOPS,
+      page: 3,
+      ariaValue: value => value * 100,
       get: () => get().tremolo,
       set: value => setDxOperator(store, op, { tremolo: value }),
       format: formatShare,
@@ -191,9 +227,9 @@ export function mountVoiceTable(store: LabStore): void {
     row.append(
       head,
       role,
-      cell('voice-ratio', 'Ratio', ratio.element),
+      cell('voice-ratio', 'Ratio', pair(ratioSlider.element, ratioReel.element)),
       cell('voice-detune', 'Detune ¢', detune.element),
-      cell('voice-level', 'Level dB', level.element),
+      cell('voice-level', 'Level dB', pair(levelSlider.element, levelReel.element)),
       cell('voice-tremolo', 'Tremolo', tremolo.element),
       cell('voice-env', 'Envelope', envelope.button),
       cell('voice-scaling', 'Across the keyboard', keys.button),
@@ -217,9 +253,11 @@ export function mountVoiceTable(store: LabStore): void {
       tag.dataset.role = r;
       row.classList.toggle('is-selected', state.selectedOp === op);
       row.classList.toggle('is-pointed', state.hoverOp === op);
-      ratio.update();
+      ratioSlider.update();
+      ratioReel.update();
       detune.update();
-      level.update();
+      levelSlider.update();
+      levelReel.update();
       tremolo.update();
       drawVoiceEnvelope(envelope.canvas, o.envelope, penOf(r), false);
       envelope.button.setAttribute('aria-label', `${name} envelope: edit it above`);

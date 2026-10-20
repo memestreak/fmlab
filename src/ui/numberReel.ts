@@ -1,17 +1,15 @@
 // A number reel: a small vertical drum of values, turned rather than
-// typed in. The sandbox's operator table uses it for each operator's
-// share of the LFO's tremolo, eleven stops from off to 100 %. It is a
-// canvas that is a control, as the Bessel plot is: a `role="slider"`,
-// turned by a vertical drag (up for more), the mouse wheel (as a page
-// scrolls: down for the larger values below), a click above
-// or below the middle, or the keys. A value between stops (a factory
-// voice's 26 %) is shown as it is, on the drum between its neighbours,
-// and a turn goes to the next stop that way.
+// typed in. The sandbox's operator table uses one for each operator's
+// ratio, detune, level and share of the LFO's tremolo, each with its own
+// stops. It is a canvas that is a control, as the Bessel plot is: a
+// `role="slider"`, turned by a vertical drag (up for more), the mouse
+// wheel (as a page scrolls: down for the larger values below), a click
+// above or below the middle, or the keys. A value between stops (a
+// factory voice's 26 % or ratio 1.41) is shown as it is, on the drum
+// between its neighbours, and a turn goes to the next stop that way.
 
 import { beginPlot } from '../viz/plot';
 
-/** The reel's stops: every tenth from 0 to 1. */
-export const REEL_STOPS = 10;
 /** Pixels of drag, and of wheel, per step. */
 const DRAG_STEP = 14;
 const WHEEL_STEP = 30;
@@ -19,35 +17,64 @@ const WHEEL_STEP = 30;
 const SPACING = 0.72;
 /** How far towards its value the drum turns each frame. */
 const EASE = 0.3;
+/** How near a stop a value must be to be on it. */
+const ON = 1e-6;
 
 /**
- * The value `steps` stops from `value` (0 to 1), up for positive. From a
- * value between stops the first step goes to the stop that way.
+ * Where a value is among the stops (ascending): its index, or between two
+ * indices for a value between stops. A value beyond the stops (a ratio
+ * of 40 from a link, past the reel's 31) is half a stop past that end.
  */
-export function reelStep(value: number, steps: number): number {
-  const at = value * REEL_STOPS;
-  const on = Math.abs(at - Math.round(at)) < 1e-6;
-  let stop: number;
-  if (steps === 0) return value;
-  if (on) stop = Math.round(at) + steps;
-  else stop = steps > 0 ? Math.ceil(at) + steps - 1 : Math.floor(at) + steps + 1;
-  return Math.min(REEL_STOPS, Math.max(0, stop)) / REEL_STOPS;
+export function placeOf(stops: readonly number[], value: number): number {
+  const last = stops.length - 1;
+  if (value < stops[0] - ON) return -0.5;
+  if (value > stops[last] + ON) return last + 0.5;
+  if (value <= stops[0]) return 0;
+  if (value >= stops[last]) return last;
+  let lo = 0;
+  let hi = last;
+  while (hi - lo > 1) {
+    const mid = (lo + hi) >> 1;
+    if (stops[mid] <= value) lo = mid;
+    else hi = mid;
+  }
+  if (Math.abs(value - stops[lo]) < ON) return lo;
+  if (Math.abs(value - stops[hi]) < ON) return hi;
+  return lo + (value - stops[lo]) / (stops[hi] - stops[lo]);
 }
 
 /**
- * The places on the drum, in stops: the eleven stops and, for a value
- * between them, that value too, each to a slot of its own.
+ * The value `steps` stops from `value`, up for positive, held to the
+ * ends. From a value between stops the first step goes to the stop that
+ * way.
  */
-export function drumPlaces(value: number): number[] {
-  const places = Array.from({ length: REEL_STOPS + 1 }, (_, i) => i);
-  const at = value * REEL_STOPS;
-  if (Math.abs(at - Math.round(at)) > 1e-6) places.splice(Math.ceil(at), 0, at);
+export function reelStep(stops: readonly number[], value: number, steps: number): number {
+  if (steps === 0) return value;
+  // Beyond the stops, a turn further out leaves it where it is.
+  if ((steps > 0 && value > stops[stops.length - 1]) || (steps < 0 && value < stops[0])) return value;
+  const at = placeOf(stops, value);
+  const on = Math.abs(at - Math.round(at)) < ON;
+  let index: number;
+  if (on) index = Math.round(at) + steps;
+  else index = steps > 0 ? Math.ceil(at) + steps - 1 : Math.floor(at) + steps + 1;
+  return stops[Math.min(stops.length - 1, Math.max(0, index))];
+}
+
+/**
+ * The places on the drum, as places among the stops: every stop and, for
+ * a value between stops, that value's place too, each to a slot of its
+ * own.
+ */
+export function drumPlaces(stops: readonly number[], value: number): number[] {
+  const places = stops.map((_, i) => i);
+  const at = placeOf(stops, value);
+  if (Math.abs(at - Math.round(at)) > ON) places.splice(Math.max(0, Math.ceil(at)), 0, at);
   return places;
 }
 
-/** Which slot of the drum a place (in stops) is at, between slots for one between places. */
+/** Which slot of the drum a place is at, between slots for one between places. */
 export function slotOf(places: readonly number[], at: number): number {
-  if (at <= places[0]) return 0;
+  if (at <= places[0]) return at < places[0] ? at - places[0] : 0;
   for (let slot = 1; slot < places.length; slot++) {
     if (at <= places[slot]) return slot - 1 + (at - places[slot - 1]) / (places[slot] - places[slot - 1]);
   }
@@ -62,23 +89,27 @@ export function wheelSteps(deltaY: number): number {
   return Math.trunc(deltaY / WHEEL_STEP);
 }
 
-/** The step a key takes, or null for a key the reel leaves alone (Space is the page's). */
-export function reelKey(value: number, key: string): number | null {
+/**
+ * Where a key turns the reel, or null for a key it leaves alone (Space is
+ * the page's): the arrows a step, Page Up and Down `page` steps, Home and
+ * End the ends.
+ */
+export function reelKey(stops: readonly number[], value: number, key: string, page: number): number | null {
   switch (key) {
     case 'ArrowUp':
     case 'ArrowRight':
-      return reelStep(value, 1);
+      return reelStep(stops, value, 1);
     case 'ArrowDown':
     case 'ArrowLeft':
-      return reelStep(value, -1);
+      return reelStep(stops, value, -1);
     case 'PageUp':
-      return reelStep(value, 3);
+      return reelStep(stops, value, page);
     case 'PageDown':
-      return reelStep(value, -3);
+      return reelStep(stops, value, -page);
     case 'Home':
-      return 0;
+      return stops[0];
     case 'End':
-      return 1;
+      return stops[stops.length - 1];
     default:
       return null;
   }
@@ -87,14 +118,20 @@ export function reelKey(value: number, key: string): number | null {
 export interface ReelSpec {
   /** What a screen reader hears it called: "OP4 tremolo share". */
   name: string;
-  /** The value now, 0 to 1. */
+  /** The values it stops at, ascending. */
+  stops: readonly number[];
+  /** How many stops Page Up and Page Down move. */
+  page: number;
+  /** The value now. */
   get: () => number;
-  /** Takes a new value, 0 to 1. */
+  /** Takes a new value. */
   set: (value: number) => void;
-  /** A value's label on the drum: "off", "30 %". */
+  /** A value's label on the drum: "off", "30 %", "1.41". */
   format: (value: number) => string;
   /** What a screen reader hears a value as. */
   say: (value: number) => string;
+  /** A value as the slider's aria-valuenow (the value itself unless given). */
+  ariaValue?: (value: number) => number;
 }
 
 /** Builds a reel. `update()` shows the value now and redraws it. */
@@ -104,12 +141,15 @@ export function createReel(spec: ReelSpec): { element: HTMLCanvasElement; update
   canvas.tabIndex = 0;
   canvas.setAttribute('role', 'slider');
   canvas.setAttribute('aria-label', spec.name);
-  canvas.setAttribute('aria-valuemin', '0');
-  canvas.setAttribute('aria-valuemax', '100');
+  const { stops } = spec;
+  const aria = spec.ariaValue ?? ((value: number) => value);
+  canvas.setAttribute('aria-valuemin', String(aria(stops[0])));
+  canvas.setAttribute('aria-valuemax', String(aria(stops[stops.length - 1])));
 
   const still = window.matchMedia('(prefers-reduced-motion: reduce)');
-  // Where the drum is turned to, in stops; it eases towards the value.
-  let shown = spec.get() * REEL_STOPS;
+  // Where the drum is turned to, as a place among the stops; it eases
+  // towards the value's.
+  let shown = placeOf(stops, spec.get());
   let frame = 0;
 
   const draw = () => {
@@ -140,7 +180,8 @@ export function createReel(spec: ReelSpec): { element: HTMLCanvasElement; update
     ctx.textBaseline = 'middle';
     // The values on the drum, each in a slot of its own: the stops, and a
     // value between stops between them.
-    const places = drumPlaces(spec.get());
+    const value = spec.get();
+    const places = drumPlaces(stops, value);
     const now = slotOf(places, shown);
     places.forEach((place, slot) => {
       // Larger values below: the drum turns up to bring them in.
@@ -151,7 +192,8 @@ export function createReel(spec: ReelSpec): { element: HTMLCanvasElement; update
       ctx.translate(w / 2 - 4, mid + Math.sin(t) * (radius + 6));
       ctx.scale(1, Math.cos(t));
       ctx.font = `${near ? 500 : 400} ${near ? 13 : 11}px ${font}`;
-      ctx.fillText(spec.format(place / REEL_STOPS), 0, 1);
+      const label = Number.isInteger(place) ? spec.format(stops[place]) : spec.format(value);
+      ctx.fillText(label, 0, 1);
       ctx.restore();
     });
     ctx.restore();
@@ -186,7 +228,7 @@ export function createReel(spec: ReelSpec): { element: HTMLCanvasElement; update
 
   // Eases the drum to the value, a frame at a time; at once if motion is unwelcome.
   const turn = () => {
-    const target = spec.get() * REEL_STOPS;
+    const target = placeOf(stops, spec.get());
     if (still.matches) {
       shown = target;
       draw();
@@ -204,10 +246,9 @@ export function createReel(spec: ReelSpec): { element: HTMLCanvasElement; update
 
   const update = () => {
     const value = spec.get();
-    const percent = Math.round(value * 1000) / 10;
-    canvas.setAttribute('aria-valuenow', String(percent));
+    canvas.setAttribute('aria-valuenow', String(Math.round(aria(value) * 1000) / 1000));
     canvas.setAttribute('aria-valuetext', spec.say(value));
-    if (Math.abs(value * REEL_STOPS - shown) > 1e-9) turn();
+    if (Math.abs(placeOf(stops, value) - shown) > 1e-9) turn();
     else draw();
   };
 
@@ -230,12 +271,12 @@ export function createReel(spec: ReelSpec): { element: HTMLCanvasElement; update
     const steps = Math.trunc((drag.y - event.clientY) / DRAG_STEP);
     if (!drag.moved && Math.abs(drag.y - event.clientY) < 3) return;
     drag.moved = true;
-    go(reelStep(drag.from, steps));
+    go(reelStep(stops, drag.from, steps));
   });
   canvas.addEventListener('pointerup', event => {
     if (drag && !drag.moved) {
       const box = canvas.getBoundingClientRect();
-      go(reelStep(spec.get(), event.clientY < box.top + box.height / 2 ? 1 : -1));
+      go(reelStep(stops, spec.get(), event.clientY < box.top + box.height / 2 ? 1 : -1));
     }
     drag = null;
   });
@@ -256,14 +297,14 @@ export function createReel(spec: ReelSpec): { element: HTMLCanvasElement; update
       const steps = wheelSteps(wheel);
       if (steps !== 0) {
         wheel -= steps * WHEEL_STEP;
-        go(reelStep(spec.get(), steps));
+        go(reelStep(stops, spec.get(), steps));
       }
     },
     { passive: false },
   );
 
   canvas.addEventListener('keydown', event => {
-    const next = reelKey(spec.get(), event.key);
+    const next = reelKey(stops, spec.get(), event.key, spec.page);
     if (next === null) return;
     event.preventDefault();
     go(next);

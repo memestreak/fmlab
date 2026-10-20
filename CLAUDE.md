@@ -395,23 +395,31 @@ figures subscribe to it. Nothing else passes values around.
   which of the lab's nodes go where in `#instrument`, and a comment left
   at each node's place in the lab brings it back on the way out;
   `voiceTable.ts` is the sandbox's operator table (in `#voice-table`, its
-  own, not the lab's): per row the tag and role, Ratio (slider snapping
-  to `DX7_RATIO_STOPS`, 0.5 and 1 to 31, and a box to 61.69), Detune ¢,
-  Level dB (its slider's bottom is off), Tremolo (the operator's share of
-  the LFO's tremolo on a number reel, `numberReel.ts`: a canvas drum,
-  `role="slider"`, eleven stops from off to 100 % by tenths, larger values
+  own, not the lab's): per row the tag and role, Ratio (a slider snapping
+  to `DX7_RATIO_STOPS`, 0.5 and 1 to 31, and a number reel through the
+  same stops, Page Up / Down four), Detune ¢ (a reel through the DX7's 15
+  steps, `DETUNE_STOPS`, -6.31 to +6.31 as the factory voices are
+  written, Page Up / Down to the ends), Level dB (a slider whose bottom
+  is off, and a reel through off and whole dB from -72 to 0,
+  `LEVEL_STOPS`, Page Up / Down 6 dB), Tremolo (the operator's share of
+  the LFO's tremolo, a reel alone, `TREMOLO_STOPS`, off to 100 % by
+  tenths). The number reel (`numberReel.ts`, `createReel`) is a canvas
+  drum, `role="slider"`, through any ascending stops, larger values
   below; a vertical drag a step per 14 px, up for more, the wheel a step
-  per 30 px, scrolling down for more (`wheelSteps`), a click above or below the middle, the arrows, Home, End and
-  Page Up / Down; no typing; a factory share between stops, 26 % or 43 %,
-  is shown and kept as it is until a turn takes it to the next stop that
-  way; it eases between values unless motion is reduced), and two small read-only drawings
+  per 30 px, scrolling down for more (`wheelSteps`), a click above or
+  below the middle, the arrows, Home, End and Page Up / Down; no typing;
+  a value between stops (a factory ratio of 1.41, a level of -30.75 dB, a
+  share of 26 %) is shown and kept as it is, in a slot of its own, until
+  a turn takes it to the next stop that way, and one beyond them (a
+  ratio of 40 from a link) stays until turned back in; it eases between
+  values unless motion is reduced. Last, two small read-only drawings
   to compare the operators by, the envelope and Across the keyboard
   (`.voice-mini` buttons: a click selects the row and opens that tab of
   the operator panel, where each is edited); a row clicked or focused is
   selected (`selectedOp`; one always is, and presets, links and stepping
   keep it) and outlined, and nothing else on a row changes with the
-  selection, so the columns never change width. `paramControl.ts` is its box (type, or drag up or right for
-  more) with an optional slider; `voiceFormat.ts` writes times, dB, cents
+  selection, so the columns never change width. `paramControl.ts` is the
+  ratio's and level's slider (`createSlider`); `voiceFormat.ts` writes times, dB, cents
   and keys the same everywhere. `envelopeView.ts` is the operator panel,
   always open: the selected operator's tag and role and two tabs,
   Envelope and Across the keyboard (`role="tab"`, arrows between them;
