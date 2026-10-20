@@ -388,7 +388,8 @@ figures subscribe to it. Nothing else passes values around.
   into `noteStartedAt` / `noteLength`. Keys are let go on blur, a hidden
   tab, a lost pointer capture and a change of chapter, so none sticks.
   Piano-shaped keys under an ink key slip, every C named, the octave
-  control (− the range +, and the Z / X hint) on their left; every held
+  control (− the range +, and the Z / X hint, shown only while the
+pointer is over the keyboard or keyboard focus is in it) on their left; every held
   key is drawn in --pen-blue. Its key colours are local tokens (`--key-light` and so
   on) so the white keys stay light in the dark theme;
   `instrument.ts` lays out the sandbox's instrument page: `PLACES` says
