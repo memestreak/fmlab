@@ -16,43 +16,93 @@
   display: none;
 }
 
-/* The title bar: the title and its line on the left, the tools on the
-   right, an ink rule under them. */
+/* The title bar, as a synthesizer's: on the left the voice's name as
+   the title (the preset menu, ‹ › and what it plays without), then the
+   factory voices' credit and Volume on the right, an ink rule under
+   them. The page's title, "Sandbox", is for screen readers only. */
 .inst-bar {
   display: flex;
   flex: none;
   flex-wrap: nowrap;
-  /* Top-aligned, so the tools stay put if one layout's line wraps. */
-  align-items: flex-start;
+  align-items: center;
   gap: 0.75rem 1.5rem;
-  padding-bottom: 0.75rem;
+  padding-bottom: 0.6rem;
   border-bottom: 1px solid var(--ink);
 }
 
 .inst-head {
   display: flex;
   flex: 1 1 auto;
-  align-items: baseline;
-  gap: 0.25rem 1rem;
+  align-items: center;
   min-width: 0;
-  /* Level with the middle of the tools on a single line. */
-  padding-top: 0.4rem;
-}
-
-.inst-title {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: 1.9rem;
-  font-weight: 600;
-  line-height: 1.1;
 }
 
 .inst-title:focus {
   outline: none;
 }
 
-.inst-lede {
+.inst-presets {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* The voice's name: the page's heading, in the display face, with no
+   box, as wide as the name, its chevron after it in ink, underlined on
+   hover. It is a picture of the menu: the menu itself lies over it,
+   unseen, in the page's own type, so the list it opens is the usual size
+   (a native list takes its menu's font). */
+.preset-pick {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  min-height: 2.25rem;
+  border-bottom: 2px solid transparent;
+}
+
+.preset-name {
+  padding-right: 1.25rem;
+  background-image:
+    linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position:
+    calc(100% - 0.55rem) 55%,
+    calc(100% - 0.25rem) 55%;
+  background-size: 0.3rem 0.3rem;
+  background-repeat: no-repeat;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 600;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.preset-pick:hover {
+  border-bottom-color: var(--ink);
+}
+
+.preset-pick:has(.preset-menu:focus-visible) {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.inst .preset-pick .preset-menu {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  min-height: 0;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* The credit the lede used to give, on one line before Volume. */
+.inst-credit {
+  flex: none;
   margin: 0;
+  font-size: 0.8rem;
+  white-space: nowrap;
 }
 
 .inst-tools {
@@ -141,22 +191,17 @@
   font-size: 0.85rem;
 }
 
-/* The section titles, each on its own controls' line: Presets with the
-   voice menu, and Algorithms with the algorithm list, over the diagram. */
+/* The section titles, each on its own controls' line: Voice with its
+   tabs, over the diagram. */
 .inst-section-title {
   flex: none;
   margin: 0;
 }
 
-.inst-section-head {
-  gap: 0.75rem;
-}
-
-/* The rule between the sections is above Algorithms: the list and the
-   diagram it draws are one section, the presets another. */
+/* Voice tops the left column, under the title bar's rule (no rule of
+   its own), level with the operator panel's head on the right. */
 .inst-alg-head {
-  padding-top: 0.6rem;
-  border-top: 1px solid var(--ink);
+  padding-top: 0.4rem;
 }
 
 /* The diagram's frame: the figure's own parts laid out in this grid,
@@ -1290,13 +1335,18 @@ canvas.voice-keys {
     flex-wrap: wrap;
   }
 
+  /* The presets first, on a line of their own; then the credit and
+     Volume. */
   .inst-head {
     flex-basis: 100%;
-    flex-wrap: wrap;
+  }
+
+  .preset-name {
+    font-size: 1.25rem;
   }
 
   .inst-tools {
-    flex: 1 1 100%;
+    flex: 1 1 12rem;
     flex-wrap: wrap;
   }
 
@@ -1313,14 +1363,14 @@ canvas.voice-keys {
     padding-top: 0.75rem;
   }
 
-  .inst-row,
-  .inst .inst-row .presets {
+  .inst-row {
     flex-wrap: wrap;
   }
 
-  .preset-note {
-    flex-basis: 100%;
-    white-space: normal;
+  /* The name, ‹ › and the note on one line, the note cut short. */
+  .inst .inst-presets,
+  .inst .inst-row .presets {
+    flex-wrap: nowrap;
   }
 
   /* The envelope view first, over the algorithms. */

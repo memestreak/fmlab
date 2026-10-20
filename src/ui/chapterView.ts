@@ -525,6 +525,7 @@ function presetMenu(presets: readonly Preset[], store: LabStore): HTMLElement[] 
     const preset = at < 0 ? null : presets[at];
     note.textContent = preset ? (preset.note ?? preset.hint) : 'your own, from a factory voice';
     note.title = preset ? preset.hint : note.textContent;
+    name.textContent = select.selectedOptions[0]?.textContent ?? '';
   };
   select.addEventListener('change', () => choose(Number(select.value)));
   const stop = store.subscribe((state, previous) => {
@@ -539,6 +540,16 @@ function presetMenu(presets: readonly Preset[], store: LabStore): HTMLElement[] 
       show(state);
     }
   });
+  // The voice's name shown as a heading, the menu itself over it, unseen:
+  // the heading is as wide as the name, and the list the menu opens keeps
+  // the page's own type, not the heading's (a native list takes the
+  // menu's font, which the heading's would make huge).
+  const pick = document.createElement('span');
+  pick.className = 'preset-pick';
+  const name = document.createElement('span');
+  name.className = 'preset-name';
+  name.setAttribute('aria-hidden', 'true');
+  pick.append(name, select);
   show(store.get());
-  return [step('Previous preset', '‹', -1), select, step('Next preset', '›', 1), note];
+  return [step('Previous preset', '‹', -1), pick, step('Next preset', '›', 1), note];
 }
