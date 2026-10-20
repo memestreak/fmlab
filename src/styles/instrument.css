@@ -1264,6 +1264,12 @@ canvas.voice-keys {
     flex: none;
   }
 
+  /* A little room between the operator table and the keyboard (Jeremy,
+     2026-10-20), from the height the title bar's row left. */
+  .inst-foot {
+    margin-top: 0.75rem;
+  }
+
   .inst-keys {
     padding-top: 0.25rem;
   }
