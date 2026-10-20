@@ -59,6 +59,30 @@
   --vfd-graph-grid: rgba(63, 242, 208, 0.12);
   --vfd-graph-dim: rgba(185, 255, 240, 0.55);
   --vfd-graph-edge: 0 0 0 0 transparent;
+  /* The sandbox's tabs: push keys with amber jewel lamps, the same in
+     either theme (but the bezel's edge). */
+  --lamp-bezel-1: #0b0c0c;
+  --lamp-bezel-2: #1c1e1e;
+  --lamp-bezel-edge: 0 1px 0 rgba(255, 255, 255, 0.25);
+  --lamp-key-1: #2f3333;
+  --lamp-key-2: #191b1b;
+  --lamp-key-3: #0e0f0f;
+  --lamp-key-down-1: #151717;
+  --lamp-key-down-2: #0c0d0d;
+  --lamp-legend: #8d9393;
+  --lamp-legend-hover: #b5baba;
+  --lamp-legend-lit: #ffe3ad;
+  --lamp-glow: #ff9d2e;
+  --lamp-ring: #8e9393;
+  --lamp-off-1: #6e4719;
+  --lamp-off-2: #9a6427;
+  --lamp-off-3: #4a2d0f;
+  --lamp-off-4: #87561f;
+  --lamp-on-1: #ffc566;
+  --lamp-on-2: #ffe6a8;
+  --lamp-on-3: #d9822b;
+  --lamp-on-4: #ffd88a;
+  --lamp-on-5: #c26a1c;
 }
 
 /* Dark: follows the system unless the viewer picked Light, or forced by
@@ -106,6 +130,30 @@
     --vfd-graph-grid: rgba(63, 242, 208, 0.12);
     --vfd-graph-dim: rgba(185, 255, 240, 0.55);
     --vfd-graph-edge: 0 0 0.6px 1.4px rgba(255, 255, 255, 0.35);
+    /* The sandbox's tabs: push keys with amber jewel lamps, the same in
+       either theme (but the bezel's edge). */
+    --lamp-bezel-1: #0b0c0c;
+    --lamp-bezel-2: #1c1e1e;
+    --lamp-bezel-edge: 0 0 0.6px 1.4px rgba(255, 255, 255, 0.3);
+    --lamp-key-1: #2f3333;
+    --lamp-key-2: #191b1b;
+    --lamp-key-3: #0e0f0f;
+    --lamp-key-down-1: #151717;
+    --lamp-key-down-2: #0c0d0d;
+    --lamp-legend: #8d9393;
+    --lamp-legend-hover: #b5baba;
+    --lamp-legend-lit: #ffe3ad;
+    --lamp-glow: #ff9d2e;
+    --lamp-ring: #8e9393;
+    --lamp-off-1: #6e4719;
+    --lamp-off-2: #9a6427;
+    --lamp-off-3: #4a2d0f;
+    --lamp-off-4: #87561f;
+    --lamp-on-1: #ffc566;
+    --lamp-on-2: #ffe6a8;
+    --lamp-on-3: #d9822b;
+    --lamp-on-4: #ffd88a;
+    --lamp-on-5: #c26a1c;
   }
 }
 :root[data-theme='dark'] {
@@ -150,4 +198,28 @@
   --vfd-graph-grid: rgba(63, 242, 208, 0.12);
   --vfd-graph-dim: rgba(185, 255, 240, 0.55);
   --vfd-graph-edge: 0 0 0.6px 1.4px rgba(255, 255, 255, 0.35);
+  /* The sandbox's tabs: push keys with amber jewel lamps, the same in
+     either theme (but the bezel's edge). */
+  --lamp-bezel-1: #0b0c0c;
+  --lamp-bezel-2: #1c1e1e;
+  --lamp-bezel-edge: 0 0 0.6px 1.4px rgba(255, 255, 255, 0.3);
+  --lamp-key-1: #2f3333;
+  --lamp-key-2: #191b1b;
+  --lamp-key-3: #0e0f0f;
+  --lamp-key-down-1: #151717;
+  --lamp-key-down-2: #0c0d0d;
+  --lamp-legend: #8d9393;
+  --lamp-legend-hover: #b5baba;
+  --lamp-legend-lit: #ffe3ad;
+  --lamp-glow: #ff9d2e;
+  --lamp-ring: #8e9393;
+  --lamp-off-1: #6e4719;
+  --lamp-off-2: #9a6427;
+  --lamp-off-3: #4a2d0f;
+  --lamp-off-4: #87561f;
+  --lamp-on-1: #ffc566;
+  --lamp-on-2: #ffe6a8;
+  --lamp-on-3: #d9822b;
+  --lamp-on-4: #ffd88a;
+  --lamp-on-5: #c26a1c;
 }
