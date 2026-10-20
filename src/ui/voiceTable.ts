@@ -107,7 +107,7 @@ export function mountVoiceTable(store: LabStore): void {
     if (state.selectedOp !== op || state.voiceTab !== voiceTab) store.set({ selectedOp: op, voiceTab });
   };
 
-  const updates: (() => void)[] = [];
+  const updates: ((force: boolean) => void)[] = [];
 
   for (let op = 0; op < 6; op++) {
     const name = `OP${op + 1}`;
@@ -231,9 +231,16 @@ export function mountVoiceTable(store: LabStore): void {
     row.addEventListener('pointerdown', () => select(op));
     row.addEventListener('focusin', () => select(op));
 
-    updates.push(() => {
+    // What the row last showed: a knob turned on another operator leaves
+    // this one's row alone, which redrawing every row (twelve drawings,
+    // each reading the layout back) made a turn lag.
+    let shown: readonly unknown[] = [];
+    updates.push((force: boolean) => {
       const state = store.get();
       const o = state.dxOperators[op];
+      const now = [o, state.algorithm, state.selectedOp === op, state.hoverOp === op, state.theme, state.chapter];
+      if (!force && now.every((value, i) => value === shown[i])) return;
+      shown = now;
       const used = operatorsUsed(algorithm(state.algorithm)).includes(op);
       row.hidden = !used;
       const r = roleOf(state.algorithm, op);
@@ -257,7 +264,7 @@ export function mountVoiceTable(store: LabStore): void {
     });
   }
 
-  const show = () => updates.forEach(update => update());
+  const show = (force = false) => updates.forEach(update => update(force));
   const changed = (state: LabState, previous: LabState) =>
     state.dxOperators !== previous.dxOperators ||
     state.algorithm !== previous.algorithm ||
@@ -269,6 +276,6 @@ export function mountVoiceTable(store: LabStore): void {
     if (changed(state, previous)) show();
   });
   // The drawings again when their canvases change size.
-  new ResizeObserver(show).observe(body);
-  show();
+  new ResizeObserver(() => show(true)).observe(body);
+  show(true);
 }

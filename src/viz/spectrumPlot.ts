@@ -11,6 +11,7 @@ import {
   highlightOf,
   type LabState,
   momentOf,
+  noteProgress,
   operatorLevelsAt,
   patchOf,
 } from '../model/lab';
@@ -116,6 +117,19 @@ export function operatorsAxisEnd(state: LabState): number {
   return lastAxis.end;
 }
 
+/** The DX7 voice's spectrum between notes, last worked out. */
+let lastSteady: { state: LabState; lines: SpectralLine[] } | null = null;
+
+/** Whether two states give the DX7 voice the same steady spectrum. */
+function sameVoice(a: LabState, b: LabState): boolean {
+  return (
+    a.algorithm === b.algorithm &&
+    a.dxOperators === b.dxOperators &&
+    a.dxFeedback === b.dxFeedback &&
+    a.carrierHz === b.carrierHz
+  );
+}
+
 /**
  * The patch's line spectrum, by whichever kind of modulation it uses. For
  * a patch that plays notes, `time` makes it the note at that moment: that
@@ -123,8 +137,16 @@ export function operatorsAxisEnd(state: LabState): number {
  */
 export function spectrumOf(state: LabState, time?: number): SpectralLine[] {
   if (state.mode === 'ops' && state.voiceModel === 'dx7') {
+    // Between notes the voice's spectrum is the same until its patch or
+    // key changes, and it is asked for three times a frame (the stems,
+    // the axis, the description): worked out once. It runs the kernel and
+    // a transform, which a knob turned at sixty frames a second felt.
+    const steady = noteProgress(state, time) === null;
+    if (steady && lastSteady && sameVoice(lastSteady.state, state)) return lastSteady.lines;
     const note = dx7NoteOf(state);
-    return kernelSpectrum(state.algorithm, note.ratios, dx7KernelLevelsAt(state, time), note.feedback);
+    const lines = kernelSpectrum(state.algorithm, note.ratios, dx7KernelLevelsAt(state, time), note.feedback);
+    if (steady) lastSteady = { state, lines };
+    return lines;
   }
   if (state.mode === 'ops') {
     return operatorSpectrum(
