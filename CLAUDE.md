@@ -523,11 +523,11 @@ neither the link nor storage; while closed, the LFO's pill shows an ink
 dot, "LFO, on", when vibrato or tremolo is above 0, and the Pitch EG's,
 "Pitch EG, on", when the pitch envelope is not flat). The Algorithm tab is
 one row: on the left the algorithm list between
-‹ › (`stepAlgorithm`, round the 32) a little in from the top of the
-diagram's area, and the Feedback knob (`mountFeedbackKnob`, 0 to 2π) a
-little in from its bottom (the height left shared 1 : 3 : 1), and the
-wiring diagram it draws beside them (Jeremy,
-2026-10-19). The diagram's column is as wide as six boxes need at the
+‹ › (`stepAlgorithm`, round the 32) and, just under it (1.25rem; 0.75rem
+under 52rem high), the Feedback knob (`mountFeedbackKnob`, 0 to 2π), the
+pair centred together on the diagram's height, and the wiring diagram it
+draws beside them (Jeremy, 2026-10-19; the knob tight under the chooser,
+2026-10-20). The diagram's column is as wide as six boxes need at the
 box size its height gives, within what the pair leaves
 (`steadyDiagramWidth`), so the pair holds still; on a phone the chooser
 sits above, the knob beside the diagram. The LFO tab, as tall: on the
