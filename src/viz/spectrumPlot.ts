@@ -193,6 +193,7 @@ export function drawSpectrum(
 ): SpectralLine[] {
   const plot = beginPlot(canvas);
   if (!plot) return spectrumOf(state, time);
+  plot.glow();
   const x = drawSpectrumFrame(plot, state);
   return drawPredicted(plot, state, x, time);
 }

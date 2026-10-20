@@ -575,7 +575,14 @@ the keyboard, its x-axis title shown only under the pointer (its canvas's
 `--plot-title: hover`; `drawFrame` leaves the line to the frame). Carriers are solid blue and modulators
 green outlines in the table (filled or outlined tags, carrier rows
 shaded); the diagram is a VFD panel, carriers lit solid and modulators
-dimmer cyan outlines. On a wide screen it is one window high and
+dimmer cyan outlines. The envelope, Key scaling and pitch envelope
+graphs, large and the table's small ones, and the spectrum (its
+negative stems lit as the rest, the measured curve cyan) are VFDs too (Jeremy,
+2026-10-20): the same drawings, their tokens remapped in CSS to cyan on
+dark glass, everything but the area fills glowing (`--plot-glow`, which
+`beginPlot`'s `glow()` reads); a carrier's curve lit full, a
+modulator's at about half. Blue and green stay on the table's tags and
+shading and in the chapter pages' plots. On a wide screen it is one window high and
 nothing scrolls, at 1440 × 900 and 1280 × 800; the figures' captions are
 for screen readers only there, and under 52rem high the rows, drawings,
 knobs and gaps tighten. Below 62rem it is one column: the masthead
@@ -606,15 +613,17 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
   hierarchy.
 - Colour appears only in plots, rules and control fills, with one
   exception: the VFD readouts (the operator table's, the algorithm's),
-  every knob's VFD dial, the line across the sandbox's fader caps and
-  the sandbox's algorithm diagram glow cyan on dark glass, in both themes (Jeremy, 2026-10-20;
-  `--vfd-*` tokens, the same in every theme but for the dials', faders'
-  and diagram's faint light edge in dark and the faders' scale, in ink). They
+  every knob's VFD dial, the line across the sandbox's fader caps, the
+  sandbox's algorithm diagram, its envelope, Key scaling and pitch
+  envelope graphs, large and small, and its spectrum glow cyan on dark glass, in both themes (Jeremy, 2026-10-20;
+  `--vfd-*` tokens, the same in every theme but for a faint light edge
+  in dark and the faders' scale, in ink). They
   are a drawn display, not text, so the ink rule above does not apply
   to them.
 - Red means negative phase and nothing else: controls and the focus ring
   are ink. Never let phase rest on colour alone; a negative stem also gets
-  a hollow marker.
+  a hollow marker. In the sandbox's VFD spectrum, a negative stem is
+  shown by its place and hollow end alone.
 - A figure sits between two ink rules (`.figure`) with an italic caption,
   "Fig. n" then an em space then the title. Where the lab is pinned
   beside the text, its figures share one plate instead: an ink rule above

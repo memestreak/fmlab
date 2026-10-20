@@ -799,6 +799,35 @@ canvas.voice-keys {
     var(--vfd-fader-edge);
 }
 
+/* The sandbox's envelope, key scaling and pitch envelope graphs, large
+   and small, and its spectrum, as VFDs (Jeremy, 2026-10-20): the same drawing on dark
+   glass, its tokens remapped to the display's cyan, every line, dot and
+   label glowing (`--plot-glow`, read by viz/plot.ts). A carrier's curve
+   (--pen-blue) is lit full, a modulator's (--pen-green) at about half.
+   The spectrum too, its negative stems lit as the rest (--pen-red): they
+   keep their place below the axis and their hollow end, so phase still
+   reads without colour. The focus ring keeps the page's ink. */
+[data-view='instrument']
+  :is(.voice-envelope-curve, .inst-pitch-curve, .voice-env-mini, canvas.voice-keys, #inst-figures #spectrum) {
+  --paper: var(--vfd-graph-paper);
+  --paper-sunken: var(--vfd-graph-sunken);
+  --ink: var(--vfd-lit);
+  --rule: var(--vfd-graph-rule);
+  --grid: var(--vfd-graph-grid);
+  --pen-blue: var(--vfd-lit);
+  --pen-green: var(--vfd-graph-dim);
+  --pen-red: var(--vfd-lit);
+  --plot-glow: var(--vfd-glow);
+  border-radius: 4px;
+  background: radial-gradient(ellipse at 50% 40%, var(--vfd-dial-1), var(--vfd-dial-2) 75%);
+  box-shadow: 0 0 0 1px #000, var(--vfd-graph-edge);
+}
+
+[data-view='instrument']
+  :is(.voice-envelope-curve, .inst-pitch-curve, .voice-env-mini, canvas.voice-keys):focus-visible {
+  outline-color: currentColor;
+}
+
 /* The selected row, the operator the panel shows: an ink bar down its
    left edge, the one a row pointed at has, and no outline (Jeremy,
    2026-10-20). A box shadow inside its first cell, so nothing moves. */
