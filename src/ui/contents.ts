@@ -1,4 +1,5 @@
-import { chapterById, GLOSSARY, landing, LANDING } from '../chapters';
+import { chapterById, GLOSSARY, landing, LANDING, sequenceNeighbours } from '../chapters';
+import type { Chapter } from '../chapters/types';
 import { groupOf, OUTLINE, type SectionId } from '../chapters/outline';
 import { hashFor } from '../chapters/route';
 import type { LabStore, LabState } from '../model/lab';
@@ -19,6 +20,25 @@ export function whereLine(id: string): string {
   return '';
 }
 
+/** How one of the crumb's arrows shows: a link, its place kept but empty, or gone. */
+export type StepShown = { to: Chapter } | 'kept' | 'gone';
+
+/**
+ * The arrows either side of the crumb for a view: to the previous and
+ * next section, as the bottom links go (`sequenceNeighbours`). Where there
+ * is no previous (the landing view) its place is kept, so the crumb does
+ * not shift on the way to the first section. The glossary, outside the
+ * sequence, and the sandbox, with no crumb, have neither.
+ */
+export function whereSteps(id: string): { previous: StepShown; next: StepShown } {
+  if (id === GLOSSARY || chapterById(id)?.instrument) return { previous: 'gone', next: 'gone' };
+  const { previous, next } = sequenceNeighbours(id);
+  return {
+    previous: previous ? { to: previous } : 'kept',
+    next: next ? { to: next } : 'kept',
+  };
+}
+
 /**
  * The header's Contents button and the panel it opens: every group and
  * its sections in order, then the glossary, with the one on screen
@@ -33,6 +53,10 @@ export function mountContents(store: LabStore): void {
   const list = document.querySelector<HTMLElement>('#contents-list');
   const close = document.querySelector<HTMLButtonElement>('#contents-close');
   const where = document.querySelector<HTMLElement>('#where');
+  const steps = {
+    previous: document.querySelector<HTMLAnchorElement>('#where-prev'),
+    next: document.querySelector<HTMLAnchorElement>('#where-next'),
+  };
   if (!open || !panel || !list) return;
 
   list.innerHTML =
@@ -53,6 +77,28 @@ export function mountContents(store: LabStore): void {
       else link.removeAttribute('aria-current');
     }
     if (where) where.textContent = whereLine(state.chapter);
+    const shown = whereSteps(state.chapter);
+    for (const way of ['previous', 'next'] as const) {
+      const step = steps[way];
+      if (!step) continue;
+      const show = shown[way];
+      step.hidden = show === 'gone';
+      const to = typeof show === 'object' ? show.to : null;
+      step.classList.toggle('is-kept', show === 'kept');
+      if (to) {
+        step.href = hashFor(to.id);
+        step.title = to.title;
+        step.setAttribute('aria-label', `${way === 'previous' ? 'Previous' : 'Next'}: ${to.title}`);
+        step.removeAttribute('aria-hidden');
+        step.removeAttribute('tabindex');
+      } else {
+        step.removeAttribute('href');
+        step.removeAttribute('title');
+        step.removeAttribute('aria-label');
+        step.setAttribute('aria-hidden', 'true');
+        step.tabIndex = -1;
+      }
+    }
   };
 
   open.addEventListener('click', () => {

@@ -27,7 +27,13 @@ Previous it; `#/glossary` is the
 glossary, outside the sequence. The header's Contents button opens a panel
 of every group and section (`ui/contents.ts`); each section ends with
 Previous and Next by name, except the sandbox, an instrument page with no
-text (its way back is the Contents panel). In the code a section is still a "chapter".
+text (its way back is the Contents panel). The masthead's crumb (`#where`,
+"Two operators · The modulation index") has the same two ways either side
+of it, ‹ and › (`#where-prev`, `#where-next`, `whereSteps` in
+`ui/contents.ts`; Jeremy, 2026-10-20): small ink-outlined squares named
+"Previous: …" and "Next: …"; on the landing view the ‹ keeps its place
+unseen, so the crumb holds still; none on the glossary or the sandbox;
+on a phone, where the crumb is hidden, the two sit after Contents. In the code a section is still a "chapter".
 Never write a section's number in its copy: link to it by name with
 `sectionLink(id)`.
 
@@ -117,8 +123,8 @@ figures subscribe to it. Nothing else passes values around.
   written as `BASE_PATCH` (`basePatch.ts`) with its own differences.
   `landing.ts` is the landing view, written as a chapter with the id
   `LANDING` so that everything following the store's chapter needs no
-  special case. It is not in `CHAPTERS` (Previous and Next reach it in
-  `chapterView.ts`), is at `#/` and plays one long note. `glossary.ts` is the glossary, the same way: `GLOSSARY`, at
+  special case. It is not in `CHAPTERS` (Previous and Next reach it
+  through `sequenceNeighbours`), is at `#/` and plays one long note. `glossary.ts` is the glossary, the same way: `GLOSSARY`, at
   `#/glossary` (an entry: `#/glossary?t=index`), drawn from the terms,
   with no lab and nothing to play. `route.ts` reads and writes addresses,
   and `upgradeHash` turns a link from before the sections had names
@@ -168,7 +174,9 @@ figures subscribe to it. Nothing else passes values around.
   `rel="noopener"`, marked ↗): the lesson text uses it only for proper
   nouns (John Chowning, the Yamaha DX7), maths panels where a formula
   appears, and the glossary gives each entry its article.
-  `index.ts` lists them (`CHAPTERS`, `neighbours`); `route.ts` reads and
+  `index.ts` lists them (`CHAPTERS`, `neighbours`, and
+  `sequenceNeighbours`, where Previous and Next go from any view, the
+  bottom links and the masthead's arrows alike); `route.ts` reads and
   writes the hash (`soundParams`, and `soundFromParams`, which checks and
   clamps every value a link carries). A new chapter is a file here and an entry in `CHAPTERS`. Lesson
   text is plain language for musicians; formulas go in the panels, as
