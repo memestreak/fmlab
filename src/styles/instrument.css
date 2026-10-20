@@ -313,8 +313,8 @@ body:not([data-view='instrument']) #inst-tools {
   border-radius: 2px;
   background: linear-gradient(var(--lamp-key-1), var(--lamp-key-2) 60%, var(--lamp-key-3));
   box-shadow:
-    0 2px 0 #000,
-    0 3px 2px rgba(0, 0, 0, 0.5),
+    0 1px 0 #000,
+    0 2px 1px rgba(0, 0, 0, 0.45),
     inset 0 1px 0 rgba(255, 255, 255, 0.14);
   color: var(--lamp-legend);
   font-family: var(--font-sans);
@@ -322,7 +322,6 @@ body:not([data-view='instrument']) #inst-tools {
   font-weight: 700;
   letter-spacing: 0.09em;
   text-transform: uppercase;
-  transform: translateY(-1px);
 }
 
 [data-view='instrument'] .pill-tab:hover {
@@ -331,7 +330,7 @@ body:not([data-view='instrument']) #inst-tools {
 
 [data-view='instrument'] .pill-tab[aria-selected='true'] {
   background: linear-gradient(var(--lamp-key-down-1), var(--lamp-key-down-2));
-  box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.9);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.8);
   color: var(--lamp-legend-lit);
   text-shadow:
     0 0 2px var(--lamp-glow),

@@ -44,13 +44,18 @@ export function mountEnvelopeView(store: LabStore): void {
   const knobs = document.querySelector<HTMLElement>('#voice-envelope-knobs');
   if (!view || !tag || !role || !canvas || !knobs) return;
 
-  // The tabs: a click, or the arrow keys between them (Home and End to the
-  // ends), choose one.
+  // The tabs: a press (at once, not on the release), a click from the
+  // keyboard, or the arrow keys between them (Home and End to the ends),
+  // choose one.
   const tabs = [...view.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
   const choose = (tab: VoiceTab) => {
     if (store.get().voiceTab !== tab) store.set({ voiceTab: tab });
   };
   tabs.forEach((button, i) => {
+    // The click that follows a press finds the tab chosen already.
+    button.addEventListener('pointerdown', event => {
+      if (event.button === 0) choose(button.dataset.tab as VoiceTab);
+    });
     button.addEventListener('click', () => choose(button.dataset.tab as VoiceTab));
     button.addEventListener('keydown', event => {
       const to = { ArrowLeft: i - 1, ArrowRight: i + 1, Home: 0, End: tabs.length - 1 }[event.key];

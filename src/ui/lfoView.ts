@@ -64,7 +64,9 @@ export function mountVoiceArea(store: LabStore): void {
   const lfo = () => store.get().dxLfo;
   const setLfo = (patch: Partial<Dx7Lfo>) => store.set({ dxLfo: { ...lfo(), ...patch } });
 
-  // The tabs: a click, or the arrow keys between them, open one.
+  // The tabs: a press (not waiting for the release, as a key on a panel
+  // goes down at once), a click from the keyboard, or the arrow keys
+  // between them, open one.
   const tabs = [...head.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
   // The tabs whose feature can be on, and when it is.
   const features: { tab: HTMLButtonElement | undefined; area: VoiceArea; name: string; on: () => boolean }[] = [
@@ -99,6 +101,10 @@ export function mountVoiceArea(store: LabStore): void {
     showTabs();
   };
   tabs.forEach((tab, i) => {
+    // The click that follows a press finds the tab open already.
+    tab.addEventListener('pointerdown', event => {
+      if (event.button === 0) choose(tab.dataset.tab as VoiceArea);
+    });
     tab.addEventListener('click', () => choose(tab.dataset.tab as VoiceArea));
     tab.addEventListener('keydown', event => {
       const to = { ArrowLeft: i - 1, ArrowRight: i + 1, Home: 0, End: tabs.length - 1 }[event.key];
