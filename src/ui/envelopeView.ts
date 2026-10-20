@@ -160,7 +160,6 @@ export function mountEnvelopeView(store: LabStore): void {
     tag.textContent = name;
     tag.dataset.role = r;
     role.textContent = r;
-    view.style.setProperty('--knob-pen', `var(${penOf(r)})`);
     built.forEach((knob, i) => {
       knob.update();
       dials[i].setAttribute('aria-label', `${name} ${KNOBS[i].label.toLowerCase()}`);

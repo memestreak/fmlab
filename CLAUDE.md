@@ -445,10 +445,11 @@ pointer is over the keyboard or keyboard focus is in it) on their left; every he
   right for the break point, C to turn), and under it Left curve (a
   lin / exp button), Left depth, Break point, Right depth, Right curve
   and Speed-up (the envelope's, per octave). `knob.ts` is the knob: a `role="slider"` turned by dragging up
-  or down or with the keys the Bessel plot answers to, drawn ink on paper
-  with its value arc in `--knob-pen`, its name and its `.num` value
-  under it, time knobs on a log scale, and a two-sided one's arc from its
-  `centre`;
+  or down or with the keys the Bessel plot answers to, drawn as a VFD
+  dial, cyan segments lit to its value on dark glass (21 segments,
+  `litSegments`; Jeremy, 2026-10-20), its name and its `.num` value
+  under it, time knobs on a log scale, and a two-sided one lit from its
+  `centre` to the value;
   `besselControls.ts` makes the Bessel plot a control: the canvas is a
   `role="slider"` for the index (drag, or arrows, Page Up / Down, Home,
   End), pointing at a curve, a spectrum stem or a J button sets `hover`,
@@ -591,9 +592,10 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
 - All text is pure `--ink`, never a grey. Use weight, size and italics for
   hierarchy.
 - Colour appears only in plots, rules and control fills, with one
-  exception: the VFD readouts (the operator table's, the algorithm's) glow cyan on dark glass,
-  in both themes (Jeremy, 2026-10-20; `--vfd-*` tokens, the same in every
-  theme). They are a drawn display, not text, so the ink rule above does
+  exception: the VFD readouts (the operator table's, the algorithm's)
+  and every knob's VFD dial glow cyan on dark glass, in both themes
+  (Jeremy, 2026-10-20; `--vfd-*` tokens, the same in every theme but for
+  the dials' faint light edge in dark). They are a drawn display, not text, so the ink rule above does
   not apply to them.
 - Red means negative phase and nothing else: controls and the focus ring
   are ink. Never let phase rest on colour alone; a negative stem also gets

@@ -1,4 +1,4 @@
-import { knobAfterKey, knobPosition, knobValue } from '../../ui/knob';
+import { KNOB_SEGMENTS, knobAfterKey, knobPosition, knobValue, litSegments } from '../../ui/knob';
 
 describe('a knob', () => {
   const level = { min: -96, max: 0 };
@@ -31,5 +31,26 @@ describe('a knob', () => {
     expect(knobAfterKey(0.5, 'Home')).toBe(0);
     expect(knobAfterKey(0.5, 'End')).toBe(1);
     expect(knobAfterKey(0.5, 'a')).toBeNull();
+  });
+});
+
+describe("a knob's lit segments", () => {
+  it('light none at the bottom and all 21 at the top', () => {
+    expect(KNOB_SEGMENTS).toBe(21);
+    expect(litSegments(0)).toEqual([0, 0]);
+    expect(litSegments(1)).toEqual([0, 21]);
+  });
+
+  it('light round(position × 21) from the bottom left', () => {
+    expect(litSegments(0.5)).toEqual([0, 11]);
+    expect(litSegments(0.3)).toEqual([0, 6]);
+  });
+
+  it("light between a centre and the value, on either side", () => {
+    expect(litSegments(1, 0.5)).toEqual([11, 21]);
+    expect(litSegments(0, 0.5)).toEqual([0, 11]);
+    expect(litSegments(0.75, 0.5)).toEqual([11, 16]);
+    expect(litSegments(0.25, 0.5)).toEqual([5, 11]);
+    expect(litSegments(0.5, 0.5)).toEqual([11, 11]);
   });
 });
