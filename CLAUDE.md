@@ -333,7 +333,13 @@ figures subscribe to it. Nothing else passes values around.
   modulator's a solid --pen-green outline, the same at any level, so the
   two read apart without colour too. While a note
   sounds a modulator's box fills as strongly as it sounds (a carrier is
-  filled already).
+  filled already). In the sandbox (`chapter === 'sandbox'`) it is a VFD
+  panel instead (`drawVfdAlgorithm`, Jeremy, 2026-10-20), on the same
+  geometry: cyan on dark glass in either theme, the carriers lit solid
+  with their wires down to the output, the output line ("OUT") and the
+  feedback loop at full brightness, the modulators cyan outlines at
+  about half brightness with the wires between them; the pointed-at
+  ring is lit full. The algorithms chapter's diagram keeps its pens.
   `liveSpectrum.ts` is
   the spectrum's live view, drawn whenever sound plays (there is no
   switch): the measured FFT as a filled --pen-blue curve over the
@@ -568,7 +574,8 @@ spectrum (`#inst-figures`) filling the rest of the row, no taller than
 the keyboard, its x-axis title shown only under the pointer (its canvas's
 `--plot-title: hover`; `drawFrame` leaves the line to the frame). Carriers are solid blue and modulators
 green outlines in the table (filled or outlined tags, carrier rows
-shaded) and the diagram. On a wide screen it is one window high and
+shaded); the diagram is a VFD panel, carriers lit solid and modulators
+dimmer cyan outlines. On a wide screen it is one window high and
 nothing scrolls, at 1440 × 900 and 1280 × 800; the figures' captions are
 for screen readers only there, and under 52rem high the rows, drawings,
 knobs and gaps tighten. Below 62rem it is one column: the masthead
@@ -599,10 +606,10 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
   hierarchy.
 - Colour appears only in plots, rules and control fills, with one
   exception: the VFD readouts (the operator table's, the algorithm's),
-  every knob's VFD dial and the line across the sandbox's fader caps
-  glow cyan on dark glass, in both themes (Jeremy, 2026-10-20;
-  `--vfd-*` tokens, the same in every theme but for the dials' and
-  faders' faint light edge in dark and the faders' scale, in ink). They
+  every knob's VFD dial, the line across the sandbox's fader caps and
+  the sandbox's algorithm diagram glow cyan on dark glass, in both themes (Jeremy, 2026-10-20;
+  `--vfd-*` tokens, the same in every theme but for the dials', faders'
+  and diagram's faint light edge in dark and the faders' scale, in ink). They
   are a drawn display, not text, so the ink rule above does not apply
   to them.
 - Red means negative phase and nothing else: controls and the focus ring
