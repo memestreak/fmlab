@@ -1,4 +1,4 @@
-import { drumPlaces, reelKey, reelStep, slotOf } from '../../ui/numberReel';
+import { drumPlaces, reelKey, reelStep, slotOf, wheelSteps } from '../../ui/numberReel';
 
 describe('the number reel', () => {
   it('steps a tenth at a time, held from off to 100 %', () => {
@@ -46,5 +46,14 @@ describe('the number reel\'s drum', () => {
   it('has only the eleven stops for a value on one', () => {
     expect(drumPlaces(0.3)).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     expect(slotOf(drumPlaces(0.3), 3)).toBe(3);
+  });
+});
+
+describe('the number reel\'s wheel', () => {
+  it('scrolls as a page does: down (positive deltaY) is the larger value below', () => {
+    expect(wheelSteps(30)).toBe(1);
+    expect(wheelSteps(95)).toBe(3);
+    expect(wheelSteps(-30)).toBe(-1);
+    expect(wheelSteps(29)).toBe(0);
   });
 });

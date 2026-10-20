@@ -2,7 +2,8 @@
 // typed in. The sandbox's operator table uses it for each operator's
 // share of the LFO's tremolo, eleven stops from off to 100 %. It is a
 // canvas that is a control, as the Bessel plot is: a `role="slider"`,
-// turned by a vertical drag (up for more), the mouse wheel, a click above
+// turned by a vertical drag (up for more), the mouse wheel (as a page
+// scrolls: down for the larger values below), a click above
 // or below the middle, or the keys. A value between stops (a factory
 // voice's 26 %) is shown as it is, on the drum between its neighbours,
 // and a turn goes to the next stop that way.
@@ -51,6 +52,14 @@ export function slotOf(places: readonly number[], at: number): number {
     if (at <= places[slot]) return slot - 1 + (at - places[slot - 1]) / (places[slot] - places[slot - 1]);
   }
   return places.length - 1;
+}
+
+/**
+ * How many whole steps `deltaY` pixels of wheel make, as a page scrolls:
+ * positive (down) is more, the next value below.
+ */
+export function wheelSteps(deltaY: number): number {
+  return Math.trunc(deltaY / WHEEL_STEP);
 }
 
 /** The step a key takes, or null for a key the reel leaves alone (Space is the page's). */
@@ -234,17 +243,19 @@ export function createReel(spec: ReelSpec): { element: HTMLCanvasElement; update
     drag = null;
   });
 
-  // The wheel: a step per 30 px of scrolling, up for more; the page does
-  // not scroll while the pointer is over the reel.
+  // The wheel: a step per 30 px of scrolling, as a page scrolls: down
+  // (positive deltaY) brings the larger values below into the window, a
+  // step more (Jeremy, 2026-10-20). The page does not scroll while the
+  // pointer is over the reel.
   let wheel = 0;
   canvas.addEventListener(
     'wheel',
     event => {
       event.preventDefault();
       wheel += event.deltaMode === 1 ? event.deltaY * 16 : event.deltaY;
-      const steps = Math.trunc(-wheel / WHEEL_STEP);
+      const steps = wheelSteps(wheel);
       if (steps !== 0) {
-        wheel += steps * WHEEL_STEP;
+        wheel -= steps * WHEEL_STEP;
         go(reelStep(spec.get(), steps));
       }
     },

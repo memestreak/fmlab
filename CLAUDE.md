@@ -401,7 +401,7 @@ figures subscribe to it. Nothing else passes values around.
   the LFO's tremolo on a number reel, `numberReel.ts`: a canvas drum,
   `role="slider"`, eleven stops from off to 100 % by tenths, larger values
   below; a vertical drag a step per 14 px, up for more, the wheel a step
-  per 30 px, a click above or below the middle, the arrows, Home, End and
+  per 30 px, scrolling down for more (`wheelSteps`), a click above or below the middle, the arrows, Home, End and
   Page Up / Down; no typing; a factory share between stops, 26 % or 43 %,
   is shown and kept as it is until a turn takes it to the next stop that
   way; it eases between values unless motion is reduced), and two small read-only drawings
@@ -543,6 +543,11 @@ then the credit and Volume; the keyboard
 and the spectrum over it docked to the screen's foot, the operator panel
 first (its tabs on a line of their own), the controls scrolling under it, and the
 operator table as cards, each with its drawings.
+
+Wheel controls scroll with the page's direction (Jeremy, 2026-10-20):
+positive deltaY, scrolling down, is the next value below, as a page
+would scroll to it. On the number reel, where larger values sit below,
+that is a step more.
 
 ## Styling
 
