@@ -27,15 +27,16 @@ export const landing: Chapter = {
     ...BASE_PATCH,
     noteMode: true,
     // A slow swell on 1:1: the plain sine wave grows harmonics one after
-    // another, holds, and gives them back. Let go, it is gone in 0.4 s,
-    // not left ringing.
+    // another and gives some back. Its brightness follows the envelope, so
+    // it stops moving once the decay has settled (attack + decay, 2.2 s);
+    // it is let go 0.3 s after that, and gone 0.4 s later.
     carrierHz: 220,
     ratio: 1,
     index: 6,
     attack: 1.6,
     decay: 0.6,
     sustain: 0.6,
-    hold: 2.8,
+    hold: 2.5,
     release: 0.4,
   },
   figures: {
