@@ -473,6 +473,9 @@ export function stepPreset(at: number, steps: number, count: number): number {
  * the voice the sound is, or "Edited" once it has been changed; the steps
  * then go on from the voice last chosen.
  */
+/** The credit for the sandbox's presets, Yamaha's factory voices. */
+export const FACTORY_CREDIT = 'DX7 factory voices © Yamaha';
+
 function presetMenu(presets: readonly Preset[], store: LabStore): HTMLElement[] {
   const select = document.createElement('select');
   select.className = 'input num preset-menu';
@@ -481,8 +484,12 @@ function presetMenu(presets: readonly Preset[], store: LabStore): HTMLElement[] 
   edited.value = '';
   edited.textContent = 'Edited';
   edited.disabled = true;
-  select.append(
-    edited,
+  // The factory voices under their credit, which the open list shows as
+  // its group's name (and the name's tip): Yamaha's voices, credited
+  // without a line of their own on the page.
+  const factory = document.createElement('optgroup');
+  factory.label = FACTORY_CREDIT;
+  factory.append(
     ...presets.map((preset, i) => {
       const option = document.createElement('option');
       option.value = String(i);
@@ -490,6 +497,7 @@ function presetMenu(presets: readonly Preset[], store: LabStore): HTMLElement[] 
       return option;
     }),
   );
+  select.append(edited, factory);
   const note = document.createElement('span');
   note.className = 'preset-note';
   note.id = 'preset-note';
@@ -542,6 +550,7 @@ function presetMenu(presets: readonly Preset[], store: LabStore): HTMLElement[] 
   // menu's font, which the heading's would make huge).
   const pick = document.createElement('span');
   pick.className = 'preset-pick';
+  pick.title = FACTORY_CREDIT;
   const name = document.createElement('span');
   name.className = 'preset-name';
   name.setAttribute('aria-hidden', 'true');

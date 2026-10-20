@@ -16,25 +16,24 @@
   display: none;
 }
 
-/* The title bar, as a synthesizer's: on the left the voice's name as
-   the title (the preset menu, ‹ › and what it plays without), then the
-   factory voices' credit and Volume on the right, an ink rule under
-   them. The page's title, "Sandbox", is for screen readers only. */
-.inst-bar {
-  display: flex;
-  flex: none;
-  flex-wrap: nowrap;
-  align-items: center;
-  gap: 0.75rem 1.5rem;
-  padding-bottom: 0.6rem;
-  border-bottom: 1px solid var(--ink);
+/* On the sandbox the masthead is the synthesizer's title bar (Jeremy,
+   2026-10-20, "more stand alone"): the wordmark, then the voice's name
+   as the title (the preset menu, ‹ › and what it plays without) in the
+   place of Contents, then Volume, the glossary and the theme. Elsewhere
+   the two are not there. The page's title, "Sandbox", is for screen
+   readers only. */
+body:not([data-view='instrument']) .inst-presets,
+body:not([data-view='instrument']) #inst-tools {
+  display: none;
 }
 
-.inst-head {
-  display: flex;
-  flex: 1 1 auto;
-  align-items: center;
-  min-width: 0;
+[data-view='instrument'] #contents-open,
+[data-view='instrument'] #where {
+  display: none;
+}
+
+[data-view='instrument'] .guide-link {
+  margin-left: 0;
 }
 
 .inst-title:focus {
@@ -42,7 +41,9 @@
 }
 
 .inst-presets {
+  display: flex;
   flex: 1 1 auto;
+  align-items: center;
   min-width: 0;
 }
 
@@ -87,7 +88,7 @@
   outline-offset: 2px;
 }
 
-.inst .preset-pick .preset-menu {
+[data-view='instrument'] .preset-pick .preset-menu {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -97,19 +98,12 @@
   cursor: pointer;
 }
 
-/* The credit the lede used to give, on one line before Volume. */
-.inst-credit {
-  flex: none;
-  margin: 0;
-  font-size: 0.8rem;
-  white-space: nowrap;
-}
-
 .inst-tools {
   display: flex;
   flex: none;
   align-items: center;
   gap: 0.75rem;
+  margin-left: auto;
 }
 
 /* Volume as one compact line. */
@@ -486,11 +480,11 @@
   gap: 0.5rem 1rem;
 }
 
-.inst .presets {
+[data-view='instrument'] .presets {
   margin: 0;
 }
 
-.inst .presets .btn {
+[data-view='instrument'] .presets .btn {
   height: auto;
   min-height: 2.25rem;
   padding: 0 0.7rem;
@@ -503,7 +497,7 @@
   gap: 0.5rem 0.75rem;
 }
 
-.inst .inst-row .presets {
+[data-view='instrument'] .inst-row .presets {
   flex-wrap: nowrap;
   gap: 0.35rem;
 }
@@ -520,20 +514,20 @@
 }
 
 .inst #algorithm,
-.inst .preset-menu {
+[data-view='instrument'] .preset-menu {
   min-height: 2.25rem;
 }
 
 /* The sandbox's 32 factory voices, one menu with ‹ › either side, and
    beside them what the chosen one plays without, cut short if the line
    is full. */
-.inst .inst-row #inst-dx7-presets {
+[data-view='instrument'] .inst-row #inst-dx7-presets {
   display: flex;
   flex: 1 1 auto;
   min-width: 0;
 }
 
-.inst .inst-row .presets:has(.preset-menu) {
+[data-view='instrument'] .inst-row .presets:has(.preset-menu) {
   flex: 1 1 auto;
   align-items: center;
   gap: 0.6rem;
@@ -1214,6 +1208,11 @@ canvas.voice-keys {
     margin-bottom: 0.75rem;
   }
 
+  /* One line, as on every page: the note is cut short first. */
+  [data-view='instrument'] .guide-nav {
+    flex-wrap: nowrap;
+  }
+
   [data-view='instrument'] .inst:not([hidden]) {
     display: flex;
     flex: 1 1 auto;
@@ -1221,6 +1220,8 @@ canvas.voice-keys {
     min-height: 0;
   }
 
+  /* The ink rule under the masthead, the title bar's, on the top of
+     the body, so the masthead is as tall as on any page. */
   .inst-body {
     display: flex;
     flex: 1 1 auto;
@@ -1228,6 +1229,7 @@ canvas.voice-keys {
     gap: 0.75rem;
     min-height: 0;
     padding: 1rem 0 0.5rem;
+    border-top: 1px solid var(--ink);
   }
 
   .inst-top {
@@ -1360,13 +1362,14 @@ canvas.voice-keys {
     padding-bottom: calc(19rem + env(safe-area-inset-bottom, 0px));
   }
 
-  .inst-bar {
-    flex-wrap: wrap;
+  /* The title bar's rule under the masthead here too. */
+  [data-view='instrument'] .inst-body {
+    border-top: 1px solid var(--ink);
   }
 
-  /* The presets first, on a line of their own; then the credit and
-     Volume. */
-  .inst-head {
+  /* The masthead wraps: the wordmark and the theme, then the presets
+     on a line of their own, then Volume and the glossary. */
+  [data-view='instrument'] .inst-presets {
     flex-basis: 100%;
   }
 
@@ -1374,16 +1377,20 @@ canvas.voice-keys {
     font-size: 1.25rem;
   }
 
-  .inst-tools {
+  [data-view='instrument'] .inst-tools {
     flex: 1 1 12rem;
-    flex-wrap: wrap;
+    margin-left: 0;
   }
 
   [data-view='instrument'] .inst-tools .slider-row {
-    flex-basis: 100%;
+    flex: 1 1 auto;
     grid-template-columns: auto minmax(0, 1fr) auto;
     grid-template-areas: 'label slider value';
     margin: 0;
+  }
+
+  [data-view='instrument'] .guide-link {
+    margin-left: auto;
   }
 
   .inst-top {
@@ -1397,8 +1404,8 @@ canvas.voice-keys {
   }
 
   /* The name, ‹ › and the note on one line, the note cut short. */
-  .inst .inst-presets,
-  .inst .inst-row .presets {
+  [data-view='instrument'] .inst-presets,
+  [data-view='instrument'] .inst-row .presets {
     flex-wrap: nowrap;
   }
 

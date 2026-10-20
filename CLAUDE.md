@@ -132,7 +132,7 @@ figures subscribe to it. Nothing else passes values around.
   parameters.
   `sandbox.ts` is an instrument page, not a section (`instrument`): no
   lesson, maths or lede; a synthesizer of its own (Jeremy, 2026-10-20),
-  its title bar the voice's name. It plays a DX7
+  its masthead its title bar, the voice's name in it. It plays a DX7
   voice (`voiceModel: 'dx7'`) from the keyboard, its presets in
   `dx7Voices.ts`: all 32 of Yamaha's DX7 factory voices (ROM1A), numbered
   as on the DX7 ("11 E.PIANO 1", which it opens on), in one dropdown
@@ -141,7 +141,9 @@ figures subscribe to it. Nothing else passes values around.
   2026-10-18) and a short note beside it for the
   chosen voice ("approximate · no velocity"; `note`) and
   "Edited" once the sound is changed (`presetOf`). They are credited
-  "DX7 factory voices © Yamaha" in the title bar, and each hint says it is a close approximation
+  "DX7 factory voices © Yamaha" (`FACTORY_CREDIT`) as the open list's
+  group label and the name's hover title, not as a line of their own,
+  and each hint says it is a close approximation
   and what it plays without (velocity, fixed frequency, played as a
   ratio from middle C, transpose, an envelope ending above silence);
   since 2026-10-19 it plays each voice's LFO (vibrato and tremolo, with
@@ -495,16 +497,20 @@ both sizes after adding controls or figures.
 
 The sandbox is an instrument page (`body[data-view='instrument']`;
 Jeremy approved it on 2026-10-18: "the existing app, just full page and
-with a better looking keyboard", six operators only): no text column, a
-title bar (Jeremy, 2026-10-20, "a free standing synthesizer"): the
-preset menu as the title: the name chosen in the display face at
-1.45rem with no box (`.preset-name`), the native menu over it unseen in
-the page's own type, so the list it opens is the usual size, between ‹ ›
-(`stepPreset`, round the 32), and its note, cut short; on the right
-"DX7 factory voices © Yamaha" and Volume (no Play or Copy link: the
-keyboard and the space bar play, and the address bar keeps the sound).
-The page's title, "Sandbox" (`#inst-title`), is for screen readers only,
-and the masthead's line beside Contents is empty here (`whereLine`). Then,
+with a better looking keyboard", six operators only): no text column;
+the masthead is its title bar (Jeremy, 2026-10-20, "more stand alone"):
+the wordmark (home), then in the place of Contents, which the sandbox
+hides with the crumb, the preset menu as the title: the name chosen in
+the display face at 1.45rem with no box (`.preset-name`), the native
+menu over it unseen in the page's own type, so the list it opens is the
+usual size, between ‹ › (`stepPreset`, round the 32), and its note, cut
+short; then Volume, the glossary and the theme. Their containers
+(`#inst-dx7-presets` in a group named Presets, `#inst-tools`) are in the
+masthead's markup and shown on the sandbox only; `PLACES` moves the
+lab's nodes into them. The masthead keeps every page's height, and its
+ink rule is the top of `.inst-body`. No Play or Copy link: the keyboard
+and the space bar play, and the address bar keeps the sound. The page's
+title, "Sandbox" (`#inst-title`), is for screen readers only. Then,
 in layout F (Jeremy, 2026-10-18), a top band: on the left, the
 title Voice at the top left, the band's first row, with
 a pill switch, Algorithm | LFO | Pitch EG, at the right of its line (`lfoView.ts`;
@@ -547,9 +553,9 @@ green outlines in the table (filled or outlined tags, carrier rows
 shaded) and the diagram. On a wide screen it is one window high and
 nothing scrolls, at 1440 × 900 and 1280 × 800; the figures' captions are
 for screen readers only there, and under 52rem high the rows, drawings,
-knobs and gaps tighten. Below 62rem it is one column: the title bar
-wraps, the presets row first (the name at 1.25rem, the note cut short),
-then the credit and Volume; the keyboard
+knobs and gaps tighten. Below 62rem it is one column: the masthead
+wraps, the wordmark and the theme, then the presets row (the name at
+1.25rem, the note cut short), then Volume and the glossary; the keyboard
 and the spectrum over it docked to the screen's foot, the operator panel
 first (its tabs on a line of their own), the controls scrolling under it, and the
 operator table as cards, each with its drawings.
