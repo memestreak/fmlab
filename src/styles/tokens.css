@@ -27,6 +27,13 @@
   --font-display: 'Fraunces', Georgia, serif;
   --font-sans: 'Figtree', system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  /* The operator table's VFD readouts: the same in either theme, as a
+     real display is. */
+  --vfd-glass-1: #0d1d1d;
+  --vfd-glass-2: #050a0a;
+  --vfd-lit: #b9fff0;
+  --vfd-glow: #3ff2d0;
+  --vfd-unlit-opacity: 0.06;
 }
 
 /* Dark: follows the system unless the viewer picked Light, or forced by
@@ -42,6 +49,13 @@
     --pen-blue: #94b2ff;
     --pen-green: #7fd18a;
     --pen-red: #ff7a6e;
+    /* The operator table's VFD readouts: the same in either theme, as a
+       real display is. */
+    --vfd-glass-1: #0d1d1d;
+    --vfd-glass-2: #050a0a;
+    --vfd-lit: #b9fff0;
+    --vfd-glow: #3ff2d0;
+    --vfd-unlit-opacity: 0.06;
   }
 }
 :root[data-theme='dark'] {
@@ -54,4 +68,11 @@
   --pen-blue: #94b2ff;
   --pen-green: #7fd18a;
   --pen-red: #ff7a6e;
+  /* The operator table's VFD readouts: the same in either theme, as a
+     real display is. */
+  --vfd-glass-1: #0d1d1d;
+  --vfd-glass-2: #050a0a;
+  --vfd-lit: #b9fff0;
+  --vfd-glow: #3ff2d0;
+  --vfd-unlit-opacity: 0.06;
 }

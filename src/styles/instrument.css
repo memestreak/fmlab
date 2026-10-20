@@ -675,6 +675,42 @@ canvas.voice-keys {
   outline-offset: 2px;
 }
 
+/* The ratio's and the level's VFD readouts: read only, in the reel's
+   place and size; dark glass and cyan segments in either theme (Jeremy,
+   2026-10-20). Drawn, not text, so the ink rule does not apply. */
+.op-vfd {
+  display: flex;
+  flex: none;
+  align-items: center;
+  box-sizing: border-box;
+  width: 3.8rem;
+  height: 1.75rem;
+  padding: 3px;
+  border-radius: 3px;
+  background: radial-gradient(ellipse at 50% 40%, var(--vfd-glass-1), var(--vfd-glass-2));
+  box-shadow: inset 0 0 0 1px #000;
+  cursor: default;
+  user-select: none;
+}
+
+.op-vfd svg {
+  display: block;
+  width: 100%;
+  height: min(19px, 100%);
+  overflow: visible;
+}
+
+.op-vfd .vfd-seg {
+  fill: var(--vfd-glow);
+  opacity: var(--vfd-unlit-opacity);
+}
+
+.op-vfd .vfd-seg.is-lit {
+  fill: var(--vfd-lit);
+  opacity: 1;
+  filter: drop-shadow(0 0 1.5px var(--vfd-glow)) drop-shadow(0 0 3px color-mix(in srgb, var(--vfd-glow) 50%, transparent));
+}
+
 /* The selected row, the operator the panel shows: an ink bar down its
    left edge, the one a row pointed at has, and no outline (Jeremy,
    2026-10-20). A box shadow inside its first cell, so nothing moves. */
@@ -1282,7 +1318,8 @@ canvas.voice-keys {
     white-space: nowrap;
   }
 
-  .op-reel {
+  .op-reel,
+  .op-vfd {
     height: 1.4rem;
   }
 
@@ -1623,7 +1660,8 @@ canvas.voice-keys {
     height: 2rem;
   }
 
-  .op-reel {
+  .op-reel,
+  .op-vfd {
     height: 2rem;
   }
 

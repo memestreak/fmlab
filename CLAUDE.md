@@ -401,14 +401,19 @@ pointer is over the keyboard or keyboard focus is in it) on their left; every he
   at each node's place in the lab brings it back on the way out;
   `voiceTable.ts` is the sandbox's operator table (in `#voice-table`, its
   own, not the lab's): per row the tag and role, Ratio (a slider snapping
-  to `DX7_RATIO_STOPS`, 0.5 and 1 to 31, and a number reel through the
-  same stops, Page Up / Down four), Detune ¢ (a reel through the DX7's 15
-  steps, `DETUNE_STOPS`, -6.31 to +6.31 as the factory voices are
-  written, Page Up / Down to the ends), Level dB (a slider whose bottom
-  is off, and a reel through off and whole dB from -72 to 0,
-  `LEVEL_STOPS`, Page Up / Down 6 dB), Tremolo (the operator's share of
+  to `DX7_RATIO_STOPS`, 0.5 and 1 to 31, with a VFD readout beside it),
+  Detune ¢ (a number reel through the DX7's 15 steps, `DETUNE_STOPS`,
+  -6.31 to +6.31 as the factory voices are written, Page Up / Down to the
+  ends), Level dB (a slider whose bottom is off, with a VFD readout
+  beside it), Tremolo (the operator's share of
   the LFO's tremolo, a reel alone, `TREMOLO_STOPS`, off to 100 % by
-  tenths). The number reel (`numberReel.ts`, `createReel`) is a canvas
+  tenths). The VFD readout (`vfdReadout.ts`, `createVfdReadout`; Jeremy,
+  2026-10-20) is read only and hidden from screen readers (the slider
+  says the value): four seven-segment places behind dark glass, lit cyan
+  in either theme, each with its own point, unlit 8s in the empty ones,
+  `formatRatio` or `formatLevel` ("oFF" for off), in the reel's place and
+  size; `vfdCells` and `SEGMENTS` are its glyphs. The number reel
+  (`numberReel.ts`, `createReel`), for Detune and Tremolo, is a canvas
   drum, `role="slider"`, through any ascending stops, larger values
   below; a vertical drag a step per 14 px, up for more, the wheel a step
   per 30 px, scrolling down for more (`wheelSteps`), a click above or
@@ -582,7 +587,11 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
   `--pen-green` (modulator), `--pen-red` (negative sideband phase).
 - All text is pure `--ink`, never a grey. Use weight, size and italics for
   hierarchy.
-- Colour appears only in plots, rules and control fills.
+- Colour appears only in plots, rules and control fills, with one
+  exception: the operator table's VFD readouts glow cyan on dark glass,
+  in both themes (Jeremy, 2026-10-20; `--vfd-*` tokens, the same in every
+  theme). They are a drawn display, not text, so the ink rule above does
+  not apply to them.
 - Red means negative phase and nothing else: controls and the focus ring
   are ink. Never let phase rest on colour alone; a negative stem also gets
   a hollow marker.
