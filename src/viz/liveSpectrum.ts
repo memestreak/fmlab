@@ -72,6 +72,7 @@ export function drawLiveSpectrum(
 ): void {
   const plot = beginPlot(canvas);
   if (!plot) return;
+  plot.glow();
   const x = drawSpectrumFrame(plot, state);
   drawPredicted(plot, state, x, time);
   trace(plot, liveTrace(measured, state.carrierHz, axisSpan(state)), x);
@@ -93,9 +94,13 @@ function trace(
   for (const point of points) ctx.lineTo(x(point.freq), y(point.amp));
   ctx.lineTo(x(points[points.length - 1].freq), axis);
   ctx.closePath();
+  // The area under it is a fill, so it never glows.
+  ctx.save();
+  ctx.shadowBlur = 0;
   ctx.globalAlpha = 0.18;
   ctx.fillStyle = token('--pen-blue');
   ctx.fill();
+  ctx.restore();
 
   ctx.globalAlpha = 1;
   ctx.beginPath();

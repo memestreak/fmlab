@@ -37,6 +37,13 @@ export interface Plot extends Area {
   token: (name: string) => string;
   /** Device pixels per CSS pixel. */
   dpr: number;
+  /**
+   * Lights what is drawn from here on with the canvas's `--plot-glow`, as
+   * a VFD's segments glow (the sandbox's envelope, key scaling and pitch
+   * graphs); nothing where the canvas has none. Called after the area
+   * fills, which do not glow.
+   */
+  glow: () => void;
 }
 
 /**
@@ -60,12 +67,20 @@ export function beginPlot(canvas: HTMLCanvasElement): Plot | null {
   if (canvas.height !== pixelHeight) canvas.height = pixelHeight;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, width, height);
+  ctx.shadowBlur = 0;
+  ctx.shadowColor = 'transparent';
 
   const style = getComputedStyle(canvas);
   return {
     ctx,
     token: name => style.getPropertyValue(name).trim(),
     dpr,
+    glow: () => {
+      const colour = style.getPropertyValue('--plot-glow').trim();
+      if (!colour) return;
+      ctx.shadowColor = colour;
+      ctx.shadowBlur = 4;
+    },
     ...plotArea(width, height),
   };
 }

@@ -100,7 +100,7 @@ export function drawKeyScaling(
 ): void {
   const plot = beginPlot(canvas);
   if (!plot) return;
-  const { ctx, token } = plot;
+  const { ctx, token, glow } = plot;
   const { width, height } = canvas.getBoundingClientRect();
   const area = keysArea(width, height, Boolean(large));
   const { left, right, top, bottom, keysTop, keysHeight } = area;
@@ -111,6 +111,7 @@ export function drawKeyScaling(
   // The keys, white with the black ones marked, along the bottom.
   ctx.fillStyle = token('--paper');
   ctx.fillRect(left, keysTop, right - left, keysHeight);
+  glow();
   ctx.strokeStyle = token('--rule');
   ctx.lineWidth = 1;
   ctx.strokeRect(left + 0.5, keysTop + 0.5, right - left - 1, keysHeight - 1);

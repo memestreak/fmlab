@@ -321,6 +321,9 @@ body:not([data-view='instrument']) #inst-tools {
   display: grid;
   grid-template-columns: repeat(8, 4.2rem);
   gap: 0.1rem;
+  /* Clear of the curve's glass by 0.5rem, as the operator panel's knobs
+     are of theirs. */
+  margin-top: 0.35rem;
 }
 
 /* Its dials as small as a short window's, to leave the curve the height. */
@@ -797,6 +800,36 @@ canvas.voice-keys {
     inset 0 0 0 0.5px rgba(255, 255, 255, 0.14),
     0 1px 0.6px rgba(0, 0, 0, 0.25),
     var(--vfd-fader-edge);
+}
+
+/* The sandbox's envelope, key scaling, pitch envelope and LFO graphs,
+   large and small, and its spectrum, as VFDs (Jeremy, 2026-10-20): the
+   same drawing on dark glass, its tokens remapped to the display's cyan,
+   every line, dot and label glowing (`--plot-glow`, read by
+   viz/plot.ts). A carrier's curve (--pen-blue) is lit full, a
+   modulator's (--pen-green) at about half; the LFO's wave, in ink, full.
+   The spectrum's negative stems are lit as the rest (--pen-red): they
+   keep their place below the axis and their hollow end, so phase still
+   reads without colour. The focus ring keeps the page's ink. */
+[data-view='instrument']
+  :is(.voice-envelope-curve, .inst-pitch-curve, .inst-lfo-plot, .voice-env-mini, canvas.voice-keys, #inst-figures #spectrum) {
+  --paper: var(--vfd-graph-paper);
+  --paper-sunken: var(--vfd-graph-sunken);
+  --ink: var(--vfd-lit);
+  --rule: var(--vfd-graph-rule);
+  --grid: var(--vfd-graph-grid);
+  --pen-blue: var(--vfd-lit);
+  --pen-green: var(--vfd-graph-dim);
+  --pen-red: var(--vfd-lit);
+  --plot-glow: var(--vfd-glow);
+  border-radius: 4px;
+  background: radial-gradient(ellipse at 50% 40%, var(--vfd-dial-1), var(--vfd-dial-2) 75%);
+  box-shadow: 0 0 0 1px #000, var(--vfd-graph-edge);
+}
+
+[data-view='instrument']
+  :is(.voice-envelope-curve, .inst-pitch-curve, .inst-lfo-plot, .voice-env-mini, canvas.voice-keys):focus-visible {
+  outline-color: currentColor;
 }
 
 /* The selected row, the operator the panel shows: an ink bar down its
