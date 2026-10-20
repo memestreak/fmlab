@@ -72,3 +72,16 @@ export function neighbours(id: string): {
   if (at === -1) return {};
   return { previous: CHAPTERS[at - 1], next: CHAPTERS[at + 1] };
 }
+
+/**
+ * Where Previous and Next go from a view, in the bottom links and round
+ * the masthead's crumb alike: the landing view comes before the first
+ * section (its Next is the first section, the first section's Previous
+ * is it), and the sections run on to the sandbox. The glossary, outside
+ * the sequence, has neither.
+ */
+export function sequenceNeighbours(id: string): { previous?: Chapter; next?: Chapter } {
+  if (id === LANDING) return { next: CHAPTERS[0] };
+  if (id === CHAPTERS[0].id) return { previous: landing, next: neighbours(id).next };
+  return neighbours(id);
+}

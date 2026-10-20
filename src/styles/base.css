@@ -224,6 +224,51 @@ a.btn {
   white-space: nowrap;
 }
 
+/* The previous and next section, either side of the crumb: small
+   ink-outlined squares, as the sandbox's steps are drawn. Where there is
+   no previous (the landing view) the place is kept, so the crumb holds
+   still. */
+.where-step {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  border: 1px solid var(--ink);
+  border-radius: 4px;
+  color: var(--ink);
+  font-size: 1.1rem;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.where-step:hover {
+  background: var(--paper-sunken);
+}
+
+.where-step:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.where-step[hidden] {
+  display: none;
+}
+
+.where-step.is-kept {
+  visibility: hidden;
+}
+
+/* A step's 0.5rem to the crumb, inside the nav's wider gap. */
+#where-prev {
+  margin-right: -0.5rem;
+}
+
+#where-next {
+  margin-left: -0.5rem;
+}
+
 .guide-link {
   margin-left: auto;
   padding: 0.4rem 0;
@@ -246,6 +291,11 @@ a.btn {
 
   .where {
     display: none;
+  }
+
+  /* The two steps side by side after Contents, 0.5rem apart. */
+  #where-prev {
+    margin-right: 0;
   }
 }
 

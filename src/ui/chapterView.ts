@@ -7,7 +7,7 @@ import {
   GLOSSARY,
   landing,
   LANDING,
-  neighbours,
+  sequenceNeighbours,
 } from '../chapters';
 import { groupOf, OUTLINE, type SectionId, titleOf } from '../chapters/outline';
 import {
@@ -189,11 +189,7 @@ function narrativeHtml(chapter: Chapter): string {
   // The landing view comes before the first section, and after it in
   // reverse: Previous and Next run through it as through any section.
   const isLanding = chapter.id === LANDING;
-  const { previous, next } = isLanding
-    ? { previous: undefined, next: CHAPTERS[0] }
-    : chapter === CHAPTERS[0]
-      ? { previous: landing, next: neighbours(chapter.id).next }
-      : neighbours(chapter.id);
+  const { previous, next } = sequenceNeighbours(chapter.id);
   const maths = chapter.maths
     .map(
       panel => `
