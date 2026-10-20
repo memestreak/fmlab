@@ -536,6 +536,18 @@ body:not([data-view='instrument']) #inst-tools {
   min-width: 0;
 }
 
+/* What the voice plays without: for screen readers (the menu's
+   description) and in the name's tip, not shown beside it (Jeremy,
+   2026-10-20). */
+[data-view='instrument'] .preset-note {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 .preset-note {
   overflow: hidden;
   font-size: 0.8rem;
@@ -1169,25 +1181,7 @@ canvas.voice-keys {
   text-align: center;
 }
 
-.piano-letter {
-  position: absolute;
-  right: 0;
-  bottom: 0.9rem;
-  left: 0;
-  font-size: 0.68rem;
-  text-align: center;
-}
-
-.piano-is-c .piano-letter {
-  bottom: 2.05rem;
-}
-
-.piano-black .piano-letter {
-  bottom: 0.65rem;
-}
-
 @media (hover: none) {
-  .piano-letter,
   .piano-oct-hint {
     display: none;
   }
@@ -1664,8 +1658,7 @@ canvas.voice-keys {
   }
 
   .piano-oct-label,
-  .piano-oct-hint,
-  .piano-letter {
+  .piano-oct-hint {
     display: none;
   }
 
