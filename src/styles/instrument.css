@@ -289,8 +289,23 @@ body:not([data-view='instrument']) #inst-tools {
    faceted amber jewel lamp lit before its legend and the legend glowing
    warm; the others up, their lamps unlit amber glass, their legends
    grey. Amber is only ever this light behind the keys. Nothing moves
-   between up and down. */
-[data-view='instrument'] .pill-tabs {
+   between up and down. The LFO's Key sync and Key scaling's LIN | EXP
+   are the same keys (.lamp-keys, .lamp-key): pressed while on, or
+   chosen. */
+.lamp-keys {
+  display: inline-flex;
+  flex: none;
+}
+
+.lamp-key {
+  display: inline-flex;
+  align-items: center;
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+[data-view='instrument'] :is(.pill-tabs, .lamp-keys) {
   gap: 3px;
   padding: 3px 4px 4px;
   border-radius: 4px;
@@ -303,7 +318,8 @@ body:not([data-view='instrument']) #inst-tools {
 
 [data-view='instrument'] .pill-tab,
 [data-view='instrument'] .pill-tab:first-child,
-[data-view='instrument'] .pill-tab:last-child {
+[data-view='instrument'] .pill-tab:last-child,
+[data-view='instrument'] .lamp-key {
   gap: 0.45rem;
   min-height: 1.65rem;
   margin-left: 0;
@@ -323,11 +339,11 @@ body:not([data-view='instrument']) #inst-tools {
   text-transform: uppercase;
 }
 
-[data-view='instrument'] .pill-tab:hover {
+[data-view='instrument'] :is(.pill-tab, .lamp-key):hover {
   color: var(--lamp-legend-hover);
 }
 
-[data-view='instrument'] .pill-tab[aria-selected='true'] {
+[data-view='instrument'] :is(.pill-tab[aria-selected='true'], .lamp-key[aria-pressed='true'], .lamp-key[aria-checked='true']) {
   background: linear-gradient(var(--lamp-key-down-1), var(--lamp-key-down-2));
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.8);
   color: var(--lamp-legend-lit);
@@ -339,14 +355,14 @@ body:not([data-view='instrument']) #inst-tools {
 
 /* The focus ring, light so it shows on the black bezel in either theme
    (ink would vanish on it in light), and just clear of the key. */
-[data-view='instrument'] .pill-tab:focus-visible {
+[data-view='instrument'] :is(.pill-tab, .lamp-key):focus-visible {
   outline: 2px solid var(--lamp-legend-hover);
   outline-offset: 1px;
 }
 
 /* The jewel lamp: coloured glass in a bright ring, unlit; lit, faceted
    with a hot spot, glowing. */
-[data-view='instrument'] .pill-tab::before {
+[data-view='instrument'] :is(.pill-tab, .lamp-key)::before {
   content: '';
   flex: none;
   width: 7px;
@@ -367,7 +383,8 @@ body:not([data-view='instrument']) #inst-tools {
     0 0 0 1.8px var(--lamp-ring);
 }
 
-[data-view='instrument'] .pill-tab[aria-selected='true']::before {
+[data-view='instrument']
+  :is(.pill-tab[aria-selected='true'], .lamp-key[aria-pressed='true'], .lamp-key[aria-checked='true'])::before {
   background:
     radial-gradient(circle at 45% 40%, rgba(255, 250, 235, 0.95) 0 15%, transparent 55%),
     conic-gradient(
@@ -575,21 +592,6 @@ body:not([data-view='instrument']) #inst-tools {
   display: grid;
   grid-template-columns: repeat(4, 3.6rem);
   gap: 0.1rem;
-}
-
-.inst-lfo-sync {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.8rem;
-  /* Wrapped to fit beside the knobs. */
-  max-width: 5.5rem;
-  line-height: 1.2;
-  cursor: pointer;
-}
-
-.inst-lfo-sync input {
-  accent-color: var(--ink);
 }
 
 .inst-alg-step-row {
@@ -1121,32 +1123,9 @@ canvas.voice-keys {
 }
 
 .voice-envelope-knobs.voice-keys-knobs {
-  grid-template-columns: repeat(6, 4.4rem);
-}
-
-/* A side's curve: a button where a knob would be, as tall as a dial. */
-.knob-toggle {
-  display: grid;
-  place-items: center;
-  width: 2.4rem;
-  height: 2.4rem;
-  padding: 0;
-  border: 1.5px solid var(--ink);
-  border-radius: 0.4rem;
-  background: var(--paper);
-  color: var(--ink);
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  cursor: pointer;
-}
-
-.knob-toggle:hover {
-  background: var(--paper-sunken);
-}
-
-.knob-toggle:focus-visible {
-  outline: 2px solid var(--ink);
-  outline-offset: 2px;
+  /* The curves' LIN | EXP keys are wider than a dial. */
+  grid-template-columns: auto repeat(3, 4.4rem) auto 4.4rem;
+  align-items: end;
 }
 
 /* A knob: the dial, its name, its value. */
@@ -1636,8 +1615,7 @@ canvas.voice-keys {
 
 
 
-  .knob-dial,
-  .knob-toggle {
+  .knob-dial {
     width: 2rem;
     height: 2rem;
   }
@@ -1648,6 +1626,15 @@ canvas.voice-keys {
 
   :root {
     --kv-row: 3.6rem;
+  }
+
+  /* The LFO's row a little closer, to fit Key sync beside its knobs. */
+  .inst-lfo .inst-voice-controls {
+    gap: 0.45rem;
+  }
+
+  .inst-lfo-knobs {
+    grid-template-columns: repeat(4, 3.4rem);
   }
 
   .voice-envelope {

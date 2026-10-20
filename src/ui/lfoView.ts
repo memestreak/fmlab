@@ -4,7 +4,7 @@
 // alone, in neither the link nor storage. While the LFO or the Pitch EG
 // tab is closed its pill shows a dot when that feature is on. The LFO tab: the wave, six buttons each drawing its shape, with
 // a drawing of the LFO under them (viz/lfoPlot.ts); Speed, Delay,
-// Vibrato and Tremolo, four knobs; and key sync, "Restart on each key".
+// Vibrato and Tremolo, four knobs; and key sync, a push key, "Key sync".
 
 import {
   type Dx7Lfo,
@@ -59,7 +59,7 @@ export function mountVoiceArea(store: LabStore): void {
   const waves = document.getElementById('inst-lfo-waves');
   const knobs = document.getElementById('inst-lfo-knobs');
   const plot = document.querySelector<HTMLCanvasElement>('#inst-lfo-plot');
-  const sync = document.querySelector<HTMLInputElement>('#inst-lfo-sync');
+  const sync = document.querySelector<HTMLButtonElement>('#inst-lfo-sync');
   if (!head || !waves || !knobs || !plot || !sync) return;
 
   const lfo = () => store.get().dxLfo;
@@ -200,7 +200,16 @@ export function mountVoiceArea(store: LabStore): void {
   ];
   knobs.replaceChildren(...built.map(knob => knob.element));
 
-  sync.addEventListener('change', () => setLfo({ sync: sync.checked }));
+  // Key sync, a push key: it goes down or up on the press, as the tabs
+  // change. Enter and Space work it through the click; a pointer's click
+  // (detail 1 or more) follows a press that has already worked it.
+  const flip = () => setLfo({ sync: !lfo().sync });
+  sync.addEventListener('pointerdown', event => {
+    if (event.button === 0) flip();
+  });
+  sync.addEventListener('click', event => {
+    if (event.detail === 0) flip();
+  });
 
   const drawPlot = () => {
     const now = lfo();
@@ -216,7 +225,7 @@ export function mountVoiceArea(store: LabStore): void {
       button.tabIndex = on ? 0 : -1;
     });
     built.forEach(knob => knob.update());
-    sync.checked = now.sync;
+    sync.setAttribute('aria-pressed', String(now.sync));
     showTabs();
   };
 
