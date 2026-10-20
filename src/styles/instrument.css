@@ -607,14 +607,6 @@ body:not([data-view='instrument']) #inst-tools {
   border: 2px solid var(--pen-green);
 }
 
-[data-view='instrument'] .op-row:has(.op-tag[data-role='carrier']) {
-  --slider-fill: var(--pen-blue);
-}
-
-[data-view='instrument'] .op-row:has(.op-tag[data-role='modulator']) {
-  --slider-fill: var(--pen-green);
-}
-
 [data-view='instrument'] .op-row:has(.op-tag[data-role='carrier']) > * {
   background: var(--paper-sunken);
 }
@@ -745,6 +737,66 @@ canvas.voice-keys {
   fill: var(--vfd-lit);
   opacity: 1;
   filter: drop-shadow(0 0 1.5px var(--vfd-glow)) drop-shadow(0 0 3px color-mix(in srgb, var(--vfd-glow) 50%, transparent));
+}
+
+/* The sandbox's sliders, Ratio, Level and Volume, as faders: a dark
+   slot, a black cap with a glowing cyan line across it, and a printed
+   scale of 21 ticks under the slot, every fifth longer (Jeremy,
+   2026-10-20). Still the native range input, its size and keys; no
+   filled part, and no role colour. The slot sits 2px above the middle
+   (the padding); the scale under it is the input's background, from
+   the cap's centre at one end to its centre at the other, its ticks
+   starting 1.5px under the slot. */
+[data-view='instrument'] :is(.op-slider, .inst-tools .slider) {
+  padding-bottom: 4px;
+  /* An SVG, not a repeating gradient: browsers drop gradient stripes
+     thinner than a pixel. */
+  background: var(--vfd-fader-scale) 5.7px calc(50% + 3.1px) / calc(100% - 11.4px) 4px no-repeat;
+}
+
+[data-view='instrument'] :is(.op-slider, .inst-tools .slider)::-webkit-slider-runnable-track {
+  height: 3.2px;
+  background: var(--vfd-fader-slot);
+  box-shadow: 0 0 0 0.6px var(--rule), var(--vfd-fader-edge);
+}
+
+[data-view='instrument'] :is(.op-slider, .inst-tools .slider)::-moz-range-track {
+  height: 3.2px;
+  background: var(--vfd-fader-slot);
+  box-shadow: 0 0 0 0.6px var(--rule), var(--vfd-fader-edge);
+}
+
+/* The cap: the line is a layer of its own, its glow a soft band behind
+   it, as a thumb has no children to glow. */
+[data-view='instrument'] :is(.op-slider, .inst-tools .slider)::-webkit-slider-thumb {
+  width: 12px;
+  height: 20px;
+  margin-top: -8.4px;
+  border: 0.6px solid #000;
+  border-radius: 1.6px;
+  background:
+    linear-gradient(var(--vfd-fader-line), var(--vfd-fader-line)) center / 10px 1.6px no-repeat,
+    linear-gradient(transparent, color-mix(in srgb, var(--vfd-glow) 55%, transparent), transparent) center / 12px 6px no-repeat,
+    linear-gradient(var(--vfd-fader-cap-1), var(--vfd-fader-cap-2) 50%, var(--vfd-fader-cap-3));
+  box-shadow:
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.14),
+    0 1px 0.6px rgba(0, 0, 0, 0.25),
+    var(--vfd-fader-edge);
+}
+
+[data-view='instrument'] :is(.op-slider, .inst-tools .slider)::-moz-range-thumb {
+  width: 12px;
+  height: 20px;
+  border: 0.6px solid #000;
+  border-radius: 1.6px;
+  background:
+    linear-gradient(var(--vfd-fader-line), var(--vfd-fader-line)) center / 10px 1.6px no-repeat,
+    linear-gradient(transparent, color-mix(in srgb, var(--vfd-glow) 55%, transparent), transparent) center / 12px 6px no-repeat,
+    linear-gradient(var(--vfd-fader-cap-1), var(--vfd-fader-cap-2) 50%, var(--vfd-fader-cap-3));
+  box-shadow:
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.14),
+    0 1px 0.6px rgba(0, 0, 0, 0.25),
+    var(--vfd-fader-edge);
 }
 
 /* The selected row, the operator the panel shows: an ink bar down its
