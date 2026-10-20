@@ -473,8 +473,9 @@ The sandbox is an instrument page (`body[data-view='instrument']`;
 Jeremy approved it on 2026-10-18: "the existing app, just full page and
 with a better looking keyboard", six operators only): no text column, a
 title bar (Jeremy, 2026-10-20, "a free standing synthesizer"): the
-preset menu as the title, set in the display face at 1.45rem with no
-box and as wide as the name chosen (`presetMenu` fits it), between ‹ ›
+preset menu as the title: the name chosen in the display face at
+1.45rem with no box (`.preset-name`), the native menu over it unseen in
+the page's own type, so the list it opens is the usual size, between ‹ ›
 (`stepPreset`, round the 32), and its note, cut short; on the right
 "DX7 factory voices © Yamaha" and Volume (no Play or Copy link: the
 keyboard and the space bar play, and the address bar keeps the sound).

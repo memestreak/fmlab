@@ -525,27 +525,11 @@ function presetMenu(presets: readonly Preset[], store: LabStore): HTMLElement[] 
     const preset = at < 0 ? null : presets[at];
     note.textContent = preset ? (preset.note ?? preset.hint) : 'your own, from a factory voice';
     note.title = preset ? preset.hint : note.textContent;
-    fit();
+    name.textContent = select.selectedOptions[0]?.textContent ?? '';
   };
-  // As wide as the name chosen, not the longest of the 32, so ‹ › and
-  // the note sit right after it (a select is otherwise as wide as its
-  // longest option). Measured in its own font, once it is on the page.
-  const measure = document.createElement('canvas').getContext('2d');
-  const fit = () => {
-    if (!select.isConnected || !measure) return;
-    const style = getComputedStyle(select);
-    measure.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
-    const text = select.selectedOptions[0]?.textContent ?? '';
-    const room = ['paddingLeft', 'paddingRight', 'borderLeftWidth', 'borderRightWidth'] as const;
-    const extra = room.reduce((sum, side) => sum + (parseFloat(style[side]) || 0), 0);
-    select.style.width = `${Math.ceil(measure.measureText(text).width + extra) + 2}px`;
-  };
-  void document.fonts?.ready.then(fit);
-  window.matchMedia('(min-width: 62rem)').addEventListener('change', fit);
   select.addEventListener('change', () => choose(Number(select.value)));
   const stop = store.subscribe((state, previous) => {
     if (!select.isConnected) return stop();
-    if (state.chapter !== previous.chapter) requestAnimationFrame(fit);
     if (
       state.dxOperators !== previous.dxOperators ||
       state.algorithm !== previous.algorithm ||
@@ -556,7 +540,16 @@ function presetMenu(presets: readonly Preset[], store: LabStore): HTMLElement[] 
       show(state);
     }
   });
+  // The voice's name shown as a heading, the menu itself over it, unseen:
+  // the heading is as wide as the name, and the list the menu opens keeps
+  // the page's own type, not the heading's (a native list takes the
+  // menu's font, which the heading's would make huge).
+  const pick = document.createElement('span');
+  pick.className = 'preset-pick';
+  const name = document.createElement('span');
+  name.className = 'preset-name';
+  name.setAttribute('aria-hidden', 'true');
+  pick.append(name, select);
   show(store.get());
-  requestAnimationFrame(fit);
-  return [step('Previous preset', '‹', -1), select, step('Next preset', '›', 1), note];
+  return [step('Previous preset', '‹', -1), pick, step('Next preset', '›', 1), note];
 }
