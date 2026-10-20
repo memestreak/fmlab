@@ -926,6 +926,10 @@ canvas.voice-keys {
 
 .inst-foot #inst-figures {
   flex: 1 1 auto;
+  /* No ink rules round the VFD spectrum: the glass is its own frame, and
+     the rule under it showed past its rounded corners. Transparent, not
+     gone, so the plot keeps its size. */
+  border-color: transparent;
 }
 
 /* As tall as the keyboard: the foot's height is the keyboard's. */
