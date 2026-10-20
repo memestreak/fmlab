@@ -23,6 +23,14 @@ const GLIDE_SECONDS = 0.03;
 const FADE_SECONDS = 0.02;
 /** After Stop, the fade gets this long before the context is suspended. */
 const SUSPEND_AFTER_MS = 250;
+/**
+ * How long the sandbox's context stays running in silence before it is
+ * suspended. Resuming a suspended context switches the audio output back
+ * on, which delays the next note by the better part of 100 ms, so
+ * between notes the sandbox keeps it running; an idle voice pool costs
+ * little.
+ */
+const SANDBOX_IDLE_MS = 60_000;
 /** Between chapters, the fade-out gets this long before the patch jumps. */
 const SCENE_GAP_MS = 100;
 /**
@@ -107,6 +115,8 @@ export class AudioEngine {
   private silence: HTMLAudioElement | null = null;
   /** Whether the iOS unlock has been done, in the first gesture. */
   private unlocked = false;
+  /** Whether the sandbox's gestures are being listened for (`prime`). */
+  private listening = false;
   private suspendTimer: number | undefined;
   private sceneTimer: number | undefined;
   /** True while faded out between two chapters' patches. */
@@ -281,6 +291,7 @@ export class AudioEngine {
    * browser lets it run), and the first key's `wake` resumes it.
    */
   private warm(): void {
+    this.listen();
     if (this.loading) return;
     this.loading = this.load();
     this.loading.then(
@@ -289,6 +300,36 @@ export class AudioEngine {
         this.loading = null;
       },
     );
+  }
+
+  /**
+   * In the sandbox, any click, tap or key press resumes the built context
+   * (Jeremy, 2026-10-20): the browser switches the audio output on, which
+   * it only does in a gesture and which takes the better part of 100 ms,
+   * before a key needs it. It plays nothing and leaves the event alone;
+   * the context is suspended again after a minute's silence
+   * (`SANDBOX_IDLE_MS`), and the next gesture resumes it.
+   */
+  private listen(): void {
+    if (this.listening) return;
+    this.listening = true;
+    const prime = () => {
+      if (this.store.get().chapter !== 'sandbox') return;
+      const graph = this.graph;
+      if (!graph || graph.context.state === 'running') return;
+      if (!this.unlocked) {
+        this.unlocked = true;
+        this.silence = unlockIosAudio();
+      }
+      void this.silence?.play().catch(() => {});
+      graph.context.resume().then(
+        () => this.suspendSoon(SUSPEND_AFTER_MS),
+        () => {},
+      );
+    };
+    for (const type of ['pointerdown', 'keydown', 'touchend']) {
+      document.addEventListener(type, prime, { capture: true, passive: true });
+    }
   }
 
   private async start(): Promise<void> {
@@ -336,6 +377,7 @@ export class AudioEngine {
   private suspendSoon(ms: number): void {
     const graph = this.graph;
     if (!graph) return;
+    if (this.store.get().chapter === 'sandbox') ms = Math.max(ms, SANDBOX_IDLE_MS);
     window.clearTimeout(this.suspendTimer);
     this.suspendTimer = window.setTimeout(() => {
       const state = this.store.get();
