@@ -18,6 +18,7 @@ import {
   pitchDragged,
   pitchScale,
 } from '../viz/pitchEnvelopePlot';
+import { knobValues, redrawOnLayout } from './screenValues';
 import { createKnob } from './knob';
 import { formatGlideSpeed, formatPitchBend } from './voiceFormat';
 
@@ -104,7 +105,9 @@ export function mountPitchEgView(store: LabStore): void {
     }
   });
 
-  const draw = () => drawPitchEnvelope(canvas, env(), '--ink', scale, formatPitchBend, dragging ?? over);
+  const draw = () =>
+    drawPitchEnvelope(canvas, env(), '--ink', scale, formatPitchBend, dragging ?? over, knobValues(canvas, knobs));
+  redrawOnLayout(knobs, draw);
 
   const show = () => {
     if (!dragging) scale = pitchScale(env());

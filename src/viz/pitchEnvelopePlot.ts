@@ -8,7 +8,7 @@
 // part, which drag up and down for pitch. Still: no playhead.
 
 import { type Dx7PitchEnvelope, glideSeconds, PITCH_ENVELOPE_CENTS } from '../dsp/dx7';
-import { beginPlot } from './plot';
+import { beginPlot, drawValueStrip, type ScreenValue, VALUE_BAND } from './plot';
 import { type EnvelopeArea, SLOTS, timePosition } from './voiceEnvelopePlot';
 
 /** The dots to drag: the start, and each part's end but the release's (back at the start). */
@@ -30,7 +30,7 @@ export function pitchScale(env: Dx7PitchEnvelope): { reach: number; step: number
 
 /** The drawing's margins: room for the pitch labels and the part names. */
 export function pitchArea(width: number, height: number): EnvelopeArea {
-  return { left: 56, right: width - 12, top: 18, bottom: height - 18 };
+  return { left: 56, right: width - 12, top: 18, bottom: height - 18 - VALUE_BAND };
 }
 
 /** Where each dot is and the corners the curve is drawn through, at a scale of `reach` cents. */
@@ -97,6 +97,7 @@ export function drawPitchEnvelope(
   scale: { reach: number; step: number },
   label: (cents: number) => string,
   active: PitchDot | null = null,
+  values?: readonly ScreenValue[],
 ): void {
   const plot = beginPlot(canvas);
   if (!plot) return;
@@ -184,6 +185,7 @@ export function drawPitchEnvelope(
     ctx.strokeStyle = ink;
     ctx.stroke();
   }
+  if (values) drawValueStrip(plot, width, height, values);
 }
 
 /** The envelope in words, for whoever cannot see the curve. */

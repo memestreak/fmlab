@@ -16,6 +16,7 @@ import {
   type EnvelopeDot,
   largeArea,
 } from '../viz/voiceEnvelopePlot';
+import { knobValues, redrawOnLayout } from './screenValues';
 import { createKnob } from './knob';
 import { roleOf } from './operators';
 import { formatDb, formatTime } from './voiceFormat';
@@ -152,8 +153,9 @@ export function mountEnvelopeView(store: LabStore): void {
     const at = state.selectedOp;
     if (at === null) return;
     const r = roleOf(state.algorithm, at);
-    drawVoiceEnvelope(canvas, state.dxOperators[at].envelope, penOf(r), true, dragging ?? over);
+    drawVoiceEnvelope(canvas, state.dxOperators[at].envelope, penOf(r), true, dragging ?? over, knobValues(canvas, knobs));
   };
+  redrawOnLayout(knobs, draw);
 
   const show = (state: LabState) => {
     const at = state.voiceModel === 'dx7' ? state.selectedOp : null;

@@ -85,6 +85,58 @@ export function beginPlot(canvas: HTMLCanvasElement): Plot | null {
   };
 }
 
+/**
+ * The band at the foot of the sandbox's large screens (envelope, key
+ * scaling, pitch envelope, LFO) that shows the values of the knobs under
+ * the screen, in CSS pixels. Their areas end above it.
+ */
+export const VALUE_BAND = 22;
+
+/** A knob's value on a screen: its text, at the knob dial's x. */
+export interface ScreenValue {
+  /** The dial's centre, in the canvas's CSS pixels from its left. */
+  x: number;
+  text: string;
+  /**
+   * Which row of knobs it is in, 0 or 1, where they wrap (on a phone):
+   * each row's values get a line of the band.
+   */
+  line?: number;
+}
+
+/**
+ * Writes the knobs' values in the band at the canvas's foot (Jeremy,
+ * 2026-10-20), each centred over its dial, under a faint rule; the
+ * values glow where the canvas does, the rule does not.
+ */
+export function drawValueStrip(plot: Plot, width: number, height: number, values: readonly ScreenValue[]): void {
+  const { ctx, token, glow } = plot;
+  ctx.save();
+  ctx.shadowBlur = 0;
+  ctx.globalAlpha = 0.6;
+  ctx.strokeStyle = token('--rule');
+  ctx.lineWidth = 1;
+  const at = Math.round(height - VALUE_BAND) + 0.5;
+  ctx.beginPath();
+  ctx.moveTo(6, at);
+  ctx.lineTo(width - 6, at);
+  ctx.stroke();
+  ctx.restore();
+  ctx.save();
+  glow();
+  // One line, or two smaller where the knobs wrap onto two rows.
+  const two = values.some(value => value.line === 1);
+  ctx.font = `600 ${two ? 10 : 12}px ${token('--font-mono')}`;
+  ctx.fillStyle = token('--ink');
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  for (const { x, text, line = 0 } of values) {
+    const y = two ? height - VALUE_BAND + 6 + line * 10 : height - VALUE_BAND / 2;
+    ctx.fillText(text, x, y);
+  }
+  ctx.restore();
+}
+
 /** A half-pixel centre, which keeps a one-pixel line sharp. */
 const crisp = (v: number) => Math.round(v) + 0.5;
 

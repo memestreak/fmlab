@@ -6,7 +6,7 @@
 // dot holds still under the pointer as it is dragged.
 
 import { type Dx7Envelope, MAX_STAGE_SECONDS, SILENCE_DB } from '../dsp/dx7';
-import { beginPlot } from './plot';
+import { beginPlot, drawValueStrip, type ScreenValue, VALUE_BAND } from './plot';
 
 /** The parts in the order drawn, with each one's slot, 0 to 1 across. */
 export const SLOTS = {
@@ -42,7 +42,7 @@ export interface EnvelopeArea {
 
 /** The large drawing's margins: room for the dB labels and the part names. */
 export function largeArea(width: number, height: number): EnvelopeArea {
-  return { left: 34, right: width - 12, top: 22, bottom: height - 20 };
+  return { left: 34, right: width - 12, top: 22, bottom: height - 20 - VALUE_BAND };
 }
 
 /** The small drawing fills its canvas, with a pixel to spare. */
@@ -137,6 +137,7 @@ export function drawVoiceEnvelope(
   pen: string,
   large: boolean,
   active: EnvelopeDot | null = null,
+  values?: readonly ScreenValue[],
 ): void {
   const plot = beginPlot(canvas);
   if (!plot) return;
@@ -226,4 +227,5 @@ export function drawVoiceEnvelope(
       ctx.stroke();
     }
   }
+  if (large && values) drawValueStrip(plot, width, height, values);
 }

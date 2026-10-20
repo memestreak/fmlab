@@ -450,11 +450,20 @@ pointer is over the keyboard or keyboard focus is in it) on their left; every he
   from the keyboard up and down, with Shift the left side, left and
   right for the break point, C to turn), and under it Left curve (a
   lin / exp button), Left depth, Break point, Right depth, Right curve
-  and Speed-up (the envelope's, per octave). `knob.ts` is the knob: a `role="slider"` turned by dragging up
+  and Speed-up (the envelope's, per octave). On these two tabs and on
+  the LFO and Pitch EG tabs the knobs' values are written on the screen,
+  not under the knobs (Jeremy, 2026-10-20): a 22 px band at the screen's
+  foot (`VALUE_BAND`, `drawValueStrip` in `viz/plot.ts`, the areas ending
+  above it) under a faint rule, each value centred over its dial,
+  glowing (on a phone, where the knobs wrap, each row's values a smaller
+  line of their own); `ui/screenValues.ts` reads each knob's hidden readout and its
+  dial's place (`knobValues`) and redraws when the row lays out. The
+  curve buttons' words go, the buttons saying lin or exp. `knob.ts` is
+  the knob: a `role="slider"` turned by dragging up
   or down or with the keys the Bessel plot answers to, drawn as a VFD
   dial, cyan segments lit to its value on dark glass (21 segments,
   `litSegments`; Jeremy, 2026-10-20), its name and its `.num` value
-  under it, time knobs on a log scale, and a two-sided one lit from its
+  under it (hidden in the sandbox's panels, whose screens show it), time knobs on a log scale, and a two-sided one lit from its
   `centre` to the value;
   `besselControls.ts` makes the Bessel plot a control: the canvas is a
   `role="slider"` for the index (drag, or arrows, Page Up / Down, Home,
@@ -570,7 +579,11 @@ end dragging up and down only), and eight knobs in a row: Start,
 Attack, Peak, Decay 1, Break, Decay 2, Sustain, Release (pitches two-sided, ±48 st; speeds log in st/s).
 `formatPitchBend` writes a bend in cents under a semitone, else in
 semitones; `formatGlideSpeed` a speed in st/s. On the right the operator
-panel (`#voice-envelope`) alone, the showing tab's curve filling it.
+panel (`#voice-envelope`) alone, the showing tab's curve filling it. On
+a wide screen the Voice screen and the operator screen share their top
+and bottom edges whichever tabs are open: the heads as tall and as far
+above their screens, and both control rows `--kv-row` high (4rem; 3.6rem
+under 52rem high).
 Under the band the operator table (`#voice-table`) the full width, then
 the foot (`.inst-foot`): the octave control and keyboard on the left, the
 spectrum (`#inst-figures`) filling the rest of the row, no taller than

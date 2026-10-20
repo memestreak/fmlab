@@ -19,6 +19,7 @@ import {
 } from '../dsp/dx7';
 import { dx7LfoDelay, dx7VibratoCents } from '../dsp/lfo';
 import type { LabStore } from '../model/lab';
+import { knobValues, redrawOnLayout } from './screenValues';
 import { describeLfo, drawLfo } from '../viz/lfoPlot';
 import { createKnob } from './knob';
 import { formatTime } from './voiceFormat';
@@ -203,7 +204,7 @@ export function mountVoiceArea(store: LabStore): void {
 
   const drawPlot = () => {
     const now = lfo();
-    drawLfo(plot, now);
+    drawLfo(plot, now, knobValues(plot, knobs));
     plot.setAttribute('aria-label', describeLfo(now, WAVES[now.wave].name));
   };
 
@@ -229,5 +230,8 @@ export function mountVoiceArea(store: LabStore): void {
   new ResizeObserver(() => {
     if (open === 'lfo') drawPlot();
   }).observe(plot);
+  redrawOnLayout(knobs, () => {
+    if (open === 'lfo') drawPlot();
+  });
   show();
 }

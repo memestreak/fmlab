@@ -5,7 +5,7 @@
 // operator panel's Key scaling tab.
 
 import { type Dx7Operator, levelScalingDb, SCALING_DEPTH } from '../dsp/dx7';
-import { type Area, beginPlot } from './plot';
+import { type Area, beginPlot, drawValueStrip, type ScreenValue, VALUE_BAND } from './plot';
 
 /** The keys drawn: a piano's 88, A0 to C8. */
 export const FIRST_KEY = 21;
@@ -44,7 +44,7 @@ export function keysArea(width: number, height: number, large = false): KeysArea
   if (!large) {
     return { left: 0, right: width, top: 2, bottom: height - KEYS_HEIGHT - 2, keysTop: height - KEYS_HEIGHT, keysHeight: KEYS_HEIGHT };
   }
-  const keysTop = height - KEY_NAMES_HEIGHT - LARGE_KEYS_HEIGHT;
+  const keysTop = height - KEY_NAMES_HEIGHT - LARGE_KEYS_HEIGHT - VALUE_BAND;
   return { left: 34, right: width - 6, top: 16, bottom: keysTop - 4, keysTop, keysHeight: LARGE_KEYS_HEIGHT };
 }
 
@@ -96,7 +96,7 @@ export function drawKeyScaling(
   canvas: HTMLCanvasElement,
   op: Dx7Operator,
   pen: string,
-  large?: { name: (key: number) => string },
+  large?: { name: (key: number) => string; values?: readonly ScreenValue[] },
 ): void {
   const plot = beginPlot(canvas);
   if (!plot) return;
@@ -185,6 +185,7 @@ export function drawKeyScaling(
     else ctx.lineTo(x(key), y);
   }
   ctx.stroke();
+  if (large?.values) drawValueStrip(plot, width, height, large.values);
 }
 
 /** What the curve shows, in words, for whoever cannot see it. */

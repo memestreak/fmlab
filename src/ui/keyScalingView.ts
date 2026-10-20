@@ -19,6 +19,7 @@ import {
   keyX,
   LAST_KEY,
 } from '../viz/keyScalingPlot';
+import { knobValues, redrawOnLayout } from './screenValues';
 import { createKnob } from './knob';
 import { roleOf } from './operators';
 import { noteName } from './voiceFormat';
@@ -194,8 +195,12 @@ export function mountKeyScalingView(store: LabStore): void {
   const draw = () => {
     const state = store.get();
     const at = state.selectedOp;
-    drawKeyScaling(canvas, state.dxOperators[at], penOf(roleOf(state.algorithm, at)), { name: noteName });
+    drawKeyScaling(canvas, state.dxOperators[at], penOf(roleOf(state.algorithm, at)), {
+      name: noteName,
+      values: knobValues(canvas, controls),
+    });
   };
+  redrawOnLayout(controls, draw);
 
   const show = (state: LabState) => {
     if (state.voiceModel !== 'dx7') return;
