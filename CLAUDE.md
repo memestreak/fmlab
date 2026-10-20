@@ -317,7 +317,7 @@ figures subscribe to it. Nothing else passes values around.
   scale (`timePosition`), so short and long parts both show and a dot
   holds still as it is dragged (`dotDragged`). `keyScalingPlot.ts` draws
   an operator's level across a piano's 88 keys (A0 to C8), small in each
-  table row and large in the panel's Across the keyboard tab (`keysArea`:
+  table row and large in the panel's Key scaling tab (`keysArea`:
   dB at the left, the break point named over its line, the Cs under the
   keys). `plot.ts`'s `drawFrame` takes the horizontal rows a plot
   wants; amplitude from -1 to 1 is only the default. `algorithmPlot.ts` draws an algorithm as the DX7 does (`layoutAlgorithm`:
@@ -413,7 +413,7 @@ figures subscribe to it. Nothing else passes values around.
   a turn takes it to the next stop that way, and one beyond them (a
   ratio of 40 from a link) stays until turned back in; it eases between
   values unless motion is reduced. Last, two small read-only drawings
-  to compare the operators by, the envelope and Across the keyboard
+  to compare the operators by, the envelope and Key scaling
   (`.voice-mini` buttons: a click selects the row and opens that tab of
   the operator panel, where each is edited); a row clicked or focused is
   selected (`selectedOp`; one always is, and presets, links and stepping
@@ -423,12 +423,12 @@ figures subscribe to it. Nothing else passes values around.
   ratio's and level's slider (`createSlider`); `voiceFormat.ts` writes times, dB, cents
   and keys the same everywhere. `envelopeView.ts` is the operator panel,
   always open: the selected operator's tag and role and two tabs,
-  Envelope and Across the keyboard (`role="tab"`, arrows between them;
+  Envelope and Key scaling (`role="tab"`, arrows between them;
   drawn as the lab's two-pill switch at the header's right-hand end, so
   they read apart from the tag and role),
   and the Envelope tab: the curve with a dot to drag at the end of each
   part (across for the time, up and down for the level), and seven knobs
-  under it. `keyScalingView.ts` is the Across the keyboard tab: the curve
+  under it. `keyScalingView.ts` is the Key scaling tab: the curve
   large (a drag up or down at either side of the break point sets its
   depth, a click turns its curve, the break point's line drags sideways;
   from the keyboard up and down, with Shift the left side, left and

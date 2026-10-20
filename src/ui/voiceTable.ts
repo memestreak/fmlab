@@ -3,10 +3,10 @@
 // ratio (slider and box), detune in cents, level in dB (slider and box),
 // its share of the LFO's tremolo (a number reel, off to 100 % by tenths),
 // and two small drawings, to compare at a glance: its envelope and its
-// level across the keyboard. A row clicked or focused is the selected
-// one, marked by an ink bar down its left edge, and the operator panel
-// above shows it; a click on a
-// drawing also opens that drawing's tab there, where it is edited.
+// key scaling (its level across the keyboard). A row clicked or focused
+// is the selected one, marked by an ink bar down its left edge, and the
+// operator panel above shows it; a click on a drawing also opens that
+// drawing's tab there, where it is edited.
 
 import { algorithm, operatorsUsed } from '../dsp/algorithms';
 import { DETUNE_CENTS, DX7_RATIO, type Dx7Envelope, type Dx7Operator, LEVEL_DB } from '../dsp/dx7';
@@ -233,7 +233,7 @@ export function mountVoiceTable(store: LabStore): void {
       cell('voice-level', 'Level dB', pair(levelSlider.element, levelReel.element)),
       cell('voice-tremolo', 'Tremolo', tremolo.element),
       cell('voice-env', 'Envelope', envelope.button),
-      cell('voice-scaling', 'Across the keyboard', keys.button),
+      cell('voice-scaling', 'Key scaling', keys.button),
     );
     body.append(row);
 
@@ -265,7 +265,7 @@ export function mountVoiceTable(store: LabStore): void {
       drawKeyScaling(keys.canvas, o, penOf(r));
       keys.button.setAttribute(
         'aria-label',
-        `${name} across the keyboard. ${describeKeyScaling(o, noteName)} Edit it above.`,
+        `${name} key scaling. ${describeKeyScaling(o, noteName)} Edit it above.`,
       );
     });
   }

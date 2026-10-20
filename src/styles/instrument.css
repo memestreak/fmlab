@@ -226,7 +226,7 @@
 
 /* A switch between tabs, drawn as the lab's switches are (.switch): two
    pills joined, the one showing filled in ink. The Voice's Algorithm |
-   LFO and the operator panel's Envelope | Across the keyboard. */
+   LFO and the operator panel's Envelope | Key scaling. */
 .pill-tabs {
   display: inline-flex;
   flex: none;

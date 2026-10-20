@@ -1,4 +1,4 @@
-// The operator panel's Across the keyboard tab: the selected operator's
+// The operator panel's Key scaling tab: the selected operator's
 // level across the keyboard, large, and everything that sets it and its
 // envelope's speed-up up the keyboard. The curve: up or down at either
 // side of the break point sets that side's depth, a click turns its curve
@@ -204,7 +204,7 @@ export function mountKeyScalingView(store: LabStore): void {
     for (const [dial, what] of knobNames) dial?.setAttribute('aria-label', `${name} ${what}`);
     canvas.setAttribute(
       'aria-label',
-      `${name} across the keyboard. ${describeKeyScaling(get(), noteName)} Up and down arrows set the right side's depth, with Shift the left's; left and right move the break point; C changes the curve.`,
+      `${name} key scaling. ${describeKeyScaling(get(), noteName)} Up and down arrows set the right side's depth, with Shift the left's; left and right move the break point; C changes the curve.`,
     );
     draw();
   };

@@ -1,7 +1,7 @@
 // The sandbox's operator panel, at the top right: the selected operator,
 // which one always is (OP1 to begin with), so the panel is always open.
 // Its header names the operator and its role, then two tabs, Envelope (the
-// first) and Across the keyboard (ui/keyScalingView.ts); the tab stays
+// first) and Key scaling (ui/keyScalingView.ts); the tab stays
 // as it is when another operator is selected. This file draws the header,
 // the tabs and the Envelope tab: the curve, large, with a dot at the end
 // of each part to drag, and seven knobs, one for each part's time or
