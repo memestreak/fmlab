@@ -1,7 +1,8 @@
 // A knob: a dial that turns as it is dragged up or down, or with the keys a
 // slider answers to. It is a `role="slider"` for a screen reader, as the
-// Bessel plot is (besselControls.ts), drawn ink on paper with its value
-// arc in a pen, with its name under it and its value under that.
+// Bessel plot is (besselControls.ts), drawn as a VFD dial, cyan segments
+// lit to its value on dark glass (Jeremy, 2026-10-20), with its name under
+// it and its value under that.
 
 /** What a knob sets. */
 export interface KnobSpec {
@@ -20,8 +21,8 @@ export interface KnobSpec {
    */
   zero?: boolean;
   /**
-   * The value its arc starts from, for a value either side of it (a
-   * depth from -6 to 6 dB about 0); the arc starts at the bottom otherwise.
+   * The value its lit segments start from, for a value either side of it
+   * (a depth from -6 to 6 dB about 0); they start at the bottom otherwise.
    */
   centre?: number;
   /** The value to show. */
@@ -72,7 +73,27 @@ export function knobAfterKey(position: number, key: string): number | null {
   return key in moves ? Math.min(1, Math.max(0, moves[key])) : null;
 }
 
+/** How many segments a dial's arc is split into. */
+export const KNOB_SEGMENTS = 21;
+/** The empty arc at each end of every segment, in degrees. */
+const SEGMENT_GAP = 2.2;
+
+/**
+ * The segments lit for a position, as [first, end) indices counted from
+ * the bottom left: round(position × n) of them from the bottom, or, with
+ * a centre, those between the centre's and the value's.
+ */
+export function litSegments(position: number, centrePosition?: number, n = KNOB_SEGMENTS): [number, number] {
+  const at = Math.round(position * n);
+  if (centrePosition === undefined) return [0, at];
+  const from = Math.round(centrePosition * n);
+  return at < from ? [at, from] : [from, at];
+}
+
 const SVG = 'http://www.w3.org/2000/svg';
+
+/** Gives every dial's glass gradient its own id. */
+let dials = 0;
 
 /** An SVG arc from angle `a` to `b`, degrees clockwise from straight up. */
 function arc(a: number, b: number, r: number): string {
@@ -85,9 +106,8 @@ function arc(a: number, b: number, r: number): string {
 }
 
 /**
- * Builds a knob. `update()` redraws it from `spec.get()`; call it when the
- * value may have changed. The pen is the CSS variable --knob-pen, set on
- * the knob or anything around it.
+ * Builds a knob. `update()` lights the dial from `spec.get()`, at once;
+ * call it when the value may have changed.
  */
 export function createKnob(spec: KnobSpec): { element: HTMLElement; update: () => void } {
   const element = document.createElement('div');
@@ -104,21 +124,41 @@ export function createKnob(spec: KnobSpec): { element: HTMLElement; update: () =
   const svg = document.createElementNS(SVG, 'svg');
   svg.setAttribute('viewBox', '0 0 40 40');
   svg.setAttribute('aria-hidden', 'true');
-  const track = document.createElementNS(SVG, 'path');
-  track.setAttribute('class', 'knob-track');
-  track.setAttribute('d', arc(-SWEEP, SWEEP, 15));
-  const value = document.createElementNS(SVG, 'path');
-  value.setAttribute('class', 'knob-value-arc');
+  const id = `knob-glass-${++dials}`;
+  const defs = document.createElementNS(SVG, 'defs');
+  const gradient = document.createElementNS(SVG, 'radialGradient');
+  gradient.id = id;
+  gradient.setAttribute('cx', '50%');
+  gradient.setAttribute('cy', '40%');
+  gradient.setAttribute('r', '70%');
+  for (const [offset, name] of [['0', 'knob-glass-1'], ['1', 'knob-glass-2']]) {
+    const stop = document.createElementNS(SVG, 'stop');
+    stop.setAttribute('offset', offset);
+    stop.setAttribute('class', name);
+    gradient.append(stop);
+  }
+  defs.append(gradient);
+  const glass = document.createElementNS(SVG, 'circle');
+  glass.setAttribute('class', 'knob-glass');
+  glass.setAttribute('cx', '20');
+  glass.setAttribute('cy', '20');
+  glass.setAttribute('r', '19.6');
+  glass.setAttribute('fill', `url(#${id})`);
+  const step = (2 * SWEEP) / KNOB_SEGMENTS;
+  const segments = Array.from({ length: KNOB_SEGMENTS }, (_, i) => {
+    const path = document.createElementNS(SVG, 'path');
+    path.setAttribute('class', 'knob-seg');
+    path.setAttribute('d', arc(-SWEEP + i * step + SEGMENT_GAP, -SWEEP + (i + 1) * step - SEGMENT_GAP, 16.4));
+    return path;
+  });
   const face = document.createElementNS(SVG, 'circle');
   face.setAttribute('class', 'knob-face');
   face.setAttribute('cx', '20');
   face.setAttribute('cy', '20');
-  face.setAttribute('r', '10.5');
+  face.setAttribute('r', '10.4');
   const pointer = document.createElementNS(SVG, 'line');
   pointer.setAttribute('class', 'knob-pointer');
-  pointer.setAttribute('x1', '20');
-  pointer.setAttribute('y1', '20');
-  svg.append(track, value, face, pointer);
+  svg.append(defs, glass, ...segments, face, pointer);
   dial.append(svg);
 
   const label = document.createElement('span');
@@ -138,12 +178,14 @@ export function createKnob(spec: KnobSpec): { element: HTMLElement; update: () =
     const now = spec.get();
     const position = knobPosition(spec, now);
     const angle = -SWEEP + 2 * SWEEP * position;
-    const from = spec.centre === undefined ? -SWEEP : -SWEEP + 2 * SWEEP * knobPosition(spec, spec.centre);
-    const [a, b] = angle < from ? [angle, from] : [from, angle];
-    value.setAttribute('d', b - a > 0.6 ? arc(a, b, 15) : '');
+    const centre = spec.centre === undefined ? undefined : knobPosition(spec, spec.centre);
+    const [first, end] = litSegments(position, centre);
+    segments.forEach((segment, i) => segment.classList.toggle('is-lit', i >= first && i < end));
     const rad = (angle * Math.PI) / 180;
-    pointer.setAttribute('x2', (20 + 8 * Math.sin(rad)).toFixed(2));
-    pointer.setAttribute('y2', (20 - 8 * Math.cos(rad)).toFixed(2));
+    pointer.setAttribute('x1', (20 + 4.5 * Math.sin(rad)).toFixed(2));
+    pointer.setAttribute('y1', (20 - 4.5 * Math.cos(rad)).toFixed(2));
+    pointer.setAttribute('x2', (20 + 9.2 * Math.sin(rad)).toFixed(2));
+    pointer.setAttribute('y2', (20 - 9.2 * Math.cos(rad)).toFixed(2));
     const text = spec.format(now);
     readout.textContent = text;
     dial.setAttribute('aria-valuenow', String(Math.round(position * 100)));

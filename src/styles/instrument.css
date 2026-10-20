@@ -937,31 +937,45 @@ canvas.voice-keys {
   height: 100%;
 }
 
-.knob-track,
-.knob-value-arc {
+.knob-glass {
+  filter: var(--vfd-dial-edge);
+}
+
+.knob-glass-1 {
+  stop-color: var(--vfd-dial-1);
+}
+
+.knob-glass-2 {
+  stop-color: var(--vfd-dial-2);
+}
+
+/* The 21 segments: unlit faint, lit to the value with a glow. Nothing
+   eases; they change straight to the new value. */
+.knob-seg {
   fill: none;
-  stroke-width: 3.5;
-  stroke-linecap: round;
+  stroke: var(--vfd-glow);
+  stroke-opacity: var(--vfd-dial-unlit-opacity);
+  stroke-width: 3.2;
+  stroke-linecap: butt;
 }
 
-.knob-track {
-  stroke: var(--paper-sunken);
-}
-
-.knob-value-arc {
-  stroke: var(--knob-pen, var(--ink));
+.knob-seg.is-lit {
+  stroke: var(--vfd-lit);
+  stroke-opacity: 1;
+  filter: drop-shadow(0 0 0.8px var(--vfd-glow)) drop-shadow(0 0 1.6px var(--vfd-glow));
 }
 
 .knob-face {
-  fill: var(--paper);
-  stroke: var(--ink);
-  stroke-width: 1.5;
+  fill: var(--vfd-knob);
+  stroke: #000;
+  stroke-width: 0.8;
 }
 
 .knob-pointer {
-  stroke: var(--ink);
-  stroke-width: 2;
+  stroke: var(--vfd-lit);
+  stroke-width: 1.4;
   stroke-linecap: round;
+  filter: drop-shadow(0 0 1px var(--vfd-glow));
 }
 
 .knob-label {
