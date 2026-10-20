@@ -98,6 +98,8 @@ describe('the landing view', () => {
     expect(seconds).toBeLessThan(6);
     // Slow enough to hear the partials arrive one after another.
     expect(opened.attack).toBeGreaterThan(1);
+    // And not left ringing once let go: gone within half a second.
+    expect(opened.release).toBeLessThanOrEqual(0.5);
   });
 });
 
@@ -124,7 +126,7 @@ describe('the figures following the landing view\'s sound', () => {
 
   it('follow the index and the loudness through the note', () => {
     const envelope = envelopeOf(opened);
-    for (const into of [0.4, 1.6, 2.5, 3.9]) {
+    for (const into of [0.4, 1.6, 2.5, 3.0]) {
       const { index, level } = momentOf(sounding, 100 + into);
       expect(level).toBeCloseTo(envelopeAt(envelope, into), 12);
       expect(index).toBeCloseTo(6 * envelopeAt(envelope, into), 12);
@@ -134,14 +136,14 @@ describe('the figures following the landing view\'s sound', () => {
   it('grow partials on the way up and lose them on the way down', () => {
     const count = (into: number) => spectrumOf(sounding, 100 + into).length;
     expect(count(1.6)).toBeGreaterThan(count(0.3));
-    expect(count(1.6)).toBeGreaterThan(count(4.2));
+    expect(count(1.6)).toBeGreaterThan(count(3.1));
   });
 
   it('scale every stem by the loudness of the moment', () => {
     const loudest = (lines: { amp: number }[]) =>
       Math.max(...lines.map(line => Math.abs(line.amp)));
     // Late in the release the note is nearly gone, and so are the stems.
-    expect(loudest(spectrumOf(sounding, 104.2))).toBeLessThan(0.1);
+    expect(loudest(spectrumOf(sounding, 103.1))).toBeLessThan(0.1);
     expect(loudest(spectrumOf(sounding, 101.6))).toBeGreaterThan(0.3);
   });
 

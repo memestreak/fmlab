@@ -27,7 +27,8 @@ export const landing: Chapter = {
     ...BASE_PATCH,
     noteMode: true,
     // A slow swell on 1:1: the plain sine wave grows harmonics one after
-    // another, holds, and gives them back.
+    // another, holds, and gives them back. Let go, it is gone in 0.4 s,
+    // not left ringing.
     carrierHz: 220,
     ratio: 1,
     index: 6,
@@ -35,7 +36,7 @@ export const landing: Chapter = {
     decay: 0.6,
     sustain: 0.6,
     hold: 2.8,
-    release: 1.6,
+    release: 0.4,
   },
   figures: {
     waveform:
