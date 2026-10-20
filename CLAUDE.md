@@ -157,7 +157,7 @@ figures subscribe to it. Nothing else passes values around.
   1, as `sine_5.81_0.31_12_0_1`), and `p` the pitch envelope
   (`pitchParam`: start, attack, peak, decay 1, break, decay 2, sustain,
   release; levels in cents, speeds in cents a second), validated and clamped by
-  `soundFromParams` (a share snaps to the nearest DX7 step); an older
+  `soundFromParams` (a share any percentage from 0 to 100, to 0.1 %); an older
   link keeps only its pitch and algorithm.
   `terms.ts` holds every defined term: its name, a one-sentence plain
   definition (for the glossary and the term's tip only), an optional
@@ -206,8 +206,9 @@ figures subscribe to it. Nothing else passes values around.
   `rateScalingFactor` are msfa's `ScaleLevel` and `ScaleRate` without
   their rounding; `dx7Note` works out a note's ratios, kernel levels,
   rate-scaled envelopes and feedback once, at its key. A `Dx7Operator`
-  also has `tremolo`, its share of the LFO's tremolo (one of `AMS_SHARES`,
-  Dexed's 0, 66, 109 and 255 of 255), and the voice a `Dx7Lfo` (wave,
+  also has `tremolo`, its share of the LFO's tremolo, 0 to 1 (the factory
+  voices' are `AMS_SHARES`, Dexed's 0, 66, 109 and 255 of 255; the table
+  edits it in tenths), and the voice a `Dx7Lfo` (wave,
   speed in Hz, delay in s, vibrato in cents, tremolo in dB, sync; ranges
   `LFO_*`, the DX7's 0 to 99; `HELD_LFO` off). `lfo.ts` is the LFO, after
   msfa's `lfo.cc` and Dexed's `dx7note.cc`: `Lfo` (one for the whole
@@ -397,8 +398,13 @@ figures subscribe to it. Nothing else passes values around.
   own, not the lab's): per row the tag and role, Ratio (slider snapping
   to `DX7_RATIO_STOPS`, 0.5 and 1 to 31, and a box to 61.69), Detune ¢,
   Level dB (its slider's bottom is off), Tremolo (the operator's share of
-  the LFO's tremolo, a box with no slider stepping between off, 26 %,
-  43 % and 100 %: drag, up and down arrows, or type, snapped), and two small read-only drawings
+  the LFO's tremolo on a number reel, `numberReel.ts`: a canvas drum,
+  `role="slider"`, eleven stops from off to 100 % by tenths, larger values
+  below; a vertical drag a step per 14 px, up for more, the wheel a step
+  per 30 px, a click above or below the middle, the arrows, Home, End and
+  Page Up / Down; no typing; a factory share between stops, 26 % or 43 %,
+  is shown and kept as it is until a turn takes it to the next stop that
+  way; it eases between values unless motion is reduced), and two small read-only drawings
   to compare the operators by, the envelope and Across the keyboard
   (`.voice-mini` buttons: a click selects the row and opens that tab of
   the operator panel, where each is edited); a row clicked or focused is

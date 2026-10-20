@@ -5,6 +5,7 @@ import {
   isStrayHash,
   operatorsFromParam,
   paramsFromHash,
+  shareFromPercent,
   soundFromParams,
   soundParams,
   upgradeHash,
@@ -142,8 +143,14 @@ describe('the sandbox in a link', () => {
     expect(op.left.depth).toBeCloseTo(5.96, 2);
     expect(op.right.depth).toBeCloseTo(-5.96, 2);
     expect(op.rateScaling).toBeCloseTo(2 ** (7 / 8), 9);
-    // A share snaps to the nearest of the DX7's four: 40 % is AMS 2's 43 %.
-    expect(op.tremolo).toBeCloseTo(109 / 255, 3);
+    // A share is any percentage, not only the DX7's four: 40 % is 40 %.
+    expect(op.tremolo).toBe(0.4);
+    // Held inside 0 to 100 %, to 0.1 %; a factory share written to 0.1 %
+    // comes back exact.
+    expect(shareFromPercent(150)).toBe(1);
+    expect(shareFromPercent(-5)).toBe(0);
+    expect(shareFromPercent(33.333)).toBe(0.333);
+    expect(shareFromPercent(25.9)).toBe(4342338 / 2 ** 24);
     expect(back.dxLfo).toEqual({
       wave: 'square',
       speed: LFO_SPEED.max,

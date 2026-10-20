@@ -654,8 +654,20 @@ canvas.voice-keys {
   width: 4.5rem;
 }
 
-.inst .voice-tremolo .op-input {
-  width: 3.6rem;
+/* The tremolo share's number reel: as big as the box it replaced, so the
+   rows keep their height, turned by a drag (a finger's turns the reel
+   and does not scroll the page; elsewhere it still does). */
+.op-reel {
+  display: block;
+  width: 3.8rem;
+  height: 1.75rem;
+  cursor: ns-resize;
+  touch-action: none;
+}
+
+.op-reel:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
 }
 
 /* The selected row: outlined in ink, the operator whose envelope is open. */
@@ -1248,7 +1260,8 @@ canvas.voice-keys {
     white-space: nowrap;
   }
 
-  .inst .op-input {
+  .inst .op-input,
+  .op-reel {
     height: 1.4rem;
   }
 
@@ -1572,6 +1585,10 @@ canvas.voice-keys {
 
   .inst .op-input {
     width: 3.5rem;
+    height: 2rem;
+  }
+
+  .op-reel {
     height: 2rem;
   }
 
