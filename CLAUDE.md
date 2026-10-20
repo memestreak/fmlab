@@ -417,7 +417,8 @@ figures subscribe to it. Nothing else passes values around.
   (`.voice-mini` buttons: a click selects the row and opens that tab of
   the operator panel, where each is edited); a row clicked or focused is
   selected (`selectedOp`; one always is, and presets, links and stepping
-  keep it) and outlined, and nothing else on a row changes with the
+  keep it) and marked by an ink bar down its left edge (the pointed
+  row's; no outline: Jeremy, 2026-10-20), and nothing else on a row changes with the
   selection, so the columns never change width. `paramControl.ts` is the
   ratio's and level's slider (`createSlider`); `voiceFormat.ts` writes times, dB, cents
   and keys the same everywhere. `envelopeView.ts` is the operator panel,
