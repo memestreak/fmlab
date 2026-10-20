@@ -52,6 +52,26 @@ MIDDLE_C_HZ = 440 * 2 ** (-9 / 12)
 LFO_WAVES = ("triangle", "sawDown", "sawUp", "square", "sine", "sampleHold")
 # msfa's pitch modulation sensitivity weights, PMS 0 to 7 (dx7note.cc).
 PMS_WEIGHTS = (0, 10, 20, 33, 55, 92, 153, 255)
+# msfa's pitch envelope: a level 0 to 99 is PITCH_LEVELS[L] / 32 octaves
+# from the note, and a rate 0 to 99 moves PITCH_RATES[R] / 21.3 octaves a
+# second (pitchenv.cc, pitchenv_tab and pitchenv_rate).
+PITCH_LEVELS = (
+    -128, -116, -104, -95, -85, -76, -68, -61, -56, -52, -49, -46, -43,
+    -41, -39, -37, -35, -33, -32, -31, -30, -29, -28, -27, -26, -25, -24,
+    -23, -22, -21, -20, -19, -18, -17, -16, -15, -14, -13, -12, -11, -10,
+    -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+    11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27,
+    28, 29, 30, 31, 32, 33, 34, 35, 38, 40, 43, 46, 49, 53, 58, 65, 73,
+    82, 92, 103, 115, 127,
+)
+PITCH_RATES = (
+    1, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12,
+    12, 13, 13, 14, 14, 15, 16, 16, 17, 18, 18, 19, 20, 21, 22, 23, 24,
+    25, 26, 27, 28, 30, 31, 33, 34, 36, 37, 38, 39, 41, 42, 44, 46, 47,
+    49, 51, 53, 54, 56, 58, 60, 62, 64, 66, 68, 70, 72, 74, 76, 79, 82,
+    85, 88, 91, 94, 98, 102, 106, 110, 115, 120, 125, 130, 135, 141, 147,
+    153, 159, 165, 171, 178, 185, 193, 202, 211, 232, 243, 254, 255,
+)
 # Dexed's amplitude modulation sensitivities, AMS 0 to 3, over 2^24
 # (dx7note.cc, ampmodsenstab): 0, 66, 109 and 255 of 255.
 AMS_SHARES = (0.0, 4342338 / 2**24, 7171437 / 2**24, 1.0)
@@ -84,6 +104,7 @@ class RawVoice:
 
     name: str
     operators: tuple[RawOperator, ...]
+    pitch_rates: tuple[int, int, int, int]
     pitch_levels: tuple[int, int, int, int]
     algorithm: int
     feedback: int
@@ -141,6 +162,9 @@ def unpack_voice(data: bytes) -> RawVoice:
     return RawVoice(
         name=" ".join(data[118:128].decode("ascii").split()),
         operators=operators[::-1],
+        # As Dexed's Cartridge::unpackProgram: rates 102-105, levels
+        # 106-109.
+        pitch_rates=(data[102], data[103], data[104], data[105]),
         pitch_levels=(data[106], data[107], data[108], data[109]),
         algorithm=(data[110] & 31) + 1,
         feedback=data[111] & 7,
@@ -353,6 +377,61 @@ def convert_operator(op: RawOperator) -> dict[str, object]:
     }
 
 
+def pitch_cents(level: int) -> float:
+    """A pitch envelope level in cents from the note (pitchenv.cc).
+
+    Args:
+        level: The patch's level, 0 to 99 (50 is the note).
+
+    Returns:
+        PITCH_LEVELS[level] / 32 octaves, in cents: -4800 to +4762.5.
+    """
+    return PITCH_LEVELS[level] / 32 * 1200
+
+
+def pitch_speed(rate: int) -> float:
+    """How fast a pitch envelope rate moves, in octaves a second.
+
+    Args:
+        rate: The patch's rate, 0 to 99.
+
+    Returns:
+        PITCH_RATES[rate] / 21.3.
+    """
+    return PITCH_RATES[rate] / 21.3
+
+
+def convert_pitch_envelope(voice: RawVoice) -> dict[str, float]:
+    """The voice's pitch envelope in the sandbox's units (Dx7PitchEnvelope).
+
+    Args:
+        voice: The voice as the patch stores it.
+
+    Returns:
+        Its levels in cents (start is L4, then L1 to L3) and its four
+        parts as speeds in cents a second (R1 to R4).
+    """
+    rates = voice.pitch_rates
+    levels = voice.pitch_levels
+
+    def speed(rate: int) -> float:
+        return round(pitch_speed(rate) * 1200, 2)
+
+    def level(value: int) -> float:
+        return round(pitch_cents(value), 2)
+
+    return {
+        "start": level(levels[3]),
+        "attack": speed(rates[0]),
+        "peak": level(levels[0]),
+        "decay1": speed(rates[1]),
+        "brk": level(levels[1]),
+        "decay2": speed(rates[2]),
+        "sustain": level(levels[2]),
+        "release": speed(rates[3]),
+    }
+
+
 def lfo_hz(speed: int) -> float:
     """The LFO's speed in Hz, as msfa's lfo.cc has it.
 
@@ -453,7 +532,6 @@ def missing(voice: RawVoice) -> list[str]:
     """
     lost: list[str] = []
     checks = (
-        (voice.pitch_levels != (50, 50, 50, 50), "pitch envelope"),
         (any(op.velocity > 0 for op in voice.operators), "velocity"),
         (any(op.fixed for op in voice.operators),
          "fixed frequency (played as a ratio from middle C)"),
@@ -473,7 +551,8 @@ def convert_voice(voice: RawVoice) -> dict[str, object]:
 
     Returns:
         Its name, algorithm, feedback (radians, 2π at 7, halving each
-        step down), operators, LFO and what the sandbox cannot play.
+        step down), operators, LFO, pitch envelope and what the sandbox
+        cannot play.
     """
     feedback = 0.0 if voice.feedback == 0 else (
         2 * math.pi / 2 ** (7 - voice.feedback)
@@ -485,6 +564,7 @@ def convert_voice(voice: RawVoice) -> dict[str, object]:
         "dxFeedback": math.floor(feedback * 10**4) / 10**4,
         "dxOperators": [convert_operator(op) for op in voice.operators],
         "dxLfo": convert_lfo(voice),
+        "dxPitchEnvelope": convert_pitch_envelope(voice),
         "missing": missing(voice),
     }
 
@@ -503,7 +583,8 @@ def to_typescript(voices: list[dict[str, object]]) -> str:
         "// Generated by scripts/dx7_voices.py from Yamaha's DX7 factory\n"
         "// voices (ROM1A); do not edit by hand. Factory voices © Yamaha.\n"
         "// Numbers in the sandbox's units (src/dsp/dx7.ts).\n\n"
-        "import type { Dx7Lfo, Dx7Operator } from '../dsp/dx7';\n\n"
+        "import type { Dx7Lfo, Dx7Operator, Dx7PitchEnvelope } from "
+        "'../dsp/dx7';\n\n"
         "/** A DX7 factory voice, and what the sandbox cannot play of it. "
         "*/\n"
         "export interface FactoryVoice {\n"
@@ -512,6 +593,7 @@ def to_typescript(voices: list[dict[str, object]]) -> str:
         "  dxFeedback: number;\n"
         "  dxOperators: Dx7Operator[];\n"
         "  dxLfo: Dx7Lfo;\n"
+        "  dxPitchEnvelope: Dx7PitchEnvelope;\n"
         "  missing: string[];\n"
         "}\n\n"
         f"export const FACTORY_VOICES: FactoryVoice[] = {body};\n"

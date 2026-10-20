@@ -7,7 +7,9 @@ import {
   type Dx7Note,
   dx7Note,
   type Dx7Operator,
+  type Dx7PitchEnvelope,
   dx7ReleaseSeconds,
+  FLAT_PITCH_ENVELOPE,
   HELD_LFO,
   heldOperator,
   keyOf,
@@ -144,6 +146,8 @@ export interface LabState {
   dxFeedback: number;
   /** `dx7`: the voice's LFO, its vibrato and tremolo (dsp/lfo.ts). */
   dxLfo: Dx7Lfo;
+  /** `dx7`: the voice's pitch envelope, which each note runs (dsp/dx7.ts). */
+  dxPitchEnvelope: Dx7PitchEnvelope;
   /**
    * `dx7`: the operator selected in the table, whose envelope view is
    * open. One always is: OP1 when the sandbox opens.
@@ -242,6 +246,7 @@ export const DEFAULTS: LabState = {
   ],
   dxFeedback: 0,
   dxLfo: HELD_LFO,
+  dxPitchEnvelope: FLAT_PITCH_ENVELOPE,
   selectedOp: 0,
   voiceTab: 'envelope',
   compare: false,

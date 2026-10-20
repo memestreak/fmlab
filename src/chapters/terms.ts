@@ -413,6 +413,13 @@ export const TERMS = {
     wiki: 'Tremolo',
     match: /\btremolo\b/i,
   },
+  pitchEnvelope: {
+    name: 'pitch envelope',
+    plain: `A pitch envelope is an envelope that bends a note's pitch over
+      time instead of its loudness.`,
+    section: 'dx7-voice',
+    match: /\bpitch envelopes?\b/i,
+  },
   fft: {
     name: 'fast Fourier transform',
     plain: `The fast Fourier transform (FFT) is the standard way to take a

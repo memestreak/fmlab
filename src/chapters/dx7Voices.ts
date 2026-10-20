@@ -6,8 +6,8 @@ import type { ChapterPatch, Preset } from './types';
 // converted into the sandbox's units by
 // scripts/dx7_voices.py (dx7Factory.ts). Close approximations: the
 // sandbox plays everything they set that it has, and leaves out what it
-// has not (velocity, the pitch envelope, fixed frequencies, transpose,
-// an envelope ending above silence), which each hint names.
+// has not (velocity, fixed frequencies, transpose, an envelope ending
+// above silence), which each hint names.
 
 /** A factory voice as a preset's patch. */
 function patchOf(voice: FactoryVoice): Partial<ChapterPatch> {
@@ -16,6 +16,7 @@ function patchOf(voice: FactoryVoice): Partial<ChapterPatch> {
     dxFeedback: voice.dxFeedback,
     dxOperators: voice.dxOperators,
     dxLfo: voice.dxLfo,
+    dxPitchEnvelope: voice.dxPitchEnvelope,
   };
 }
 

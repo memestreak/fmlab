@@ -375,8 +375,9 @@
                 <h3 class="panel-title inst-section-title">Presets</h3>
                 <div id="inst-dx7-presets"></div>
               </div>
-              <!-- The voice: its title, and a switch between two tabs, the
-                   algorithm and the LFO (ui/lfoView.ts). -->
+              <!-- The voice: its title, and a switch between three tabs,
+                   the algorithm, the LFO and the pitch envelope
+                   (ui/lfoView.ts). -->
               <div class="inst-alg-head">
                 <h3 class="panel-title inst-section-title">Voice</h3>
                 <div class="pill-tabs" role="tablist" aria-label="Voice">
@@ -399,6 +400,16 @@
                     data-tab="lfo"
                   >
                     LFO<span class="pill-mark" aria-hidden="true"></span>
+                  </button>
+                  <button
+                    type="button"
+                    id="inst-tab-pitch"
+                    class="pill-tab"
+                    role="tab"
+                    aria-controls="inst-pitch-panel"
+                    data-tab="pitch"
+                  >
+                    Pitch EG<span class="pill-mark" aria-hidden="true"></span>
                   </button>
                 </div>
               </div>
@@ -460,6 +471,19 @@
                     Restart on each key
                   </label>
                 </div>
+              </div>
+              <!-- The pitch envelope: its curve and its eight knobs
+                   (ui/pitchEgView.ts). -->
+              <div
+                id="inst-pitch-panel"
+                class="inst-pitch"
+                role="tabpanel"
+                aria-labelledby="inst-tab-pitch"
+                hidden
+              >
+                <span class="inst-lfo-label">Pitch envelope</span>
+                <canvas id="inst-pitch-curve" class="inst-pitch-curve" role="img"></canvas>
+                <div id="inst-pitch-knobs" class="inst-pitch-knobs"></div>
               </div>
             </div>
             <div class="inst-right">

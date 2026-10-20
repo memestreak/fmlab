@@ -6,7 +6,10 @@ import {
   type Dx7Note,
   dx7Note,
   type Dx7Operator,
+  dx7PitchAt,
+  type Dx7PitchEnvelope,
   keyOf,
+  pitchEnvelopeOn,
 } from './dx7';
 import { type Envelope, envelopeAt } from './envelope';
 import { Lfo } from './lfo';
@@ -43,6 +46,8 @@ export interface Dx7Patch {
   operators: readonly Dx7Operator[];
   /** The LFO, which every sounding note shares. */
   lfo: Dx7Lfo;
+  /** The pitch envelope, which each note runs its own copy of. */
+  pitchEnvelope: Dx7PitchEnvelope;
 }
 
 /** What the main thread tells the pool, over the worklet's port. */
@@ -82,6 +87,8 @@ class Voice implements VoiceState {
   envelopes: Envelope[] = [];
   /** A DX7 voice's note, or null for simple operators. */
   dx7: Dx7Note | null = null;
+  /** A DX7 note's pitch envelope, as the patch was when struck; null if flat. */
+  pitchEnvelope: Dx7PitchEnvelope | null = null;
   /** When the note is let go, in seconds; Infinity while it is held. */
   hold = Infinity;
   /** Samples since the note started. */
@@ -231,7 +238,10 @@ export class VoicePool {
         if (share > 0 && pull > 0) level *= 10 ** ((-pull * share) / 20);
         voice.scaled[op] = level;
       }
-      sample = voice.kernel.tick(voice.baseFreq * this.pitch, dx7.ratios, voice.scaled, dx7.feedback);
+      // The note's own pitch envelope, and the LFO's vibrato, in cents.
+      let freq = voice.baseFreq * this.pitch;
+      if (voice.pitchEnvelope) freq *= 2 ** (dx7PitchAt(voice.pitchEnvelope, time, voice.hold) / 1200);
+      sample = voice.kernel.tick(freq, dx7.ratios, voice.scaled, dx7.feedback);
     } else {
       for (let op = 0; op < MAX_OPERATORS; op++) {
         voice.heard[op] = voice.levels[op] * envelopeAt(voice.envelopes[op], time);
@@ -288,6 +298,7 @@ export class VoicePool {
     voice.hold = hold;
     if (patch.kind === 'dx7') {
       voice.dx7 = dx7Note(patch.algorithm, patch.operators, patch.feedback, keyOf(hz));
+      voice.pitchEnvelope = pitchEnvelopeOn(patch.pitchEnvelope) ? patch.pitchEnvelope : null;
     } else {
       voice.dx7 = null;
       voice.feedback = patch.feedback;

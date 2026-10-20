@@ -13,6 +13,7 @@ import {
   DX7_RATIO,
   type Dx7Lfo,
   type Dx7Operator,
+  type Dx7PitchEnvelope,
   LEVEL_DB,
   LFO_DELAY,
   LFO_SPEED,
@@ -21,6 +22,8 @@ import {
   LFO_WAVES,
   type LfoWave,
   MAX_STAGE_SECONDS,
+  PITCH_EG_SPEED,
+  PITCH_ENVELOPE_CENTS,
   RATE_SCALING,
   SCALING_DEPTH,
   type ScalingSide,
@@ -233,9 +236,35 @@ export function lfoFromParam(raw: string | null): Dx7Lfo | null {
   };
 }
 
+/** The pitch envelope's fields in a link, in this order. */
+const PITCH_FIELDS = ['start', 'attack', 'peak', 'decay1', 'brk', 'decay2', 'sustain', 'release'] as const;
+const PITCH_SPEEDS = new Set<string>(['attack', 'decay1', 'decay2', 'release']);
+
+/**
+ * The pitch envelope in a link: start, attack, peak, decay 1, break,
+ * decay 2, sustain and release, joined by "_"; levels in cents, speeds in
+ * cents a second.
+ */
+export function pitchParam(env: Dx7PitchEnvelope): string {
+  return PITCH_FIELDS.map(key => brief(env[key], 2)).join('_');
+}
+
+/** The pitch envelope a link's "p" describes, each value held inside its range; null if it is not one. */
+export function pitchFromParam(raw: string | null): Dx7PitchEnvelope | null {
+  if (raw === null) return null;
+  const f = raw.split('_').map(text => (text.trim() === '' ? NaN : Number(text)));
+  if (f.length !== PITCH_FIELDS.length || !f.every(Number.isFinite)) return null;
+  const env = {} as Dx7PitchEnvelope;
+  PITCH_FIELDS.forEach((key, i) => {
+    env[key] = clamp(f[i], PITCH_SPEEDS.has(key) ? PITCH_EG_SPEED : PITCH_ENVELOPE_CENTS);
+  });
+  return env;
+}
+
 /**
  * The parameters that carry a sandbox sound: the base pitch, the
- * algorithm, the feedback, the six operators and the LFO. Volume stays the
+ * algorithm, the feedback, the six operators, the LFO and the pitch
+ * envelope. Volume stays the
  * listener's own, and is left out.
  */
 export function soundParams(state: LabState): string {
@@ -245,6 +274,7 @@ export function soundParams(state: LabState): string {
     f: brief(state.dxFeedback, 4),
     o: operatorsParam(state.dxOperators),
     l: lfoParam(state.dxLfo),
+    p: pitchParam(state.dxPitchEnvelope),
   }).toString();
 }
 
@@ -281,5 +311,7 @@ export function soundFromParams(params: URLSearchParams): Partial<LabState> {
   if (operators) patch.dxOperators = operators;
   const lfo = lfoFromParam(params.get('l'));
   if (lfo) patch.dxLfo = lfo;
+  const pitch = pitchFromParam(params.get('p'));
+  if (pitch) patch.dxPitchEnvelope = pitch;
   return patch;
 }

@@ -181,6 +181,15 @@ export const dx7Voice: Chapter = {
      carrier you hear the note grow softer and louder; on a modulator it is
      the index that moves, and the note grows darker and brighter. A delay
      holds both back each time a key goes down, then fades them in.`,
+    `Each note can also bend. The DX7's ${define('pitchEnvelope', 'pitch envelope')},
+     which it calls the pitch EG (for envelope generator), has the same
+     parts as an operator's ${use('envelope')}, but moves the pitch of all
+     six operators together instead of their levels: up to four octaves
+     either way, from where it starts at the key down, through its peak and
+     break to a pitch it holds, and back at the key up. Unlike the LFO,
+     every note runs its own. Most factory voices that use it bend only a
+     third of a semitone for a few thousandths of a second at the attack;
+     TAKE OFF uses all of it, sweeping down and up by octaves.`,
     `None of these numbers can be changed in this section; in
      ${sectionLink('sandbox', 'the sandbox')} every one of them can, and a
      keyboard plays the voice at every pitch.`,

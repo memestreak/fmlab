@@ -206,8 +206,11 @@
   border-radius: 999px 0 0 999px;
 }
 
-.pill-tab:last-child {
+.pill-tab + .pill-tab {
   margin-left: -1px;
+}
+
+.pill-tab:last-child {
   border-radius: 0 999px 999px 0;
 }
 
@@ -242,8 +245,47 @@
 }
 
 .inst-diagram[hidden],
-.inst-lfo[hidden] {
+.inst-lfo[hidden],
+.inst-pitch[hidden] {
   display: none;
+}
+
+/* The Pitch EG tab, as tall as the others: its name, the curve taking the
+   height left, and its eight knobs in a row under it. */
+.inst-pitch {
+  display: grid;
+  flex: 1 1 auto;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  justify-items: center;
+  gap: 0.15rem;
+  min-height: 0;
+  padding: 0 0 0.2rem;
+}
+
+.inst-pitch .inst-lfo-label {
+  justify-self: start;
+}
+
+.inst-pitch-curve {
+  display: block;
+  align-self: stretch;
+  justify-self: stretch;
+  width: 100%;
+  height: 100%;
+  min-height: 4rem;
+  touch-action: none;
+}
+
+.inst-pitch-knobs {
+  display: grid;
+  grid-template-columns: repeat(8, 4.2rem);
+  gap: 0.1rem;
+}
+
+/* Its dials as small as a short window's, to leave the curve the height. */
+.inst-pitch .knob-dial {
+  width: 2rem;
+  height: 2rem;
 }
 
 /* The LFO tab, as tall as the Algorithm tab: the wave's buttons over its
@@ -1134,7 +1176,8 @@ canvas.voice-keys {
   }
 
   .inst-diagram,
-  .inst-lfo {
+  .inst-lfo,
+  .inst-pitch {
     flex: 1 1 auto;
     min-height: 9rem;
   }
@@ -1174,8 +1217,13 @@ canvas.voice-keys {
   }
 
   .inst-diagram,
-  .inst-lfo {
+  .inst-lfo,
+  .inst-pitch {
     min-height: 7rem;
+  }
+
+  .inst-pitch-knobs {
+    grid-template-columns: repeat(8, 3.9rem);
   }
 
   .voice-env-mini,
@@ -1395,6 +1443,17 @@ canvas.voice-keys {
 
   .inst-lfo-knobs {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  /* The pitch envelope's curve a fixed height, its knobs in two rows. */
+  .inst-pitch-curve {
+    height: 9rem;
+  }
+
+  .inst-pitch-knobs {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    row-gap: 0.5rem;
+    width: 100%;
   }
 
   #inst-diagram-figure .plot-frame {

@@ -1,5 +1,13 @@
 import { algorithm } from '../../dsp/algorithms';
-import { type Dx7Lfo, dx7EnvelopeAt, dx7Note, HELD_LFO, heldOperator } from '../../dsp/dx7';
+import {
+  type Dx7Lfo,
+  dx7EnvelopeAt,
+  dx7Note,
+  type Dx7PitchEnvelope,
+  FLAT_PITCH_ENVELOPE,
+  HELD_LFO,
+  heldOperator,
+} from '../../dsp/dx7';
 import { envelopeAt } from '../../dsp/envelope';
 import { kernelLevels, type Operator, operatorEnvelope } from '../../dsp/operators';
 import { MAX_OPERATORS, PmKernel } from '../../dsp/pmKernel';
@@ -166,6 +174,7 @@ describe('the voice pool, playing a DX7 voice', () => {
     feedback: 0,
     operators: [held(1, 0), held(2, -6), held(3, null), held(4, null), held(5, null), held(6, null)],
     lfo: HELD_LFO,
+    pitchEnvelope: FLAT_PITCH_ENVELOPE,
   };
 
   it('with one voice plays exactly what dx7Note and the kernel give', () => {
@@ -219,6 +228,7 @@ describe('the voice pool\'s LFO', () => {
     // A square, synced, very slow: from a key on it sits at its bottom,
     // which swings the pitch down and pulls levels hardest, for seconds.
     lfo: { ...HELD_LFO, wave: 'square', speed: 0.065, sync: true, ...lfo },
+    pitchEnvelope: FLAT_PITCH_ENVELOPE,
   });
   const peak = (samples: Float32Array) => Math.max(...samples.map(Math.abs));
   /** Rising zero crossings a second. */
@@ -266,5 +276,76 @@ describe('the voice pool\'s LFO', () => {
     voices.noteOn(72, 523.25);
     render(voices, SAMPLE_RATE * 0.05);
     expect(peak(render(voices, SAMPLE_RATE * 0.3))).toBeGreaterThan(0.25);
+  });
+});
+
+describe('the voice pool\'s pitch envelope', () => {
+  const sine = (pitchEnvelope: Dx7PitchEnvelope, lfo: Partial<Dx7Lfo> = {}): Dx7Patch => ({
+    kind: 'dx7',
+    algorithm: 32,
+    feedback: 0,
+    operators: [heldOperator(1, 0), ...[2, 3, 4, 5, 6].map(r => heldOperator(r, null))],
+    lfo: { ...HELD_LFO, ...lfo },
+    pitchEnvelope,
+  });
+  /** Rising zero crossings a second. */
+  const pitchOf = (samples: Float32Array) => {
+    let crossings = 0;
+    for (let i = 1; i < samples.length; i++) if (samples[i - 1] < 0 && samples[i] >= 0) crossings++;
+    return (crossings * SAMPLE_RATE) / samples.length;
+  };
+  // An octave up at the key, gliding down to the note at 12 semitones a
+  // second, held there; let go, back up at the same speed.
+  const fall: Dx7PitchEnvelope = {
+    ...FLAT_PITCH_ENVELOPE,
+    start: 1200,
+    attack: 1200,
+    peak: 0,
+    release: 1200,
+  };
+
+  it('bends a struck note as its envelope says, and back on release', () => {
+    const voices = new VoicePool(1, SAMPLE_RATE, LOCK_SAMPLES);
+    voices.setPatch(sine(fall));
+    voices.noteOn(69, 220);
+    // The first tenth of a second, near an octave up.
+    expect(pitchOf(render(voices, SAMPLE_RATE * 0.1))).toBeGreaterThan(400);
+    render(voices, SAMPLE_RATE);
+    // Down at the note.
+    expect(pitchOf(render(voices, SAMPLE_RATE * 0.5))).toBeCloseTo(220, -1);
+    voices.noteOff(69);
+    // Let go, it glides back up at 12 semitones a second: over the first
+    // quarter second (its operators' 0.3 s release) well above the note.
+    expect(pitchOf(render(voices, SAMPLE_RATE * 0.25))).toBeGreaterThan(230);
+  });
+
+  it('gives each note its own, from its own key', () => {
+    const play = (second: boolean) => {
+      const voices = new VoicePool(2, SAMPLE_RATE, LOCK_SAMPLES);
+      voices.setPatch(sine(fall));
+      voices.noteOn(60, 220);
+      render(voices, SAMPLE_RATE * 1.5);
+      if (second) voices.noteOn(62, 330);
+      return render(voices, SAMPLE_RATE * 0.1);
+    };
+    // The second note alone: the two together less the first.
+    const both = play(true);
+    const first = play(false);
+    const second = both.map((sample, i) => sample - first[i]);
+    // It starts an octave up, 660 Hz, as the first did; the first, held,
+    // stays at its note.
+    expect(pitchOf(second)).toBeGreaterThan(560);
+    expect(pitchOf(first)).toBeCloseTo(220, -1);
+  });
+
+  it('adds the LFO\'s vibrato to it', () => {
+    const voices = new VoicePool(1, SAMPLE_RATE, LOCK_SAMPLES);
+    // Held a fifth up, with an octave's vibrato pulling down (a square, synced).
+    const fifth = { ...FLAT_PITCH_ENVELOPE, start: 700, peak: 700, brk: 700, sustain: 700 };
+    voices.setPatch(sine(fifth, { wave: 'square', speed: 0.065, sync: true, vibrato: 1200 }));
+    voices.noteOn(69, 440);
+    render(voices, SAMPLE_RATE * 0.1);
+    // 440 × 2^((700 - 1200) / 1200): about 329.6 Hz.
+    expect(pitchOf(render(voices, SAMPLE_RATE))).toBeCloseTo(440 * 2 ** (-500 / 1200), -1);
   });
 });

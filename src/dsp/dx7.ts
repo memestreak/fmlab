@@ -115,6 +115,91 @@ export function lfoOn(lfo: Dx7Lfo): boolean {
   return lfo.vibrato > 0 || lfo.tremolo > 0;
 }
 
+/**
+ * The voice's pitch envelope (the DX7's pitch EG): every note runs its own
+ * from its key down, and it bends all six operators together. Levels in
+ * cents from the note: the pitch at the key (`start`, the DX7's L4), then
+ * `peak`, `brk` and `sustain` (L1 to L3). The four parts are speeds, in
+ * cents a second, as on the DX7 (R1 to R4): `attack` glides from start to
+ * peak, `decay1` to the break, `decay2` to the sustain, held while the key
+ * is down; at key up `release` glides from wherever the pitch is back to
+ * start. A part that does not move takes no time.
+ */
+export interface Dx7PitchEnvelope {
+  start: number;
+  attack: number;
+  peak: number;
+  decay1: number;
+  brk: number;
+  decay2: number;
+  sustain: number;
+  release: number;
+}
+
+/** A pitch envelope's levels: four octaves either way, in cents. */
+export const PITCH_ENVELOPE_CENTS = { min: -4800, max: 4800 };
+
+/**
+ * A pitch envelope's speeds, in cents a second: msfa's pitchenv_rate[R] /
+ * 21.3 octaves a second for the DX7's rates 0 and 99, about 0.56 to 144
+ * semitones a second.
+ */
+export const PITCH_EG_SPEED = { min: (1200 * 1) / 21.3, max: (1200 * 255) / 21.3 };
+
+/** A pitch envelope that leaves the pitch alone. */
+export const FLAT_PITCH_ENVELOPE: Dx7PitchEnvelope = {
+  start: 0,
+  attack: PITCH_EG_SPEED.max,
+  peak: 0,
+  decay1: PITCH_EG_SPEED.max,
+  brk: 0,
+  decay2: PITCH_EG_SPEED.max,
+  sustain: 0,
+  release: PITCH_EG_SPEED.max,
+};
+
+/** Whether a pitch envelope bends the pitch at all. */
+export function pitchEnvelopeOn(env: Dx7PitchEnvelope): boolean {
+  return env.start !== 0 || env.peak !== 0 || env.brk !== 0 || env.sustain !== 0;
+}
+
+/** How long a glide from `from` to `to` cents takes at `speed` cents a second. */
+export function glideSeconds(from: number, to: number, speed: number): number {
+  return from === to ? 0 : Math.abs(to - from) / Math.max(PITCH_EG_SPEED.min, speed);
+}
+
+/** The pitch, in cents, a glide from `from` to `to` at `speed` reaches `t` seconds in. */
+function glide(from: number, to: number, speed: number, t: number): number {
+  const length = glideSeconds(from, to, speed);
+  return t >= length ? to : from + ((to - from) * t) / length;
+}
+
+/** The pitch envelope while the key is down, `time` seconds after it. */
+function heldPitch(env: Dx7PitchEnvelope, time: number): number {
+  let t = time;
+  const attack = glideSeconds(env.start, env.peak, env.attack);
+  if (t < attack) return glide(env.start, env.peak, env.attack, t);
+  t -= attack;
+  const decay1 = glideSeconds(env.peak, env.brk, env.decay1);
+  if (t < decay1) return glide(env.peak, env.brk, env.decay1, t);
+  t -= decay1;
+  return glide(env.brk, env.sustain, env.decay2, t);
+}
+
+/**
+ * The pitch envelope, in cents, `time` seconds into a note let go at
+ * `hold` (Infinity while the key is down): start at the key, then each
+ * part a straight line at its speed, held at the sustain; once let go, a
+ * straight line from wherever it had got to back to start, at the release
+ * speed, as msfa's pitchenv.cc. The pool calls it every sample, so it
+ * makes nothing new.
+ */
+export function dx7PitchAt(env: Dx7PitchEnvelope, time: number, hold = Infinity): number {
+  if (time <= 0) return env.start;
+  if (time <= hold) return heldPitch(env, time);
+  return glide(heldPitch(env, hold), env.start, env.release, time - hold);
+}
+
 /** One of the sandbox's six operators. */
 export interface Dx7Operator {
   ratio: number;

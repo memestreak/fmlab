@@ -1,19 +1,29 @@
-// The sandbox's Voice section: two tabs, Algorithm (the chooser, the
-// diagram and Feedback) and LFO. The sandbox always opens on Algorithm;
-// which tab is open is the page's alone, in neither the link nor
-// storage. While the LFO tab is closed its pill shows a dot when the LFO
-// is on. The LFO tab: the wave, six buttons each drawing its shape, with
+// The sandbox's Voice section: three tabs, Algorithm (the chooser, the
+// diagram and Feedback), LFO and Pitch EG (ui/pitchEgView.ts). The
+// sandbox always opens on Algorithm; which tab is open is the page's
+// alone, in neither the link nor storage. While the LFO or the Pitch EG
+// tab is closed its pill shows a dot when that feature is on. The LFO tab: the wave, six buttons each drawing its shape, with
 // a drawing of the LFO under them (viz/lfoPlot.ts); Speed, Delay,
 // Vibrato and Tremolo, four knobs; and key sync, "Restart on each key".
 
-import { type Dx7Lfo, LFO_DELAY, LFO_SPEED, LFO_TREMOLO, LFO_VIBRATO, LFO_WAVES, type LfoWave, lfoOn } from '../dsp/dx7';
+import {
+  type Dx7Lfo,
+  LFO_DELAY,
+  LFO_SPEED,
+  LFO_TREMOLO,
+  LFO_VIBRATO,
+  LFO_WAVES,
+  type LfoWave,
+  lfoOn,
+  pitchEnvelopeOn,
+} from '../dsp/dx7';
 import { dx7LfoDelay, dx7VibratoCents } from '../dsp/lfo';
 import type { LabStore } from '../model/lab';
 import { describeLfo, drawLfo } from '../viz/lfoPlot';
 import { createKnob } from './knob';
 import { formatTime } from './voiceFormat';
 
-type VoiceArea = 'algorithm' | 'lfo';
+type VoiceArea = 'algorithm' | 'lfo' | 'pitch';
 
 /** Each wave's name and its button's drawing (an SVG path in 24 × 16). */
 const WAVES: Record<LfoWave, { name: string; path: string }> = {
@@ -56,7 +66,16 @@ export function mountVoiceArea(store: LabStore): void {
 
   // The tabs: a click, or the arrow keys between them, open one.
   const tabs = [...head.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
-  const lfoTab = tabs.find(tab => tab.dataset.tab === 'lfo');
+  // The tabs whose feature can be on, and when it is.
+  const features: { tab: HTMLButtonElement | undefined; area: VoiceArea; name: string; on: () => boolean }[] = [
+    { tab: tabs.find(tab => tab.dataset.tab === 'lfo'), area: 'lfo', name: 'LFO', on: () => lfoOn(lfo()) },
+    {
+      tab: tabs.find(tab => tab.dataset.tab === 'pitch'),
+      area: 'pitch',
+      name: 'Pitch EG',
+      on: () => pitchEnvelopeOn(store.get().dxPitchEnvelope),
+    },
+  ];
   let open: VoiceArea = 'algorithm';
   const showTabs = () => {
     for (const tab of tabs) {
@@ -66,10 +85,12 @@ export function mountVoiceArea(store: LabStore): void {
       const panel = document.getElementById(tab.getAttribute('aria-controls') ?? '');
       if (panel) panel.hidden = !on;
     }
-    // The LFO's dot, while it is on and its tab closed.
-    const marked = open !== 'lfo' && lfoOn(lfo());
-    lfoTab?.classList.toggle('is-marked', marked);
-    lfoTab?.setAttribute('aria-label', marked ? 'LFO, on' : 'LFO');
+    // A feature's dot, while it is on and its tab closed.
+    for (const { tab, area, name, on } of features) {
+      const marked = open !== area && on();
+      tab?.classList.toggle('is-marked', marked);
+      tab?.setAttribute('aria-label', marked ? `${name}, on` : name);
+    }
     if (open === 'lfo') drawPlot();
   };
   const choose = (area: VoiceArea) => {
@@ -190,6 +211,7 @@ export function mountVoiceArea(store: LabStore): void {
     // Every visit to the sandbox opens on the Algorithm tab.
     if (state.chapter !== previous.chapter) open = 'algorithm';
     if (state.chapter !== previous.chapter || state.dxLfo !== previous.dxLfo) show();
+    else if (state.dxPitchEnvelope !== previous.dxPitchEnvelope) showTabs();
     else if (state.theme !== previous.theme && open === 'lfo') drawPlot();
   });
   new ResizeObserver(() => {

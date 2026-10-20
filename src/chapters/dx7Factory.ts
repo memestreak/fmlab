@@ -2,7 +2,7 @@
 // voices (ROM1A); do not edit by hand. Factory voices © Yamaha.
 // Numbers in the sandbox's units (src/dsp/dx7.ts).
 
-import type { Dx7Lfo, Dx7Operator } from '../dsp/dx7';
+import type { Dx7Lfo, Dx7Operator, Dx7PitchEnvelope } from '../dsp/dx7';
 
 /** A DX7 factory voice, and what the sandbox cannot play of it. */
 export interface FactoryVoice {
@@ -11,6 +11,7 @@ export interface FactoryVoice {
   dxFeedback: number;
   dxOperators: Dx7Operator[];
   dxLfo: Dx7Lfo;
+  dxPitchEnvelope: Dx7PitchEnvelope;
   missing: string[];
 }
 
@@ -178,6 +179,16 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'vibrato': 7.25,
       'tremolo': 0.0,
       'sync': false
+    },
+    'dxPitchEnvelope': {
+      'start': 0.0,
+      'attack': 7605.63,
+      'peak': 0.0,
+      'decay1': 11887.32,
+      'brk': 0.0,
+      'decay2': 11887.32,
+      'sustain': 0.0,
+      'release': 3267.61
     },
     'missing': [
       'velocity'
@@ -347,6 +358,16 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'tremolo': 0.0,
       'sync': false
     },
+    'dxPitchEnvelope': {
+      'start': 0.0,
+      'attack': 7605.63,
+      'peak': 0.0,
+      'decay1': 11887.32,
+      'brk': 0.0,
+      'decay2': 11887.32,
+      'sustain': 0.0,
+      'release': 3267.61
+    },
     'missing': []
   },
   {
@@ -512,6 +533,16 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'vibrato': 7.25,
       'tremolo': 0.0,
       'sync': false
+    },
+    'dxPitchEnvelope': {
+      'start': 0.0,
+      'attack': 11380.28,
+      'peak': 0.0,
+      'decay1': 4056.34,
+      'brk': 0.0,
+      'decay2': 11887.32,
+      'sustain': 0.0,
+      'release': 3267.61
     },
     'missing': [
       'velocity',
@@ -682,6 +713,16 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'tremolo': 0.0,
       'sync': false
     },
+    'dxPitchEnvelope': {
+      'start': 0.0,
+      'attack': 11380.28,
+      'peak': 0.0,
+      'decay1': 4056.34,
+      'brk': 0.0,
+      'decay2': 11887.32,
+      'sustain': 0.0,
+      'release': 3267.61
+    },
     'missing': [
       'velocity'
     ]
@@ -850,6 +891,16 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'tremolo': 0.0,
       'sync': false
     },
+    'dxPitchEnvelope': {
+      'start': 0.0,
+      'attack': 7605.63,
+      'peak': 0.0,
+      'decay1': 11887.32,
+      'brk': 0.0,
+      'decay2': 11887.32,
+      'sustain': 0.0,
+      'release': 3267.61
+    },
     'missing': [
       'transpose'
     ]
@@ -1017,6 +1068,16 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'vibrato': 14.1,
       'tremolo': 0.0,
       'sync': false
+    },
+    'dxPitchEnvelope': {
+      'start': 0.0,
+      'attack': 11380.28,
+      'peak': 0.0,
+      'decay1': 4056.34,
+      'brk': 0.0,
+      'decay2': 11887.32,
+      'sustain': 0.0,
+      'release': 3267.61
     },
     'missing': [
       'velocity',
@@ -1187,6 +1248,16 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'tremolo': 0.0,
       'sync': false
     },
+    'dxPitchEnvelope': {
+      'start': 0.0,
+      'attack': 7605.63,
+      'peak': 0.0,
+      'decay1': 11887.32,
+      'brk': 0.0,
+      'decay2': 11887.32,
+      'sustain': 0.0,
+      'release': 3267.61
+    },
     'missing': [
       'transpose'
     ]
@@ -1355,6 +1426,16 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'tremolo': 0.0,
       'sync': false
     },
+    'dxPitchEnvelope': {
+      'start': 0.0,
+      'attack': 11380.28,
+      'peak': 0.0,
+      'decay1': 4056.34,
+      'brk': 0.0,
+      'decay2': 11887.32,
+      'sustain': 0.0,
+      'release': 3267.61
+    },
     'missing': [
       'velocity'
     ]
@@ -1522,6 +1603,16 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'vibrato': 0.0,
       'tremolo': 0.0,
       'sync': false
+    },
+    'dxPitchEnvelope': {
+      'start': 0.0,
+      'attack': 11380.28,
+      'peak': 0.0,
+      'decay1': 4056.34,
+      'brk': 0.0,
+      'decay2': 11887.32,
+      'sustain': 0.0,
+      'release': 3267.61
     },
     'missing': [
       'velocity',
@@ -1692,6 +1783,16 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'tremolo': 0.0,
       'sync': false
     },
+    'dxPitchEnvelope': {
+      'start': 0.0,
+      'attack': 56.34,
+      'peak': 0.0,
+      'decay1': 56.34,
+      'brk': 0.0,
+      'decay2': 56.34,
+      'sustain': 0.0,
+      'release': 56.34
+    },
     'missing': [
       'velocity'
     ]
@@ -1859,6 +1960,16 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'vibrato': 0.0,
       'tremolo': 0.0,
       'sync': false
+    },
+    'dxPitchEnvelope': {
+      'start': 0.0,
+      'attack': 11380.28,
+      'peak': 0.0,
+      'decay1': 4056.34,
+      'brk': 0.0,
+      'decay2': 11887.32,
+      'sustain': 0.0,
+      'release': 3267.61
     },
     'missing': [
       'velocity'
@@ -2028,6 +2139,16 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'tremolo': 0.14,
       'sync': false
     },
+    'dxPitchEnvelope': {
+      'start': 0.0,
+      'attack': 5295.77,
+      'peak': 0.0,
+      'decay1': 6478.87,
+      'brk': 0.0,
+      'decay2': 5295.77,
+      'sustain': 0.0,
+      'release': 3267.61
+    },
     'missing': [
       'velocity'
     ]
@@ -2195,6 +2316,16 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'vibrato': 0.0,
       'tremolo': 0.0,
       'sync': false
+    },
+    'dxPitchEnvelope': {
+      'start': 0.0,
+      'attack': 7605.63,
+      'peak': 0.0,
+      'decay1': 11887.32,
+      'brk': 0.0,
+      'decay2': 11887.32,
+      'sustain': 0.0,
+      'release': 3267.61
     },
     'missing': [
       'velocity',
@@ -2365,6 +2496,16 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'tremolo': 91.71,
       'sync': false
     },
+    'dxPitchEnvelope': {
+      'start': 0.0,
+      'attack': 56.34,
+      'peak': 0.0,
+      'decay1': 56.34,
+      'brk': 0.0,
+      'decay2': 56.34,
+      'sustain': 0.0,
+      'release': 56.34
+    },
     'missing': [
       'transpose'
     ]
@@ -2532,6 +2673,16 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'vibrato': 0.0,
       'tremolo': 0.0,
       'sync': false
+    },
+    'dxPitchEnvelope': {
+      'start': 0.0,
+      'attack': 11380.28,
+      'peak': 0.0,
+      'decay1': 4056.34,
+      'brk': 0.0,
+      'decay2': 11887.32,
+      'sustain': 0.0,
+      'release': 3267.61
     },
     'missing': [
       'velocity',
@@ -2702,6 +2853,16 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'tremolo': 0.0,
       'sync': false
     },
+    'dxPitchEnvelope': {
+      'start': 0.0,
+      'attack': 11380.28,
+      'peak': 0.0,
+      'decay1': 4056.34,
+      'brk': 0.0,
+      'decay2': 11887.32,
+      'sustain': 0.0,
+      'release': 3267.61
+    },
     'missing': [
       'velocity',
       'transpose'
@@ -2871,6 +3032,16 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'tremolo': 0.0,
       'sync': false
     },
+    'dxPitchEnvelope': {
+      'start': 0.0,
+      'attack': 5295.77,
+      'peak': 0.0,
+      'decay1': 6478.87,
+      'brk': 0.0,
+      'decay2': 5295.77,
+      'sustain': 0.0,
+      'release': 3267.61
+    },
     'missing': []
   },
   {
@@ -3036,6 +3207,16 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'vibrato': 0.0,
       'tremolo': 0.0,
       'sync': false
+    },
+    'dxPitchEnvelope': {
+      'start': 0.0,
+      'attack': 11380.28,
+      'peak': 0.0,
+      'decay1': 4056.34,
+      'brk': 0.0,
+      'decay2': 11887.32,
+      'sustain': 0.0,
+      'release': 3267.61
     },
     'missing': [
       'velocity',
@@ -3206,6 +3387,16 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'tremolo': 0.0,
       'sync': false
     },
+    'dxPitchEnvelope': {
+      'start': 0.0,
+      'attack': 56.34,
+      'peak': 0.0,
+      'decay1': 56.34,
+      'brk': 0.0,
+      'decay2': 56.34,
+      'sustain': 0.0,
+      'release': 56.34
+    },
     'missing': [
       'velocity',
       'an envelope ending above silence'
@@ -3375,6 +3566,16 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'tremolo': 0.0,
       'sync': false
     },
+    'dxPitchEnvelope': {
+      'start': 0.0,
+      'attack': 56.34,
+      'peak': 0.0,
+      'decay1': 56.34,
+      'brk': 0.0,
+      'decay2': 56.34,
+      'sustain': 0.0,
+      'release': 56.34
+    },
     'missing': [
       'velocity'
     ]
@@ -3542,6 +3743,16 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'vibrato': 0.0,
       'tremolo': 0.0,
       'sync': true
+    },
+    'dxPitchEnvelope': {
+      'start': 0.0,
+      'attack': 14366.2,
+      'peak': 0.0,
+      'decay1': 14309.86,
+      'brk': 0.0,
+      'decay2': 5295.77,
+      'sustain': 0.0,
+      'release': 3267.61
     },
     'missing': [
       'velocity'
@@ -3711,6 +3922,16 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'tremolo': 0.0,
       'sync': true
     },
+    'dxPitchEnvelope': {
+      'start': 0.0,
+      'attack': 11380.28,
+      'peak': 0.0,
+      'decay1': 4056.34,
+      'brk': 0.0,
+      'decay2': 11887.32,
+      'sustain': 0.0,
+      'release': 3267.61
+    },
     'missing': [
       'velocity'
     ]
@@ -3879,8 +4100,17 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'tremolo': 1.01,
       'sync': true
     },
+    'dxPitchEnvelope': {
+      'start': 0.0,
+      'attack': 7943.66,
+      'peak': -37.5,
+      'decay1': 14366.2,
+      'brk': 0.0,
+      'decay2': 5295.77,
+      'sustain': 0.0,
+      'release': 56.34
+    },
     'missing': [
-      'pitch envelope',
       'velocity'
     ]
   },
@@ -4047,6 +4277,16 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'vibrato': 3.66,
       'tremolo': 0.84,
       'sync': false
+    },
+    'dxPitchEnvelope': {
+      'start': 0.0,
+      'attack': 11380.28,
+      'peak': 0.0,
+      'decay1': 4056.34,
+      'brk': 0.0,
+      'decay2': 11887.32,
+      'sustain': 0.0,
+      'release': 3267.61
     },
     'missing': [
       'velocity'
@@ -4216,6 +4456,16 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'tremolo': 0.0,
       'sync': false
     },
+    'dxPitchEnvelope': {
+      'start': 0.0,
+      'attack': 14366.2,
+      'peak': 0.0,
+      'decay1': 14366.2,
+      'brk': 0.0,
+      'decay2': 14366.2,
+      'sustain': 0.0,
+      'release': 14366.2
+    },
     'missing': [
       'velocity'
     ]
@@ -4383,6 +4633,16 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'vibrato': 0.0,
       'tremolo': 0.0,
       'sync': false
+    },
+    'dxPitchEnvelope': {
+      'start': 0.0,
+      'attack': 4056.34,
+      'peak': 0.0,
+      'decay1': 11887.32,
+      'brk': 0.0,
+      'decay2': 11887.32,
+      'sustain': 0.0,
+      'release': 3267.61
     },
     'missing': [
       'velocity',
@@ -4553,6 +4813,16 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'tremolo': 91.71,
       'sync': false
     },
+    'dxPitchEnvelope': {
+      'start': 0.0,
+      'attack': 2309.86,
+      'peak': 0.0,
+      'decay1': 2309.86,
+      'brk': 0.0,
+      'decay2': 2309.86,
+      'sustain': 0.0,
+      'release': 2309.86
+    },
     'missing': [
       'velocity',
       'fixed frequency (played as a ratio from middle C)'
@@ -4722,8 +4992,17 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'tremolo': 0.0,
       'sync': false
     },
+    'dxPitchEnvelope': {
+      'start': 0.0,
+      'attack': 14366.2,
+      'peak': 0.0,
+      'decay1': 14309.86,
+      'brk': 37.5,
+      'decay2': 5295.77,
+      'sustain': 0.0,
+      'release': 3267.61
+    },
     'missing': [
-      'pitch envelope',
       'velocity'
     ]
   },
@@ -4891,8 +5170,17 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'tremolo': 0.0,
       'sync': true
     },
+    'dxPitchEnvelope': {
+      'start': 0.0,
+      'attack': 1408.45,
+      'peak': -412.5,
+      'decay1': 4056.34,
+      'brk': 0.0,
+      'decay2': 11887.32,
+      'sustain': 0.0,
+      'release': 3267.61
+    },
     'missing': [
-      'pitch envelope',
       'velocity',
       'fixed frequency (played as a ratio from middle C)'
     ]
@@ -5061,8 +5349,17 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'tremolo': 0.1,
       'sync': false
     },
+    'dxPitchEnvelope': {
+      'start': 0.0,
+      'attack': 619.72,
+      'peak': -75.0,
+      'decay1': 3267.61,
+      'brk': 37.5,
+      'decay2': 11887.32,
+      'sustain': 0.0,
+      'release': 3267.61
+    },
     'missing': [
-      'pitch envelope',
       'velocity',
       'an envelope ending above silence'
     ]
@@ -5230,6 +5527,16 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'vibrato': 0.0,
       'tremolo': 91.71,
       'sync': false
+    },
+    'dxPitchEnvelope': {
+      'start': 0.0,
+      'attack': 5295.77,
+      'peak': 0.0,
+      'decay1': 4056.34,
+      'brk': 0.0,
+      'decay2': 11887.32,
+      'sustain': 0.0,
+      'release': 3267.61
     },
     'missing': [
       'fixed frequency (played as a ratio from middle C)',
@@ -5400,8 +5707,17 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'tremolo': 0.0,
       'sync': true
     },
+    'dxPitchEnvelope': {
+      'start': 4762.5,
+      'attack': 1070.42,
+      'peak': 0.0,
+      'decay1': 1014.08,
+      'brk': -2287.5,
+      'decay2': 11380.28,
+      'sustain': 1162.5,
+      'release': 563.38
+    },
     'missing': [
-      'pitch envelope',
       'transpose'
     ]
   }
