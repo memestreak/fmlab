@@ -1,4 +1,5 @@
 import type { LabStore } from '../model/lab';
+import { type Settings, settings } from '../model/settings';
 import { KNOB_SEGMENTS, litSegments } from './knob';
 
 // The sandbox's mod wheel (Jeremy, 2026-10-21): a ribbed rubber drum in a
@@ -42,10 +43,15 @@ export function wheelAfterKey(key: string, amount: number): number | null {
 /**
  * The amount after a scroll of `deltaY` (in `deltaMode`'s units): as every
  * wheel in the sandbox, scrolling down (positive) is more, 1 % for each
- * 10 px.
+ * 10 px; less with the Wheel setting on Reverse.
  */
-export function wheelAfterScroll(deltaY: number, amount: number, deltaMode = 0): number {
-  const px = deltaMode === 1 ? deltaY * LINE_PX : deltaMode === 2 ? deltaY * 800 : deltaY;
+export function wheelAfterScroll(
+  deltaY: number,
+  amount: number,
+  deltaMode = 0,
+  direction: Settings['wheel'] = 'page',
+): number {
+  const px = (deltaMode === 1 ? deltaY * LINE_PX : deltaMode === 2 ? deltaY * 800 : deltaY) * (direction === 'reverse' ? -1 : 1);
   return settle(amount + px / SCROLL_PX_PER_STEP / 100);
 }
 
@@ -122,7 +128,7 @@ export function createModWheel(store: LabStore): HTMLElement {
     'wheel',
     event => {
       event.preventDefault();
-      set(wheelAfterScroll(event.deltaY, amount(), event.deltaMode));
+      set(wheelAfterScroll(event.deltaY, amount(), event.deltaMode, settings.get().wheel));
     },
     { passive: false },
   );

@@ -16,6 +16,7 @@ import { drawSpectrogram, sliceAt } from '../viz/spectrogramPlot';
 import { drawLiveSpectrum } from '../viz/liveSpectrum';
 import { drawSpectrum, spectrumOf } from '../viz/spectrumPlot';
 import type { AudioEngine } from '../audio/engine';
+import { motionReduced, onMotionChange } from './motion';
 import {
   cyclesShown,
   drawWaveform,
@@ -24,7 +25,6 @@ import {
 } from '../viz/waveformPlot';
 import { formatRate, formatSeconds } from './sliders';
 
-const REDUCED_MOTION = '(prefers-reduced-motion: reduce)';
 
 /**
  * A renderer: everything a figure shows comes from the state and, for a
@@ -130,7 +130,7 @@ function mountFigure(
       schedule();
     }
   });
-  window.matchMedia(REDUCED_MOTION).addEventListener('change', schedule);
+  onMotionChange(schedule);
   new ResizeObserver(schedule).observe(canvas);
   window
     .matchMedia('(prefers-color-scheme: dark)')
@@ -221,10 +221,9 @@ export function mountFigures(store: LabStore, engine: AudioEngine): void {
   let lastLive = 0;
   const waveform = document.querySelector<HTMLCanvasElement>('#waveform');
   const note = document.querySelector<HTMLElement>('#waveform-note');
-  const reduced = window.matchMedia(REDUCED_MOTION);
   /** Whether a figure should be following a note that is sounding. */
   const noteMoves = (state: LabState, time: number) =>
-    noteHasPlayhead(state, time, reduced.matches);
+    noteHasPlayhead(state, time, motionReduced());
   if (waveform) {
     mountFigure(
       waveform,
@@ -236,12 +235,12 @@ export function mountFigures(store: LabStore, engine: AudioEngine): void {
         if (canvas.getAttribute('aria-label') !== label) {
           canvas.setAttribute('aria-label', label);
         }
-        const text = motionNote(state, reduced.matches);
+        const text = motionNote(state, motionReduced());
         if (note && note.textContent !== text) note.textContent = text;
       },
       // A slow vibrato squeezing and stretching, or a note sounding.
       (state: LabState, time: number) =>
-        waveformMoves(state, reduced.matches) || noteMoves(state, time),
+        waveformMoves(state, motionReduced()) || noteMoves(state, time),
     );
   }
 
@@ -259,7 +258,7 @@ export function mountFigures(store: LabStore, engine: AudioEngine): void {
           // While sound plays, what it measures is drawn over the stems.
           // Under reduced motion only a few times a second; each time is a
           // still picture of the sound.
-          if (reduced.matches && now - lastLive < CALM_SECONDS) return;
+          if (motionReduced() && now - lastLive < CALM_SECONDS) return;
           lastLive = now;
           // Nothing to measure until the audio has started.
           const measured = engine.measure();

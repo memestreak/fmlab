@@ -233,14 +233,24 @@ export function mountPiano(
       key.setAttribute('aria-pressed', 'false');
       // The computer key that plays it is in its name, not drawn on it
       // (Jeremy, 2026-10-20).
-      // Every C names itself, so the octave can be read off the keys.
-      if (midi % 12 === 0) {
-        key.classList.add('piano-is-c');
+      // Every C names itself, so the octave can be read off the keys; the
+      // other white keys' names are there for the Note names setting (All),
+      // shown only then.
+      if (midi % 12 === 0) key.classList.add('piano-is-c');
+      if (!isBlack(midi)) {
         const name = document.createElement('span');
-        name.className = 'piano-c num';
-        name.textContent = noteName(midi);
+        name.className = midi % 12 === 0 ? 'piano-c num' : 'piano-c piano-letter num';
+        name.textContent = midi % 12 === 0 ? noteName(midi) : NAMES[midi % 12];
         name.setAttribute('aria-hidden', 'true');
         key.append(name);
+      }
+      // The computer key that plays it, for the Computer keys setting.
+      if (letter) {
+        const typed = document.createElement('span');
+        typed.className = 'piano-typed num';
+        typed.textContent = letter;
+        typed.setAttribute('aria-hidden', 'true');
+        key.append(typed);
       }
       // A pointer holds a key for as long as it is down on it.
       key.addEventListener('pointerdown', event => {

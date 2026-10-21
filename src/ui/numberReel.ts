@@ -9,6 +9,8 @@
 // between its neighbours, and a turn goes to the next stop that way.
 
 import { beginPlot } from '../viz/plot';
+import { motionReduced } from './motion';
+import { type Settings, settings } from '../model/settings';
 
 /** Pixels of drag, and of wheel, per step. */
 const DRAG_STEP = 14;
@@ -83,10 +85,11 @@ export function slotOf(places: readonly number[], at: number): number {
 
 /**
  * How many whole steps `deltaY` pixels of wheel make, as a page scrolls:
- * positive (down) is more, the next value below.
+ * positive (down) is more, the next value below; the other way round with
+ * the sandbox's Wheel setting on Reverse.
  */
-export function wheelSteps(deltaY: number): number {
-  return Math.trunc(deltaY / WHEEL_STEP);
+export function wheelSteps(deltaY: number, direction: Settings['wheel'] = 'page'): number {
+  return Math.trunc((direction === 'reverse' ? -deltaY : deltaY) / WHEEL_STEP);
 }
 
 /**
@@ -146,7 +149,6 @@ export function createReel(spec: ReelSpec): { element: HTMLCanvasElement; update
   canvas.setAttribute('aria-valuemin', String(aria(stops[0])));
   canvas.setAttribute('aria-valuemax', String(aria(stops[stops.length - 1])));
 
-  const still = window.matchMedia('(prefers-reduced-motion: reduce)');
   // Where the drum is turned to, as a place among the stops; it eases
   // towards the value's.
   let shown = placeOf(stops, spec.get());
@@ -229,7 +231,7 @@ export function createReel(spec: ReelSpec): { element: HTMLCanvasElement; update
   // Eases the drum to the value, a frame at a time; at once if motion is unwelcome.
   const turn = () => {
     const target = placeOf(stops, spec.get());
-    if (still.matches) {
+    if (motionReduced()) {
       shown = target;
       draw();
       return;
@@ -294,9 +296,11 @@ export function createReel(spec: ReelSpec): { element: HTMLCanvasElement; update
     event => {
       event.preventDefault();
       wheel += event.deltaMode === 1 ? event.deltaY * 16 : event.deltaY;
-      const steps = wheelSteps(wheel);
+      const direction = settings.get().wheel;
+      const steps = wheelSteps(wheel, direction);
       if (steps !== 0) {
-        wheel -= steps * WHEEL_STEP;
+        // Keep what is left over, in the scroll's own sense.
+        wheel -= (direction === 'reverse' ? -steps : steps) * WHEEL_STEP;
         go(reelStep(stops, spec.get(), steps));
       }
     },

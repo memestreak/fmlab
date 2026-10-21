@@ -1,4 +1,5 @@
-import { screenGlitchOn } from '../model/settings';
+import { settings } from '../model/settings';
+import { motionReduced } from './motion';
 
 // The sandbox's top screens glitch, briefly, as an analog display does,
 // when what they show changes (Jeremy, 2026-10-21): a tab opened on the
@@ -6,8 +7,8 @@ import { screenGlitchOn } from '../model/settings';
 // once, each its own kind, never the two alike). One of five, at random,
 // never the same twice in a row on a screen. Only the glass moves: the canvas inside its bezel, by Web
 // Animations on it or on an overlay over it, so nothing is drawn again
-// and nothing in the layout moves. None under reduced motion, or with
-// Screen glitch off (model/settings.ts).
+// and nothing in the layout moves. None under reduced motion (motion.ts),
+// or with the Screen glitch setting off (model/settings.ts).
 
 export const GLITCHES = ['flash', 'refresh', 'jitter', 'tear', 'scanline'] as const;
 export type Glitch = (typeof GLITCHES)[number];
@@ -59,8 +60,7 @@ export function glitchScreens(canvases: readonly (HTMLCanvasElement | null)[]): 
   for (const [canvas, stop] of [...running]) {
     if (screens.includes(canvas) || canvas.offsetParent === null) stop();
   }
-  if (screens.length === 0 || !screenGlitchOn()) return;
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (screens.length === 0 || settings.get().screenGlitch === 'off' || motionReduced()) return;
   const kinds = nextGlitches(
     screens.map(canvas => last[screenOf(canvas)]),
     Math.random,

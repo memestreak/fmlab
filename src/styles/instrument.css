@@ -2206,8 +2206,14 @@ canvas.voice-keys {
   }
 
   [data-view='instrument'] .inst-tools {
-    flex: 1 1 12rem;
+    flex: 1 1 6rem;
+    min-width: 0;
     margin-left: 0;
+  }
+
+  /* The Settings key on Volume's line, a little narrower. */
+  [data-view='instrument'] .inst-settings .lamp-key {
+    padding: 0 0.55rem 0 0.45rem;
   }
 
   [data-view='instrument'] .inst-tools .slider-row {
@@ -2501,4 +2507,197 @@ canvas.voice-keys {
   .piano-c {
     bottom: 0.7rem;
   }
+}
+
+/* The sandbox's Settings (ui/settingsPanel.ts; Jeremy, 2026-10-21): a
+   push key in the title bar, between Volume and the glossary, lit while
+   its panel is open; the panel a modal console of the chassis's black
+   plastic, the same in either theme, its settings on a VFD screen. */
+body:not([data-view='instrument']) .inst-settings {
+  display: none;
+}
+
+.inst-settings {
+  flex: none;
+}
+
+:root:has(.settings-panel[open]) {
+  overflow: hidden;
+}
+
+.settings-panel {
+  box-sizing: border-box;
+  width: min(600px, calc(100vw - 32px));
+  max-width: none;
+  padding: 14px 16px 16px;
+  border: 1px solid #000;
+  border-radius: 9px;
+  background: linear-gradient(#202323, #111313);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 24px 60px rgba(0, 0, 0, 0.55),
+    0 4px 12px rgba(0, 0, 0, 0.4);
+  color: var(--lamp-legend);
+}
+
+.settings-panel::backdrop {
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.settings-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.settings-screen {
+  min-height: 0;
+  padding: 7px;
+}
+
+/* The glass: one line a setting, its group dim, its name, its value at
+   the right, glowing; the selected one lit behind, a bar at its left. */
+.settings-glass {
+  display: grid;
+  padding: 6px 0;
+  border-radius: 3px;
+  background: radial-gradient(ellipse at 50% 40%, var(--vfd-glass-1), var(--vfd-glass-2));
+  box-shadow: 0 0 0 1px #000;
+  color: var(--vfd-lit);
+  font: 500 0.8rem / 1.35 var(--font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-shadow:
+    0 0 2px var(--vfd-glow),
+    0 0 6px color-mix(in srgb, var(--vfd-glow) 60%, transparent);
+  cursor: default;
+  user-select: none;
+}
+
+.settings-glass:focus-visible {
+  outline: 2px solid var(--lamp-legend-hover);
+  outline-offset: 9px;
+}
+
+.settings-line {
+  display: grid;
+  grid-template-columns: 7.5rem minmax(0, 1fr) auto;
+  gap: 0 12px;
+  padding: 3px 12px;
+}
+
+.settings-line[aria-selected='true'] {
+  background: color-mix(in srgb, var(--vfd-glow) 16%, transparent);
+  box-shadow: inset 2px 0 0 var(--vfd-lit);
+}
+
+.settings-group {
+  opacity: 0.45;
+}
+
+.settings-value {
+  text-align: right;
+  cursor: pointer;
+}
+
+/* Under the screen: ‹ › through the lines, the selected one's name
+   silkscreened grey, its choices as lamp keys. */
+.settings-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.settings-steps .chooser-key {
+  height: 1.65rem;
+}
+
+.settings-legend {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--lamp-legend);
+  font: 700 0.72rem / 1 var(--font-sans);
+  font-variant: small-caps;
+  letter-spacing: 0.1em;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.settings-choices {
+  flex: none;
+}
+
+/* On a phone the group goes under the name. */
+@media (max-width: 30rem) {
+  .settings-line {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .settings-group {
+    grid-column: 1 / -1;
+    font-size: 0.68rem;
+  }
+
+  .settings-controls {
+    flex-wrap: wrap;
+  }
+
+  .settings-legend {
+    order: -1;
+    flex-basis: 100%;
+    text-align: left;
+  }
+}
+
+/* What the settings govern, keyed off <html>'s data attributes. */
+.piano-letter,
+.piano-typed {
+  display: none;
+}
+
+:root[data-note-names='all'] .piano-letter {
+  display: block;
+}
+
+:root[data-note-names='off'] .piano-c {
+  display: none;
+}
+
+/* The computer key that plays each piano key, small at its foot, above
+   the note's name. */
+:root[data-computer-keys='on'] .piano-typed {
+  display: block;
+  position: absolute;
+  right: 0;
+  bottom: 2.05rem;
+  left: 0;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  text-align: center;
+  opacity: 0.6;
+}
+
+:root[data-computer-keys='on'] .piano-black .piano-typed {
+  bottom: 0.85rem;
+  opacity: 0.8;
+}
+
+:root[data-zx='always'] .piano .piano-oct-hint {
+  opacity: 1;
+}
+
+:root[data-zx='off'] .piano .piano-oct-hint {
+  visibility: hidden;
+}
+
+:root[data-tips='off'] body[data-view='instrument'] .term-tip {
+  display: none;
+}
+
+:root[data-motion='still'] body[data-view='instrument'] * {
+  transition: none !important;
 }

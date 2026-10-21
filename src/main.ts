@@ -40,6 +40,7 @@ import { mountPiano } from './ui/piano';
 import { mountSliders } from './ui/sliders';
 import { mountSteps } from './ui/steps';
 import { mountTerms } from './ui/terms';
+import { mountSettings } from './ui/settingsPanel';
 import { mountThemeSwitch } from './ui/themeSwitch';
 import { mountVoiceTable } from './ui/voiceTable';
 import {
@@ -122,6 +123,9 @@ if (follows) mountIndexFollowsToggle(follows, store);
 
 const theme = document.querySelector<HTMLButtonElement>('#theme');
 if (theme) mountThemeSwitch(theme, store);
+
+// The sandbox's Settings key and panel, and what the settings govern.
+mountSettings(store);
 
 const commit = document.querySelector<HTMLElement>('#commit');
 if (commit) mountCommitHash(commit);
