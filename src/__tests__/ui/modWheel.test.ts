@@ -24,6 +24,11 @@ describe('the mod wheel', () => {
     expect(wheelAfterScroll(3, 0, 1)).toBe(0.048);
   });
 
+  it('scrolls down for less with the Wheel setting on Reverse', () => {
+    expect(wheelAfterScroll(100, 0.5, 0, 'reverse')).toBe(0.4);
+    expect(wheelAfterScroll(-100, 0.5, 0, 'reverse')).toBe(0.6);
+  });
+
   it('answers the arrows, Page Up and Down, Home and End', () => {
     expect(wheelAfterKey('ArrowUp', 0.4)).toBe(0.41);
     expect(wheelAfterKey('ArrowRight', 0.4)).toBe(0.41);

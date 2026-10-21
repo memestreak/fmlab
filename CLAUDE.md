@@ -75,11 +75,15 @@ figures subscribe to it. Nothing else passes values around.
   `set` and get the previous state too), `lab.ts` (`LabState`; the ranges
   and defaults; the log scales of the carrier and modulator sliders),
   `theme.ts` (the choice, its storage key, `applyTheme`) and
-  `settings.ts`, the sandbox's saved settings beside the theme, outside
-  the store, the link and the sound: Screen glitch
-  (`localStorage["fmlab.screenGlitch"]`, "on" or "off"; on when nothing
-  or nothing readable is saved; `screenGlitchOn`, `saveScreenGlitch`; no
-  control on the page yet, the sandbox's settings menu will show it).
+  `settings.ts`, the sandbox's settings (its Settings panel), outside the
+  lab's store, the link and the sound: `Settings` (Screen glitch, Motion,
+  Tips on hover, Z X hint, Note names, Computer keys, Wheel),
+  `DEFAULT_SETTINGS` (today's behaviour), `parseSettings` (anything
+  missing, unknown or unreadable its default), `loadSettings` and
+  `saveSettings`, all together as JSON under
+  `localStorage["fmlab.settings"]`, and `settings`, a store of their own
+  that whatever they govern subscribes to; the theme, the panel's last
+  line, keeps its own key and `theme.ts`.
   The URL holds
   the section and, for one with `sharesSound` (the sandbox), its
   sound (see `sandbox.ts` below). `state.chapter`
@@ -588,7 +592,32 @@ usual size, between ‹ › (`stepPreset`, round the 32; with the menu
 focused the arrows step it the same way, up and left back, down and
 right on, and Enter opens its list); its note, what
 the voice plays without, is not shown but is the menu's description for
-screen readers and follows the credit in the name's tip; then Volume, the glossary and the theme. Their containers
+screen readers and follows the credit in the name's tip; then Volume, the
+Settings key, the glossary and the theme. The Settings key
+(`ui/settingsPanel.ts`, `mountSettings`; Jeremy, 2026-10-21, "the
+function panel, named SETTINGS") is one lamp key in its own bezel, lit
+while its panel is open (`aria-pressed`, `aria-expanded`), worked on
+the press; the panel a modal `<dialog>` named Settings, a console of
+the chassis's black plastic the same in either theme over a page dimmed
+35 %: "Settings" on Dymo tape and a Close key, a VFD screen in a molded
+bezel listing the eight settings one line each (group dim, name, value;
+the selected line lit behind with a bar at its left; a listbox: Up and
+Down, Left and Right change the value, Enter and Space the next choice,
+a click on a value too), and under it ‹ › through the lines, the
+selected one's name silkscreened grey and its choices as lamp keys.
+Changes apply and are saved as they are made; Esc, Close, the key or a
+click round the case closes it, focus going back to the key; the note
+keys and Z / X still play while it is open. The settings: Screen glitch
+(On, Off), Motion (System, Still), Tips on hover (On, Off: the
+sandbox's native titles put away in `data-tip-off` and the terms' tips
+hidden, names and descriptions kept), Z X hint (Hover, Always, Off),
+Note names (C only, All: every white key, Off), Computer keys (Off, On:
+the computer key that plays each piano key, small at its foot), Wheel
+(Page, Reverse) and Theme (the masthead switch's choice, kept in step);
+`applySettings` sets them on `<html>` (`data-motion`, `data-tips`,
+`data-zx`, `data-note-names`, `data-computer-keys`) for the CSS. On a
+phone the key sits on Volume's line. Chapters have neither the key nor
+the settings. Their containers
 (`#inst-dx7-presets` in a group named Presets, `#inst-tools`) are in the
 masthead's markup and shown on the sandbox only; `PLACES` moves the
 lab's nodes into them. The masthead keeps every page's height, and its
@@ -706,7 +735,9 @@ Wheel controls scroll with the page's direction (Jeremy, 2026-10-20):
 positive deltaY, scrolling down, is the next value below, as a page
 would scroll to it. On the number reel, where larger values sit below,
 that is a step more; on the mod wheel, too, scrolling down is more, 1 %
-for each 10 px.
+for each 10 px. The sandbox's Wheel setting on Reverse turns every reel
+and the mod wheel the other way (`wheelSteps`, `wheelAfterScroll`); the
+knobs take no wheel. Drags and arrows are unchanged.
 
 ## Styling
 
@@ -803,9 +834,12 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
   random, never the same twice in a row on a screen, and on a preset the
   two screens never alike (`nextGlitch`, `nextGlitches`), 120 to 190 ms
   (Jeremy, 2026-10-21); on the glass only, cyan only, never moving the
-  layout or redrawing a plot; none under `prefers-reduced-motion`, and a
-  saved setting turns it off (`fmlab.screenGlitch`, on by default; the
-  sandbox's settings menu will show it). Anything
+  layout or redrawing a plot; none under reduced motion, and its own
+  setting turns it off. In the sandbox the Motion setting on Still acts
+  as `prefers-reduced-motion` does (no glitch, no reel easing, no
+  playheads or moving views, no CSS transitions): everything that moves
+  asks `motionReduced()` (`ui/motion.ts`), the media query or the
+  setting, and listens with `onMotionChange`. Anything
   else that moves must do the same.
 
 ## Testing

@@ -106,4 +106,10 @@ describe('the number reel\'s wheel', () => {
     expect(wheelSteps(-30)).toBe(-1);
     expect(wheelSteps(29)).toBe(0);
   });
+
+  it('turns the other way with the Wheel setting on Reverse', () => {
+    expect(wheelSteps(30, 'reverse')).toBe(-1);
+    expect(wheelSteps(-95, 'reverse')).toBe(3);
+    expect(wheelSteps(30, 'page')).toBe(1);
+  });
 });

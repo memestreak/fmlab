@@ -1,4 +1,3 @@
-import { parseScreenGlitch, SCREEN_GLITCH_KEY, saveScreenGlitch, screenGlitchOn } from '../../model/settings';
 import { GLITCH_MS, GLITCHES, type Glitch, nextGlitch, nextGlitches } from '../../ui/screenGlitch';
 
 describe('the screen glitch', () => {
@@ -69,44 +68,5 @@ describe('a preset change, both screens at once', () => {
 
   it('keeps to what is left: with the other screen\'s pick and its own last taken, three', () => {
     expect([0, 0.34, 0.67].map(r => nextGlitch(['flash', 'refresh'], r))).toEqual(['jitter', 'tear', 'scanline']);
-  });
-});
-
-describe('the Screen glitch setting', () => {
-  /** A localStorage of our own: Node 22 has none. */
-  const storage = (items: Record<string, string> = {}) => ({
-    getItem: (key: string) => items[key] ?? null,
-    setItem: (key: string, value: string) => {
-      items[key] = value;
-    },
-  });
-  afterEach(() => vi.unstubAllGlobals());
-
-  it('is on unless saved off', () => {
-    expect(SCREEN_GLITCH_KEY).toBe('fmlab.screenGlitch');
-    vi.stubGlobal('localStorage', storage());
-    expect(screenGlitchOn()).toBe(true);
-    saveScreenGlitch(false);
-    expect(localStorage.getItem(SCREEN_GLITCH_KEY)).toBe('off');
-    expect(screenGlitchOn()).toBe(false);
-    saveScreenGlitch(true);
-    expect(screenGlitchOn()).toBe(true);
-    expect(parseScreenGlitch('nonsense')).toBe(true);
-  });
-
-  it('is on when storage cannot be read, unless turned off this visit', () => {
-    const blocked = {
-      getItem: () => {
-        throw new Error('blocked');
-      },
-      setItem: () => {
-        throw new Error('blocked');
-      },
-    };
-    vi.stubGlobal('localStorage', blocked);
-    saveScreenGlitch(true);
-    expect(screenGlitchOn()).toBe(true);
-    saveScreenGlitch(false);
-    expect(screenGlitchOn()).toBe(false);
   });
 });
