@@ -691,7 +691,7 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
   `src/main.ts`): `--font-display` (Fraunces 600: wordmark and headings),
   `--font-sans` (Figtree 400 to 700, italic for figure captions:
   everything else), `--font-mono` (IBM Plex Mono: numbers, with tabular
-  figures; `.num`), `--font-tape` (Barlow Condensed 500: the sandbox's
+  figures; `.num`), `--font-tape` (Barlow Condensed 400: the sandbox's
   Dymo tape labels only). A weight that is not imported there is not
   available.
 - A canvas has no CSS: draw code reads the tokens with `getComputedStyle`

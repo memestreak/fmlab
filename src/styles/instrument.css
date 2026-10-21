@@ -265,7 +265,7 @@ body:not([data-view='instrument']) #inst-tools {
     var(--dymo-tape);
   box-shadow: var(--dymo-shadow);
   color: var(--dymo-letter);
-  font: 500 16px / 1 var(--font-tape);
+  font: 400 16px / 1 var(--font-tape);
   letter-spacing: 0.13em;
   text-transform: uppercase;
   text-shadow:
