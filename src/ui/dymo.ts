@@ -43,7 +43,10 @@ export function strike(word: string, i: number): { drop: number; tilt: number } 
 export function tapeLabel(element: Element | null): void {
   if (!element || element.classList.contains('dymo')) return;
   const word = (element.textContent ?? '').trim();
-  const letters = [...word.toUpperCase()].map((letter, i) => {
+  // The word's own case: the tape's CSS sets it in capitals, and where
+  // the label is untaped (Volume, back in a chapter's lab) it reads as it
+  // always did.
+  const letters = [...word].map((letter, i) => {
     const span = document.createElement('span');
     span.className = 'dymo-letter';
     span.textContent = letter;

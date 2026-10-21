@@ -310,7 +310,7 @@ body:not([data-view='instrument']) #inst-tools {
 }
 
 @media (min-resolution: 2dppx) {
-  .dymo-letter {
+  [data-view='instrument'] .dymo-letter {
     transform: translateY(var(--drop, 0)) rotate(var(--tilt, 0));
   }
 }
