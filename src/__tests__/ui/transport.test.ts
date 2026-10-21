@@ -107,4 +107,12 @@ describe('where the space bar is left alone', () => {
   it('is not kept from the Bessel plot, a slider with no use for space', () => {
     expect(spaceIsFree(element(['[role="slider"]']))).toBe(true);
   });
+
+  it('is left to a menu, but in the sandbox a menu leaves it free', () => {
+    expect(spaceIsFree(element(['select']))).toBe(false);
+    expect(spaceIsFree(element(['select']), true)).toBe(true);
+    // Typing and buttons keep it in the sandbox too.
+    expect(spaceIsFree(element(['input[type="text"]']), true)).toBe(false);
+    expect(spaceIsFree(element(['button']), true)).toBe(false);
+  });
 });

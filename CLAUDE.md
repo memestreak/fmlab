@@ -396,7 +396,10 @@ figures subscribe to it. Nothing else passes values around.
   `envelopeControls.ts` drags the envelope's dots; `piano.ts` is the
   sandbox's keyboard, on screen and on the computer's keys
   (by `KeyboardEvent.code`: A to K the white notes, W E T Y U O P the
-  black, Z and X an octave down and up). Every key held sounds: it writes
+  black, Z and X an octave down and up; with a menu focused too, a
+  preset just picked or the algorithm, which then takes neither them nor
+  the space bar as the start of a name, its arrows still its own).
+  Every key held sounds: it writes
   `held`, and the key struck last's pitch into `carrierHz` and its moment
   into `noteStartedAt` / `noteLength`. Keys are let go on blur, a hidden
   tab, a lost pointer capture and a change of chapter, so none sticks.

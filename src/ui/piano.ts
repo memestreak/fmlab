@@ -267,12 +267,17 @@ export function mountPiano(
   draw();
 
   // The computer's keys, while the sandbox is showing. Not with Ctrl, Alt
-  // or Cmd held (those are the browser's), and not while typing.
+  // or Cmd held (those are the browser's), and not while typing. A menu
+  // with the focus (a preset just picked, or the algorithm) lets them
+  // play too, and does not take them as the start of a name (Jeremy,
+  // 2026-10-21); its arrows, Enter and Tab are still its own.
   document.addEventListener('keydown', event => {
     if (!active() || event.repeat || event.ctrlKey || event.altKey || event.metaKey) return;
-    if (event.target instanceof Element && event.target.closest('input[type="text"], textarea, select')) return;
-    if (event.code === OCTAVE_DOWN) return move(-1);
-    if (event.code === OCTAVE_UP) return move(1);
+    if (event.target instanceof Element && event.target.closest('input[type="text"], textarea')) return;
+    if (event.code === OCTAVE_DOWN || event.code === OCTAVE_UP) {
+      event.preventDefault();
+      return move(event.code === OCTAVE_DOWN ? -1 : 1);
+    }
     const midi = noteForCode(event.code, start);
     if (midi === null) return;
     event.preventDefault();

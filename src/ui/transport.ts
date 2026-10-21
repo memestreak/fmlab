@@ -37,9 +37,13 @@ export function pressPlay(state: LabState, time: number): Partial<LabState> {
  * button (it presses it, so the Play button still works), a link, a
  * checkbox (it ticks it), a maths panel's heading (it opens it), or
  * anything typed into. On a slider, the Bessel plot included, space has
- * no meaning, so there it plays and stops.
+ * no meaning, so there it plays and stops. In the sandbox a menu (a
+ * preset just picked, or the algorithm) leaves it free too, so that
+ * picking from one does not take the keys from the keyboard; its arrows
+ * still step it.
  */
-export function spaceIsFree(target: Element | null): boolean {
+export function spaceIsFree(target: Element | null, sandbox = false): boolean {
+  if (sandbox && target?.closest('select')) return true;
   return !target?.closest(
     'button, a, summary, input[type="checkbox"], input[type="text"], textarea, select, [contenteditable="true"]',
   );
@@ -53,7 +57,8 @@ export function mountPlayButton(button: HTMLButtonElement, store: LabStore): voi
   button.addEventListener('click', press);
   document.addEventListener('keydown', event => {
     if (event.key !== ' ' || event.repeat) return;
-    if (!(event.target instanceof Element) || !spaceIsFree(event.target)) return;
+    if (!(event.target instanceof Element)) return;
+    if (!spaceIsFree(event.target, store.get().chapter === 'sandbox')) return;
     // The glossary has no lab: nothing to play.
     if (store.get().chapter === GLOSSARY) return;
     // Or the page would scroll down a screen as well.
