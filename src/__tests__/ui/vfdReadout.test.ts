@@ -51,4 +51,12 @@ describe('the VFD readout\'s glyphs', () => {
     }
     expect(vfdCells(formatLevel(-72)).map(c => c.char + (c.point ? '.' : '')).join('')).toBe('-72.0');
   });
+
+  it("writes the octave's first C, C1 to C5, in two places", () => {
+    expect(SEGMENTS.C).toEqual(['a', 'd', 'e', 'f']);
+    expect(vfdCells('C3', 2)).toEqual([
+      { char: 'C', point: false },
+      { char: '3', point: false },
+    ]);
+  });
 });

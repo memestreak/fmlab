@@ -72,6 +72,7 @@
   --lamp-legend: #8d9393;
   --lamp-legend-hover: #b5baba;
   --lamp-legend-lit: #ffe3ad;
+  --lamp-legend-dead: #3d4141;
   --lamp-glow: #ff9d2e;
   --lamp-ring: #8e9393;
   --lamp-off-1: #6e4719;
@@ -143,6 +144,7 @@
     --lamp-legend: #8d9393;
     --lamp-legend-hover: #b5baba;
     --lamp-legend-lit: #ffe3ad;
+    --lamp-legend-dead: #3d4141;
     --lamp-glow: #ff9d2e;
     --lamp-ring: #8e9393;
     --lamp-off-1: #6e4719;
@@ -211,6 +213,7 @@
   --lamp-legend: #8d9393;
   --lamp-legend-hover: #b5baba;
   --lamp-legend-lit: #ffe3ad;
+  --lamp-legend-dead: #3d4141;
   --lamp-glow: #ff9d2e;
   --lamp-ring: #8e9393;
   --lamp-off-1: #6e4719;

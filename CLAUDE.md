@@ -405,7 +405,10 @@ figures subscribe to it. Nothing else passes values around.
   tab, a lost pointer capture and a change of chapter, so none sticks.
   Piano-shaped keys under an ink key slip, every C named (the computer
   keys that play them are in their names, not drawn on them), the octave
-  control (− the range +, and the Z / X hint, shown only while the
+  control (‹ › black push keys either side of a two-place VFD readout of
+  the keyboard's first C, C1 to C5, in one bezel as the algorithm
+  chooser's (Jeremy, 2026-10-21); the range in words lies over the
+  readout unseen, for its tip and double click; and the Z / X hint, shown only while the
 pointer is over the keyboard or keyboard focus is in it) on their left.
 It shows two octaves, from C1–B2 to C5–B6 (`STARTS`; Jeremy, 2026-10-21),
 starting at C3–B4, where a double click on the range brings it back;
@@ -571,8 +574,10 @@ its display the panel's width, the same size whichever tab is open (the
 row under it is one height for all three), over one row of its controls;
 on a phone each display is 9rem high and its row wraps. The Algorithm
 tab: the wiring diagram, and under it the algorithm list between ‹ ›
-(`stepAlgorithm`, round the 32), its number shown on a two-place VFD
-readout as wide as the list was, the list unseen over it so a click
+(`stepAlgorithm`, round the 32; the ‹ › the tabs' black push keys
+without a lamp, stepping on the press, all three in one bezel, the
+`.chooser` the octave control shares), its number shown on a two-place
+VFD readout 48px wide, the list unseen over it so a click
 opens it and the keys choose, keyboard focus ringing the glass and a
 click's not, and beside them the Feedback knob (`mountFeedbackKnob`, 0
 to 2π), its dial level with ‹ ›, its name under it and no readout:

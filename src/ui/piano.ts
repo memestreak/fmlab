@@ -1,5 +1,6 @@
 import { midiToHz } from '../dsp/voices';
 import { type LabStore, releaseSecondsOf } from '../model/lab';
+import { createVfdReadout } from './vfdReadout';
 
 // The sandbox's keyboard: on screen, and on the computer's own keys laid
 // out the way music software does it. Every key held sounds, at its own
@@ -120,30 +121,48 @@ export function mountPiano(
   board.setAttribute('role', 'group');
   board.setAttribute('aria-label', 'Piano keyboard');
 
+  // The octave's keys, black push keys as the algorithm chooser's: they
+  // step on the press, Enter and Space through the click (a pointer's own
+  // click follows a press that has already stepped).
   const octave = (label: string, direction: number) => {
     const button = document.createElement('button');
     button.type = 'button';
-    button.className = 'piano-octave';
+    button.className = 'piano-octave chooser-key';
     button.textContent = label;
     button.setAttribute('aria-label', direction < 0 ? 'Octave down (Z)' : 'Octave up (X)');
-    button.addEventListener('click', () => move(direction));
+    button.addEventListener('pointerdown', event => {
+      if (event.button === 0) move(direction);
+    });
+    button.addEventListener('click', event => {
+      if (event.detail === 0) move(direction);
+    });
     return button;
   };
-  const down = octave('−', -1);
-  const up = octave('+', 1);
+  const down = octave('‹', -1);
+  const up = octave('›', 1);
 
-  // The octave control, left of the keys: its name, − and + either side
-  // of the range the keys cover, and the computer keys that do the same.
+  // The octave control, left of the keys: its name, ‹ and › either side
+  // of a VFD readout of the keyboard's first C (Jeremy, 2026-10-21), all
+  // in one bezel, as the algorithm chooser; and the computer keys that do
+  // the same. The range in words lies over the readout, unseen: its tip
+  // and its double click are the readout's.
   const range = document.createElement('span');
   range.className = 'piano-oct-range num';
   range.title = 'Double-click: back to C3–B4';
+  const readout = createVfdReadout({ get: () => start, format: noteName, places: 2 });
+  readout.element.classList.add('piano-oct-vfd');
+  const display = document.createElement('span');
+  display.className = 'piano-oct-display';
+  display.append(readout.element, range);
   const control = document.createElement('div');
   control.className = 'piano-oct';
   control.innerHTML =
     '<span class="piano-oct-label" aria-hidden="true">Octave</span>' +
     '<div class="piano-oct-row"></div>' +
     '<span class="piano-oct-hint" aria-hidden="true"><kbd>Z</kbd> <kbd>X</kbd> on the keyboard</span>';
-  control.querySelector('.piano-oct-row')?.append(down, range, up);
+  const row = control.querySelector('.piano-oct-row');
+  row?.classList.add('chooser');
+  row?.append(down, display, up);
 
   /** Every key held is drawn down. */
   const update = () => {
@@ -241,6 +260,7 @@ export function mountPiano(
     board.setAttribute('aria-label', `Piano keyboard, ${span}`);
     board.dataset.range = span;
     range.textContent = `${noteName(start)}–${noteName(start + KEYS - 1)}`;
+    readout.update();
     down.disabled = start === STARTS[0];
     up.disabled = start === STARTS[STARTS.length - 1];
     update();
