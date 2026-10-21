@@ -74,6 +74,8 @@
   --lamp-key-down-1: #151717;
   --lamp-key-down-2: #0c0d0d;
   --lamp-legend: #8d9393;
+  /* Text printed on the sandbox's chassis panels: a light silkscreen grey. */
+  --chassis-legend: #c9cdca;
   --lamp-legend-hover: #b5baba;
   --lamp-legend-lit: #ffe3ad;
   --lamp-legend-dead: #3d4141;
@@ -153,6 +155,8 @@
     --lamp-key-down-1: #151717;
     --lamp-key-down-2: #0c0d0d;
     --lamp-legend: #8d9393;
+    /* Text printed on the sandbox's chassis panels: a light silkscreen grey. */
+    --chassis-legend: #c9cdca;
     --lamp-legend-hover: #b5baba;
     --lamp-legend-lit: #ffe3ad;
     --lamp-legend-dead: #3d4141;
@@ -174,7 +178,10 @@
     --dymo-shadow: 0 1px 1.5px rgba(0, 0, 0, 0.7), 0 0 0 0.5px rgba(255, 255, 255, 0.16), inset 0 0.5px 0 rgba(255, 255, 255, 0.11);
   }
 }
-:root[data-theme='dark'] {
+:root[data-theme='dark'],
+/* The sandbox's chassis panels (instrument.css) take the dark values in
+   either theme, so what sits on their black plastic reads on it. */
+[data-view='instrument'] .chassis-ink {
   color-scheme: dark;
   --paper: #131418;
   --paper-sunken: #1d1f24;
@@ -229,6 +236,8 @@
   --lamp-key-down-1: #151717;
   --lamp-key-down-2: #0c0d0d;
   --lamp-legend: #8d9393;
+  /* Text printed on the sandbox's chassis panels: a light silkscreen grey. */
+  --chassis-legend: #c9cdca;
   --lamp-legend-hover: #b5baba;
   --lamp-legend-lit: #ffe3ad;
   --lamp-legend-dead: #3d4141;
