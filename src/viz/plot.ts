@@ -5,6 +5,8 @@ import { keepsLabel, labelStride, type Tick } from './ticks';
 
 /** Space around the plot area for the axis labels, in CSS pixels. */
 const MARGIN = { top: 12, right: 22, bottom: 62, left: 40 };
+/** The foot's margin without the x axis's title: its two rows of numbers only. */
+const UNTITLED_BOTTOM = 42;
 export const LABEL_SIZE = 12;
 /** The least clear space between two labels in the second row. */
 const LABEL_GAP = 8;
@@ -21,12 +23,12 @@ export interface Area {
  * The plot area of a canvas of a given size. On its own so that pointer
  * code can turn a position into a value without a canvas to hand.
  */
-export function plotArea(width: number, height: number): Area {
+export function plotArea(width: number, height: number, bottomMargin = MARGIN.bottom): Area {
   return {
     left: MARGIN.left,
     right: width - MARGIN.right,
     top: MARGIN.top,
-    bottom: height - MARGIN.bottom,
+    bottom: height - bottomMargin,
   };
 }
 
@@ -110,7 +112,9 @@ export function beginPlot(canvas: HTMLCanvasElement): Plot | null {
       }
       return on;
     },
-    ...plotArea(width, height),
+    // A canvas whose --plot-title is "none" (the sandbox's spectrum) has
+    // no title under its axis, and its plot takes that line.
+    ...plotArea(width, height, style.getPropertyValue('--plot-title').trim() === 'none' ? UNTITLED_BOTTOM : MARGIN.bottom),
   };
   return plot;
 }
@@ -281,14 +285,9 @@ export function drawFrame(
     if (keepsLabel(i, ticks.length, stride)) ctx.fillText(sub, x(at), bottom + 23);
   });
 
-  // Where the canvas's --plot-title is "hover" (the sandbox's spectrum),
-  // its frame shows the title only under the pointer, so the canvas leaves
-  // the title's line blank and hands the frame the text.
-  const frame = ctx.canvas.parentElement;
-  if (token('--plot-title') === 'hover' && frame) {
-    frame.dataset.xTitle = xTitle;
-    return;
-  }
+  // Where the canvas's --plot-title is "none" (the sandbox's spectrum),
+  // there is no title: the plot area took its line.
+  if (token('--plot-title') === 'none') return;
   ctx.font = `${LABEL_SIZE}px ${token('--font-sans')}`;
   ctx.fillText(xTitle, (left + right) / 2, bottom + 44);
 }
