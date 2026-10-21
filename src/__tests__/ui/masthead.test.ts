@@ -11,7 +11,9 @@ describe('the sandbox\'s masthead', () => {
     expect(masthead).toContain('id="inst-tools"');
     expect(masthead).toContain('id="contents-open"');
     expect(masthead).toContain('href="#/glossary"');
-    expect(masthead).toContain('<a href="#/">fmlab</a>');
+    // The logo is the way home: its word is the link's name, its stripes
+    // are drawn and hidden from screen readers.
+    expect(masthead).toMatch(/<a href="#\/"><span class="logo-word">fmlab<\/span><span class="logo-bars" aria-hidden="true">/);
     // The presets are a group named for screen readers.
     expect(masthead).toMatch(/role="group" aria-labelledby="inst-presets-title"/);
     expect(masthead).toMatch(/id="inst-presets-title" class="visually-hidden">Presets</);

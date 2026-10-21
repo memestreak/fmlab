@@ -401,6 +401,55 @@ h3 {
   letter-spacing: -0.01em;
 }
 
+/* The logo (Jeremy, 2026-10-21): "fmlab" in wide lowercase over three
+   racing stripes, amber, red and teal, slanted forward like speed lines,
+   the paint lightly chipped (a fixed noise pattern, the same every
+   visit). It keeps the old wordmark's height, so the masthead does too. */
+.wordmark {
+  display: flex;
+  align-items: center;
+  height: calc(2.1rem * 1.15);
+  --logo-wear: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='120'%3E%3Cfilter id='w'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -9 6.4'/%3E%3C/filter%3E%3Crect width='220' height='120' filter='url(%23w)'/%3E%3C/svg%3E");
+}
+
+.wordmark a {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  color: var(--ink);
+  font-size: 1.4rem;
+}
+
+.logo-word {
+  font: 400 1em / 1 var(--font-logo);
+  letter-spacing: 0.05em;
+  -webkit-mask: var(--logo-wear) 0 0 / 160px;
+  mask: var(--logo-wear) 0 0 / 160px;
+}
+
+.logo-bars {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.14em;
+  height: 0.2em;
+  transform: skewX(-28deg);
+  transform-origin: left;
+  -webkit-mask: var(--logo-wear) 30px 0 / 120px;
+  mask: var(--logo-wear) 30px 0 / 120px;
+}
+
+.logo-bars b:nth-child(1) {
+  background: var(--logo-amber);
+}
+
+.logo-bars b:nth-child(2) {
+  background: var(--logo-red);
+}
+
+.logo-bars b:nth-child(3) {
+  background: var(--logo-teal);
+}
+
 p {
   margin: 0 0 1rem;
 }

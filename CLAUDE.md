@@ -838,19 +838,30 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
 - Red means negative phase and nothing else: controls and the focus ring
   are ink. Never let phase rest on colour alone; a negative stem also gets
   a hollow marker. In the sandbox's VFD spectrum, a negative stem is
-  shown by its place and hollow end alone.
+  shown by its place and hollow end alone. The one exception is the
+  logo's middle stripe (`--logo-red`; Jeremy picked it knowingly,
+  2026-10-21): a drawn mark, not a plot.
+- The logo, in every page's masthead and the way home (`.wordmark`,
+  index.html; Jeremy, 2026-10-21): "fmlab" in wide lowercase
+  (`--font-logo`, Michroma) over three racing stripes, amber, red and
+  teal (`--logo-*`), slanted forward like speed lines, the paint lightly
+  chipped by a fixed noise mask (the same every visit), in ink on either
+  theme. The word is the link's name; the stripes are hidden from screen
+  readers. It keeps the old wordmark's height, so the masthead does. The
+  favicon stays the carrier and its sidebands, which reads at 16px where
+  the stripes would not.
 - A figure sits between two ink rules (`.figure`) with an italic caption,
   "Fig. n" then an em space then the title. Where the lab is pinned
   beside the text, its figures share one plate instead: an ink rule above
   the first and below the last, a `--rule` hairline between them (but
   not round the sandbox's VFD spectrum).
 - Fonts, self-hosted through `@fontsource` (latin subsets, imported in
-  `src/main.ts`): `--font-display` (Fraunces 600: wordmark and headings),
+  `src/main.ts`): `--font-display` (Fraunces 600: headings),
   `--font-sans` (Figtree 400 to 700, italic for figure captions:
   everything else), `--font-mono` (IBM Plex Mono: numbers, with tabular
   figures; `.num`), `--font-tape` (Barlow Condensed 400: the sandbox's
-  Dymo tape labels only). A weight that is not imported there is not
-  available.
+  Dymo tape labels only), `--font-logo` (Michroma 400: the logo only). A
+  weight that is not imported there is not available.
 - A canvas has no CSS: draw code reads the tokens with `getComputedStyle`
   and whoever mounts it must redraw on resize, theme change and
   `document.fonts.ready` (`mountFigure` in `src/ui/figures.ts` does).

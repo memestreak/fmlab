@@ -29,6 +29,14 @@
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
   /* The sandbox's Dymo tape labels only. */
   --font-tape: 'Barlow Condensed', var(--font-sans);
+  /* The logo only: wide, as a 1970s instrument's front panel. */
+  --font-logo: 'Michroma', var(--font-sans);
+  /* The logo's racing stripes (Jeremy, 2026-10-21), the same in either
+     theme. The red is the logo's alone: elsewhere red means negative
+     phase and nothing else. */
+  --logo-amber: #e8892b;
+  --logo-red: #d4452a;
+  --logo-teal: #2f9c94;
   /* The VFD readouts, the knobs' VFD dials, the faders and the
      sandbox's diagram and graphs: the same in either theme (but for a
      faint light edge in dark), as a real display is. */
