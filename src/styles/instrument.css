@@ -1046,9 +1046,54 @@ body:not([data-view='instrument']) #inst-tools {
   background: color-mix(in srgb, var(--pen-blue) 18%, var(--paper));
 }
 
-/* The operator table, the full width. */
-.inst .panel {
-  border-top: 1px solid var(--ink);
+/* The operator table, the full width, in its own chassis. */
+[data-view='instrument'] #inst-operators {
+  padding: 9px 12px;
+  /* Not a panel's ink rule: the chassis's edge is its line. */
+  border-top: 0;
+}
+
+/* The bezels of the large screens let into the chassis, as the
+   spectrum's: a recess, no light edge of their own. */
+[data-view='instrument'] .chassis-ink :is(.screen-bezel, #inst-diagram-figure .plot-frame) {
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.8),
+    0 0 0 1px #000,
+    0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+/* The top band padded as the keyboard's chassis is. */
+[data-view='instrument'] .inst-top.chassis {
+  padding: 9px 12px;
+}
+
+/* The Voice column no wider than the panel leaves it, whatever its
+   canvas's last size (on a phone it ran past the panel's edge). */
+[data-view='instrument'] .inst-top .inst-left {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 62rem) {
+  /* Operators on the column heads' line, over the tags and roles, whose
+     heads are for screen readers only: the table a line higher in its
+     panel (Jeremy, 2026-10-21). */
+  [data-view='instrument'] #inst-operators {
+    position: relative;
+  }
+
+  [data-view='instrument'] #inst-operators #voice-heading {
+    position: absolute;
+    top: 9px;
+    left: 12px;
+    margin: 0;
+  }
+
+  [data-view='instrument'] .op-table thead th {
+    height: 24px;
+    padding-top: 0;
+    padding-bottom: 0;
+    vertical-align: middle;
+  }
 }
 
 .inst .voice-panel .panel-title {
@@ -1348,19 +1393,55 @@ canvas.voice-keys {
    control panel and the keys, let into it, and the spectrum, its glass
    let in the same way. The chassis above the keys is their rail; its
    ends are their cheeks. */
+/* The chassis (Jeremy, 2026-10-21): the tab strips' molded black
+   plastic, the same in either theme, for the sandbox's three bodies, the
+   top band (Voice and the operator panel), the operator table and the
+   keyboard. Only a black edge round them: no light edge, which read as
+   a white line between them. */
+[data-view='instrument'] .chassis {
+  border-radius: 8px;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.05), transparent 30%),
+    linear-gradient(var(--lamp-bezel-1), var(--lamp-bezel-2));
+  box-shadow: 0 0 0 1px #000;
+}
+
+/* The top two hold text, rules and controls drawn in the page's tokens:
+   they take the dark theme's (tokens.css) in either theme, their text a
+   light silkscreen grey rather than white, as the push keys' legends are
+   printed. The page's own paper and ink are kept for what stays paper
+   (the number reels). */
+.inst-body {
+  --page-paper: var(--paper);
+  --page-paper-sunken: var(--paper-sunken);
+  --page-ink: var(--ink);
+  --page-rule: var(--rule);
+  --page-grid: var(--grid);
+}
+
+[data-view='instrument'] .chassis-ink {
+  --ink: var(--chassis-legend);
+  color: var(--ink);
+}
+
+[data-view='instrument'] .chassis-ink .op-reel {
+  --paper: var(--page-paper);
+  --paper-sunken: var(--page-paper-sunken);
+  --ink: var(--page-ink);
+  --rule: var(--page-rule);
+  --grid: var(--page-grid);
+}
+
 .inst-foot {
   display: flex;
   flex: none;
   align-items: stretch;
   gap: 14px;
   padding: 9px 12px 0;
+}
+
+[data-view='instrument'] .inst-foot.chassis {
   border-radius: 8px 8px 0 0;
-  background:
-    linear-gradient(rgba(255, 255, 255, 0.05), transparent 30%),
-    linear-gradient(var(--lamp-bezel-1), var(--lamp-bezel-2));
-  box-shadow:
-    0 0 0 1px #000,
-    var(--lamp-bezel-edge);
 }
 
 .inst-foot .inst-keys {
@@ -1979,16 +2060,19 @@ canvas.voice-keys {
     min-height: 0;
   }
 
-  /* The ink rule under the masthead, the title bar's, on the top of
-     the body, so the masthead is as tall as on any page. */
+  /* The body under the title bar, no rule between them (Jeremy,
+     2026-10-21): the top panel's edge is the line. */
   .inst-body {
     display: flex;
     flex: 1 1 auto;
     flex-direction: column;
-    gap: 0.75rem;
+    /* Half the room under the title bar it had (Jeremy, 2026-10-21):
+       0.875rem with the masthead's margin, not 1.75rem; the half freed
+       shared between the panels' two gaps, which are equal, 5px +
+       0.6875rem (16.7px) each, so the page's heights are unchanged. */
+    gap: calc(5px + 0.6875rem);
     min-height: 0;
-    padding: 1rem 0 0.5rem;
-    border-top: 1px solid var(--ink);
+    padding: 0.125rem 0 calc(5px + 0.6875rem);
   }
 
   .inst-top {
@@ -2085,11 +2169,6 @@ canvas.voice-keys {
     flex: none;
   }
 
-  /* A little room between the operator table and the keyboard (Jeremy,
-     2026-10-20), from the height the title bar's row left. */
-  .inst-foot {
-    margin-top: 0.75rem;
-  }
 
   .piano-bed {
     height: 9rem;
@@ -2187,9 +2266,16 @@ canvas.voice-keys {
     height: 1.75rem;
   }
 
+  /* Under 52rem high: 0.675rem under the title bar, half its 1.35rem,
+     and the freed half shared between the gaps, 5px + 0.5875rem each. */
+  [data-view='instrument'] .masthead {
+    margin-bottom: 0.675rem;
+  }
+
   .inst-body {
-    gap: 0.4rem;
-    padding-top: 0.6rem;
+    gap: calc(5px + 0.5875rem);
+    padding-top: 0;
+    padding-bottom: calc(5px + 0.5875rem);
   }
 
   .inst-left {
@@ -2222,11 +2308,6 @@ canvas.voice-keys {
     padding-bottom: calc(19rem + env(safe-area-inset-bottom, 0px));
   }
 
-  /* The title bar's rule under the masthead here too. */
-  [data-view='instrument'] .inst-body {
-    border-top: 1px solid var(--ink);
-  }
-
   /* The masthead wraps: the wordmark and the theme, then the presets
      on a line of their own, then Volume and the glossary. */
   [data-view='instrument'] .inst-presets {
@@ -2235,6 +2316,13 @@ canvas.voice-keys {
 
   .preset-name {
     font-size: 1.25rem;
+  }
+
+  /* The Voice tabs a little closer, to fit beside the tape inside the
+     panel. */
+  [data-view='instrument'] .inst-alg-head .pill-tab {
+    gap: 0.35rem;
+    padding: 0 0.5rem 0 0.42rem;
   }
 
   /* The widest name at this size. */

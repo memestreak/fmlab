@@ -651,8 +651,8 @@ phone the key and the glossary share the line under Volume's. Chapters have neit
 the settings. Their containers
 (`#inst-dx7-presets` in a group named Presets, `#inst-tools`) are in the
 masthead's markup and shown on the sandbox only; `PLACES` moves the
-lab's nodes into them. The masthead keeps every page's height, and its
-ink rule is the top of `.inst-body`. No Play or Copy link: the keyboard
+lab's nodes into them. The masthead keeps every page's height, with no
+rule under it (Jeremy, 2026-10-21): the top panel's edge is the line. No Play or Copy link: the keyboard
 and the space bar play, and the address bar keeps the sound. The page's
 title, "Sandbox" (`#inst-title`), is for screen readers only. Then,
 in layout F (Jeremy, 2026-10-18), a top band: on the left, the
@@ -727,6 +727,21 @@ under 52rem high). Every control row's dials are one size,
 row's dials, push keys (their bezels a dial tall; the algorithm chooser,
 the LFO's waves and Key sync lifted onto the dials' line) and knob names
 fall on the same two lines in all five rows.
+The page is three bodies of the same molded black plastic, the
+`.chassis` (Jeremy, 2026-10-21), an even 16.7px apart (15px under 52rem
+high; half the room the title bar had above them given to these two
+gaps) with no rules
+between them or under the title bar, and only a black edge (no light
+one, which read as a white line): the top band (Voice and the operator panel, padded 9px
+12px, all four corners rounded), the operator table's panel (its
+Operators tape on the column heads' line, over the tags and roles,
+whose heads are for screen readers only, so the table starts a line
+higher) and the keyboard's foot. The top two are `.chassis-ink`: they
+take the dark theme's tokens in either theme (tokens.css), their text
+the light silkscreen `--chassis-legend`; the number reels keep the
+page's own paper and ink (`--page-*`), and the screens' bezels are
+recesses in the plastic, as the spectrum's. On a phone they are the
+same panels stacked, the Voice column held to the panel's width.
 Under the band the operator table (`#voice-table`) the full width, then
 the foot (`.inst-foot`), one chassis of the tab strips' molded black
 plastic (Jeremy, 2026-10-21; rounded at the top, square at the foot, the
@@ -784,7 +799,9 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
   `--pen-blue` (carrier and output traces, positive sidebands),
   `--pen-green` (modulator), `--pen-red` (negative sideband phase).
 - All text is pure `--ink`, never a grey. Use weight, size and italics for
-  hierarchy.
+  hierarchy. The exception is text printed on the sandbox's chassis
+  panels, which is the light silkscreen `--chassis-legend`, as the push
+  keys' legends are printed, and the same in either theme.
 - Colour appears only in plots, rules and control fills, with one
   exception: the VFD readouts (the operator table's, the algorithm's),
   every knob's VFD dial, the line across the sandbox's fader caps, the
@@ -798,7 +815,9 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
   the light behind those keys, and cyan stays the glass displays'
   colour. The sandbox's large screens sit in molded black bezels, the
   tab strips' plastic (Jeremy, 2026-10-21); the operator table's small
-  glass has none. The keyboard's chassis is that plastic too, its keys
+  glass has none. The sandbox's three bodies (the top band, the
+  operator table and the keyboard) are that plastic too (`.chassis`),
+  the same in either theme but the edge. The keyboard's chassis, its keys
   and the spectrum let into it; the felt under its rail is charcoal, not
   red, because red is reserved for negative phase. The mod wheel's drum
   is black rubber, its index line painted white, and its bar a VFD.
