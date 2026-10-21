@@ -402,14 +402,14 @@ h3 {
 }
 
 /* The logo (Jeremy, 2026-10-21): "fmlab" in wide lowercase over three
-   straight racing stripes, amber, red and teal, the paint lightly
-   chipped (a fixed noise pattern, the same every visit). As tall as the
-   old wordmark's box, so the masthead keeps its height. */
+   straight racing stripes, amber, red and teal. Clean on the chapters;
+   in the sandbox, an instrument, the paint is lightly chipped (a fixed
+   noise pattern, the same every visit). It sets the masthead's height,
+   51px. */
 .wordmark {
   display: flex;
   align-items: center;
-  height: calc(2.1rem * 1.15);
-  --logo-wear: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='120'%3E%3Cfilter id='w'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -9 6.4'/%3E%3C/filter%3E%3Crect width='220' height='120' filter='url(%23w)'/%3E%3C/svg%3E");
+  height: 3rem;
 }
 
 .wordmark a {
@@ -417,15 +417,13 @@ h3 {
   flex-direction: column;
   gap: 0.13em;
   color: var(--ink);
-  /* As big as the masthead's height allows (Jeremy, 2026-10-21). */
-  font-size: 1.82rem;
+  /* Bigger, the masthead growing to hold it (Jeremy, 2026-10-21). */
+  font-size: 2.28rem;
 }
 
 .logo-word {
   font: 400 1em / 1 var(--font-logo);
   letter-spacing: 0.05em;
-  -webkit-mask: var(--logo-wear) 0 0 / 160px;
-  mask: var(--logo-wear) 0 0 / 160px;
 }
 
 .logo-bars {
@@ -433,6 +431,25 @@ h3 {
   grid-template-columns: 1fr 1fr 1fr;
   gap: 0.1em;
   height: 0.2em;
+}
+
+/* The taller logo's room taken from the space under the masthead, so a
+   chapter's content sits where it did (the sandbox's screens give it). */
+body:not([data-view='instrument']) .masthead {
+  margin-bottom: calc(1.5rem - (3rem - 2.1rem * 1.15));
+}
+
+/* The sandbox's wear: about half the specks the studies had. */
+[data-view='instrument'] .wordmark {
+  --logo-wear: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='120'%3E%3Cfilter id='w'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -9 7.1'/%3E%3C/filter%3E%3Crect width='220' height='120' filter='url(%23w)'/%3E%3C/svg%3E");
+}
+
+[data-view='instrument'] .logo-word {
+  -webkit-mask: var(--logo-wear) 0 0 / 160px;
+  mask: var(--logo-wear) 0 0 / 160px;
+}
+
+[data-view='instrument'] .logo-bars {
   -webkit-mask: var(--logo-wear) 30px 0 / 120px;
   mask: var(--logo-wear) 30px 0 / 120px;
 }
@@ -1037,9 +1054,10 @@ dfn {
     padding-bottom: 0.5rem;
   }
 
-  [data-view='chapter'] .masthead {
+  body[data-view='chapter'] .masthead {
     flex: none;
-    margin-bottom: 1rem;
+    /* Less the taller logo's 0.585rem, so the panes sit where they did. */
+    margin-bottom: calc(1rem - (3rem - 2.1rem * 1.15));
   }
 
   [data-view='chapter'] .chapter {
