@@ -40,7 +40,11 @@
   <body>
     <div class="page">
       <header class="masthead">
-        <h1 class="wordmark"><a href="#/">fmlab</a></h1>
+        <!-- The logo (Jeremy, 2026-10-21): racing stripes. The word is the
+             link's name; the bars are drawn, hidden from screen readers. -->
+        <h1 class="wordmark">
+          <a href="#/"><span class="logo-word">fmlab</span><span class="logo-bars" aria-hidden="true"><b></b><b></b><b></b></span></a>
+        </h1>
         <!-- The way round the guide: the contents panel, where the reader
              is, and the glossary. Built by ui/contents.ts. On the sandbox
              the presets stand in the place of Contents, and Volume before
