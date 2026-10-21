@@ -452,8 +452,10 @@ pointer is over the keyboard or keyboard focus is in it) on their left; every he
   large (a drag up or down at either side of the break point sets its
   depth, a click turns its curve, the break point's line drags sideways;
   from the keyboard up and down, with Shift the left side, left and
-  right for the break point, C to turn), and under it Left curve (a
-  lin / exp button), Left depth, Break point, Right depth, Right curve
+  right for the break point, C to turn), and under it Left curve (LIN |
+  EXP, a radio group of the tabs' push keys, lamps and all, chosen on
+  the press, arrows between; Jeremy, 2026-10-20), Left depth, Break
+  point, Right depth, Right curve (the same)
   and Speed-up (the envelope's, per octave). On these two tabs and on
   the LFO and Pitch EG tabs the knobs' values are written on the screen,
   not under the knobs (Jeremy, 2026-10-20): a 22 px band at the screen's
@@ -462,7 +464,7 @@ pointer is over the keyboard or keyboard focus is in it) on their left; every he
   glowing (on a phone, where the knobs wrap, each row's values a smaller
   line of their own); `ui/screenValues.ts` reads each knob's hidden readout and its
   dial's place (`knobValues`) and redraws when the row lays out. The
-  curve buttons' words go, the buttons saying lin or exp. `knob.ts` is
+  curves' LIN | EXP keys have no value of their own. `knob.ts` is
   the knob: a `role="slider"` turned by dragging up
   or down or with the keys the Bessel plot answers to, drawn as a VFD
   dial, cyan segments lit to its value on dark glass (21 segments,
@@ -573,7 +575,8 @@ icon keys (a radiogroup, unlabelled on screen: Triangle, Saw down, Saw
 up, Square, Sine, Sample and hold), drawn in the sandbox as the tabs'
 push keys without lamps, chosen on the press; Speed (log), Delay (log,
 0 at the bottom), Vibrato (log, 0 at the bottom) and Tremolo knobs; and
-"Restart on each key" (key sync). The Pitch EG tab (`pitchEgView.ts`):
+Key sync, one of the tabs' push keys (`aria-pressed`, pressed and lit
+while on, worked on the press; Jeremy, 2026-10-20). The Pitch EG tab (`pitchEgView.ts`):
 its curve (`viz/pitchEnvelopePlot.ts`, its name, "Pitch envelope", for
 screen readers only; drawn as the operator envelope's, each part's slot
 ended at its glide's time on the log scale; its y scale symmetric,

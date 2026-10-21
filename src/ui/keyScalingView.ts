@@ -71,30 +71,57 @@ export function mountKeyScalingView(store: LabStore): void {
       format: () => signedDb(endDb(get(), side)),
     });
 
-  // A side's curve, linear or exponential: a button where a knob would be.
+  // A side's curve, linear or exponential: LIN | EXP push keys where a
+  // knob would be, a radio group (Jeremy, 2026-10-20), its name under it
+  // as a knob's is. A key is chosen on the press, as the tabs are; the
+  // arrows move between the two.
   const curveButton = (side: Side) => {
     const element = document.createElement('div');
     element.className = 'knob';
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'knob-toggle';
-    button.addEventListener('click', () => toggle(side));
+    const group = document.createElement('div');
+    group.className = 'lamp-keys';
+    group.setAttribute('role', 'radiogroup');
+    const curves = ['lin', 'exp'] as const;
+    const keys = curves.map(curve => {
+      const key = document.createElement('button');
+      key.type = 'button';
+      key.className = 'lamp-key';
+      key.setAttribute('role', 'radio');
+      key.textContent = curve === 'lin' ? 'Lin' : 'Exp';
+      key.setAttribute('aria-label', curve === 'lin' ? 'Linear' : 'Exponential');
+      const choose = () => {
+        if (get()[side].curve !== curve) set({ [side]: { ...get()[side], curve } });
+      };
+      key.addEventListener('pointerdown', event => {
+        if (event.button === 0) choose();
+      });
+      key.addEventListener('click', choose);
+      return key;
+    });
+    keys.forEach((key, i) => {
+      key.addEventListener('keydown', event => {
+        const step = { ArrowLeft: -1, ArrowUp: -1, ArrowRight: 1, ArrowDown: 1 }[event.key];
+        if (step === undefined) return;
+        event.preventDefault();
+        const to = (i + step + keys.length) % keys.length;
+        set({ [side]: { ...get()[side], curve: curves[to] } });
+        keys[to].focus();
+      });
+    });
+    group.append(...keys);
     const label = document.createElement('span');
     label.className = 'knob-label';
     label.textContent = side === 'left' ? 'Left curve' : 'Right curve';
     label.setAttribute('aria-hidden', 'true');
-    const readout = document.createElement('span');
-    readout.className = 'knob-readout num';
-    readout.setAttribute('aria-hidden', 'true');
-    element.append(button, label, readout);
+    element.append(group, label);
     const update = () => {
-      const lin = get()[side].curve === 'lin';
-      button.textContent = lin ? 'lin' : 'exp';
-      readout.textContent = lin ? 'linear' : 'expon.';
-      button.setAttribute(
-        'aria-label',
-        `OP${op() + 1} ${side} curve: ${lin ? 'linear' : 'exponential'}. Press for ${lin ? 'exponential' : 'linear'}.`,
-      );
+      const now = get()[side].curve;
+      group.setAttribute('aria-label', `OP${op() + 1} ${side} curve`);
+      keys.forEach((key, i) => {
+        const on = curves[i] === now;
+        key.setAttribute('aria-checked', String(on));
+        key.tabIndex = on ? 0 : -1;
+      });
     };
     return { element, update };
   };
