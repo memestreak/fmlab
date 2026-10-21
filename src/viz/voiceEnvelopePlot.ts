@@ -141,7 +141,8 @@ export function drawVoiceEnvelope(
 ): void {
   const plot = beginPlot(canvas);
   if (!plot) return;
-  const { ctx, token, glow } = plot;
+  const { token, glow } = plot;
+  let { ctx } = plot;
   const { width, height } = canvas.getBoundingClientRect();
   const area = large ? largeArea(width, height) : smallArea(width, height);
   const { dots, corners, held, y } = envelopeGeometry(env, area);
@@ -152,7 +153,7 @@ export function drawVoiceEnvelope(
   // The sustain's slot, shaded: where the note sits while the key is held.
   ctx.fillStyle = token('--paper-sunken');
   ctx.fillRect(dots.sustain.x, area.top, held.x - dots.sustain.x, area.bottom - area.top);
-  glow();
+  ctx = glow();
 
   if (large) {
     ctx.font = `11px ${token('--font-mono')}`;

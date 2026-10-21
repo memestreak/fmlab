@@ -598,7 +598,8 @@ lit full) and the spectrum (its
 negative stems lit as the rest, the measured curve cyan) are VFDs too (Jeremy,
 2026-10-20): the same drawings, their tokens remapped in CSS to cyan on
 dark glass, everything but the area fills glowing (`--plot-glow`, which
-`beginPlot`'s `glow()` reads); a carrier's curve lit full, a
+`beginPlot`'s `glow()` reads: what glows is drawn on a layer, laid on the
+canvas in one shadowed pass); a carrier's curve lit full, a
 modulator's at about half. Blue and green stay on the table's tags and
 shading and in the chapter pages' plots. On a wide screen it is one window high and
 nothing scrolls, at 1440 × 900 and 1280 × 800; the figures' captions are

@@ -101,7 +101,8 @@ export function drawPitchEnvelope(
 ): void {
   const plot = beginPlot(canvas);
   if (!plot) return;
-  const { ctx, token, glow } = plot;
+  const { token, glow } = plot;
+  let { ctx } = plot;
   const { width, height } = canvas.getBoundingClientRect();
   const area = pitchArea(width, height);
   const { dots, corners, held, y } = pitchGeometry(env, area, scale.reach);
@@ -112,7 +113,7 @@ export function drawPitchEnvelope(
   // The sustain's slot, shaded: where the pitch sits while the key is held.
   ctx.fillStyle = token('--paper-sunken');
   ctx.fillRect(dots.sustain.x, area.top, held.x - dots.sustain.x, area.bottom - area.top);
-  glow();
+  ctx = glow();
 
   // The gridlines and their pitches; the note itself, 0, in ink.
   ctx.font = `11px ${token('--font-mono')}`;

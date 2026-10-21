@@ -235,12 +235,27 @@ export function mountVoiceTable(store: LabStore): void {
     // this one's row alone, which redrawing every row (twelve drawings,
     // each reading the layout back) made a turn lag.
     let shown: readonly unknown[] = [];
+    let shownOp: Dx7Operator | null = null;
     updates.push((force: boolean) => {
       const state = store.get();
       const o = state.dxOperators[op];
       const now = [o, state.algorithm, state.selectedOp === op, state.hoverOp === op, state.theme, state.chapter];
       if (!force && now.every((value, i) => value === shown[i])) return;
+      // Only its envelope changed (an envelope knob turned): only its
+      // envelope drawing changes.
+      const onlyEnvelope =
+        !force &&
+        shownOp !== null &&
+        now.slice(1).every((value, i) => value === shown[i + 1]) &&
+        (Object.keys(o) as (keyof Dx7Operator)[]).every(
+          key => key === 'envelope' || o[key] === shownOp?.[key],
+        );
       shown = now;
+      shownOp = o;
+      if (onlyEnvelope) {
+        drawVoiceEnvelope(envelope.canvas, o.envelope, penOf(roleOf(state.algorithm, op)), false);
+        return;
+      }
       const used = operatorsUsed(algorithm(state.algorithm)).includes(op);
       row.hidden = !used;
       const r = roleOf(state.algorithm, op);

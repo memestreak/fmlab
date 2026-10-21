@@ -72,6 +72,16 @@ const DRAWN: (keyof LabState)[] = [
   'theme',
 ];
 
+/** Everything drawn, as `mountFigure` compares it. */
+const drawnOf = (state: LabState): readonly unknown[] => DRAWN.map(key => state[key]);
+
+/**
+ * Everything drawn but the six operators: in the sandbox they reach the
+ * diagram only through a sounding note's levels, when it animates anyway.
+ */
+const drawnButOperators = (state: LabState): readonly unknown[] =>
+  DRAWN.filter(key => key !== 'dxOperators').map(key => state[key]);
+
 /**
  * Keeps a canvas showing the store. A canvas keeps no memory of what was
  * drawn on it, so it is repainted when the patch changes, and also when
@@ -82,12 +92,18 @@ const DRAWN: (keyof LabState)[] = [
  *   time, in seconds on the page's clock. While it says so the figure is
  *   redrawn every frame with the time; when it stops saying so the figure
  *   is drawn once more without one, and then only when something changes.
+ * @param inputs what the figure shows depends on, when that is narrower
+ *   than everything drawn (`DRAWN`): it is repainted only when one of
+ *   these changes. The sandbox's diagram and spectrum use it, so that
+ *   turning an envelope knob, which changes the operators but neither of
+ *   them, does not repaint them sixty times a second.
  */
 function mountFigure(
   canvas: HTMLCanvasElement,
   store: LabStore,
   draw: Draw,
   moves: (state: LabState, time: number) => boolean = () => false,
+  inputs: (state: LabState) => readonly unknown[] = drawnOf,
 ): void {
   let frame = 0;
   const run = (now: number) => {
@@ -105,9 +121,14 @@ function mountFigure(
     frame = requestAnimationFrame(run);
   };
 
-  store.subscribe((state, previous) => {
+  let shown = inputs(store.get());
+  store.subscribe(state => {
     // Not for `volume`, which changes nothing drawn.
-    if (DRAWN.some(key => state[key] !== previous[key])) schedule();
+    const now = inputs(state);
+    if (now.some((value, i) => value !== shown[i])) {
+      shown = now;
+      schedule();
+    }
   });
   window.matchMedia(REDUCED_MOTION).addEventListener('change', schedule);
   new ResizeObserver(schedule).observe(canvas);
@@ -256,6 +277,12 @@ export function mountFigures(store: LabStore, engine: AudioEngine): void {
       },
       // A note sounding, or any sound, measured as it plays.
       (state: LabState, time: number) => noteMoves(state, time) || isSounding(state, time),
+      // The six operators only as far as they change the sound between
+      // notes: spectrumOf keeps its lines while they do not.
+      state => [
+        ...drawnButOperators(state),
+        state.mode === 'ops' && state.voiceModel === 'dx7' ? spectrumOf(state) : state.dxOperators,
+      ],
     );
   }
 
@@ -285,6 +312,7 @@ export function mountFigures(store: LabStore, engine: AudioEngine): void {
         }
       },
       noteMoves,
+      drawnButOperators,
     );
   }
 

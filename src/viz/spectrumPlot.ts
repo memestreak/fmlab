@@ -117,18 +117,11 @@ export function operatorsAxisEnd(state: LabState): number {
   return lastAxis.end;
 }
 
-/** The DX7 voice's spectrum between notes, last worked out. */
-let lastSteady: { state: LabState; lines: SpectralLine[] } | null = null;
-
-/** Whether two states give the DX7 voice the same steady spectrum. */
-function sameVoice(a: LabState, b: LabState): boolean {
-  return (
-    a.algorithm === b.algorithm &&
-    a.dxOperators === b.dxOperators &&
-    a.dxFeedback === b.dxFeedback &&
-    a.carrierHz === b.carrierHz
-  );
-}
+/**
+ * The DX7 voice's spectrum between notes, last worked out, and what the
+ * kernel was given for it.
+ */
+let lastSteady: { key: number[]; lines: SpectralLine[] } | null = null;
 
 /**
  * The patch's line spectrum, by whichever kind of modulation it uses. For
@@ -141,11 +134,15 @@ export function spectrumOf(state: LabState, time?: number): SpectralLine[] {
     // key changes, and it is asked for three times a frame (the stems,
     // the axis, the description): worked out once. It runs the kernel and
     // a transform, which a knob turned at sixty frames a second felt.
-    const steady = noteProgress(state, time) === null;
-    if (steady && lastSteady && sameVoice(lastSteady.state, state)) return lastSteady.lines;
+    // Keyed on what the kernel is given, not on the operators: turning an
+    // envelope knob changes the operators but not the steady sound.
     const note = dx7NoteOf(state);
-    const lines = kernelSpectrum(state.algorithm, note.ratios, dx7KernelLevelsAt(state, time), note.feedback);
-    if (steady) lastSteady = { state, lines };
+    const levels = dx7KernelLevelsAt(state, time);
+    const steady = noteProgress(state, time) === null;
+    const key = [state.algorithm, note.feedback, ...note.ratios, ...levels];
+    if (steady && lastSteady && key.every((value, i) => value === lastSteady?.key[i])) return lastSteady.lines;
+    const lines = kernelSpectrum(state.algorithm, note.ratios, levels, note.feedback);
+    if (steady) lastSteady = { key, lines };
     return lines;
   }
   if (state.mode === 'ops') {
