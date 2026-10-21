@@ -598,10 +598,13 @@ ends, labelled as the readouts are; a dot at Start and at each part's
 end dragging up and down only), and eight knobs in a row: Start,
 Attack, Peak, Decay 1, Break, Decay 2, Sustain, Release (pitches two-sided, ±48 st; speeds log in st/s).
 `formatPitchBend` writes a bend in cents under a semitone, else in
-semitones; `formatGlideSpeed` a speed in st/s. Voice, Operators and the
-keyboard's Octave are labelled on Dymo tape (`tapeLabel`: each letter a
-span with the die's fixed tiny drop and tilt from the word, `strike`,
-shown at 2x pixels and finer; the word once more for screen readers).
+semitones; `formatGlideSpeed` a speed in st/s. Voice, Operators, the
+keyboard's Octave and the masthead's Volume are labelled on Dymo tape
+(`tapeLabel`: each letter a span in the word's own case, the tape's CSS
+setting it in capitals, with the die's fixed tiny drop and tilt from
+the word, `strike`, shown at 2x pixels and finer; the word once more for
+screen readers). Volume's label is the lab's own, taped only while it is
+in the sandbox's masthead; back in a chapter's lab it reads as before.
 On the right the operator
 panel (`#voice-envelope`) alone, the showing tab's curve filling it. Each
 screen keeps its box, and its glass, the canvas, sits 7px inside a
@@ -674,7 +677,7 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
   the light behind those keys, and cyan stays the glass displays'
   colour. The sandbox's large screens sit in molded black bezels, the
   tab strips' plastic (Jeremy, 2026-10-21); the operator table's small
-  glass has none. The sandbox's Voice, Operators and Octave labels are on
+  glass has none. The sandbox's Voice, Operators, Octave and Volume labels are on
   black Dymo embossing tape (`ui/dymo.ts`, `--dymo-*`; Jeremy,
   2026-10-21): a drawn object, the same in either theme but its edge,
   its white letters not `--ink`.
