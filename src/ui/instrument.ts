@@ -88,9 +88,18 @@ export function mountAlgorithmSteps(store: LabStore): void {
     list?.addEventListener('pointerdown', () => list.setAttribute('data-pointer', ''));
     list?.addEventListener('keydown', () => list.removeAttribute('data-pointer'));
   }
+  // Black push keys in the chooser's bezel (Jeremy, 2026-10-21): they
+  // step on the press, as the tabs change; Enter and Space work them
+  // through the click, and a pointer's own click (detail 1 or more)
+  // follows a press that has already stepped.
   const step = (id: string, direction: number) => {
-    document.getElementById(id)?.addEventListener('click', () => {
-      store.set({ algorithm: stepAlgorithm(store.get().algorithm, direction) });
+    const key = document.getElementById(id);
+    const go = () => store.set({ algorithm: stepAlgorithm(store.get().algorithm, direction) });
+    key?.addEventListener('pointerdown', event => {
+      if (event.button === 0) go();
+    });
+    key?.addEventListener('click', event => {
+      if (event.detail === 0) go();
     });
   };
   step('inst-alg-prev', -1);

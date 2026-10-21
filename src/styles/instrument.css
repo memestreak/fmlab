@@ -613,8 +613,8 @@ body:not([data-view='instrument']) #inst-tools {
 }
 
 /* Round on a phone too: no square flash behind a tapped button. */
-.piano-octave,
-.round-step {
+.round-step,
+.chooser-key {
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -671,17 +671,76 @@ body:not([data-view='instrument']) #inst-tools {
   display: inline-flex;
 }
 
-.op-vfd.inst-alg-vfd {
+/* The algorithm's and the octave's two-place readouts, no wider than
+   their two digits need (Jeremy, 2026-10-21). */
+.op-vfd:is(.inst-alg-vfd, .piano-oct-vfd) {
   justify-content: center;
-  /* As wide as the list it shows was, so the row and the pair hold still. */
-  width: 74px;
+  width: 48px;
   height: 2.25rem;
-  padding: 3px 7px;
+  padding: 3px 6px;
 }
 
-.op-vfd.inst-alg-vfd svg {
+.op-vfd:is(.inst-alg-vfd, .piano-oct-vfd) svg {
   width: auto;
   height: 22px;
+}
+
+/* The algorithm and octave choosers: ‹ readout › in one bezel, as the
+   tab strips are, the ‹ › the tabs' black push keys without a lamp
+   (Jeremy, 2026-10-21). A key goes down while pressed and steps on the
+   press; one at its end (the octave's at C1 or C5) stays black, its
+   chevron dark. */
+.chooser {
+  display: inline-flex;
+  flex: none;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 3px;
+  padding: 3px 4px 4px;
+  border-radius: 4px;
+  background: linear-gradient(var(--lamp-bezel-1), var(--lamp-bezel-2));
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.8),
+    0 0 0 1px #000,
+    var(--lamp-bezel-edge);
+}
+
+.chooser-key {
+  display: grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 1px solid #000;
+  border-radius: 2px;
+  background: linear-gradient(var(--lamp-key-1), var(--lamp-key-2) 60%, var(--lamp-key-3));
+  box-shadow:
+    0 1px 0 #000,
+    0 2px 1px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  color: var(--lamp-legend);
+  font: 700 1.15rem / 1 var(--font-sans);
+  cursor: pointer;
+}
+
+.chooser-key:hover:not(:disabled) {
+  color: var(--lamp-legend-hover);
+}
+
+.chooser-key:active:not(:disabled) {
+  background: linear-gradient(var(--lamp-key-down-1), var(--lamp-key-down-2));
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.8);
+  transform: translateY(1px);
+}
+
+.chooser-key:disabled {
+  color: var(--lamp-legend-dead);
+  cursor: default;
+}
+
+.chooser-key:focus-visible {
+  outline: 2px solid var(--lamp-legend-hover);
+  outline-offset: 1px;
 }
 
 .inst #inst-algorithm #algorithm {
@@ -1306,19 +1365,23 @@ canvas.voice-keys {
 .piano-oct-row {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
 }
 
+.piano-oct-display {
+  position: relative;
+  display: inline-flex;
+}
+
+/* The range in words, unseen over the readout: its tip, its double click
+   (back to C3–B4), and nothing selected by it. */
 .piano-oct-range {
-  min-width: 4.5rem;
-  font-size: 0.9rem;
-  text-align: center;
-  /* A double click brings it back to C3–B4, and selects nothing. */
+  position: absolute;
+  inset: 0;
+  opacity: 0;
   cursor: default;
   user-select: none;
 }
 
-.piano-octave,
 .round-step {
   width: 2rem;
   height: 2rem;
@@ -1331,14 +1394,8 @@ canvas.voice-keys {
   cursor: pointer;
 }
 
-.piano-octave:hover:not(:disabled),
 .round-step:hover:not(:disabled) {
   box-shadow: 0 0 0 1px var(--ink);
-}
-
-.piano-octave:disabled {
-  cursor: default;
-  opacity: 0.35;
 }
 
 .piano-oct-hint {

@@ -24,6 +24,7 @@ export const SEGMENTS: Readonly<Record<string, readonly Segment[]>> = {
   '-': ['g'],
   o: ['c', 'd', 'e', 'g'],
   F: ['a', 'e', 'f', 'g'],
+  C: ['a', 'd', 'e', 'f'],
 };
 
 /** One place of the display: its character ('' for none) and whether its point is lit. */
