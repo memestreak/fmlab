@@ -238,25 +238,6 @@ body:not([data-view='instrument']) #inst-tools {
   --vfd-panel-edge: transparent;
 }
 
-/* The table's small glass, its Ratio and Level readouts and its two
-   drawings, in a small bezel drawn outside it, so the rows and columns
-   keep their sizes. */
-[data-view='instrument'] :is(.voice-table .op-vfd, .voice-env-mini, canvas.voice-keys) {
-  --small-bezel: 3.5px;
-  box-shadow:
-    0 0 0 1px #000,
-    0 0 0 var(--small-bezel) var(--lamp-bezel-2),
-    0 0 0 calc(var(--small-bezel) + 1px) #000,
-    var(--bezel-lip-y) var(--bezel-lip-blur) 0 calc(var(--small-bezel) + 1px + var(--bezel-lip-grow))
-      var(--bezel-lip-colour);
-}
-
-/* The drawings sit closer row to row than the readouts: their bezels a
-   little thinner, so a row's meets the next's without overlapping. */
-[data-view='instrument'] :is(.voice-env-mini, canvas.voice-keys) {
-  --small-bezel: 2.4px;
-}
-
 /* Voice tops the left column, under the title bar's rule (no rule of
    its own), level with the operator panel's head on the right. */
 .inst-alg-head {
@@ -1083,14 +1064,16 @@ canvas.voice-keys {
   --pen-green: var(--vfd-graph-dim);
   --pen-red: var(--vfd-lit);
   --plot-glow: var(--vfd-glow);
-  border-radius: 3px;
+  border-radius: 4px;
   background: radial-gradient(ellipse at 50% 40%, var(--vfd-dial-1), var(--vfd-dial-2) 75%);
+  box-shadow: 0 0 0 1px #000, var(--vfd-graph-edge);
 }
 
-/* The large screens' glass: a black edge, the bezel round it carrying
-   the light edge in dark. (The table's small glass has its own small
-   bezel; this list's #spectrum would otherwise outrank it.) */
+/* The large screens' glass, in its bezel: a black edge, the bezel
+   carrying the light edge in dark. (The table's small drawings, without
+   a bezel, keep the edge above.) */
 [data-view='instrument'] :is(.voice-envelope-curve, .inst-pitch-curve, .inst-lfo-plot, #inst-figures #spectrum) {
+  border-radius: 3px;
   box-shadow: 0 0 0 1px #000;
 }
 
@@ -1118,7 +1101,9 @@ canvas.voice-keys {
   flex: 1 1 auto;
   flex-direction: column;
   min-height: 0;
-  gap: 0.25rem;
+  /* As far under its tabs as the Voice screen is under its: room
+     between the tab strip's bezel and the screen's. */
+  gap: 0.45rem;
   padding: 0.4rem 0 0.4rem;
 }
 
@@ -1656,7 +1641,7 @@ canvas.voice-keys {
   .inst-left {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.45rem;
     min-height: 0;
   }
 
@@ -1776,11 +1761,6 @@ canvas.voice-keys {
     --kv-row: 3.6rem;
   }
 
-  /* The table's rows closer still: its small bezels only an edge. */
-  [data-view='instrument'] :is(.voice-table .op-vfd, .voice-env-mini, canvas.voice-keys) {
-    --small-bezel: 0.75px;
-  }
-
   /* The LFO's row a little closer, to fit Key sync beside its knobs. */
   .inst-lfo .inst-voice-controls {
     gap: 0.45rem;
@@ -1804,7 +1784,7 @@ canvas.voice-keys {
   }
 
   .inst-left {
-    gap: 0.25rem;
+    gap: 0.45rem;
   }
 
   .inst .op-table thead th {
