@@ -30,6 +30,7 @@ import {
 import type { Preset } from '../chapters';
 import type { LabState, LabStore } from '../model/lab';
 import { mountInstrument } from './instrument';
+import { glitchScreens, topScreens } from './screenGlitch';
 
 /** How long the sound must rest before the address is brought up to date. */
 const URL_DELAY_MS = 300;
@@ -509,6 +510,8 @@ function presetMenu(presets: readonly Preset[], store: LabStore): HTMLElement[] 
     if (!preset) return;
     last = at;
     store.set(preset.patch);
+    // Both top screens glitch together, one kind, as the voice changes.
+    glitchScreens(topScreens());
   };
   const step = (label: string, glyph: string, steps: number) => {
     const button = document.createElement('button');

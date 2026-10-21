@@ -73,8 +73,14 @@ figures subscribe to it. Nothing else passes values around.
 - `src/model/` — state, no DOM except in `theme.ts`. `store.ts`
   (`createStore`: get, set, subscribe; listeners run synchronously inside
   `set` and get the previous state too), `lab.ts` (`LabState`; the ranges
-  and defaults; the log scales of the carrier and modulator sliders) and
-  `theme.ts` (the choice, its storage key, `applyTheme`). The URL holds
+  and defaults; the log scales of the carrier and modulator sliders),
+  `theme.ts` (the choice, its storage key, `applyTheme`) and
+  `settings.ts`, the sandbox's saved settings beside the theme, outside
+  the store, the link and the sound: Screen glitch
+  (`localStorage["fmlab.screenGlitch"]`, "on" or "off"; on when nothing
+  or nothing readable is saved; `screenGlitchOn`, `saveScreenGlitch`; no
+  control on the page yet, the sandbox's settings menu will show it).
+  The URL holds
   the section and, for one with `sharesSound` (the sandbox), its
   sound (see `sandbox.ts` below). `state.chapter`
   is a section's id, or `landing` or `glossary`.
@@ -452,7 +458,8 @@ every key it can show plays (`playable`, C1 to B6). Every held
   ratio's and level's slider (`createSlider`); `voiceFormat.ts` writes times, dB, cents
   and keys the same everywhere. `envelopeView.ts` is the operator panel,
   always open: the selected operator's tag and role and two tabs,
-  Envelope and Key scaling (`role="tab"`, arrows between them;
+  Envelope and Key scaling (`role="tab"`, arrows between them; a change
+  of tab glitches the screen, `glitchScreens` in `ui/screenGlitch.ts`;
   push keys with jewel lamps, as the Voice's are, at the header's
   right-hand end, so they read apart from the tag and role),
   and the Envelope tab: the curve with a dot to drag at the end of each
@@ -565,7 +572,10 @@ a row of tabs, Algorithm | LFO | Pitch EG, at the right of its line (`lfoView.ts
 8-track player's black push keys in a bezel, the open one pressed in
 with its amber jewel lamp lit and its legend glowing warm, the others
 up with unlit lamps and grey legends; Jeremy, 2026-10-20; role tablist, arrows
-between; the sandbox always opens on Algorithm, and the open tab is in
+between; a change of tab glitches the screen's glass, and a preset
+chosen glitches both top screens with one kind (`ui/screenGlitch.ts`,
+`glitchScreens`, `topScreens`; not on load, a link, an edit or an
+operator selected); the sandbox always opens on Algorithm, and the open tab is in
 neither the link nor storage; while closed, the LFO's key shows a dot
 (amber in the sandbox), "LFO, on", when vibrato or tremolo is above 0, and the Pitch EG's,
 "Pitch EG, on", when the pitch envelope is not flat). Each tab is laid
@@ -735,7 +745,14 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
   thing that animates is `vibrato`'s waveform, while sound
   plays (it opens on a 0.5 Hz modulator, a slide slow enough to follow).
   Under `prefers-reduced-motion` it stays still and the caption says
-  why. Anything
+  why. The sandbox's two top screens play a short analog glitch when
+  their tab changes, and both when a preset is chosen: one of phosphor
+  flash, segment refresh, jitter, tear line and scanline flicker, at
+  random, never the same twice in a row (`nextGlitch`), 120 to 190 ms
+  (Jeremy, 2026-10-21); on the glass only, cyan only, never moving the
+  layout or redrawing a plot; none under `prefers-reduced-motion`, and a
+  saved setting turns it off (`fmlab.screenGlitch`, on by default; the
+  sandbox's settings menu will show it). Anything
   else that moves must do the same.
 
 ## Testing
