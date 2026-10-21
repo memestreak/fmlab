@@ -64,6 +64,8 @@
   --lamp-bezel-1: #0b0c0c;
   --lamp-bezel-2: #1c1e1e;
   --lamp-bezel-edge: 0 1px 0 rgba(255, 255, 255, 0.25);
+  /* The screens' bezels' edge: the same all round, light in dark only. */
+  --screen-bezel-edge: 0 0 0 0 transparent;
   --lamp-key-1: #2f3333;
   --lamp-key-2: #191b1b;
   --lamp-key-3: #0e0f0f;
@@ -136,6 +138,8 @@
     --lamp-bezel-1: #0b0c0c;
     --lamp-bezel-2: #1c1e1e;
     --lamp-bezel-edge: 0 0 0.6px 1.4px rgba(255, 255, 255, 0.3);
+    /* The screens' bezels' edge: the same all round, light in dark only. */
+    --screen-bezel-edge: 0 0 0.6px 1.4px rgba(255, 255, 255, 0.3);
     --lamp-key-1: #2f3333;
     --lamp-key-2: #191b1b;
     --lamp-key-3: #0e0f0f;
@@ -205,6 +209,8 @@
   --lamp-bezel-1: #0b0c0c;
   --lamp-bezel-2: #1c1e1e;
   --lamp-bezel-edge: 0 0 0.6px 1.4px rgba(255, 255, 255, 0.3);
+  /* The screens' bezels' edge: the same all round, light in dark only. */
+  --screen-bezel-edge: 0 0 0.6px 1.4px rgba(255, 255, 255, 0.3);
   --lamp-key-1: #2f3333;
   --lamp-key-2: #191b1b;
   --lamp-key-3: #0e0f0f;
