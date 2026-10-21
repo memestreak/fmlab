@@ -2,8 +2,10 @@ import { chapterById, CHAPTERS } from '../../chapters';
 import { hzToSemitones } from '../../model/lab';
 import {
   FIRST_START,
+  HIGHEST_KEY,
   isBlack,
   KEYS,
+  LOWEST_KEY,
   letterForNote,
   midiToHz,
   noteForCode,
@@ -34,11 +36,15 @@ describe('notes', () => {
     expect(octave).toEqual([false, true, false, true, false, false, true, false, true, false, true, false]);
   });
 
-  it('can be played only inside the Carrier slider, A1 to A5', () => {
-    expect(playable(33)).toBe(true);
-    expect(playable(81)).toBe(true);
-    expect(playable(32)).toBe(false);
-    expect(playable(82)).toBe(false);
+  it('can be played from C1 to B6, every key the keyboard can show', () => {
+    expect(LOWEST_KEY).toBe(24);
+    expect(HIGHEST_KEY).toBe(95);
+    expect(noteName(LOWEST_KEY)).toBe('C1');
+    expect(noteName(HIGHEST_KEY)).toBe('B6');
+    expect(playable(24)).toBe(true);
+    expect(playable(95)).toBe(true);
+    expect(playable(23)).toBe(false);
+    expect(playable(96)).toBe(false);
   });
 
   it('land exactly on the Carrier slider\'s steps', () => {
@@ -90,17 +96,20 @@ describe('the keyboard', () => {
     expect(FIRST_START).toBe(48);
   });
 
-  it('moves an octave at a time, and stops at its ends', () => {
+  it('moves an octave at a time, from C1–B2 to C5–B6, and stops at its ends', () => {
+    expect(STARTS.map(noteName)).toEqual(['C1', 'C2', 'C3', 'C4', 'C5']);
     expect(shiftStart(48, -1)).toBe(36);
     expect(shiftStart(48, 1)).toBe(60);
-    expect(shiftStart(36, -1)).toBe(36);
-    expect(shiftStart(60, 1)).toBe(60);
+    expect(shiftStart(24, -1)).toBe(24);
+    expect(shiftStart(72, 1)).toBe(72);
+    expect(shiftStart(36, -1)).toBe(24);
+    expect(shiftStart(60, 1)).toBe(72);
   });
 
-  it('has something to play wherever it is', () => {
+  it('can play every key it shows, wherever it is', () => {
     for (const start of STARTS) {
       const keys = Array.from({ length: KEYS }, (_, i) => start + i);
-      expect(keys.filter(playable).length).toBeGreaterThan(12);
+      expect(keys.every(playable)).toBe(true);
     }
   });
 });

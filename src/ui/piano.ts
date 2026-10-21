@@ -1,5 +1,5 @@
 import { midiToHz } from '../dsp/voices';
-import { CARRIER_HZ, type LabStore, releaseSecondsOf } from '../model/lab';
+import { type LabStore, releaseSecondsOf } from '../model/lab';
 
 // The sandbox's keyboard: on screen, and on the computer's own keys laid
 // out the way music software does it. Every key held sounds, at its own
@@ -22,19 +22,27 @@ export function isBlack(midi: number): boolean {
   return NAMES[midi % 12].includes('♯');
 }
 
-/**
- * Whether a note is inside the Carrier slider's range, A1 (55 Hz) to A5
- * (880 Hz). Keys outside it are drawn but cannot be played.
- */
-export function playable(midi: number): boolean {
-  return midiToHz(midi) >= CARRIER_HZ.min - 1e-9 && midiToHz(midi) <= CARRIER_HZ.max + 1e-9;
-}
-
 /** The keyboard shows two octaves, starting on a C. */
 export const KEYS = 24;
-/** The Cs it can start on: C2, C3, C4. */
-export const STARTS = [36, 48, 60];
+/**
+ * The Cs it can start on: C1 to C5, so from C1–B2 to C5–B6 (Jeremy,
+ * 2026-10-21; it was C2 to C4).
+ */
+export const STARTS = [24, 36, 48, 60, 72];
+/** Where it starts, and where a double click on its range brings it back. */
 export const FIRST_START = 48;
+/** The lowest and highest keys it can show, C1 and B6. */
+export const LOWEST_KEY = STARTS[0];
+export const HIGHEST_KEY = STARTS[STARTS.length - 1] + KEYS - 1;
+
+/**
+ * Whether a note can be played: every key the keyboard can show. (Keys
+ * outside the chapters' Carrier slider, A1 to A5, used to be greyed out,
+ * which left the top of C4–B5 dead.)
+ */
+export function playable(midi: number): boolean {
+  return midi >= LOWEST_KEY && midi <= HIGHEST_KEY;
+}
 
 /**
  * The computer's keys, by `KeyboardEvent.code` so that they are the same
@@ -128,6 +136,7 @@ export function mountPiano(
   // of the range the keys cover, and the computer keys that do the same.
   const range = document.createElement('span');
   range.className = 'piano-oct-range num';
+  range.title = 'Double-click: back to C3–B4';
   const control = document.createElement('div');
   control.className = 'piano-oct';
   control.innerHTML =
@@ -244,6 +253,14 @@ export function mountPiano(
     start = next;
     draw();
   };
+
+  // A double click on the range brings the keyboard back to C3–B4.
+  range.addEventListener('dblclick', () => {
+    if (start === FIRST_START) return;
+    releaseAll();
+    start = FIRST_START;
+    draw();
+  });
 
   // The octave control, then the keys.
   container.replaceChildren(control, board);
