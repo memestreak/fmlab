@@ -1,5 +1,6 @@
 import { midiToHz } from '../dsp/voices';
 import { type LabStore, releaseSecondsOf } from '../model/lab';
+import { createModWheel } from './modWheel';
 import { createVfdReadout } from './vfdReadout';
 
 // The sandbox's keyboard: on screen, and on the computer's own keys laid
@@ -141,11 +142,13 @@ export function mountPiano(
   const down = octave('‹', -1);
   const up = octave('›', 1);
 
-  // The octave control, left of the keys: its name, ‹ and › either side
-  // of a VFD readout of the keyboard's first C (Jeremy, 2026-10-21), all
-  // in one bezel, as the algorithm chooser; and the computer keys that do
-  // the same. The range in words lies over the readout, unseen: its tip
-  // and its double click are the readout's.
+  // The control panel, left of the keys (Jeremy, 2026-10-21): Octave over
+  // the octave control, ‹ and › either side of a VFD readout of the
+  // keyboard's first C, all in one bezel, as the algorithm chooser; and
+  // Mod over the mod wheel. The names on one line, the controls on the
+  // line under. The range in words lies over the readout, unseen: its tip
+  // and its double click are the readout's. Beside Octave, the computer
+  // keys that do the same.
   const range = document.createElement('span');
   range.className = 'piano-oct-range num';
   range.title = 'Double-click: back to C3–B4';
@@ -155,14 +158,18 @@ export function mountPiano(
   display.className = 'piano-oct-display';
   display.append(readout.element, range);
   const control = document.createElement('div');
-  control.className = 'piano-oct';
+  control.className = 'piano-panel';
   control.innerHTML =
+    '<span class="piano-oct-head">' +
     '<span class="piano-oct-label" aria-hidden="true">Octave</span>' +
-    '<div class="piano-oct-row"></div>' +
-    '<span class="piano-oct-hint" aria-hidden="true"><kbd>Z</kbd> <kbd>X</kbd> on the keyboard</span>';
+    '<span class="piano-oct-hint" aria-hidden="true" title="Z and X on the keyboard"><kbd>Z</kbd><kbd>X</kbd></span>' +
+    '</span>' +
+    '<span class="mod-wheel-label" aria-hidden="true">Mod</span>' +
+    '<div class="piano-oct-row"></div>';
   const row = control.querySelector('.piano-oct-row');
   row?.classList.add('chooser');
   row?.append(down, display, up);
+  control.append(createModWheel(store));
 
   /** Every key held is drawn down. */
   const update = () => {
@@ -282,8 +289,11 @@ export function mountPiano(
     draw();
   });
 
-  // The octave control, then the keys.
-  container.replaceChildren(control, board);
+  // The control panel, then the keys under their felt.
+  const felt = document.createElement('div');
+  felt.className = 'piano-bed';
+  felt.append(board);
+  container.replaceChildren(control, felt);
   draw();
 
   // The computer's keys, while the sandbox is showing. Not with Ctrl, Alt

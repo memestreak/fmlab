@@ -1,3 +1,4 @@
+import { WHEEL_DEPTHS } from '../dsp/dx7';
 import { FACTORY_VOICES, type FactoryVoice } from './dx7Factory';
 import type { ChapterPatch, Preset } from './types';
 
@@ -15,7 +16,8 @@ function patchOf(voice: FactoryVoice): Partial<ChapterPatch> {
     algorithm: voice.algorithm,
     dxFeedback: voice.dxFeedback,
     dxOperators: voice.dxOperators,
-    dxLfo: voice.dxLfo,
+    // The wheel's depths are not in a DX7 voice: every voice opens on the same.
+    dxLfo: { ...voice.dxLfo, ...WHEEL_DEPTHS },
     dxPitchEnvelope: voice.dxPitchEnvelope,
   };
 }

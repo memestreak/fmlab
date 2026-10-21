@@ -28,6 +28,7 @@ import {
   SCALING_DEPTH,
   type ScalingSide,
   SILENCE_DB,
+  WHEEL_DEPTHS,
 } from '../dsp/dx7';
 import { AMS_SHARES } from '../dsp/lfo';
 import { CARRIER_HZ, clamp, hzToSemitones, type LabState, semitonesToHz } from '../model/lab';
@@ -213,7 +214,10 @@ export function shareFromPercent(percent: number): number {
   return AMS_SHARES.find(step => Math.abs(step * 1000 - tenths) < 0.51) ?? tenths / 1000;
 }
 
-/** The LFO in a link: wave, speed, delay, vibrato, tremolo and sync, joined by "_". */
+/**
+ * The LFO in a link: wave, speed, delay, vibrato, tremolo, sync, and the
+ * wheel's vibrato and tremolo, joined by "_".
+ */
 export function lfoParam(lfo: Dx7Lfo): string {
   return [
     lfo.wave,
@@ -222,16 +226,23 @@ export function lfoParam(lfo: Dx7Lfo): string {
     brief(lfo.vibrato, 1),
     brief(lfo.tremolo, 1),
     lfo.sync ? '1' : '0',
+    brief(lfo.wheelVibrato, 1),
+    brief(lfo.wheelTremolo, 1),
   ].join('_');
 }
 
-/** The LFO a link's "l" describes, each number held inside its range; null if it is not one. */
+/**
+ * The LFO a link's "l" describes, each number held inside its range; null
+ * if it is not one. One without the wheel's two fields gets their
+ * defaults.
+ */
 export function lfoFromParam(raw: string | null): Dx7Lfo | null {
   if (raw === null) return null;
   const f = raw.split('_');
-  if (f.length !== 6 || !(LFO_WAVES as readonly string[]).includes(f[0])) return null;
-  const [speed, delay, vibrato, tremolo] = f.slice(1, 5).map(text => (text.trim() === '' ? NaN : Number(text)));
-  if (![speed, delay, vibrato, tremolo].every(Number.isFinite) || !['0', '1'].includes(f[5])) return null;
+  if (![6, 8].includes(f.length) || !(LFO_WAVES as readonly string[]).includes(f[0])) return null;
+  const numbers = [...f.slice(1, 5), ...f.slice(6)].map(text => (text.trim() === '' ? NaN : Number(text)));
+  if (!numbers.every(Number.isFinite) || !['0', '1'].includes(f[5])) return null;
+  const [speed, delay, vibrato, tremolo, wheelVibrato, wheelTremolo] = numbers;
   return {
     wave: f[0] as LfoWave,
     speed: clamp(speed, LFO_SPEED),
@@ -239,6 +250,8 @@ export function lfoFromParam(raw: string | null): Dx7Lfo | null {
     vibrato: clamp(vibrato, LFO_VIBRATO),
     tremolo: clamp(tremolo, LFO_TREMOLO),
     sync: f[5] === '1',
+    wheelVibrato: wheelVibrato === undefined ? WHEEL_DEPTHS.wheelVibrato : clamp(wheelVibrato, LFO_VIBRATO),
+    wheelTremolo: wheelTremolo === undefined ? WHEEL_DEPTHS.wheelTremolo : clamp(wheelTremolo, LFO_TREMOLO),
   };
 }
 

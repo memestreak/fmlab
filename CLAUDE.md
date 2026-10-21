@@ -108,7 +108,9 @@ figures subscribe to it. Nothing else passes values around.
   (`operators`, `feedback`: ratio, level 0 to 1, one decay; `algorithms`)
   or `dx7` (`dxOperators`, `dxFeedback`, `dxLfo`, `dxPitchEnvelope`; the sandbox), the DX7 voice of
   `src/dsp/dx7.ts`. `selectedOp` is the operator the sandbox's operator
-  panel shows; one always is, OP1 when it opens. `voiceTab` is that
+  panel shows; one always is, OP1 when it opens. `modWheel` is the sandbox's mod wheel, 0 to 1
+  (opens at 0; the instrument's, not the voice's, so kept through voice
+  and preset changes, and in neither the link nor storage). `voiceTab` is that
   panel's tab, `envelope` (the default) or `keys`, and stays as it is
   when another operator is selected.
   `momentOf(state, time)` is what a figure should draw at a time on the
@@ -163,7 +165,9 @@ figures subscribe to it. Nothing else passes values around.
   the envelope's seven numbers, break key, left and right scaling as "l"
   or "e" and a depth, rate scaling, tremolo share as a percentage), and
   `l` the LFO (`lfoParam`: wave, speed, delay, vibrato, tremolo, sync 0 or
-  1, as `sine_5.81_0.31_12_0_1`), and `p` the pitch envelope
+  1, and what the mod wheel adds at full, wheel vibrato in cents and
+  wheel tremolo in dB, as `sine_5.81_0.31_12_0_1_50_0`; a link with only
+  the first six gets the wheel's defaults, 50 and 0), and `p` the pitch envelope
   (`pitchParam`: start, attack, peak, decay 1, break, decay 2, sustain,
   release; levels in cents, speeds in cents a second), validated and clamped by
   `soundFromParams` (a share any percentage from 0 to 100, to 0.1 %); an older
@@ -218,7 +222,13 @@ figures subscribe to it. Nothing else passes values around.
   also has `tremolo`, its share of the LFO's tremolo, 0 to 1 (the factory
   voices' are `AMS_SHARES`, Dexed's 0, 66, 109 and 255 of 255; the table
   edits it in tenths), and the voice a `Dx7Lfo` (wave,
-  speed in Hz, delay in s, vibrato in cents, tremolo in dB, sync; ranges
+  speed in Hz, delay in s, vibrato in cents, tremolo in dB, sync, and
+  `wheelVibrato` and `wheelTremolo`, what the mod wheel adds at full, as
+  the DX7's wheel assigns do (Jeremy, 2026-10-21; per voice, 50 ¢ and
+  0 dB for every voice, `WHEEL_DEPTHS`: a DX7 voice has no such field,
+  so `dx7Factory.ts` holds `Dx7VoiceLfo` and the presets add them);
+  `lfoDepths(lfo, wheel)` is the depth heard, the LFO's own plus the
+  wheel's share, capped at the ranges' tops (1190 ¢, 91.7 dB); ranges
   `LFO_*`, the DX7's 0 to 99; `HELD_LFO` off). `lfo.ts` is the LFO, after
   msfa's `lfo.cc` and Dexed's `dx7note.cc`: `Lfo` (one for the whole
   instrument; `set`, `keyDown`, `next` giving `pitch` −1 to 1 and `amp`
@@ -247,7 +257,9 @@ figures subscribe to it. Nothing else passes values around.
   below -90 dB, measured before tremolo; it plays either kind of patch,
   `basic` or `dx7`; a `dx7` patch's LFO is stepped once a sample before
   the voices, its vibrato multiplying every note's frequency by
-  2^(cents × pitch / 1200) (with each note's own pitch envelope, taken
+  2^(cents × pitch / 1200), the cents and dB being `lfoDepths` with the
+  mod wheel, which the pool glides to over `WHEEL_GLIDE_SECONDS` (30 ms)
+  so a drag does not zipper (with each note's own pitch envelope, taken
   from the patch when it is struck and run from its own key:
   2^((pitchEnvelope + vibrato) / 1200)) and its tremolo every operator's level, after
   its envelope, by 10^(−dB × share × amp / 20)) and `voices.ts` (`chooseVoice`: a key's own voice, else a
@@ -282,7 +294,9 @@ figures subscribe to it. Nothing else passes values around.
   AudioWorklet: it runs the kernels and has a-rate AudioParams `frequency`,
   `ratio`, `index`, and for true FM `modFrequency`, `deviation` and `mode`
   (1 is true FM; 2 the voice pool, told what to play by messages on its
-  port, `VoiceMessage`: `patch`, `noteOn`, `noteOff`, `allOff`). It is
+  port, `VoiceMessage`: `patch`, `noteOn`, `noteOff`, `allOff`, and
+  `wheel`, the mod wheel alone, lighter than the whole patch at every
+  step of a drag; the engine sends it on a change and with each note). It is
   bundled on its own through the `?worker&url`
   import in `engine.ts`, and may import from `src/dsp` only. `engine.ts`
   (`AudioEngine`) follows the store: worklet, note gain, master gain,
@@ -409,13 +423,29 @@ figures subscribe to it. Nothing else passes values around.
   `held`, and the key struck last's pitch into `carrierHz` and its moment
   into `noteStartedAt` / `noteLength`. Keys are let go on blur, a hidden
   tab, a lost pointer capture and a change of chapter, so none sticks.
-  Piano-shaped keys under an ink key slip, every C named (the computer
-  keys that play them are in their names, not drawn on them), the octave
+  Piano-shaped keys, every C named (the computer keys that play them are
+  in their names, not drawn on them), drawn as real ones (Jeremy,
+  2026-10-21): white keys with shaded tops, a lit left and shaded right
+  edge and a front lip of their own; ebony black keys, bevelled, with a
+  sheen, a sloped front face and a soft shadow on their neighbours; soft
+  grey grooves; a held key sinks, straight down and up, never animated.
+  They are let into the foot's chassis, a strip of charcoal felt along
+  their top where they run under the rail. On their left the control
+  panel: Octave and Mod on tape on one line, and under them the octave
   control (‹ › black push keys either side of a two-place VFD readout of
   the keyboard's first C, C1 to C5, in one bezel as the algorithm
-  chooser's (Jeremy, 2026-10-21); the range in words lies over the
-  readout unseen, for its tip and double click; and the Z / X hint, shown only while the
-pointer is over the keyboard or keyboard focus is in it) on their left.
+  chooser's; the range in words lies over the readout unseen, for its tip
+  and double click; beside the Octave tape the Z / X hint, grey, shown
+  only while the pointer is over the keyboard or keyboard focus is in it)
+  and the mod wheel (`modWheel.ts`, `createModWheel`; Jeremy,
+  2026-10-21): a ribbed rubber drum with a painted line riding from its
+  foot (0) to its top (full), and beside it a VFD bar of 21 segments lit
+  from the bottom (`litSegments`), in a slot of the bezels' plastic; a
+  `role="slider"`, "Mod wheel", "40 %", the bar hidden from screen
+  readers; dragged (up for more, about 100 px end to end, from the
+  press), scrolled (down for more, 1 % per 10 px), the arrows (1 %), Page
+  Up / Down (10 %), Home, End, and a double click back to 0; no spring;
+  the note keys, Z / X and space still play while it has focus.
 It shows two octaves, from C1–B2 to C5–B6 (`STARTS`; Jeremy, 2026-10-21),
 starting at C3–B4, where a double click on the range brings it back;
 every key it can show plays (`playable`, C1 to B6). Every held
@@ -577,7 +607,8 @@ chosen glitches both top screens, each its own kind and never the two
 alike (`ui/screenGlitch.ts`, `glitchScreens`, `topScreens`; not on load, a link, an edit or an
 operator selected); the sandbox always opens on Algorithm, and the open tab is in
 neither the link nor storage; while closed, the LFO's key shows a dot
-(amber in the sandbox), "LFO, on", when vibrato or tremolo is above 0, and the Pitch EG's,
+(amber in the sandbox), "LFO, on", when vibrato or tremolo, the mod
+wheel's share counted, is above 0, and the Pitch EG's,
 "Pitch EG, on", when the pitch envelope is not flat). Each tab is laid
 out as the operator panel is (Jeremy, 2026-10-20; `.inst-voice-tab`):
 its display the panel's width, the same size whichever tab is open (the
@@ -593,11 +624,17 @@ click's not, and beside them the Feedback knob (`mountFeedbackKnob`, 0
 to 2π), its dial level with ‹ ›, its name under it and no readout:
 its value is on the diagram's glass, "FB 3.14", at the right halfway
 down. The LFO tab: a still drawing of the LFO for two seconds after a
-key (`viz/lfoPlot.ts`, the delay shaded, ±1), and under it the wave, six
+key (`viz/lfoPlot.ts`, the delay shaded, ±1; the swing lit full
+while the depth heard, the wheel's counted, is above 0, at about half
+while it is 0, and its description says that depth), and under it the wave, six
 icon keys (a radiogroup, unlabelled on screen: Triangle, Saw down, Saw
 up, Square, Sine, Sample and hold), drawn in the sandbox as the tabs'
 push keys without lamps, chosen on the press; Speed (log), Delay (log,
-0 at the bottom), Vibrato (log, 0 at the bottom) and Tremolo knobs; and
+0 at the bottom), Vibrato (log, 0 at the bottom), Tremolo, and what the
+mod wheel adds to those two at full, "Wh vib" and "Wh trem" (named
+Wheel vibrato and Wheel tremolo for screen readers; log, 0 at the
+bottom; the full names do not fit at 1280 wide), six knobs, the waves
+and the knobs' columns a little narrower to fit beside Key sync; and
 Key sync, one of the tabs' push keys (`aria-pressed`, pressed and lit
 while on, worked on the press; Jeremy, 2026-10-20). The Pitch EG tab (`pitchEgView.ts`):
 its curve (`viz/pitchEnvelopePlot.ts`, its name, "Pitch envelope", for
@@ -608,8 +645,10 @@ ends, labelled as the readouts are; a dot at Start and at each part's
 end dragging up and down only), and eight knobs in a row: Start,
 Attack, Peak, Decay 1, Break, Decay 2, Sustain, Release (pitches two-sided, ±48 st; speeds log in st/s).
 `formatPitchBend` writes a bend in cents under a semitone, else in
-semitones; `formatGlideSpeed` a speed in st/s. Voice, Operators, the
-keyboard's Octave and the masthead's Volume are labelled on Dymo tape
+semitones; `formatGlideSpeed` a speed in st/s. Where a row's values on
+the screen would touch (the LFO's six at 1280 wide), `drawValueStrip`
+sets them a size smaller. Voice, Operators, the keyboard's Octave and
+Mod, and the masthead's Volume, five labels, are on Dymo tape
 (`tapeLabel`: each letter a span in the word's own case, the tape's CSS
 setting it in capitals, with the die's fixed tiny drop and tilt from
 the word, `strike`, shown at 2x pixels and finer; the word once more for
@@ -629,9 +668,15 @@ row's dials, push keys (their bezels a dial tall; the algorithm chooser,
 the LFO's waves and Key sync lifted onto the dials' line) and knob names
 fall on the same two lines in all five rows.
 Under the band the operator table (`#voice-table`) the full width, then
-the foot (`.inst-foot`): the octave control and keyboard on the left, the
-spectrum (`#inst-figures`) filling the rest of the row, no taller than
-the keyboard, with no ink rules round it (its glass is its frame), its
+the foot (`.inst-foot`), one chassis of the tab strips' molded black
+plastic (Jeremy, 2026-10-21; rounded at the top, square at the foot, the
+same in both themes but its edge): the control panel and the keys on
+the left, the keys let into it and running to its bottom edge, the
+chassis above them their rail and its ends their cheeks; the white keys
+2.9rem wide under 1380px, so the spectrum keeps its room; the spectrum
+(`#inst-figures`) filling the rest of the row, no taller than the
+keyboard, its bezel a recess in the chassis with 9px of it underneath,
+with no ink rules round it (its glass is its frame), its
 x-axis title shown only under the pointer (its canvas's
 `--plot-title: hover`; `drawFrame` leaves the line to the frame). Carriers are solid blue and modulators
 green outlines in the table (filled or outlined tags, carrier rows
@@ -651,14 +696,17 @@ for screen readers only there, and under 52rem high the rows, drawings,
 knobs and gaps tighten. Below 62rem it is one column: the masthead
 wraps, the wordmark and the theme, then the presets row (the name at
 1.25rem), then Volume and the glossary; the keyboard
-and the spectrum over it docked to the screen's foot, the operator panel
+and the spectrum over it docked to the screen's foot in the chassis, the
+full width and square (the spectrum, then the octave control and the
+wheel without their tapes, then the keys), the operator panel
 first (its tabs on a line of their own), the controls scrolling under it, and the
 operator table as cards, each with its drawings.
 
 Wheel controls scroll with the page's direction (Jeremy, 2026-10-20):
 positive deltaY, scrolling down, is the next value below, as a page
 would scroll to it. On the number reel, where larger values sit below,
-that is a step more.
+that is a step more; on the mod wheel, too, scrolling down is more, 1 %
+for each 10 px.
 
 ## Styling
 
@@ -687,7 +735,11 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
   the light behind those keys, and cyan stays the glass displays'
   colour. The sandbox's large screens sit in molded black bezels, the
   tab strips' plastic (Jeremy, 2026-10-21); the operator table's small
-  glass has none. The sandbox's Voice, Operators, Octave and Volume labels are on
+  glass has none. The keyboard's chassis is that plastic too, its keys
+  and the spectrum let into it; the felt under its rail is charcoal, not
+  red, because red is reserved for negative phase. The mod wheel's drum
+  is black rubber, its index line painted white, and its bar a VFD.
+  The sandbox's Voice, Operators, Octave, Mod and Volume labels are on
   black Dymo embossing tape (`ui/dymo.ts`, `--dymo-*`; Jeremy,
   2026-10-21): a drawn object, the same in either theme but its edge,
   its white letters not `--ink`.

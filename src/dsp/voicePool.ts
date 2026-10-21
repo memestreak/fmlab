@@ -9,6 +9,7 @@ import {
   dx7PitchAt,
   type Dx7PitchEnvelope,
   keyOf,
+  lfoDepths,
   pitchEnvelopeOn,
 } from './dx7';
 import { type Envelope, envelopeAt } from './envelope';
@@ -57,7 +58,12 @@ export type VoiceMessage =
   | { type: 'noteOn'; note: number; hz: number; hold: number }
   | { type: 'noteOff'; note: number }
   /** Everything silenced at once, faded over STEAL_SECONDS. */
-  | { type: 'allOff' };
+  | { type: 'allOff' }
+  /** The mod wheel, 0 to 1: glided to over WHEEL_GLIDE_SECONDS. */
+  | { type: 'wheel'; amount: number };
+
+/** How long the pool takes to follow the mod wheel, so a drag does not zipper. */
+export const WHEEL_GLIDE_SECONDS = 0.03;
 
 /** A note waiting for its voice to fade out. */
 interface Waiting {
@@ -127,6 +133,11 @@ export class VoicePool {
   private pitch = 1;
   /** This sample's tremolo, in dB, for an operator that takes all of it. */
   private pull = 0;
+  /** The mod wheel as heard, gliding towards `wheelTarget`. */
+  private wheel = 0;
+  private wheelTarget = 0;
+  /** How far the wheel glides in a sample: the last move over WHEEL_GLIDE_SECONDS. */
+  private wheelStep = 1;
 
   constructor(
     count: number,
@@ -141,7 +152,14 @@ export class VoicePool {
     if (message.type === 'patch') this.setPatch(message.patch);
     else if (message.type === 'noteOn') this.noteOn(message.note, message.hz, message.hold);
     else if (message.type === 'noteOff') this.noteOff(message.note);
+    else if (message.type === 'wheel') this.setWheel(message.amount);
     else this.allOff();
+  }
+
+  /** Moves the mod wheel to `amount`, 0 to 1; the sound glides there. */
+  setWheel(amount: number): void {
+    this.wheelTarget = Math.min(1, Math.max(0, amount));
+    this.wheelStep = Math.abs(this.wheelTarget - this.wheel) / Math.max(1, WHEEL_GLIDE_SECONDS * this.sampleRate);
   }
 
   setPatch(patch: VoicePatch): void {
@@ -206,10 +224,17 @@ export class VoicePool {
   render(out: Float32Array): void {
     const { voices, sampleRate } = this;
     const dx7 = this.patch.kind === 'dx7';
-    const { vibrato, tremolo } = dx7 ? (this.patch as Dx7Patch).lfo : { vibrato: 0, tremolo: 0 };
+    const lfoPatch = dx7 ? (this.patch as Dx7Patch).lfo : null;
+    let { vibrato, tremolo } = lfoPatch ? lfoDepths(lfoPatch, this.wheel) : { vibrato: 0, tremolo: 0 };
     for (let i = 0; i < out.length; i++) {
       // The LFO once a sample, before the voices, which all share it.
-      if (dx7) {
+      if (lfoPatch) {
+        // The wheel's depth added on, glided so a drag does not zipper.
+        if (this.wheel !== this.wheelTarget) {
+          const gap = this.wheelTarget - this.wheel;
+          this.wheel = Math.abs(gap) <= this.wheelStep ? this.wheelTarget : this.wheel + Math.sign(gap) * this.wheelStep;
+          ({ vibrato, tremolo } = lfoDepths(lfoPatch, this.wheel));
+        }
         const lfo = this.lfo.next();
         this.pitch = 2 ** ((vibrato * lfo.pitch) / 1200);
         this.pull = tremolo * lfo.amp;

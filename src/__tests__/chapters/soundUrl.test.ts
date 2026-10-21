@@ -85,7 +85,7 @@ describe('the sandbox in a link', () => {
     ...soundFromParams(paramsFromHash(`#/sandbox?${params}`)),
   });
 
-  it('is readable, each operator in fifteen short fields, the LFO in six', () => {
+  it('is readable, each operator in fifteen short fields, the LFO in eight', () => {
     const params = new URLSearchParams(soundParams(six));
     expect(params.get('c')).toBe('146.83');
     expect(params.get('a')).toBe('5');
@@ -98,7 +98,8 @@ describe('the sandbox in a link', () => {
     // the tremolo.
     expect(ops[1]).toBe('14_0_-30.75_0.001_0_0.2786_-18.06_3.3747_-96_0.0741_21_l0_l0_1.2968_0');
     // Its LFO: a sine at 5.61 Hz, 0.15 s late, no vibrato or tremolo.
-    expect(params.get('l')).toBe('sine_5.613_0.148_0_0_0');
+    // The wheel's vibrato and tremolo last: every voice opens on 50 ¢ and 0 dB.
+    expect(params.get('l')).toBe('sine_5.613_0.148_0_0_0_50_0');
     // Its pitch envelope, flat, with the factory's speeds: levels in cents,
     // speeds in cents a second.
     expect(params.get('p')).toBe('0_11380.28_0_4056.34_0_11887.32_0_3267.61');
@@ -127,7 +128,7 @@ describe('the sandbox in a link', () => {
 
   it('holds every value inside its range', () => {
     const wild = '99_9_5_99_9_-1_-200_0_0_-5_0_e99_l-99_9_40';
-    const back = reopened(`a=40&f=9&o=${[wild, ...Array(5).fill(wild)].join('~')}&l=square_99_9_5000_500_1`);
+    const back = reopened(`a=40&f=9&o=${[wild, ...Array(5).fill(wild)].join('~')}&l=square_99_9_5000_500_1_9999_-4`);
     expect(back.algorithm).toBe(32);
     expect(back.dxFeedback).toBeCloseTo(2 * Math.PI, 9);
     const op = back.dxOperators[0];
@@ -158,7 +159,23 @@ describe('the sandbox in a link', () => {
       vibrato: LFO_VIBRATO.max,
       tremolo: LFO_TREMOLO.max,
       sync: true,
+      wheelVibrato: LFO_VIBRATO.max,
+      wheelTremolo: 0,
     });
+    // A link from before the wheel, its LFO in six fields, gets the wheel's defaults.
+    expect(reopened('l=sine_1_0_10_2_0').dxLfo).toEqual({
+      wave: 'sine',
+      speed: 1,
+      delay: 0,
+      vibrato: 10,
+      tremolo: 2,
+      sync: false,
+      wheelVibrato: 50,
+      wheelTremolo: 0,
+    });
+    // Seven fields is not an LFO, nor a wheel depth that is not a number.
+    expect(reopened('l=sine_1_0_10_2_0_5').dxLfo).toEqual(sandbox.patch.dxLfo);
+    expect(reopened('l=sine_1_0_10_2_0_x_0').dxLfo).toEqual(sandbox.patch.dxLfo);
     // The pitch envelope's levels to four octaves, its speeds to msfa's.
     const bent = reopened('p=9000_1_-9000_99999_120_300_-50_600').dxPitchEnvelope;
     expect(bent).toEqual({

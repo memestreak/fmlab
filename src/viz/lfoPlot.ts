@@ -1,9 +1,11 @@
 // The LFO tab's drawing: what the voice's LFO does in the two seconds
 // after a key goes down. Flat through the delay (shaded, as the envelope
 // view shades its hold), fading in, then the wave at its speed, from -1
-// to 1. Still: it does not move while notes sound.
+// to 1. Still: it does not move while notes sound. The swing is lit full
+// while the LFO is heard, the mod wheel's depth counted, and at about half
+// while its depth is 0.
 
-import type { Dx7Lfo } from '../dsp/dx7';
+import { type Dx7Lfo, lfoDepths, lfoOn } from '../dsp/dx7';
 import { delayGain, heldValue, nextRandom, SYNC_PHASE, waveAt } from '../dsp/lfo';
 import { beginPlot, drawValueStrip, type ScreenValue, VALUE_BAND } from './plot';
 
@@ -30,8 +32,16 @@ export function lfoAt(lfo: Dx7Lfo, time: number): number {
   return (2 * waveAt(lfo.wave, phase, held) - 1) * delayGain(lfo.delay, time);
 }
 
-/** Draws `lfo` over two seconds in `canvas`, the knobs' `values` at its foot. */
-export function drawLfo(canvas: HTMLCanvasElement, lfo: Dx7Lfo, values?: readonly ScreenValue[]): void {
+/**
+ * Draws `lfo` over two seconds in `canvas`, the knobs' `values` at its
+ * foot, with the mod wheel at `wheel` (0 to 1).
+ */
+export function drawLfo(
+  canvas: HTMLCanvasElement,
+  lfo: Dx7Lfo,
+  values?: readonly ScreenValue[],
+  wheel = 0,
+): void {
   const plot = beginPlot(canvas);
   if (!plot) return;
   const { token, glow } = plot;
@@ -83,6 +93,7 @@ export function drawLfo(canvas: HTMLCanvasElement, lfo: Dx7Lfo, values?: readonl
   // The swing, a point a pixel: a square's and a saw's jumps drawn upright.
   ctx.strokeStyle = token('--ink');
   ctx.lineWidth = 1.5;
+  ctx.globalAlpha = lfoOn(lfo, wheel) ? 1 : 0.45;
   ctx.beginPath();
   const steps = Math.max(2, Math.round((right - left) * 2));
   for (let i = 0; i <= steps; i++) {
@@ -93,11 +104,15 @@ export function drawLfo(canvas: HTMLCanvasElement, lfo: Dx7Lfo, values?: readonl
     else ctx.lineTo(px, py);
   }
   ctx.stroke();
+  ctx.globalAlpha = 1;
   if (values) drawValueStrip(plot, width, height, values);
 }
 
-/** What the drawing shows, in words. */
-export function describeLfo(lfo: Dx7Lfo, wave: string): string {
+/** What the drawing shows, in words, with the mod wheel at `wheel`. */
+export function describeLfo(lfo: Dx7Lfo, wave: string, wheel = 0): string {
   const delay = lfo.delay > 0 ? `held back ${lfo.delay.toFixed(2)} s after each key, then faded in` : 'no delay';
-  return `The LFO over two seconds after a key: ${wave.toLowerCase()} at ${lfo.speed.toFixed(2)} Hz, ${delay}.`;
+  const { vibrato, tremolo } = lfoDepths(lfo, wheel);
+  const depth = `vibrato ${Number(vibrato.toPrecision(3))} cents and tremolo ${Number(tremolo.toPrecision(3))} dB`;
+  const withWheel = wheel > 0 ? ' with the mod wheel' : '';
+  return `The LFO over two seconds after a key: ${wave.toLowerCase()} at ${lfo.speed.toFixed(2)} Hz, ${delay}; ${depth}${withWheel}.`;
 }

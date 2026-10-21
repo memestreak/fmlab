@@ -101,13 +101,14 @@ if (piano) {
   mountPiano(piano, store, () => chapterById(store.get().chapter)?.hasPiano === true);
 }
 
-// The sandbox's Voice, Operators, Octave and Volume labels, on Dymo tape
+// The sandbox's Voice, Operators, Octave, Mod and Volume labels, on Dymo tape
 // (Volume's only while it is in the sandbox's masthead: the tape's CSS is
 // the sandbox's).
 for (const selector of [
   '.inst-section-title',
   '#voice-heading',
   '.piano-oct-label',
+  '.mod-wheel-label',
   '.slider-row[data-control="volume"] > label',
 ]) {
   tapeLabel(document.querySelector(selector));

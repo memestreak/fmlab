@@ -1,4 +1,4 @@
-import { HELD_LFO, LFO_SPEED, LFO_TREMOLO, LFO_VIBRATO } from '../../dsp/dx7';
+import { HELD_LFO, LFO_SPEED, LFO_TREMOLO, LFO_VIBRATO, lfoDepths, lfoOn } from '../../dsp/dx7';
 import {
   AMS_SHARES,
   delayGain,
@@ -150,5 +150,29 @@ describe('the LFO and the keys', () => {
     expect(run(0.3)).toBeCloseTo(1, 6);
     lfo.keyDown();
     expect(run(0.05)).toBe(0);
+  });
+});
+
+describe('the mod wheel', () => {
+  const lfo = { ...HELD_LFO, vibrato: 10, tremolo: 2, wheelVibrato: 50, wheelTremolo: 6 };
+
+  it('adds its share of the wheel depths to the LFO\'s own', () => {
+    expect(lfoDepths(lfo, 0)).toEqual({ vibrato: 10, tremolo: 2 });
+    expect(lfoDepths(lfo, 0.4)).toEqual({ vibrato: 30, tremolo: 2 + 0.4 * 6 });
+    expect(lfoDepths(lfo, 1)).toEqual({ vibrato: 60, tremolo: 8 });
+  });
+
+  it('never takes the depths past the LFO\'s ranges', () => {
+    const deep = { ...lfo, vibrato: 1000, tremolo: 80, wheelVibrato: LFO_VIBRATO.max, wheelTremolo: LFO_TREMOLO.max };
+    expect(lfoDepths(deep, 1)).toEqual({ vibrato: LFO_VIBRATO.max, tremolo: LFO_TREMOLO.max });
+    expect(LFO_VIBRATO.max).toBeCloseTo(1190, -1);
+    expect(LFO_TREMOLO.max).toBeCloseTo(91.7, 1);
+  });
+
+  it('turns the LFO on while it adds a depth', () => {
+    const still = { ...HELD_LFO, wheelVibrato: 50, wheelTremolo: 0 };
+    expect(lfoOn(still)).toBe(false);
+    expect(lfoOn(still, 0.01)).toBe(true);
+    expect(lfoOn({ ...still, wheelVibrato: 0 }, 1)).toBe(false);
   });
 });
