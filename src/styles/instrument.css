@@ -194,6 +194,69 @@ body:not([data-view='instrument']) #inst-tools {
   margin: 0;
 }
 
+/* The screens' bezels (Jeremy, 2026-10-21): each large screen keeps its
+   place and box, and its glass, the canvas, sits 7px inside a molded
+   black bezel, the tab strips' plastic. The canvas still measures its
+   own box, so its drawing, drags and values are unchanged. */
+.screen-bezel {
+  position: relative;
+  min-width: 0;
+  min-height: 4rem;
+}
+
+.screen-bezel > canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.voice-envelope-screen {
+  align-self: stretch;
+  width: 100%;
+}
+
+[data-view='instrument'] :is(.screen-bezel, #inst-diagram-figure .plot-frame, #inst-figures .plot-frame) {
+  border-radius: 7px;
+  background: linear-gradient(var(--lamp-bezel-1), var(--lamp-bezel-2));
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.8),
+    0 0 0 1px #000,
+    var(--lamp-bezel-edge);
+}
+
+/* A canvas does not stretch between its insets: it is sized too. */
+[data-view='instrument'] :is(.screen-bezel, #inst-diagram-figure .plot-frame, #inst-figures .plot-frame) > canvas {
+  inset: 7px;
+  width: calc(100% - 14px);
+  height: calc(100% - 14px);
+}
+
+/* The diagram draws its own glass: its light edge is the bezel's now. */
+[data-view='instrument'] #algorithm-plot {
+  --vfd-panel-edge: transparent;
+}
+
+/* The table's small glass, its Ratio and Level readouts and its two
+   drawings, in a small bezel drawn outside it, so the rows and columns
+   keep their sizes. */
+[data-view='instrument'] :is(.voice-table .op-vfd, .voice-env-mini, canvas.voice-keys) {
+  --small-bezel: 3.5px;
+  box-shadow:
+    0 0 0 1px #000,
+    0 0 0 var(--small-bezel) var(--lamp-bezel-2),
+    0 0 0 calc(var(--small-bezel) + 1px) #000,
+    var(--bezel-lip-y) var(--bezel-lip-blur) 0 calc(var(--small-bezel) + 1px + var(--bezel-lip-grow))
+      var(--bezel-lip-colour);
+}
+
+/* The drawings sit closer row to row than the readouts: their bezels a
+   little thinner, so a row's meets the next's without overlapping. */
+[data-view='instrument'] :is(.voice-env-mini, canvas.voice-keys) {
+  --small-bezel: 2.4px;
+}
+
 /* Voice tops the left column, under the title bar's rule (no rule of
    its own), level with the operator panel's head on the right. */
 .inst-alg-head {
@@ -1020,9 +1083,15 @@ canvas.voice-keys {
   --pen-green: var(--vfd-graph-dim);
   --pen-red: var(--vfd-lit);
   --plot-glow: var(--vfd-glow);
-  border-radius: 4px;
+  border-radius: 3px;
   background: radial-gradient(ellipse at 50% 40%, var(--vfd-dial-1), var(--vfd-dial-2) 75%);
-  box-shadow: 0 0 0 1px #000, var(--vfd-graph-edge);
+}
+
+/* The large screens' glass: a black edge, the bezel round it carrying
+   the light edge in dark. (The table's small glass has its own small
+   bezel; this list's #spectrum would otherwise outrank it.) */
+[data-view='instrument'] :is(.voice-envelope-curve, .inst-pitch-curve, .inst-lfo-plot, #inst-figures #spectrum) {
+  box-shadow: 0 0 0 1px #000;
 }
 
 [data-view='instrument']
@@ -1148,9 +1217,10 @@ canvas.voice-keys {
 #inst-figures .plot-frame[data-x-title]::after {
   content: attr(data-x-title);
   position: absolute;
-  left: 40px;
-  right: 22px;
-  bottom: 4px;
+  /* The canvas's own margins, inside the bezel's 7px. */
+  left: 47px;
+  right: 29px;
+  bottom: 11px;
   font: 12px / 1 var(--font-sans);
   color: var(--ink);
   text-align: center;
@@ -1706,6 +1776,11 @@ canvas.voice-keys {
     --kv-row: 3.6rem;
   }
 
+  /* The table's rows closer still: its small bezels only an edge. */
+  [data-view='instrument'] :is(.voice-table .op-vfd, .voice-env-mini, canvas.voice-keys) {
+    --small-bezel: 0.75px;
+  }
+
   /* The LFO's row a little closer, to fit Key sync beside its knobs. */
   .inst-lfo .inst-voice-controls {
     gap: 0.45rem;
@@ -1814,7 +1889,7 @@ canvas.voice-keys {
     order: -1;
   }
 
-  .voice-envelope-curve {
+  .voice-envelope-screen {
     height: 7rem;
   }
 
@@ -1905,8 +1980,7 @@ canvas.voice-keys {
   }
 
   #inst-diagram-figure .plot-frame,
-  .inst-lfo-plot,
-  .inst-pitch-curve {
+  .inst-voice-tab > .screen-bezel {
     flex: none;
     height: 9rem;
   }

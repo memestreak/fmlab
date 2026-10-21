@@ -599,7 +599,12 @@ end dragging up and down only), and eight knobs in a row: Start,
 Attack, Peak, Decay 1, Break, Decay 2, Sustain, Release (pitches two-sided, ±48 st; speeds log in st/s).
 `formatPitchBend` writes a bend in cents under a semitone, else in
 semitones; `formatGlideSpeed` a speed in st/s. On the right the operator
-panel (`#voice-envelope`) alone, the showing tab's curve filling it. On
+panel (`#voice-envelope`) alone, the showing tab's curve filling it. Each
+screen keeps its box, and its glass, the canvas, sits 7px inside a
+molded bezel (`.screen-bezel`; the diagram's and spectrum's
+`.plot-frame`), sized so it still measures its own box; the table's
+Ratio and Level readouts and small drawings have a small bezel drawn
+outside them (`--small-bezel`, thinner where rows sit close). On
 a wide screen the Voice screen and the operator screen share their top
 and bottom edges whichever tabs are open: the heads as tall and as far
 above their screens, and both control rows `--kv-row` high (4rem; 3.6rem
@@ -665,7 +670,8 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
   to them. The sandbox's tab keys add a warm lamp light (`--lamp-*`,
   the same in every theme but the bezel's edge): amber appears only as
   the light behind those keys, and cyan stays the glass displays'
-  colour.
+  colour. The sandbox's screens and the table's small VFD glass sit in
+  molded black bezels, the tab strips' plastic (Jeremy, 2026-10-21).
 - Red means negative phase and nothing else: controls and the focus ring
   are ink. Never let phase rest on colour alone; a negative stem also gets
   a hollow marker. In the sandbox's VFD spectrum, a negative stem is
