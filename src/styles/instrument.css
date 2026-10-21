@@ -283,6 +283,15 @@ body:not([data-view='instrument']) #inst-tools {
   height: 100%;
 }
 
+/* The spectrum's bezel let into the chassis: a recess, no light edge of
+   its own. */
+[data-view='instrument'] #inst-figures .plot-frame {
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.8),
+    0 0 0 1px #000,
+    0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
 /* The diagram draws its own glass: its light edge is the bezel's now. */
 [data-view='instrument'] #algorithm-plot {
   --vfd-panel-edge: transparent;
@@ -751,7 +760,7 @@ body:not([data-view='instrument']) #inst-tools {
 
 .inst-lfo-knobs {
   display: grid;
-  grid-template-columns: repeat(4, 3.6rem);
+  grid-template-columns: repeat(6, 3.6rem);
   gap: 0.1rem;
 }
 
@@ -1286,14 +1295,24 @@ canvas.voice-keys {
   touch-action: none;
 }
 
-/* The foot: the keyboard at the left, the octave control on its left,
-   and the spectrum taking the rest of the width. The spectrum keeps room
-   for its plot under its two rows of labels. */
+/* The foot: one chassis of the tab strips' molded black plastic (Jeremy,
+   2026-10-21), the same in either theme but its edge. Left to right the
+   control panel and the keys, let into it, and the spectrum, its glass
+   let in the same way. The chassis above the keys is their rail; its
+   ends are their cheeks. */
 .inst-foot {
   display: flex;
   flex: none;
   align-items: stretch;
-  gap: 1.5rem;
+  gap: 14px;
+  padding: 9px 12px 0;
+  border-radius: 8px 8px 0 0;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.05), transparent 30%),
+    linear-gradient(var(--lamp-bezel-1), var(--lamp-bezel-2));
+  box-shadow:
+    0 0 0 1px #000,
+    var(--lamp-bezel-edge);
 }
 
 .inst-foot .inst-keys {
@@ -1302,15 +1321,16 @@ canvas.voice-keys {
 
 .inst-foot #inst-figures {
   flex: 1 1 auto;
-  /* No ink rules round the VFD spectrum: the glass is its own frame, and
-     the rule under it showed past its rounded corners. Transparent, not
-     gone, so the plot keeps its size. */
+  /* 9px of the chassis under its glass. No ink rules round it: the
+     glass is its own frame. Transparent, not gone, so the plot keeps its
+     size. */
+  padding-bottom: 9px;
   border-color: transparent;
 }
 
 /* As tall as the keyboard: the foot's height is the keyboard's. */
 #inst-figures .figure:not([hidden]) {
-  padding: 0.2rem 0 0;
+  padding: 0;
 }
 
 #inst-figures .plot-frame {
@@ -1484,10 +1504,12 @@ canvas.voice-keys {
   grid-column: 1 / -1;
 }
 
-/* The keyboard: shaped like a piano and centred, the octave control on
-   its left. Its colours are its own: the white keys stay light and the
-   black keys dark in either theme, as on a real keyboard. The key held is
-   drawn in the carrier's pen, being the note you hear. */
+/* The keyboard (Jeremy, 2026-10-21): piano-shaped keys let into the
+   chassis, the control panel on their left. Its colours are its own:
+   the white keys stay light and the black keys ebony in either theme, as
+   on a real keyboard. A key held is drawn in the carrier's pen, being the
+   note you hear, and sinks: straight down on the press, up on the
+   release, never animated. */
 .inst-keys {
   display: flex;
   flex: none;
@@ -1497,52 +1519,51 @@ canvas.voice-keys {
 .piano {
   --w: 3.1rem;
   --key-light: var(--paper);
-  --key-dark: var(--ink);
   --key-on-light: var(--ink);
-  --key-on-dark: var(--paper);
-  --key-edge: var(--ink);
+  /* The chassis's recess: let into the plastic, lit along its lower lip. */
+  --recess: inset 0 1px 2px rgba(0, 0, 0, 0.8), 0 0 0 1px #000, 0 1px 0 rgba(255, 255, 255, 0.12);
   display: flex;
-  align-items: flex-end;
-  gap: 1.75rem;
+  align-items: stretch;
+  gap: 14px;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) .piano {
     --key-light: var(--ink);
-    --key-dark: var(--paper);
     --key-on-light: var(--paper);
-    --key-on-dark: var(--ink);
-    --key-edge: var(--paper);
   }
 }
 
 :root[data-theme='dark'] .piano {
   --key-light: var(--ink);
-  --key-dark: var(--paper);
   --key-on-light: var(--paper);
-  --key-on-dark: var(--ink);
-  --key-edge: var(--paper);
 }
 
 .piano[hidden] {
   display: none;
 }
 
-.piano-oct {
+/* The control panel: Octave and Mod on tape on the top line; under
+   them, 6px down, the octave chooser and the wheel, its foot 9px above
+   the chassis's (Jeremy, 2026-10-21: the chooser close to its tape). */
+.piano-panel {
   display: grid;
-  gap: 0.35rem;
-  justify-items: start;
+  grid-template-columns: auto auto;
+  grid-template-rows: 24px minmax(0, 1fr);
+  gap: 6px 14px;
+  padding-bottom: 9px;
 }
 
-.piano-oct-label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.piano-oct-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
 }
 
 .piano-oct-row {
   display: flex;
+  align-self: start;
   align-items: center;
 }
 
@@ -1577,17 +1598,21 @@ canvas.voice-keys {
   box-shadow: 0 0 0 1px var(--ink);
 }
 
-.piano-oct-hint {
-  font-size: 0.75rem;
-  font-style: italic;
+/* The chooser's bezel and the wheel's slot let into the chassis. */
+.piano .chooser {
+  box-shadow: var(--recess);
 }
 
-/* "Z X on the keyboard" only while the pointer is over the keyboard or
-   its octave control, or the keyboard's focus is in it, as the
-   spectrum's title shows only under the pointer (Jeremy, 2026-10-20).
-   Its place is kept, so nothing moves. A touch screen, with no hover,
-   never shows it (a tap's focus is not :focus-visible). */
-.piano .piano-oct-hint {
+/* Z X, the computer keys that move the octave, beside its tape: grey, as
+   the push keys' legends, and only while the pointer is over the
+   keyboard or keyboard focus is in it, as the spectrum's title shows only
+   under the pointer (Jeremy, 2026-10-20). Its place is kept, so nothing
+   moves. A touch screen, with no hover, never shows it (a tap's focus is
+   not :focus-visible). */
+.piano-oct-hint {
+  display: inline-flex;
+  gap: 3px;
+  color: var(--lamp-legend);
   opacity: 0;
   transition: opacity 0.15s;
 }
@@ -1603,28 +1628,129 @@ canvas.voice-keys {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .piano .piano-oct-hint {
+  .piano-oct-hint {
     transition: none;
   }
 }
 
 .piano-oct-hint kbd {
   padding: 0 0.25rem;
-  border: 1px solid var(--rule);
+  border: 1px solid color-mix(in srgb, var(--lamp-legend) 55%, transparent);
   border-radius: 3px;
   font-family: var(--font-mono);
   font-size: 0.7rem;
-  font-style: normal;
+  line-height: 1.35;
 }
 
-/* The board: a key slip of ink along the top, and the edge colour behind
-   the keys so the hairlines between them show. */
+/* The mod wheel (ui/modWheel.ts): a slot of the bezels' plastic holding
+   the drum and its VFD bar side by side. */
+.mod-wheel {
+  display: flex;
+  gap: 5px;
+  padding: 5px;
+  border-radius: 4px;
+  background: linear-gradient(var(--lamp-bezel-1), var(--lamp-bezel-2));
+  box-shadow: var(--recess);
+  cursor: ns-resize;
+  touch-action: none;
+  user-select: none;
+}
+
+.mod-wheel:focus-visible {
+  outline: 2px solid var(--lamp-legend-hover);
+  outline-offset: 1px;
+}
+
+/* Ribbed black rubber in a black well, shaded round, darker at both
+   sides; its painted line riding from the foot (0) to the top (full). */
+.mod-wheel-drum {
+  position: relative;
+  width: 26px;
+  overflow: hidden;
+  border-radius: 2px;
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0) 24%, rgba(0, 0, 0, 0) 76%, rgba(0, 0, 0, 0.55)),
+    repeating-linear-gradient(rgba(0, 0, 0, 0.5) 0 1px, rgba(255, 255, 255, 0.06) 1px 2px, transparent 2px 4px),
+    linear-gradient(#030303, #2c2e2e 22%, #4b4e4e 50%, #2c2e2e 78%, #030303);
+  box-shadow: 0 0 0 2px #000;
+}
+
+.mod-wheel-line {
+  position: absolute;
+  right: 0;
+  bottom: calc(var(--at, 0) * (100% - 3px));
+  left: 0;
+  height: 3px;
+  background: #e9e9e4;
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0.8);
+}
+
+/* The bar: dark glass, 21 segments lit from the bottom to the amount,
+   as the knobs' dials are lit. */
+.mod-wheel-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  box-sizing: border-box;
+  width: 9px;
+  padding: 2px;
+  border-radius: 2px;
+  background: radial-gradient(ellipse at 50% 40%, var(--vfd-glass-1), var(--vfd-glass-2));
+  box-shadow: inset 0 0 0 1px #000;
+}
+
+.mod-wheel-seg {
+  flex: 1 1 0;
+  min-height: 0;
+  background: var(--vfd-glow);
+  opacity: var(--vfd-dial-unlit-opacity);
+}
+
+.mod-wheel-seg.is-lit {
+  background: var(--vfd-lit);
+  opacity: 1;
+  box-shadow: 0 0 1.5px var(--vfd-glow), 0 0 3px var(--vfd-glow);
+}
+
+/* The keys' bed, let into the chassis: a black edge, the rail's shadow
+   falling on them, and a strip of charcoal felt where they run under the
+   rail (charcoal: red means negative phase only). */
+.piano-bed {
+  position: relative;
+  display: flex;
+  height: 6.7rem;
+  box-shadow: 0 0 0 1px #000;
+}
+
+.piano-bed::before,
+.piano-bed::after {
+  content: '';
+  position: absolute;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.piano-bed::before {
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 4px;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='4'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0.22 0 0 0 -0.06'/%3E%3C/filter%3E%3Crect width='64' height='4' filter='url(%23f)'/%3E%3C/svg%3E") 0 0 / 64px 4px repeat,
+    linear-gradient(#2b2a29, #3a3836 45%, #1c1b1a);
+  box-shadow: 0 1px 1.5px rgba(0, 0, 0, 0.55);
+}
+
+.piano-bed::after {
+  inset: 0;
+  box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.6);
+}
+
+/* The board: soft grey grooves between the keys. */
 .piano-keys {
   display: flex;
-  height: 8.5rem;
-  border-top: 0.45rem solid var(--ink);
-  border-radius: 3px 3px 0 0;
-  background: var(--key-edge);
+  height: 100%;
+  background: linear-gradient(#8a8a86, #6f6f6b);
   /* Stops a finger on a key from scrolling the page, or selecting. */
   touch-action: none;
   user-select: none;
@@ -1638,47 +1764,134 @@ canvas.voice-keys {
   cursor: pointer;
 }
 
+.piano-key::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+}
+
+/* A white key: its top a little darker under the rail, lit along its
+   left edge and shaded along its right, and its front lip a face of its
+   own, a bright edge where the top turns down. */
 .piano-white {
   flex: 0 0 var(--w);
-  border-right: 1px solid var(--key-edge);
-  border-bottom: 1px solid var(--key-edge);
+  border-right: 1px solid transparent;
   border-radius: 0 0 5px 5px;
-  background: var(--key-light);
+  background:
+    linear-gradient(
+      rgba(0, 0, 0, 0.13),
+      rgba(0, 0, 0, 0.04) 9%,
+      rgba(0, 0, 0, 0) 22%,
+      rgba(0, 0, 0, 0) 78%,
+      rgba(0, 0, 0, 0.035)
+    ),
+    var(--key-light);
+  background-clip: padding-box;
+  box-shadow:
+    inset 1px 0 0 rgba(255, 255, 255, 0.75),
+    inset -1px 0 0 rgba(0, 0, 0, 0.07);
   color: var(--key-on-light);
-  /* The front lip: the key's own colour, a shade deeper, so it reads as
-     a lip in the dark theme too (the page's sunken shade is near black
-     there). */
-  box-shadow: inset 0 -0.45rem 0 color-mix(in srgb, var(--key-light) 88%, var(--key-on-light));
 }
 
-.piano-white:first-child {
-  border-left: 1px solid var(--key-edge);
+.piano-white::after {
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 0.5rem;
+  border-radius: 0 0 5px 5px;
+  background: linear-gradient(
+    color-mix(in srgb, var(--key-light) 93%, #000),
+    color-mix(in srgb, var(--key-light) 76%, #000)
+  );
+  box-shadow:
+    0 -1px 0 rgba(255, 255, 255, 0.95),
+    0 -2px 1px rgba(0, 0, 0, 0.06);
 }
 
-/* A black key is narrower and shorter, and sits across the join between
-   the two white keys either side of it. */
+/* A black key: ebony in either theme, narrower and shorter, across the
+   join between the white keys either side. Bevelled sides, a faint sheen
+   down its top, a sloped front face, and a soft shadow on its
+   neighbours. */
 .piano-black {
   z-index: 1;
   flex: 0 0 auto;
   width: calc(var(--w) * 0.6);
   height: 60%;
   margin: 0 calc(var(--w) * -0.3);
-  border: 1px solid var(--ink);
+  border: 1px solid #000;
   border-top: 0;
-  border-radius: 0 0 4px 4px;
-  background: var(--key-dark);
-  color: var(--key-on-dark);
-  box-shadow: inset 0 -0.35rem 0 color-mix(in srgb, var(--key-dark) 70%, var(--key-light));
+  border-radius: 0 0 3px 3px;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.16),
+      rgba(255, 255, 255, 0) 14%,
+      rgba(255, 255, 255, 0) 92%,
+      rgba(255, 255, 255, 0.16)
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 30%,
+      rgba(255, 255, 255, 0.1) 42%,
+      rgba(255, 255, 255, 0.03) 52%,
+      rgba(255, 255, 255, 0) 60%
+    ),
+    linear-gradient(#060606, #1d1e1f 30%, #141516);
+  box-shadow:
+    1px 3px 3px rgba(0, 0, 0, 0.38),
+    -1px 2px 2px rgba(0, 0, 0, 0.18);
+  color: #ddd;
 }
 
+.piano-black::after {
+  right: 2px;
+  bottom: 1px;
+  left: 2px;
+  height: 0.55rem;
+  border-radius: 0 0 3px 3px;
+  background: linear-gradient(#3a3c3d, #232526 60%, #111);
+  box-shadow: 0 -1px 0 rgba(255, 255, 255, 0.22);
+}
+
+/* Held, a white key sinks: darker at the back, shaded inside both edges,
+   only a sliver of its lip showing, in the carrier's pen. */
 .piano-white[aria-pressed='true'] {
-  background: color-mix(in srgb, var(--pen-blue) 22%, var(--key-light));
-  box-shadow: inset 0 -0.2rem 0 var(--pen-blue);
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.24), rgba(0, 0, 0, 0.08) 12%, rgba(0, 0, 0, 0) 34%),
+    color-mix(in srgb, var(--pen-blue) 22%, var(--key-light));
+  background-clip: padding-box;
+  box-shadow:
+    inset 2px 0 2px -1px rgba(0, 0, 0, 0.22),
+    inset -2px 0 2px -1px rgba(0, 0, 0, 0.22);
 }
 
-.piano-black[aria-pressed='true'] {
+.piano-white[aria-pressed='true']::after {
+  height: 0.22rem;
   background: var(--pen-blue);
+  box-shadow: none;
+}
+
+/* Held, a black key sinks too: its bevels over the blue, darker at the
+   back, 2px shorter, most of its front face gone, a smaller shadow. */
+.piano-black[aria-pressed='true'] {
+  height: calc(60% - 2px);
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.16),
+      rgba(255, 255, 255, 0) 14%,
+      rgba(255, 255, 255, 0) 92%,
+      rgba(255, 255, 255, 0.16)
+    ),
+    linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0) 30%),
+    var(--pen-blue);
+  box-shadow: 0 1px 1.5px rgba(0, 0, 0, 0.3);
   color: var(--paper);
+}
+
+.piano-black[aria-pressed='true']::after {
+  height: 0.15rem;
+  background: color-mix(in srgb, var(--pen-blue) 70%, #000);
   box-shadow: none;
 }
 
@@ -1687,7 +1900,7 @@ canvas.voice-keys {
   opacity: 0.35;
 }
 
-/* Each C names itself; the computer key that plays a key sits above. */
+/* Each C names itself, above the lip. */
 .piano-c {
   position: absolute;
   right: 0;
@@ -1783,6 +1996,21 @@ canvas.voice-keys {
     margin-bottom: 1.2rem;
   }
 
+  /* Six knobs beside the waves and Key sync (Jeremy, 2026-10-21): the
+     waves and the knobs' columns a little narrower. */
+  .inst-lfo-knobs {
+    grid-template-columns: repeat(6, 2.9rem);
+    gap: 0;
+  }
+
+  [data-view='instrument'] .inst-lfo .lfo-wave {
+    width: 1.75rem;
+  }
+
+  [data-view='instrument'] .inst-lfo .lfo-wave svg {
+    width: 1.25rem;
+  }
+
   /* Every control row's items centred in it, as the Voice rows' are, so
      the dials, the keys and the names fall on the same lines in all of
      them, whichever tabs are open. */
@@ -1831,8 +2059,29 @@ canvas.voice-keys {
     margin-top: 0.75rem;
   }
 
-  .inst-keys {
-    padding-top: 0.25rem;
+  .piano-bed {
+    height: 9rem;
+  }
+}
+
+/* Under 1380px wide the white keys narrow a little, so the spectrum
+   keeps its room beside the wheel; and the LFO's row closes up as it
+   does under 52rem high. */
+@media (min-width: 62rem) and (max-width: 1379.98px) {
+  .piano {
+    --w: 2.9rem;
+  }
+
+  .inst-lfo .inst-voice-controls {
+    gap: 0.45rem;
+  }
+
+  .inst-lfo-knobs {
+    grid-template-columns: repeat(6, 2.7rem);
+  }
+
+  [data-view='instrument'] .inst-lfo .lfo-wave {
+    width: 1.6rem;
   }
 }
 
@@ -1891,7 +2140,11 @@ canvas.voice-keys {
   }
 
   .inst-lfo-knobs {
-    grid-template-columns: repeat(4, 3.4rem);
+    grid-template-columns: repeat(6, 2.7rem);
+  }
+
+  [data-view='instrument'] .inst-lfo .lfo-wave {
+    width: 1.6rem;
   }
 
   .voice-envelope {
@@ -1918,8 +2171,8 @@ canvas.voice-keys {
 
 /* A window under 60rem high gives the keys less. */
 @media (min-width: 62rem) and (max-height: 60rem) {
-  .piano-keys {
-    height: 6.25rem;
+  .piano-bed {
+    height: 6.7rem;
   }
 }
 
@@ -2170,8 +2423,9 @@ canvas.voice-keys {
     height: 2rem;
   }
 
-  /* The foot, docked: the spectrum, then the octave control over the
-     keys, which fill the width. */
+  /* The foot, docked: the chassis the full width, square ends; the
+     spectrum, then the octave control and the wheel, then the keys,
+     which fill the width. */
   .inst-foot {
     position: fixed;
     right: 0;
@@ -2179,14 +2433,14 @@ canvas.voice-keys {
     left: 0;
     z-index: 5;
     flex-direction: column;
-    gap: 0.25rem;
-    padding: 0 1rem calc(0.5rem + env(safe-area-inset-bottom, 0px));
-    border-top: 1px solid var(--ink);
-    background: var(--paper);
+    gap: 9px;
+    padding: 9px 12px env(safe-area-inset-bottom, 0px);
+    border-radius: 0;
   }
 
   .inst-foot #inst-figures {
     order: -1;
+    padding-bottom: 0;
     border-top: 0;
   }
 
@@ -2197,22 +2451,41 @@ canvas.voice-keys {
   .piano {
     flex-direction: column;
     align-items: stretch;
-    gap: 0.4rem;
+    gap: 9px;
     width: 100%;
     max-width: 40rem;
   }
 
-  .piano-oct {
-    justify-items: center;
+  /* The tapes are hidden here: the chooser and the wheel side by side. */
+  .piano-panel {
+    grid-template-columns: auto auto;
+    grid-template-rows: auto;
+    justify-content: center;
+    padding-bottom: 0;
   }
 
-  .piano-oct-label,
-  .piano-oct-hint {
+  .piano-oct-head,
+  .piano-panel .mod-wheel-label {
     display: none;
   }
 
-  .piano-keys {
+  .piano-oct-row {
+    grid-row: 1;
+    align-self: end;
+  }
+
+  .mod-wheel {
+    grid-row: 1;
+    height: 2.75rem;
+  }
+
+  .piano-bed {
     height: 6rem;
+  }
+
+  .piano-keys {
+    flex: 1 1 auto;
+    min-width: 0;
   }
 
   .piano-white {

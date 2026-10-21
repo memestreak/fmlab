@@ -2,7 +2,7 @@
 // voices (ROM1A); do not edit by hand. Factory voices © Yamaha.
 // Numbers in the sandbox's units (src/dsp/dx7.ts).
 
-import type { Dx7Lfo, Dx7Operator, Dx7PitchEnvelope } from '../dsp/dx7';
+import type { Dx7Operator, Dx7PitchEnvelope, Dx7VoiceLfo } from '../dsp/dx7';
 
 /** A DX7 factory voice, and what the sandbox cannot play of it. */
 export interface FactoryVoice {
@@ -10,7 +10,7 @@ export interface FactoryVoice {
   algorithm: number;
   dxFeedback: number;
   dxOperators: Dx7Operator[];
-  dxLfo: Dx7Lfo;
+  dxLfo: Dx7VoiceLfo;
   dxPitchEnvelope: Dx7PitchEnvelope;
   missing: string[];
 }

@@ -204,6 +204,8 @@ export class AudioEngine {
       // Taken up by the next note struck; the LFO at once.
       this.tell({ type: 'patch', patch: voicePatch(state) });
     }
+    // The wheel on its own, lighter than the whole patch at every step of a drag.
+    if (state.modWheel !== previous.modWheel) this.tell({ type: 'wheel', amount: state.modWheel });
     if (state.volume !== previous.volume) this.tuneNote(state);
     return true;
   }
@@ -228,6 +230,7 @@ export class AudioEngine {
         master.gain.cancelScheduledValues(now);
         master.gain.setValueAtTime(state.volume, now);
         synth.port.postMessage({ type: 'patch', patch: voicePatch(state) } satisfies VoiceMessage);
+        synth.port.postMessage({ type: 'wheel', amount: state.modWheel } satisfies VoiceMessage);
         synth.port.postMessage({ type: 'noteOn', note, hz, hold } satisfies VoiceMessage);
         started?.();
       })

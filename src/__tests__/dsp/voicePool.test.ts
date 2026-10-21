@@ -11,7 +11,7 @@ import {
 import { envelopeAt } from '../../dsp/envelope';
 import { kernelLevels, type Operator, operatorEnvelope } from '../../dsp/operators';
 import { MAX_OPERATORS, PmKernel } from '../../dsp/pmKernel';
-import { type Dx7Patch, STEAL_SECONDS, VoicePool, type VoicePatch } from '../../dsp/voicePool';
+import { type Dx7Patch, STEAL_SECONDS, VoicePool, type VoicePatch, WHEEL_GLIDE_SECONDS } from '../../dsp/voicePool';
 
 const SAMPLE_RATE = 48000;
 const LOCK_SAMPLES = 0.05 * SAMPLE_RATE;
@@ -262,6 +262,32 @@ describe('the voice pool\'s LFO', () => {
     expect(level(20, 0.25) / level(0, 1)).toBeCloseTo(10 ** (-5 / 20), 2);
     // An operator taking none is untouched.
     expect(level(20, 0)).toBeCloseTo(level(0, 1), 6);
+  });
+
+  it('adds the mod wheel\'s depths to the LFO\'s, glided over 30 ms', () => {
+    const pool = (lfo: Partial<Dx7Lfo>, wheel: number) => {
+      const voices = new VoicePool(1, SAMPLE_RATE, LOCK_SAMPLES);
+      voices.setPatch(sine(lfo, 1));
+      voices.setWheel(wheel);
+      // Past the glide before the key, so both sound alike from the start.
+      render(voices, SAMPLE_RATE * WHEEL_GLIDE_SECONDS * 2);
+      voices.noteOn(69, 440);
+      render(voices, SAMPLE_RATE * 0.1);
+      return voices;
+    };
+    // The wheel at full plays its depth exactly as the LFO's own would.
+    const own = render(pool({ vibrato: 600, tremolo: 6 }, 0), 4800);
+    const wheel = render(pool({ vibrato: 0, tremolo: 0, wheelVibrato: 600, wheelTremolo: 6 }, 1), 4800);
+    expect(Math.max(...wheel.map((v, i) => Math.abs(v - own[i])))).toBeLessThan(1e-6);
+    // Halfway, half of it, on top of the LFO's own.
+    expect(pitchOf(render(pool({ vibrato: 600, wheelVibrato: 1200 }, 0.5), SAMPLE_RATE))).toBeCloseTo(220, -1);
+    // Glided: 10 ms after a move it is still on its way.
+    const voices = pool({ vibrato: 0, wheelTremolo: 20 }, 0);
+    voices.setWheel(1);
+    const early = peak(render(voices, SAMPLE_RATE * 0.01));
+    render(voices, SAMPLE_RATE * 0.05);
+    expect(early).toBeGreaterThan(0.1);
+    expect(peak(render(voices, 4800))).toBeCloseTo(1 / 60, 2);
   });
 
   it('holds the LFO back for its delay after every key, for the notes held too', () => {

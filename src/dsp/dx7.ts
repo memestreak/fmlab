@@ -83,7 +83,9 @@ export type LfoWave = (typeof LFO_WAVES)[number];
  * how far it swings every operator's pitch, in cents (the DX7's PMD and
  * PMS in one); how far it pulls levels down, in dB, for an operator that
  * takes all of it (the DX7's AMD); and key sync, which starts the wave
- * again on each key.
+ * again on each key. Then what the mod wheel adds at full (Jeremy,
+ * 2026-10-21; on the DX7 its pitch and amplitude assign): `wheelVibrato`
+ * in cents, `wheelTremolo` in dB, on top of `vibrato` and `tremolo`.
  */
 export interface Dx7Lfo {
   wave: LfoWave;
@@ -92,7 +94,15 @@ export interface Dx7Lfo {
   vibrato: number;
   tremolo: number;
   sync: boolean;
+  wheelVibrato: number;
+  wheelTremolo: number;
 }
+
+/** The LFO as a DX7 voice stores it: the wheel's depths are not in it. */
+export type Dx7VoiceLfo = Omit<Dx7Lfo, 'wheelVibrato' | 'wheelTremolo'>;
+
+/** What the mod wheel adds at full, for every voice that does not say. */
+export const WHEEL_DEPTHS = { wheelVibrato: 50, wheelTremolo: 0 } as const;
 
 /** The LFO's ranges: the DX7's 0 to 99 (and PMS 7), in these units. */
 export const LFO_SPEED = { min: dx7LfoHz(0), max: dx7LfoHz(99) };
@@ -108,11 +118,25 @@ export const HELD_LFO: Dx7Lfo = {
   vibrato: 0,
   tremolo: 0,
   sync: true,
+  ...WHEEL_DEPTHS,
 };
 
-/** Whether an LFO does anything: vibrato or tremolo above zero. */
-export function lfoOn(lfo: Dx7Lfo): boolean {
-  return lfo.vibrato > 0 || lfo.tremolo > 0;
+/**
+ * The vibrato (cents) and tremolo (dB) heard with the mod wheel at
+ * `wheel`, 0 to 1: the LFO's own depth and the wheel's share of its
+ * depth at full, held under the LFO's ranges.
+ */
+export function lfoDepths(lfo: Dx7Lfo, wheel: number): { vibrato: number; tremolo: number } {
+  return {
+    vibrato: Math.min(LFO_VIBRATO.max, lfo.vibrato + wheel * lfo.wheelVibrato),
+    tremolo: Math.min(LFO_TREMOLO.max, lfo.tremolo + wheel * lfo.wheelTremolo),
+  };
+}
+
+/** Whether an LFO does anything, with the wheel at `wheel`: vibrato or tremolo above zero. */
+export function lfoOn(lfo: Dx7Lfo, wheel = 0): boolean {
+  const { vibrato, tremolo } = lfoDepths(lfo, wheel);
+  return vibrato > 0 || tremolo > 0;
 }
 
 /**

@@ -4,7 +4,9 @@
 // alone, in neither the link nor storage. While the LFO or the Pitch EG
 // tab is closed its pill shows a dot when that feature is on. The LFO tab: the wave, six buttons each drawing its shape, with
 // a drawing of the LFO under them (viz/lfoPlot.ts); Speed, Delay,
-// Vibrato and Tremolo, four knobs; and key sync, a push key, "Key sync".
+// Vibrato and Tremolo, and what the mod wheel adds to those two at full,
+// Wheel vibrato and Wheel tremolo: six knobs; and key sync, a push key,
+// "Key sync".
 
 import {
   type Dx7Lfo,
@@ -17,7 +19,7 @@ import {
   lfoOn,
   pitchEnvelopeOn,
 } from '../dsp/dx7';
-import { dx7LfoDelay, dx7VibratoCents } from '../dsp/lfo';
+import { dx7LfoDelay, dx7TremoloDb, dx7VibratoCents } from '../dsp/lfo';
 import type { LabStore } from '../model/lab';
 import { knobValues, redrawOnLayout } from './screenValues';
 import { describeLfo, drawLfo } from '../viz/lfoPlot';
@@ -79,7 +81,12 @@ export function mountVoiceArea(store: LabStore): void {
   const tabs = [...head.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
   // The tabs whose feature can be on, and when it is.
   const features: { tab: HTMLButtonElement | undefined; area: VoiceArea; name: string; on: () => boolean }[] = [
-    { tab: tabs.find(tab => tab.dataset.tab === 'lfo'), area: 'lfo', name: 'LFO', on: () => lfoOn(lfo()) },
+    {
+      tab: tabs.find(tab => tab.dataset.tab === 'lfo'),
+      area: 'lfo',
+      name: 'LFO',
+      on: () => lfoOn(lfo(), store.get().modWheel),
+    },
     {
       tab: tabs.find(tab => tab.dataset.tab === 'pitch'),
       area: 'pitch',
@@ -163,8 +170,9 @@ export function mountVoiceArea(store: LabStore): void {
   });
   waves.replaceChildren(...buttons);
 
-  // The four knobs. The delay and the vibrato can be off, at the bottom of
-  // their log scales; the smallest above that is the DX7's first step.
+  // The six knobs. The delay and the vibratos can be off, at the bottom of
+  // their log scales; the smallest above that is the DX7's first step. The
+  // tremolos' too, the wheel's (Jeremy, 2026-10-21).
   const built = [
     createKnob({
       label: 'Speed',
@@ -207,6 +215,28 @@ export function mountVoiceArea(store: LabStore): void {
       set: value => setLfo({ tremolo: Math.round(value * 10) / 10 }),
       format: formatPull,
     }),
+    createKnob({
+      label: 'Wh vib',
+      name: 'Wheel vibrato',
+      min: dx7VibratoCents(1, 1),
+      max: LFO_VIBRATO.max,
+      log: true,
+      zero: true,
+      get: () => lfo().wheelVibrato,
+      set: value => setLfo({ wheelVibrato: value === 0 ? 0 : Number(value.toPrecision(3)) }),
+      format: formatCentsSwing,
+    }),
+    createKnob({
+      label: 'Wh trem',
+      name: 'Wheel tremolo',
+      min: dx7TremoloDb(1),
+      max: LFO_TREMOLO.max,
+      log: true,
+      zero: true,
+      get: () => lfo().wheelTremolo,
+      set: value => setLfo({ wheelTremolo: value === 0 ? 0 : Number(value.toPrecision(2)) }),
+      format: formatPull,
+    }),
   ];
   knobs.replaceChildren(...built.map(knob => knob.element));
 
@@ -223,8 +253,9 @@ export function mountVoiceArea(store: LabStore): void {
 
   const drawPlot = () => {
     const now = lfo();
-    drawLfo(plot, now, knobValues(plot, knobs));
-    plot.setAttribute('aria-label', describeLfo(now, WAVES[now.wave].name));
+    const wheel = store.get().modWheel;
+    drawLfo(plot, now, knobValues(plot, knobs), wheel);
+    plot.setAttribute('aria-label', describeLfo(now, WAVES[now.wave].name, wheel));
   };
 
   const show = () => {
@@ -243,7 +274,7 @@ export function mountVoiceArea(store: LabStore): void {
     // Every visit to the sandbox opens on the Algorithm tab.
     if (state.chapter !== previous.chapter) open = 'algorithm';
     if (state.chapter !== previous.chapter || state.dxLfo !== previous.dxLfo) show();
-    else if (state.dxPitchEnvelope !== previous.dxPitchEnvelope) showTabs();
+    else if (state.dxPitchEnvelope !== previous.dxPitchEnvelope || state.modWheel !== previous.modWheel) showTabs();
     else if (state.theme !== previous.theme && open === 'lfo') drawPlot();
   });
   new ResizeObserver(() => {

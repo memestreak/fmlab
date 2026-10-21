@@ -171,6 +171,15 @@ export function drawValueStrip(plot: Plot, width: number, height: number, values
   // One line, or two smaller where the knobs wrap onto two rows.
   const two = values.some(value => value.line === 1);
   ctx.font = `600 ${two ? 10 : 12}px ${token('--font-mono')}`;
+  // A row of narrow knobs (the LFO's six at 1280 wide) sets its values a
+  // size smaller rather than let two neighbours touch.
+  const crowded = values.some((value, i) => {
+    const next = values[i + 1];
+    if (!next || (next.line ?? 0) !== (value.line ?? 0)) return false;
+    const room = Math.abs(next.x - value.x);
+    return (ctx.measureText(value.text).width + ctx.measureText(next.text).width) / 2 + 5 > room;
+  });
+  if (crowded) ctx.font = `600 ${two ? 9 : 10.5}px ${token('--font-mono')}`;
   ctx.fillStyle = token('--ink');
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';

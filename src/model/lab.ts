@@ -149,6 +149,13 @@ export interface LabState {
   /** `dx7`: the voice's pitch envelope, which each note runs (dsp/dx7.ts). */
   dxPitchEnvelope: Dx7PitchEnvelope;
   /**
+   * `dx7`: the mod wheel, 0 to 1, adding the LFO's wheel depths
+   * (`lfoDepths`). The instrument's, not the voice's: it stays where it
+   * is left through voice and preset changes, and is in neither the link
+   * nor storage.
+   */
+  modWheel: number;
+  /**
    * `dx7`: the operator selected in the table, whose envelope view is
    * open. One always is: OP1 when the sandbox opens.
    */
@@ -247,6 +254,7 @@ export const DEFAULTS: LabState = {
   dxFeedback: 0,
   dxLfo: HELD_LFO,
   dxPitchEnvelope: FLAT_PITCH_ENVELOPE,
+  modWheel: 0,
   selectedOp: 0,
   voiceTab: 'envelope',
   compare: false,
