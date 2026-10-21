@@ -510,7 +510,7 @@ function presetMenu(presets: readonly Preset[], store: LabStore): HTMLElement[] 
     if (!preset) return;
     last = at;
     store.set(preset.patch);
-    // Both top screens glitch together, one kind, as the voice changes.
+    // Both top screens glitch together as the voice changes, each its own kind.
     glitchScreens(topScreens());
   };
   const step = (label: string, glyph: string, steps: number) => {

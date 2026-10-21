@@ -3,8 +3,8 @@ import { screenGlitchOn } from '../model/settings';
 // The sandbox's top screens glitch, briefly, as an analog display does,
 // when what they show changes (Jeremy, 2026-10-21): a tab opened on the
 // Voice screen or the operator panel, or a preset chosen (both screens at
-// once, the same kind). One of five, at random, never the same twice in a
-// row. Only the glass moves: the canvas inside its bezel, by Web
+// once, each its own kind, never the two alike). One of five, at random,
+// never the same twice in a row on a screen. Only the glass moves: the canvas inside its bezel, by Web
 // Animations on it or on an overlay over it, so nothing is drawn again
 // and nothing in the layout moves. None under reduced motion, or with
 // Screen glitch off (model/settings.ts).
@@ -15,14 +15,31 @@ export type Glitch = (typeof GLITCHES)[number];
 /** How long each lasts, in ms. */
 export const GLITCH_MS: Record<Glitch, number> = { flash: 180, refresh: 120, jitter: 130, tear: 190, scanline: 170 };
 
-/** The kind to play: any but `previous`, all others alike, `random` in [0, 1). */
-export function nextGlitch(previous: Glitch | null, random: number): Glitch {
-  const others = GLITCHES.filter(kind => kind !== previous);
-  return others[Math.min(others.length - 1, Math.floor(random * others.length))];
+/**
+ * The kind to play: any not in `exclude` (the screen's last, and on a
+ * preset the other screen's pick), all those left alike, `random` in
+ * [0, 1).
+ */
+export function nextGlitch(exclude: Iterable<Glitch | null>, random: number): Glitch {
+  const avoid = new Set(exclude);
+  const left = GLITCHES.filter(kind => !avoid.has(kind));
+  return left[Math.min(left.length - 1, Math.floor(random * left.length))];
 }
 
-/** The kind played last, on any screen. */
-let last: Glitch | null = null;
+/**
+ * The kinds for several screens changing at once, given what each played
+ * last: each new to its screen, and no two alike.
+ */
+export function nextGlitches(previous: readonly (Glitch | null)[], random: () => number): Glitch[] {
+  const picks: Glitch[] = [];
+  for (const last of previous) picks.push(nextGlitch([last, ...picks], random()));
+  return picks;
+}
+
+/** The two top screens, each with its own record of the kind played last. */
+type Screen = 'voice' | 'operator';
+const last: Record<Screen, Glitch | null> = { voice: null, operator: null };
+const screenOf = (canvas: HTMLCanvasElement): Screen => (canvas.closest('#voice-envelope') ? 'operator' : 'voice');
 
 /** What is running on a canvas, to be cancelled by the next change on it. */
 const running = new Map<HTMLCanvasElement, () => void>();
@@ -31,8 +48,8 @@ const running = new Map<HTMLCanvasElement, () => void>();
 const HELD = 'steps(1, end)';
 
 /**
- * Plays one glitch, the same kind on each of `canvases` (a tab's, or both
- * top screens' on a preset). Call it straight after the switch: nothing
+ * Plays a glitch on each of `canvases` (a tab's, or both top screens' on a
+ * preset), each its own kind. Call it straight after the switch: nothing
  * waits for it.
  */
 export function glitchScreens(canvases: readonly (HTMLCanvasElement | null)[]): void {
@@ -44,9 +61,14 @@ export function glitchScreens(canvases: readonly (HTMLCanvasElement | null)[]): 
   }
   if (screens.length === 0 || !screenGlitchOn()) return;
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const kind = nextGlitch(last, Math.random());
-  last = kind;
-  for (const canvas of screens) play(kind, canvas);
+  const kinds = nextGlitches(
+    screens.map(canvas => last[screenOf(canvas)]),
+    Math.random,
+  );
+  screens.forEach((canvas, i) => {
+    last[screenOf(canvas)] = kinds[i];
+    play(kinds[i], canvas);
+  });
 }
 
 /** The top screens' canvases showing now: the Voice tab's and the operator panel's. */

@@ -1,5 +1,5 @@
 import { parseScreenGlitch, SCREEN_GLITCH_KEY, saveScreenGlitch, screenGlitchOn } from '../../model/settings';
-import { GLITCH_MS, GLITCHES, type Glitch, nextGlitch } from '../../ui/screenGlitch';
+import { GLITCH_MS, GLITCHES, type Glitch, nextGlitch, nextGlitches } from '../../ui/screenGlitch';
 
 describe('the screen glitch', () => {
   it('is one of five, each 120 to 190 ms', () => {
@@ -19,7 +19,7 @@ describe('the screen glitch', () => {
     const seen = new Map<Glitch, number>();
     let previous: Glitch | null = null;
     for (let i = 0; i < 4000; i++) {
-      const kind = nextGlitch(previous, random());
+      const kind = nextGlitch([previous], random());
       expect(kind).not.toBe(previous);
       seen.set(kind, (seen.get(kind) ?? 0) + 1);
       previous = kind;
@@ -30,7 +30,7 @@ describe('the screen glitch', () => {
   });
 
   it('picks evenly from the other four', () => {
-    expect([0, 0.25, 0.5, 0.75, 0.999].map(r => nextGlitch('flash', r))).toEqual([
+    expect([0, 0.25, 0.5, 0.75, 0.999].map(r => nextGlitch(['flash'], r))).toEqual([
       'refresh',
       'jitter',
       'tear',
@@ -38,7 +38,37 @@ describe('the screen glitch', () => {
       'scanline',
     ]);
     // The first, with none before it, from all five.
-    expect(nextGlitch(null, 0.99)).toBe('scanline');
+    expect(nextGlitch([], 0.99)).toBe('scanline');
+  });
+});
+
+describe('a preset change, both screens at once', () => {
+  it('gives each screen its own kind, never the two alike, neither its own last again', () => {
+    let seed = 11;
+    const random = () => {
+      seed = (seed * 16807) % 2147483647;
+      return (seed - 1) / 2147483646;
+    };
+    let voice: Glitch | null = null;
+    let operator: Glitch | null = null;
+    const pairs = new Set<string>();
+    for (let i = 0; i < 2000; i++) {
+      // A tab change on one screen now and then, between presets.
+      if (i % 3 === 0) voice = nextGlitch([voice], random());
+      const [v, o] = nextGlitches([voice, operator], random);
+      expect(v).not.toBe(o);
+      expect(v).not.toBe(voice);
+      expect(o).not.toBe(operator);
+      pairs.add(`${v} ${o}`);
+      voice = v;
+      operator = o;
+    }
+    // Every pair of two different kinds comes up.
+    expect(pairs.size).toBe(20);
+  });
+
+  it('keeps to what is left: with the other screen\'s pick and its own last taken, three', () => {
+    expect([0, 0.34, 0.67].map(r => nextGlitch(['flash', 'refresh'], r))).toEqual(['jitter', 'tear', 'scanline']);
   });
 });
 

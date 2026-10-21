@@ -573,8 +573,8 @@ a row of tabs, Algorithm | LFO | Pitch EG, at the right of its line (`lfoView.ts
 with its amber jewel lamp lit and its legend glowing warm, the others
 up with unlit lamps and grey legends; Jeremy, 2026-10-20; role tablist, arrows
 between; a change of tab glitches the screen's glass, and a preset
-chosen glitches both top screens with one kind (`ui/screenGlitch.ts`,
-`glitchScreens`, `topScreens`; not on load, a link, an edit or an
+chosen glitches both top screens, each its own kind and never the two
+alike (`ui/screenGlitch.ts`, `glitchScreens`, `topScreens`; not on load, a link, an edit or an
 operator selected); the sandbox always opens on Algorithm, and the open tab is in
 neither the link nor storage; while closed, the LFO's key shows a dot
 (amber in the sandbox), "LFO, on", when vibrato or tremolo is above 0, and the Pitch EG's,
@@ -748,7 +748,8 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
   why. The sandbox's two top screens play a short analog glitch when
   their tab changes, and both when a preset is chosen: one of phosphor
   flash, segment refresh, jitter, tear line and scanline flicker, at
-  random, never the same twice in a row (`nextGlitch`), 120 to 190 ms
+  random, never the same twice in a row on a screen, and on a preset the
+  two screens never alike (`nextGlitch`, `nextGlitches`), 120 to 190 ms
   (Jeremy, 2026-10-21); on the glass only, cyan only, never moving the
   layout or redrawing a plot; none under `prefers-reduced-motion`, and a
   saved setting turns it off (`fmlab.screenGlitch`, on by default; the
