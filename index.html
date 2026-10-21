@@ -461,7 +461,9 @@
                 aria-labelledby="inst-tab-lfo"
                 hidden
               >
-                <canvas id="inst-lfo-plot" class="inst-lfo-plot inst-voice-display" role="img"></canvas>
+                <div class="screen-bezel inst-voice-display">
+                  <canvas id="inst-lfo-plot" class="inst-lfo-plot" role="img"></canvas>
+                </div>
                 <div class="inst-voice-controls">
                   <span id="inst-lfo-wave-label" class="visually-hidden">Wave</span>
                   <div
@@ -488,7 +490,9 @@
                 hidden
               >
                 <span class="visually-hidden">Pitch envelope</span>
-                <canvas id="inst-pitch-curve" class="inst-pitch-curve inst-voice-display" role="img"></canvas>
+                <div class="screen-bezel inst-voice-display">
+                  <canvas id="inst-pitch-curve" class="inst-pitch-curve" role="img"></canvas>
+                </div>
                 <div class="inst-voice-controls">
                   <div id="inst-pitch-knobs" class="inst-pitch-knobs"></div>
                 </div>
@@ -531,7 +535,9 @@
                   role="tabpanel"
                   aria-labelledby="voice-tab-envelope"
                 >
-                  <canvas id="voice-envelope-curve" class="voice-envelope-curve" role="img"></canvas>
+                  <div class="screen-bezel voice-envelope-screen">
+                    <canvas id="voice-envelope-curve" class="voice-envelope-curve" role="img"></canvas>
+                  </div>
                   <div id="voice-envelope-knobs" class="voice-envelope-knobs"></div>
                 </div>
                 <div
@@ -541,12 +547,14 @@
                   aria-labelledby="voice-tab-keys"
                   hidden
                 >
-                  <canvas
-                    id="voice-keys-curve"
-                    class="voice-envelope-curve voice-keys-curve"
-                    role="img"
-                    tabindex="0"
-                  ></canvas>
+                  <div class="screen-bezel voice-envelope-screen">
+                    <canvas
+                      id="voice-keys-curve"
+                      class="voice-envelope-curve voice-keys-curve"
+                      role="img"
+                      tabindex="0"
+                    ></canvas>
+                  </div>
                   <div id="voice-keys-knobs" class="voice-envelope-knobs voice-keys-knobs"></div>
                 </div>
               </section>

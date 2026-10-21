@@ -194,6 +194,53 @@ body:not([data-view='instrument']) #inst-tools {
   margin: 0;
 }
 
+/* The screens' bezels (Jeremy, 2026-10-21): each large screen keeps its
+   place and box, and its glass, the canvas, sits 7px inside a molded
+   black bezel, the tab strips' plastic. The canvas still measures its
+   own box, so its drawing, drags and values are unchanged. */
+.screen-bezel {
+  position: relative;
+  min-width: 0;
+  min-height: 4rem;
+}
+
+.screen-bezel > canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.voice-envelope-screen {
+  align-self: stretch;
+  width: 100%;
+}
+
+/* The same all round (Jeremy, 2026-10-21): 7px of plastic on every
+   side, one even shade, its inner shadow and edge centred, so no side
+   looks heavier. */
+[data-view='instrument'] :is(.screen-bezel, #inst-diagram-figure .plot-frame, #inst-figures .plot-frame) {
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--lamp-bezel-1), var(--lamp-bezel-2));
+  box-shadow:
+    inset 0 0 2px rgba(0, 0, 0, 0.8),
+    0 0 0 1px #000,
+    var(--screen-bezel-edge);
+}
+
+/* A canvas does not stretch between its insets: it is sized too. */
+[data-view='instrument'] :is(.screen-bezel, #inst-diagram-figure .plot-frame, #inst-figures .plot-frame) > canvas {
+  inset: 7px;
+  width: calc(100% - 14px);
+  height: calc(100% - 14px);
+}
+
+/* The diagram draws its own glass: its light edge is the bezel's now. */
+[data-view='instrument'] #algorithm-plot {
+  --vfd-panel-edge: transparent;
+}
+
 /* Voice tops the left column, under the title bar's rule (no rule of
    its own), level with the operator panel's head on the right. */
 .inst-alg-head {
@@ -1025,6 +1072,14 @@ canvas.voice-keys {
   box-shadow: 0 0 0 1px #000, var(--vfd-graph-edge);
 }
 
+/* The large screens' glass, in its bezel: a black edge, the bezel
+   carrying the light edge in dark. (The table's small drawings, without
+   a bezel, keep the edge above.) */
+[data-view='instrument'] :is(.voice-envelope-curve, .inst-pitch-curve, .inst-lfo-plot, #inst-figures #spectrum) {
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px #000;
+}
+
 [data-view='instrument']
   :is(.voice-envelope-curve, .inst-pitch-curve, .inst-lfo-plot, .voice-env-mini, canvas.voice-keys):focus-visible {
   outline-color: currentColor;
@@ -1049,7 +1104,9 @@ canvas.voice-keys {
   flex: 1 1 auto;
   flex-direction: column;
   min-height: 0;
-  gap: 0.25rem;
+  /* As far under its tabs as the Voice screen is under its: room
+     between the tab strip's bezel and the screen's. */
+  gap: 0.45rem;
   padding: 0.4rem 0 0.4rem;
 }
 
@@ -1148,9 +1205,10 @@ canvas.voice-keys {
 #inst-figures .plot-frame[data-x-title]::after {
   content: attr(data-x-title);
   position: absolute;
-  left: 40px;
-  right: 22px;
-  bottom: 4px;
+  /* The canvas's own margins, inside the bezel's 7px. */
+  left: 47px;
+  right: 29px;
+  bottom: 11px;
   font: 12px / 1 var(--font-sans);
   color: var(--ink);
   text-align: center;
@@ -1586,7 +1644,7 @@ canvas.voice-keys {
   .inst-left {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.45rem;
     min-height: 0;
   }
 
@@ -1729,7 +1787,7 @@ canvas.voice-keys {
   }
 
   .inst-left {
-    gap: 0.25rem;
+    gap: 0.45rem;
   }
 
   .inst .op-table thead th {
@@ -1814,7 +1872,7 @@ canvas.voice-keys {
     order: -1;
   }
 
-  .voice-envelope-curve {
+  .voice-envelope-screen {
     height: 7rem;
   }
 
@@ -1905,8 +1963,7 @@ canvas.voice-keys {
   }
 
   #inst-diagram-figure .plot-frame,
-  .inst-lfo-plot,
-  .inst-pitch-curve {
+  .inst-voice-tab > .screen-bezel {
     flex: none;
     height: 9rem;
   }
