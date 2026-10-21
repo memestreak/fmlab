@@ -48,9 +48,9 @@ describe('the mod wheel', () => {
     expect(formatWheel(1)).toBe('100 %');
   });
 
-  it('adds 50 cents of vibrato and no tremolo at full on every factory voice', () => {
+  it('adds 50 cents of vibrato and no tremolo at full on every voice of both banks', () => {
     const presets = chapterById('sandbox')?.presets ?? [];
-    expect(presets).toHaveLength(32);
+    expect(presets).toHaveLength(64);
     for (const preset of presets) {
       expect(preset.patch.dxLfo).toMatchObject({ wheelVibrato: 50, wheelTremolo: 0 });
     }
