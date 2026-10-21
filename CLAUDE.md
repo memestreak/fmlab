@@ -838,13 +838,13 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
 - Red means negative phase and nothing else: controls and the focus ring
   are ink. Never let phase rest on colour alone; a negative stem also gets
   a hollow marker. In the sandbox's VFD spectrum, a negative stem is
-  shown by its place and hollow end alone. The one exception is the
-  logo's middle stripe (`--logo-red`; Jeremy picked it knowingly,
-  2026-10-21): a drawn mark, not a plot.
+  shown by its place and hollow end alone. The logo's middle stripe is a
+  deep rust (`--logo-rust`), not red, for this reason.
 - The logo, in every page's masthead and the way home (`.wordmark`,
   index.html; Jeremy, 2026-10-21): "fmlab" in wide lowercase
   (`--font-logo`, Michroma) over three straight racing stripes, amber,
-  red and teal (`--logo-*`), in ink on either theme, 2.28rem (148 × 52px).
+  rust and teal (`--logo-*`; Jeremy chose the rust over a red,
+  2026-10-21), in ink on either theme, 2.28rem (148 × 52px).
   Clean on the chapters; in the sandbox only, the paint is lightly
   chipped by a fixed noise mask (the same every visit). The word is the
   link's name; the stripes are hidden from screen readers. It sets the

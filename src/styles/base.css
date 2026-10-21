@@ -459,7 +459,7 @@ body:not([data-view='instrument']) .masthead {
 }
 
 .logo-bars b:nth-child(2) {
-  background: var(--logo-red);
+  background: var(--logo-rust);
 }
 
 .logo-bars b:nth-child(3) {
