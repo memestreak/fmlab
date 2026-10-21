@@ -1064,6 +1064,11 @@ body:not([data-view='instrument']) #inst-tools {
   height: 1.65rem;
 }
 
+/* The preset steps point up and down: ‹ › turned a quarter. */
+.preset-step .chooser-key {
+  writing-mode: vertical-lr;
+}
+
 .preset-break {
   display: none;
 }

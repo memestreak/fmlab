@@ -547,8 +547,9 @@ function presetMenu(presets: readonly Preset[], banks: readonly PresetBank[], st
     choose(stepInBank(presets, last, steps));
   };
 
-  // ‹ ›: the algorithm and octave choosers' black push keys, side by side
-  // in one bezel right of the bank keys (Jeremy, 2026-10-21). They step on
+  // ‹ ›, turned to point up and down: the algorithm and octave choosers'
+  // black push keys, side by side in one bezel right of the name (Jeremy,
+  // 2026-10-21). They step on
   // the press, Enter and Space through the click (a pointer's own click
   // follows a press that has already stepped), and never stop: they go
   // round.
@@ -682,6 +683,8 @@ function presetMenu(presets: readonly Preset[], banks: readonly PresetBank[], st
   tapeLabel(tape);
   const steps = document.createElement('span');
   steps.className = 'chooser preset-step';
+  // Up and down, right of the name (Jeremy, 2026-10-21): up back, down
+  // on, as the arrow keys step.
   steps.append(step('Previous preset', '‹', -1), step('Next preset', '›', 1));
-  return [...(banks.length > 0 ? [tape, bankGroup] : []), steps, lineBreak, pick, note];
+  return [...(banks.length > 0 ? [tape, bankGroup] : []), lineBreak, pick, steps, note];
 }
