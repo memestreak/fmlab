@@ -544,7 +544,9 @@ the wordmark (home), then in the place of Contents, which the sandbox
 hides with the crumb, the preset menu as the title: the name chosen in
 the display face at 1.45rem with no box (`.preset-name`), the native
 menu over it unseen in the page's own type, so the list it opens is the
-usual size, between ‹ › (`stepPreset`, round the 32); its note, what
+usual size, between ‹ › (`stepPreset`, round the 32; with the menu
+focused the arrows step it the same way, up and left back, down and
+right on, and Enter opens its list); its note, what
 the voice plays without, is not shown but is the menu's description for
 screen readers and follows the credit in the name's tip; then Volume, the glossary and the theme. Their containers
 (`#inst-dx7-presets` in a group named Presets, `#inst-tools`) are in the

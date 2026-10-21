@@ -534,6 +534,26 @@ function presetMenu(presets: readonly Preset[], store: LabStore): HTMLElement[] 
     name.textContent = select.selectedOptions[0]?.textContent ?? '';
   };
   select.addEventListener('change', () => choose(Number(select.value)));
+  // The arrows step the voices as ‹ › do, round the 32, rather than open
+  // the list (as up and down do on a Mac) or stop at its ends (Jeremy,
+  // 2026-10-21): up and left back, down and right on, held to keep going.
+  // Enter opens the list (space plays, in the sandbox), and so does
+  // Alt + down where the browser does it.
+  select.addEventListener('keydown', event => {
+    if (event.key === 'Enter' && !event.repeat && 'showPicker' in select) {
+      event.preventDefault();
+      try {
+        select.showPicker();
+      } catch {
+        // Not allowed here: the list opens by a click as before.
+      }
+      return;
+    }
+    const steps = { ArrowUp: -1, ArrowLeft: -1, ArrowDown: 1, ArrowRight: 1 }[event.key];
+    if (steps === undefined || event.altKey || event.ctrlKey || event.metaKey) return;
+    event.preventDefault();
+    choose(stepPreset(last, steps, presets.length));
+  });
   const stop = store.subscribe((state, previous) => {
     if (!select.isConnected) return stop();
     if (
