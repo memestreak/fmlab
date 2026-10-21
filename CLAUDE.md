@@ -601,9 +601,12 @@ and Volume (Jeremy, 2026-10-21; the page's own centre line leaves it no
 room at 1440 and 1280 wide), the name's box as wide as the widest name
 so nothing in it moves from voice to voice: "Preset" on Dymo tape as
 Volume's, its visible label, then the bank keys A | B (the tabs' push keys with
-their jewel lamps in one bezel, as LIN | EXP; a radio group named Bank,
-each key named "Bank A: DX7 factory voices © Yamaha" or "Bank B: fmlab
-voices"; chosen on the press, arrows between; lit for the shown voice's
+their jewel lamps in one bezel, as LIN | EXP; a group named Bank, each
+key a tab stop named "Bank A: DX7 factory voices © Yamaha" or "Bank B:
+fmlab voices", the lit one pressed (`aria-pressed`); chosen on the
+press, a click or Enter, never by the arrows, which step the lit bank's
+voices from anywhere in the group, the bank keys, ‹ › and the name alike
+(Jeremy, 2026-10-21); lit for the shown voice's
 bank, or the last chosen's once Edited; a key loads the voice last
 chosen in its bank, A11 E.PIANO 1 and B1 TINE PIANO at first, a preset
 change that glitches the screens; space and the note keys still play

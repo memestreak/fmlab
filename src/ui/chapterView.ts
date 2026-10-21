@@ -537,6 +537,16 @@ function presetMenu(presets: readonly Preset[], banks: readonly PresetBank[], st
     glitchScreens(topScreens());
   };
 
+  // The arrows step round the lit bank's voices from anywhere in the
+  // group, the bank keys and ‹ › as the name (Jeremy, 2026-10-21): up
+  // and left back, down and right on. They never change the bank.
+  const arrowSteps = (event: KeyboardEvent) => {
+    const steps = { ArrowUp: -1, ArrowLeft: -1, ArrowDown: 1, ArrowRight: 1 }[event.key];
+    if (steps === undefined || event.altKey || event.ctrlKey || event.metaKey) return;
+    event.preventDefault();
+    choose(stepInBank(presets, last, steps));
+  };
+
   // ‹ ›: the algorithm and octave choosers' black push keys, each in a
   // bezel of its own (Jeremy, 2026-10-21). They step on the press, Enter
   // and Space through the click (a pointer's own click follows a press
@@ -556,22 +566,23 @@ function presetMenu(presets: readonly Preset[], banks: readonly PresetBank[], st
     button.addEventListener('click', event => {
       if (event.detail === 0) go();
     });
+    button.addEventListener('keydown', arrowSteps);
     bezel.append(button);
     return bezel;
   };
 
-  // The bank keys, A | B: the tabs' push keys with their lamps, a radio
-  // group as LIN | EXP is, chosen on the press, the arrows between them.
-  // A bank's key loads the voice last chosen in it.
+  // The bank keys, A | B: the tabs' push keys with their lamps, in a
+  // group named Bank, the lit one pressed. Each is a tab stop; a press, a
+  // click or Enter loads the voice last chosen in its bank. The arrows on
+  // them step the voices, as everywhere in the group.
   const bankGroup = document.createElement('span');
   bankGroup.className = 'lamp-keys preset-banks';
-  bankGroup.setAttribute('role', 'radiogroup');
+  bankGroup.setAttribute('role', 'group');
   bankGroup.setAttribute('aria-label', 'Bank');
   const bankKeys = banks.map(bank => {
     const key = document.createElement('button');
     key.type = 'button';
     key.className = 'lamp-key preset-bank';
-    key.setAttribute('role', 'radio');
     key.textContent = bank.id;
     key.title = `Bank ${bank.id}: ${bank.name}`;
     key.setAttribute('aria-label', key.title);
@@ -584,17 +595,7 @@ function presetMenu(presets: readonly Preset[], banks: readonly PresetBank[], st
     key.addEventListener('click', open);
     return key;
   });
-  bankKeys.forEach((key, i) => {
-    key.addEventListener('keydown', event => {
-      const steps = { ArrowLeft: -1, ArrowUp: -1, ArrowRight: 1, ArrowDown: 1 }[event.key];
-      if (steps === undefined) return;
-      event.preventDefault();
-      const to = (i + steps + bankKeys.length) % bankKeys.length;
-      const bank = banks[to];
-      choose(lastIn.get(bank.id) ?? bank.start);
-      bankKeys[to].focus();
-    });
-  });
+  for (const key of bankKeys) key.addEventListener('keydown', arrowSteps);
   bankGroup.append(...bankKeys);
   /** The bank lit: the shown voice's, or, once edited, the last chosen's. */
   const litBank = () => {
@@ -624,8 +625,7 @@ function presetMenu(presets: readonly Preset[], banks: readonly PresetBank[], st
     name.textContent = select.selectedOptions[0]?.textContent ?? '';
     bankKeys.forEach((key, i) => {
       const on = banks[i].id === lit;
-      key.setAttribute('aria-checked', String(on));
-      key.tabIndex = on ? 0 : -1;
+      key.setAttribute('aria-pressed', String(on));
     });
   };
   select.addEventListener('change', () => choose(Number(select.value)));
@@ -644,10 +644,7 @@ function presetMenu(presets: readonly Preset[], banks: readonly PresetBank[], st
       }
       return;
     }
-    const steps = { ArrowUp: -1, ArrowLeft: -1, ArrowDown: 1, ArrowRight: 1 }[event.key];
-    if (steps === undefined || event.altKey || event.ctrlKey || event.metaKey) return;
-    event.preventDefault();
-    choose(stepInBank(presets, last, steps));
+    arrowSteps(event);
   });
   const stop = store.subscribe((state, previous) => {
     if (!select.isConnected) return stop();
