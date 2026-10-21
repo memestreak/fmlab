@@ -464,7 +464,9 @@ figures subscribe to it. Nothing else passes values around.
 It shows two octaves, from C1–B2 to C5–B6 (`STARTS`; Jeremy, 2026-10-21),
 starting at C3–B4, where a double click on the range brings it back;
 every key it can show plays (`playable`, C1 to B6). Every held
-  key is drawn in --pen-blue. Its key colours are local tokens (`--key-light` and so
+  key sinks into shadow (Jeremy, 2026-10-21: grey, not the carrier's
+  blue): a white key's face a light shadow grey, a black key darker with
+  no sheen, the same in both themes. Its key colours are local tokens (`--key-light` and so
   on) so the white keys stay light in the dark theme;
   `instrument.ts` lays out the sandbox's instrument page: `PLACES` says
   which of the lab's nodes go where in `#instrument`, and a comment left
@@ -759,9 +761,10 @@ chassis above them their rail and its ends their cheeks; the white keys
 2.9rem wide under 1380px, so the spectrum keeps its room; the spectrum
 (`#inst-figures`) filling the rest of the row, no taller than the
 keyboard, its bezel a recess in the chassis with 9px of it underneath,
-with no ink rules round it (its glass is its frame), its
-x-axis title shown only under the pointer (its canvas's
-`--plot-title: hover`; `drawFrame` leaves the line to the frame). Carriers are solid blue and modulators
+with no ink rules round it (its glass is its frame), and no x-axis
+title (Jeremy, 2026-10-21: its canvas's `--plot-title: none`; `drawFrame`
+draws none and `beginPlot` gives the plot that line, `UNTITLED_BOTTOM`);
+its numbers and its screen-reader description stay. Carriers are solid blue and modulators
 green outlines in the table (filled or outlined tags, carrier rows
 shaded); the diagram is a VFD panel, carriers lit solid and modulators
 dimmer cyan outlines. The envelope, Key scaling and pitch envelope

@@ -1540,29 +1540,10 @@ canvas.voice-keys {
   min-height: 0;
 }
 
-/* The spectrum's title, "frequency: …", shows only under the pointer, on
-   the line the canvas leaves blank for it (viz/plot.ts drawFrame). */
+/* No title in the spectrum's glass (Jeremy, 2026-10-21): only its
+   numbers; the plot takes the title's line (viz/plot.ts). */
 #inst-figures .plot {
-  --plot-title: hover;
-}
-
-#inst-figures .plot-frame[data-x-title]::after {
-  content: attr(data-x-title);
-  position: absolute;
-  /* The canvas's own margins, inside the bezel's 7px. */
-  left: 47px;
-  right: 29px;
-  bottom: 11px;
-  font: 12px / 1 var(--font-sans);
-  color: var(--ink);
-  text-align: center;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.15s;
-}
-
-#inst-figures .plot-frame[data-x-title]:hover::after {
-  opacity: 1;
+  --plot-title: none;
 }
 
 .voice-envelope-knobs {
@@ -2040,12 +2021,13 @@ canvas.voice-keys {
   box-shadow: 0 -1px 0 rgba(255, 255, 255, 0.22);
 }
 
-/* Held, a white key sinks: darker at the back, shaded inside both edges,
-   only a sliver of its lip showing, in the carrier's pen. */
+/* Held, a white key sinks into shadow (Jeremy, 2026-10-21: grey, not
+   the carrier's blue): its face a light shadow grey, darker at the back,
+   shaded inside both edges, only a sliver of its lip showing. */
 .piano-white[aria-pressed='true'] {
   background:
     linear-gradient(rgba(0, 0, 0, 0.24), rgba(0, 0, 0, 0.08) 12%, rgba(0, 0, 0, 0) 34%),
-    color-mix(in srgb, var(--pen-blue) 22%, var(--key-light));
+    color-mix(in srgb, var(--key-light) 85%, #000);
   background-clip: padding-box;
   box-shadow:
     inset 2px 0 2px -1px rgba(0, 0, 0, 0.22),
@@ -2054,12 +2036,13 @@ canvas.voice-keys {
 
 .piano-white[aria-pressed='true']::after {
   height: 0.22rem;
-  background: var(--pen-blue);
+  background: color-mix(in srgb, var(--key-light) 68%, #000);
   box-shadow: none;
 }
 
-/* Held, a black key sinks too: its bevels over the blue, darker at the
-   back, 2px shorter, most of its front face gone, a smaller shadow. */
+/* Held, a black key sinks too: its bevels kept, its sheen gone, darker
+   all over and at the back, 2px shorter, most of its front face gone, a
+   smaller shadow. */
 .piano-black[aria-pressed='true'] {
   height: calc(60% - 2px);
   background:
@@ -2070,15 +2053,15 @@ canvas.voice-keys {
       rgba(255, 255, 255, 0) 92%,
       rgba(255, 255, 255, 0.16)
     ),
-    linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0) 30%),
-    var(--pen-blue);
+    linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0) 30%),
+    linear-gradient(#030303, #121313 30%, #0b0c0c);
   box-shadow: 0 1px 1.5px rgba(0, 0, 0, 0.3);
-  color: var(--paper);
+  color: #ddd;
 }
 
 .piano-black[aria-pressed='true']::after {
   height: 0.15rem;
-  background: color-mix(in srgb, var(--pen-blue) 70%, #000);
+  background: #1a1b1c;
   box-shadow: none;
 }
 
