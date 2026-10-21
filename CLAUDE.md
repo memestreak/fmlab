@@ -651,8 +651,8 @@ phone the key and the glossary share the line under Volume's. Chapters have neit
 the settings. Their containers
 (`#inst-dx7-presets` in a group named Presets, `#inst-tools`) are in the
 masthead's markup and shown on the sandbox only; `PLACES` moves the
-lab's nodes into them. The masthead keeps every page's height, and its
-ink rule is the top of `.inst-body`. No Play or Copy link: the keyboard
+lab's nodes into them. The masthead keeps every page's height, with no
+rule under it (Jeremy, 2026-10-21): the top panel's edge is the line. No Play or Copy link: the keyboard
 and the space bar play, and the address bar keeps the sound. The page's
 title, "Sandbox" (`#inst-title`), is for screen readers only. Then,
 in layout F (Jeremy, 2026-10-18), a top band: on the left, the
@@ -729,7 +729,8 @@ the LFO's waves and Key sync lifted onto the dials' line) and knob names
 fall on the same two lines in all five rows.
 The page is three bodies of the same molded black plastic, the
 `.chassis` (Jeremy, 2026-10-21), an even 10px apart with no rules
-between them: the top band (Voice and the operator panel, padded 9px
+between them or under the title bar, and only a black edge (no light
+one, which read as a white line): the top band (Voice and the operator panel, padded 9px
 12px, all four corners rounded), the operator table's panel (its
 Operators tape on the column heads' line, over the tags and roles,
 whose heads are for screen readers only, so the table starts a line

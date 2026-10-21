@@ -1049,6 +1049,8 @@ body:not([data-view='instrument']) #inst-tools {
 /* The operator table, the full width, in its own chassis. */
 [data-view='instrument'] #inst-operators {
   padding: 9px 12px;
+  /* Not a panel's ink rule: the chassis's edge is its line. */
+  border-top: 0;
 }
 
 /* The bezels of the large screens let into the chassis, as the
@@ -1392,17 +1394,16 @@ canvas.voice-keys {
    let in the same way. The chassis above the keys is their rail; its
    ends are their cheeks. */
 /* The chassis (Jeremy, 2026-10-21): the tab strips' molded black
-   plastic, the same in either theme but its edge, for the sandbox's
-   three bodies, the top band (Voice and the operator panel), the
-   operator table and the keyboard. */
+   plastic, the same in either theme, for the sandbox's three bodies, the
+   top band (Voice and the operator panel), the operator table and the
+   keyboard. Only a black edge round them: no light edge, which read as
+   a white line between them. */
 [data-view='instrument'] .chassis {
   border-radius: 8px;
   background:
     linear-gradient(rgba(255, 255, 255, 0.05), transparent 30%),
     linear-gradient(var(--lamp-bezel-1), var(--lamp-bezel-2));
-  box-shadow:
-    0 0 0 1px #000,
-    var(--lamp-bezel-edge);
+  box-shadow: 0 0 0 1px #000;
 }
 
 /* The top two hold text, rules and controls drawn in the page's tokens:
@@ -2059,8 +2060,8 @@ canvas.voice-keys {
     min-height: 0;
   }
 
-  /* The ink rule under the masthead, the title bar's, on the top of
-     the body, so the masthead is as tall as on any page. */
+  /* The body under the title bar, no rule between them (Jeremy,
+     2026-10-21): the top panel's edge is the line. */
   .inst-body {
     display: flex;
     flex: 1 1 auto;
@@ -2069,7 +2070,6 @@ canvas.voice-keys {
     gap: 10px;
     min-height: 0;
     padding: 1rem 0 0.5rem;
-    border-top: 1px solid var(--ink);
   }
 
   .inst-top {
@@ -2295,11 +2295,6 @@ canvas.voice-keys {
 @media (max-width: 61.99rem) {
   [data-view='instrument'] .page {
     padding-bottom: calc(19rem + env(safe-area-inset-bottom, 0px));
-  }
-
-  /* The title bar's rule under the masthead here too. */
-  [data-view='instrument'] .inst-body {
-    border-top: 1px solid var(--ink);
   }
 
   /* The masthead wraps: the wordmark and the theme, then the presets
