@@ -17,6 +17,17 @@ scripts/dx7_voices.py ROM1A.SYX src/chapters/dx7Factory.ts
 converts all 32 voices in the bank's order (the sandbox's dropdown);
 names after the paths convert only those.
 
+The sandbox's bank B, fmlab's own voices, comes from the same script and
+`fmlab-bank2.syx`, which is ours and committed:
+
+```sh
+scripts/dx7_voices.py scripts/fmlab-bank2.syx src/chapters/fmlabVoices.ts
+```
+
+then give the result fmlabVoices.ts's own header (fmlab's voices, not
+Yamaha's), import `FactoryVoice` from `./dx7Factory` in place of the
+interface, and name the list `FMLAB_VOICES`.
+
 Standard library only. Its tests use pytest:
 
 ```sh

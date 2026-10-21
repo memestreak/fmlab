@@ -21,7 +21,7 @@ describe('the instrument page', () => {
     // Feedback is a knob beside the diagram, not a slider.
     expect(sandbox.controls).toEqual(['volume']);
     expect(Object.keys(sandbox.figures)).toEqual(['algorithm', 'spectrum']);
-    expect(sandbox.presets[10].label).toBe('11 E.PIANO 1');
+    expect(sandbox.presets[10].label).toBe('A11 E.PIANO 1');
     expect(sandbox.patch.dxOperators).toEqual(sandbox.presets[10].patch.dxOperators);
     expect(sandbox.hasPiano && sandbox.sharesSound).toBe(true);
     expect(sandbox.patch.algorithm).toBe(5);

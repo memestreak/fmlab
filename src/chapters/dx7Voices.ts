@@ -1,6 +1,7 @@
 import { WHEEL_DEPTHS } from '../dsp/dx7';
 import { FACTORY_VOICES, type FactoryVoice } from './dx7Factory';
-import type { ChapterPatch, Preset } from './types';
+import { FMLAB_VOICES } from './fmlabVoices';
+import type { ChapterPatch, Preset, PresetBank } from './types';
 
 // The sandbox's sounds to start from: the 32 voices of Yamaha's DX7
 // factory set (ROM1A; factory voices © Yamaha), numbered as on the DX7,
@@ -39,12 +40,39 @@ export function factoryNote(voice: FactoryVoice): string {
   return short.length > 0 ? `approximate · no ${short.join(', ')}` : 'approximate';
 }
 
+/** The credit for bank A, Yamaha's factory voices. */
+export const FACTORY_CREDIT = 'DX7 factory voices © Yamaha';
+/** Bank B's name: fmlab's own voices. */
+export const FMLAB_CREDIT = 'fmlab voices';
+
+/** Bank A: the DX7's factory voices, "A11 E.PIANO 1". */
 export const DX7_VOICES: Preset[] = FACTORY_VOICES.map((voice, i) => ({
-  label: `${i + 1} ${voice.name}`,
+  label: `A${i + 1} ${voice.name}`,
   hint: factoryHint(voice),
   note: factoryNote(voice),
   patch: patchOf(voice),
+  bank: 'A',
 }));
+
+/**
+ * Bank B: fmlab's own 32 (fmlabVoices.ts), "B1 TINE PIANO". Written for
+ * the sandbox, they play all they set: no "approximate", no note.
+ */
+export const FMLAB_PRESETS: Preset[] = FMLAB_VOICES.map((voice, i) => ({
+  label: `B${i + 1} ${voice.name}`,
+  hint: `fmlab's own ${voice.name}`,
+  patch: patchOf(voice),
+  bank: 'B',
+}));
+
+/** The sandbox's voices: bank A, then bank B. */
+export const SANDBOX_VOICES: Preset[] = [...DX7_VOICES, ...FMLAB_PRESETS];
+
+/** The sandbox's two banks; A opens on E.PIANO 1, B on TINE PIANO. */
+export const SANDBOX_BANKS: readonly PresetBank[] = [
+  { id: 'A', name: FACTORY_CREDIT, start: FACTORY_VOICES.findIndex(voice => voice.name === 'E.PIANO 1') },
+  { id: 'B', name: FMLAB_CREDIT, start: DX7_VOICES.length },
+];
 
 /** Where the sandbox opens: E.PIANO 1, voice 11. */
 export const DX7_START: Partial<ChapterPatch> = patchOf(

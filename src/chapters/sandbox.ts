@@ -1,5 +1,5 @@
 import { BASE_PATCH } from './basePatch';
-import { DX7_START, DX7_VOICES } from './dx7Voices';
+import { DX7_START, SANDBOX_BANKS, SANDBOX_VOICES } from './dx7Voices';
 import { titleOf } from './outline';
 import type { Chapter } from './types';
 
@@ -24,8 +24,10 @@ export const sandbox: Chapter = {
   // Its Feedback is a knob beside the chooser under the diagram
   // (ui/instrument.ts).
   controls: ['volume'],
-  presets: DX7_VOICES,
+  // Two banks of 32: A the DX7's factory voices, B fmlab's own.
+  presets: SANDBOX_VOICES,
   presetMenu: true,
+  presetBanks: SANDBOX_BANKS,
   hasPiano: true,
   sharesSound: true,
   patch: {

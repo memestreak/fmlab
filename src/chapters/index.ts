@@ -20,6 +20,7 @@ export type {
   FigureId,
   MathsPanel,
   Preset,
+  PresetBank,
 } from './types';
 
 const ALL: readonly Chapter[] = [
