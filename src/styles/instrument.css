@@ -784,13 +784,7 @@ body:not([data-view='instrument']) #inst-tools {
   display: none;
 }
 
-.round-step {
-  flex: none;
-  line-height: 1;
-}
-
-/* Round on a phone too: no square flash behind a tapped button. */
-.round-step,
+/* No square flash behind a tapped key on a phone. */
 .chooser-key {
   -webkit-tap-highlight-color: transparent;
 }
@@ -949,6 +943,25 @@ body:not([data-view='instrument']) #inst-tools {
   align-items: center;
   gap: 0.6rem;
   min-width: 0;
+}
+
+/* The bank keys, A | B, and the preset steps ‹ ›, each in a bezel of
+   its own as the choosers' are (Jeremy, 2026-10-21): the steps as low
+   as the bank keys, so the title bar keeps its height. */
+.preset-banks {
+  flex: none;
+}
+
+.preset-step {
+  flex: none;
+}
+
+.preset-step .chooser-key {
+  height: 1.65rem;
+}
+
+.preset-break {
+  display: none;
 }
 
 /* What the voice plays without: for screen readers (the menu's
@@ -1580,22 +1593,6 @@ canvas.voice-keys {
   opacity: 0;
   cursor: default;
   user-select: none;
-}
-
-.round-step {
-  width: 2rem;
-  height: 2rem;
-  padding: 0;
-  border: 1px solid var(--ink);
-  border-radius: 50%;
-  background: var(--paper);
-  color: var(--ink);
-  font: inherit;
-  cursor: pointer;
-}
-
-.round-step:hover:not(:disabled) {
-  box-shadow: 0 0 0 1px var(--ink);
 }
 
 /* The chooser's bezel and the wheel's slot let into the chassis. */
@@ -2237,10 +2234,22 @@ canvas.voice-keys {
     flex-wrap: wrap;
   }
 
-  /* The name, ‹ › and the note on one line, the note cut short. */
+  /* The name, ‹ › and the note on one line, the note cut short; the
+     bank keys on a line of their own above them. */
   [data-view='instrument'] .inst-presets,
   [data-view='instrument'] .inst-row .presets {
     flex-wrap: nowrap;
+  }
+
+  [data-view='instrument'] .inst-row .presets:has(.preset-banks) {
+    flex-wrap: wrap;
+    row-gap: 0.4rem;
+  }
+
+  .preset-break {
+    display: block;
+    flex-basis: 100%;
+    height: 0;
   }
 
   /* The envelope view first, over the algorithms. */

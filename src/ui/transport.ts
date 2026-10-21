@@ -40,10 +40,10 @@ export function pressPlay(state: LabState, time: number): Partial<LabState> {
  * no meaning, so there it plays and stops. In the sandbox a menu (a
  * preset just picked, or the algorithm) leaves it free too, so that
  * picking from one does not take the keys from the keyboard; its arrows
- * still step it.
+ * still step it. So does a bank key (A | B), chosen on its press.
  */
 export function spaceIsFree(target: Element | null, sandbox = false): boolean {
-  if (sandbox && target?.closest('select')) return true;
+  if (sandbox && target?.closest('select, .preset-bank')) return true;
   return !target?.closest(
     'button, a, summary, input[type="checkbox"], input[type="text"], textarea, select, [contenteditable="true"]',
   );

@@ -27,7 +27,8 @@ import {
   TERMS,
   wikiLink,
 } from '../chapters/terms';
-import type { Preset } from '../chapters';
+import type { Preset, PresetBank } from '../chapters';
+import { FACTORY_CREDIT } from '../chapters/dx7Voices';
 import type { LabState, LabStore } from '../model/lab';
 import { mountInstrument } from './instrument';
 import { glitchScreens, topScreens } from './screenGlitch';
@@ -358,7 +359,7 @@ export function mountChapters(store: LabStore): void {
     if (unused) unused.hidden = true;
     if (presets && chapter.presetMenu) {
       presets.hidden = false;
-      presets.replaceChildren(...presetMenu(chapter.presets, store));
+      presets.replaceChildren(...presetMenu(chapter.presets, chapter.presetBanks ?? [], store));
     } else if (presets) {
       presets.hidden = chapter.presets.length === 0;
       presets.replaceChildren(
@@ -468,80 +469,164 @@ export function stepPreset(at: number, steps: number, count: number): number {
 }
 
 /**
- * The sandbox's presets as one dropdown with ‹ › either side, stepping
- * round the voices as the diagram's step round the algorithms, and a
- * line beside it saying what the chosen voice plays without. It shows
- * the voice the sound is, or "Edited" once it has been changed; the steps
- * then go on from the voice last chosen.
+ * The voice `steps` along from `at` within its own bank, round its ends:
+ * an index into all of `presets`. Without banks, round the whole list.
  */
-/** The credit for the sandbox's presets, Yamaha's factory voices. */
-export const FACTORY_CREDIT = 'DX7 factory voices © Yamaha';
+export function stepInBank(presets: readonly Preset[], at: number, steps: number): number {
+  const bank = presets[at]?.bank;
+  const inBank = presets.flatMap((preset, i) => (preset.bank === bank ? [i] : []));
+  if (at < 0 || inBank.length === 0) return stepPreset(at, steps, presets.length);
+  return inBank[stepPreset(inBank.indexOf(at), steps, inBank.length)];
+}
 
-function presetMenu(presets: readonly Preset[], store: LabStore): HTMLElement[] {
+export { FACTORY_CREDIT };
+
+/**
+ * The sandbox's presets: the bank keys (A | B, where there are banks),
+ * then the voices as one dropdown, its name a heading, with ‹ › either
+ * side stepping round the shown bank as the diagram's step round the
+ * algorithms. It shows the voice the sound is, or "Edited" once it has
+ * been changed; the steps then go on from the voice last chosen, and the
+ * lit bank is that voice's.
+ */
+function presetMenu(presets: readonly Preset[], banks: readonly PresetBank[], store: LabStore): HTMLElement[] {
   const select = document.createElement('select');
   select.className = 'input num preset-menu';
-  select.setAttribute('aria-label', 'Start from a DX7 factory voice');
+  select.setAttribute('aria-label', 'Voice');
   const edited = document.createElement('option');
   edited.value = '';
   edited.textContent = 'Edited';
   edited.disabled = true;
-  // The factory voices under their credit, which the open list shows as
-  // its group's name (and the name's tip): Yamaha's voices, credited
-  // without a line of their own on the page.
-  const factory = document.createElement('optgroup');
-  factory.label = FACTORY_CREDIT;
-  factory.append(
-    ...presets.map((preset, i) => {
-      const option = document.createElement('option');
-      option.value = String(i);
-      option.textContent = preset.label;
-      return option;
-    }),
-  );
-  select.append(edited, factory);
+  const option = (preset: Preset, i: number) => {
+    const element = document.createElement('option');
+    element.value = String(i);
+    element.textContent = preset.label;
+    return element;
+  };
+  // Each bank's voices under its name, which the open list shows as its
+  // group's name: Yamaha's voices credited without a line of their own on
+  // the page. Without banks, the voices under the factory credit.
+  const groups = (banks.length > 0 ? banks : [{ id: undefined, name: FACTORY_CREDIT }]).map(bank => {
+    const group = document.createElement('optgroup');
+    group.label = bank.name;
+    group.append(...presets.flatMap((preset, i) => (preset.bank === bank.id ? [option(preset, i)] : [])));
+    return group;
+  });
+  select.append(edited, ...groups);
   const note = document.createElement('span');
   note.className = 'preset-note';
   note.id = 'preset-note';
   select.setAttribute('aria-describedby', note.id);
-  /** The voice last chosen, which the steps go on from. */
-  let last = -1;
+
+  /** The voice last chosen, which the steps go on from, and each bank's. */
+  let last = banks[0]?.start ?? -1;
+  const lastIn = new Map(banks.map(bank => [bank.id, bank.start]));
   const choose = (at: number) => {
     const preset = presets[at];
     if (!preset) return;
     last = at;
+    if (preset.bank) lastIn.set(preset.bank, at);
     store.set(preset.patch);
     // Both top screens glitch together as the voice changes, each its own kind.
     glitchScreens(topScreens());
   };
+
+  // ‹ ›: the algorithm and octave choosers' black push keys, each in a
+  // bezel of its own (Jeremy, 2026-10-21). They step on the press, Enter
+  // and Space through the click (a pointer's own click follows a press
+  // that has already stepped), and never stop: they go round.
   const step = (label: string, glyph: string, steps: number) => {
+    const bezel = document.createElement('span');
+    bezel.className = 'chooser preset-step';
     const button = document.createElement('button');
     button.type = 'button';
-    button.className = 'round-step';
+    button.className = 'chooser-key';
     button.textContent = glyph;
     button.setAttribute('aria-label', label);
-    button.addEventListener('click', () => choose(stepPreset(last, steps, presets.length)));
-    return button;
+    const go = () => choose(stepInBank(presets, last, steps));
+    button.addEventListener('pointerdown', event => {
+      if (event.button === 0) go();
+    });
+    button.addEventListener('click', event => {
+      if (event.detail === 0) go();
+    });
+    bezel.append(button);
+    return bezel;
   };
+
+  // The bank keys, A | B: the tabs' push keys with their lamps, a radio
+  // group as LIN | EXP is, chosen on the press, the arrows between them.
+  // A bank's key loads the voice last chosen in it.
+  const bankGroup = document.createElement('span');
+  bankGroup.className = 'lamp-keys preset-banks';
+  bankGroup.setAttribute('role', 'radiogroup');
+  bankGroup.setAttribute('aria-label', 'Bank');
+  const bankKeys = banks.map(bank => {
+    const key = document.createElement('button');
+    key.type = 'button';
+    key.className = 'lamp-key preset-bank';
+    key.setAttribute('role', 'radio');
+    key.textContent = bank.id;
+    key.title = `Bank ${bank.id}: ${bank.name}`;
+    key.setAttribute('aria-label', key.title);
+    const open = () => {
+      if (litBank() !== bank.id) choose(lastIn.get(bank.id) ?? bank.start);
+    };
+    key.addEventListener('pointerdown', event => {
+      if (event.button === 0) open();
+    });
+    key.addEventListener('click', open);
+    return key;
+  });
+  bankKeys.forEach((key, i) => {
+    key.addEventListener('keydown', event => {
+      const steps = { ArrowLeft: -1, ArrowUp: -1, ArrowRight: 1, ArrowDown: 1 }[event.key];
+      if (steps === undefined) return;
+      event.preventDefault();
+      const to = (i + steps + bankKeys.length) % bankKeys.length;
+      const bank = banks[to];
+      choose(lastIn.get(bank.id) ?? bank.start);
+      bankKeys[to].focus();
+    });
+  });
+  bankGroup.append(...bankKeys);
+  /** The bank lit: the shown voice's, or, once edited, the last chosen's. */
+  const litBank = () => {
+    const at = presetOf(presets, store.get());
+    return presets[at >= 0 ? at : last]?.bank;
+  };
+
   const show = (state: LabState) => {
     const at = presetOf(presets, state);
-    if (at >= 0) last = at;
+    if (at >= 0) {
+      last = at;
+      const bank = presets[at].bank;
+      if (bank) lastIn.set(bank, at);
+    }
     select.value = at < 0 ? '' : String(at);
     edited.hidden = at >= 0;
-    // Beside it, briefly, what the voice plays without; in full in its
-    // title and for a screen reader.
+    // What the voice plays without, for a screen reader and in the tip.
     const preset = at < 0 ? null : presets[at];
-    note.textContent = preset ? (preset.note ?? preset.hint) : 'your own, from a factory voice';
+    note.textContent = preset ? (preset.note ?? preset.hint) : 'your own, from a preset voice';
     note.title = preset ? preset.hint : note.textContent;
-    // The name's tip: whose the voices are, then what this one plays without.
-    pick.title = `${FACTORY_CREDIT} · ${note.textContent}`;
+    // The name's tip: whose the voices are, then, for Yamaha's, what this
+    // one plays without; fmlab's own say only whose they are.
+    const lit = presets[at >= 0 ? at : last]?.bank;
+    const bank = banks.find(b => b.id === lit);
+    pick.title = bank && bank.id !== banks[0]?.id ? bank.name : `${FACTORY_CREDIT} · ${note.textContent}`;
     name.textContent = select.selectedOptions[0]?.textContent ?? '';
+    bankKeys.forEach((key, i) => {
+      const on = banks[i].id === lit;
+      key.setAttribute('aria-checked', String(on));
+      key.tabIndex = on ? 0 : -1;
+    });
   };
   select.addEventListener('change', () => choose(Number(select.value)));
-  // The arrows step the voices as ‹ › do, round the 32, rather than open
-  // the list (as up and down do on a Mac) or stop at its ends (Jeremy,
-  // 2026-10-21): up and left back, down and right on, held to keep going.
-  // Enter opens the list (space plays, in the sandbox), and so does
-  // Alt + down where the browser does it.
+  // The arrows step the voices as ‹ › do, round the bank's 32, rather
+  // than open the list (as up and down do on a Mac) or stop at its ends
+  // (Jeremy, 2026-10-21): up and left back, down and right on, held to
+  // keep going. Enter opens the list (space plays, in the sandbox), and so
+  // does Alt + down where the browser does it.
   select.addEventListener('keydown', event => {
     if (event.key === 'Enter' && !event.repeat && 'showPicker' in select) {
       event.preventDefault();
@@ -555,7 +640,7 @@ function presetMenu(presets: readonly Preset[], store: LabStore): HTMLElement[] 
     const steps = { ArrowUp: -1, ArrowLeft: -1, ArrowDown: 1, ArrowRight: 1 }[event.key];
     if (steps === undefined || event.altKey || event.ctrlKey || event.metaKey) return;
     event.preventDefault();
-    choose(stepPreset(last, steps, presets.length));
+    choose(stepInBank(presets, last, steps));
   });
   const stop = store.subscribe((state, previous) => {
     if (!select.isConnected) return stop();
@@ -580,5 +665,15 @@ function presetMenu(presets: readonly Preset[], store: LabStore): HTMLElement[] 
   name.setAttribute('aria-hidden', 'true');
   pick.append(name, select);
   show(store.get());
-  return [step('Previous preset', '‹', -1), pick, step('Next preset', '›', 1), note];
+  // On a phone the bank keys lead the row on a line of their own.
+  const lineBreak = document.createElement('span');
+  lineBreak.className = 'preset-break';
+  lineBreak.setAttribute('aria-hidden', 'true');
+  return [
+    ...(banks.length > 0 ? [bankGroup, lineBreak] : []),
+    step('Previous preset', '‹', -1),
+    pick,
+    step('Next preset', '›', 1),
+    note,
+  ];
 }

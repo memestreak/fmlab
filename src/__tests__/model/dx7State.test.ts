@@ -3,7 +3,7 @@ import { chapterById } from '../../chapters';
 import { DEFAULTS, dx7KernelLevelsAt, dx7NoteOf, type LabState, operatorLevelsAt, releaseSecondsOf } from '../../model/lab';
 
 const sandbox = chapterById('sandbox')!;
-const piano = sandbox.presets.find(p => p.label === '11 E.PIANO 1')!.patch;
+const piano = sandbox.presets.find(p => p.label === 'A11 E.PIANO 1')!.patch;
 const state: LabState = { ...DEFAULTS, ...sandbox.patch, ...piano, chapter: 'sandbox', carrierHz: 261.63 };
 
 describe('the sandbox\'s figures, following its DX7 voice', () => {

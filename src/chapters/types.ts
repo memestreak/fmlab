@@ -79,6 +79,19 @@ export interface Preset {
   patch: Partial<ChapterPatch>;
   /** A short line shown beside a preset menu while it is chosen. */
   note?: string;
+  /** The bank it is in, where a preset menu has banks ("A", "B"). */
+  bank?: string;
+}
+
+/**
+ * A bank of a preset menu's voices: its letter, its name ("DX7 factory
+ * voices © Yamaha"), and the voice it loads first, an index into the
+ * chapter's presets.
+ */
+export interface PresetBank {
+  id: string;
+  name: string;
+  start: number;
 }
 
 /**
@@ -139,6 +152,8 @@ export interface Chapter {
    * voices) rather than a button each.
    */
   presetMenu?: boolean;
+  /** A preset menu's banks, in order; none is one list. */
+  presetBanks?: readonly PresetBank[];
   /** Whether to show the piano keyboard, to play the patch at pitches. */
   hasPiano?: boolean;
   /**

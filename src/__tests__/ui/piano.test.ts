@@ -121,13 +121,13 @@ describe('the sandbox', () => {
     expect(CHAPTERS.filter(c => c.hasPiano).map(c => c.id)).toEqual(['sandbox']);
   });
 
-  it('starts from the DX7\'s 32 factory voices, numbered, each marked as an approximation', () => {
+  it('starts from the DX7\'s 32 factory voices, bank A, numbered, each marked as an approximation', () => {
     expect(sandbox.presetMenu).toBe(true);
-    expect(sandbox.presets).toHaveLength(32);
-    expect(sandbox.presets[0].label).toBe('1 BRASS 1');
-    expect(sandbox.presets[10].label).toBe('11 E.PIANO 1');
-    expect(sandbox.presets[31].label).toBe('32 TAKE OFF');
-    for (const preset of sandbox.presets) {
+    expect(sandbox.presets).toHaveLength(64);
+    expect(sandbox.presets[0].label).toBe('A1 BRASS 1');
+    expect(sandbox.presets[10].label).toBe('A11 E.PIANO 1');
+    expect(sandbox.presets[31].label).toBe('A32 TAKE OFF');
+    for (const preset of sandbox.presets.slice(0, 32)) {
       expect(preset.hint).toMatch(/^the DX7's factory .*, a close approximation/);
       expect(preset.note).toMatch(/^approximate/);
     }
