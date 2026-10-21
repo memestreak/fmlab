@@ -547,13 +547,12 @@ function presetMenu(presets: readonly Preset[], banks: readonly PresetBank[], st
     choose(stepInBank(presets, last, steps));
   };
 
-  // ‹ ›: the algorithm and octave choosers' black push keys, each in a
-  // bezel of its own (Jeremy, 2026-10-21). They step on the press, Enter
-  // and Space through the click (a pointer's own click follows a press
-  // that has already stepped), and never stop: they go round.
+  // ‹ ›: the algorithm and octave choosers' black push keys, side by side
+  // in one bezel right of the bank keys (Jeremy, 2026-10-21). They step on
+  // the press, Enter and Space through the click (a pointer's own click
+  // follows a press that has already stepped), and never stop: they go
+  // round.
   const step = (label: string, glyph: string, steps: number) => {
-    const bezel = document.createElement('span');
-    bezel.className = 'chooser preset-step';
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'chooser-key';
@@ -567,8 +566,7 @@ function presetMenu(presets: readonly Preset[], banks: readonly PresetBank[], st
       if (event.detail === 0) go();
     });
     button.addEventListener('keydown', arrowSteps);
-    bezel.append(button);
-    return bezel;
+    return button;
   };
 
   // The bank keys, A | B: the tabs' push keys with their lamps, in a
@@ -622,7 +620,9 @@ function presetMenu(presets: readonly Preset[], banks: readonly PresetBank[], st
     const lit = presets[at >= 0 ? at : last]?.bank;
     const bank = banks.find(b => b.id === lit);
     pick.title = bank && bank.id !== banks[0]?.id ? bank.name : `${FACTORY_CREDIT} · ${note.textContent}`;
+    // On the glass: the voice, or a dimmer EDITED once the sound is changed.
     name.textContent = select.selectedOptions[0]?.textContent ?? '';
+    name.classList.toggle('is-edited', at < 0);
     bankKeys.forEach((key, i) => {
       const on = banks[i].id === lit;
       key.setAttribute('aria-pressed', String(on));
@@ -658,10 +658,10 @@ function presetMenu(presets: readonly Preset[], banks: readonly PresetBank[], st
       show(state);
     }
   });
-  // The voice's name shown as a heading, the menu itself over it, unseen:
-  // the heading is as wide as the name, and the list the menu opens keeps
-  // the page's own type, not the heading's (a native list takes the
-  // menu's font, which the heading's would make huge).
+  // The voice's name shown as a heading, the menu itself over it, unseen,
+  // so the list the menu opens keeps the page's own type, not the
+  // heading's (a native list takes the menu's font). In the sandbox the
+  // name is on VFD glass (Jeremy, 2026-10-21).
   const pick = document.createElement('span');
   pick.className = 'preset-pick';
   const name = document.createElement('span');
@@ -680,11 +680,8 @@ function presetMenu(presets: readonly Preset[], banks: readonly PresetBank[], st
   tape.textContent = 'Preset';
   tape.setAttribute('aria-hidden', 'true');
   tapeLabel(tape);
-  return [
-    ...(banks.length > 0 ? [tape, bankGroup, lineBreak] : []),
-    step('Previous preset', '‹', -1),
-    pick,
-    step('Next preset', '›', 1),
-    note,
-  ];
+  const steps = document.createElement('span');
+  steps.className = 'chooser preset-step';
+  steps.append(step('Previous preset', '‹', -1), step('Next preset', '›', 1));
+  return [...(banks.length > 0 ? [tape, bankGroup] : []), steps, lineBreak, pick, note];
 }
