@@ -403,7 +403,10 @@ figures subscribe to it. Nothing else passes values around.
   Piano-shaped keys under an ink key slip, every C named (the computer
   keys that play them are in their names, not drawn on them), the octave
   control (− the range +, and the Z / X hint, shown only while the
-pointer is over the keyboard or keyboard focus is in it) on their left; every held
+pointer is over the keyboard or keyboard focus is in it) on their left.
+It shows two octaves, from C1–B2 to C5–B6 (`STARTS`; Jeremy, 2026-10-21),
+starting at C3–B4, where a double click on the range brings it back;
+every key it can show plays (`playable`, C1 to B6). Every held
   key is drawn in --pen-blue. Its key colours are local tokens (`--key-light` and so
   on) so the white keys stay light in the dark theme;
   `instrument.ts` lays out the sandbox's instrument page: `PLACES` says

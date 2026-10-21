@@ -1313,6 +1313,9 @@ canvas.voice-keys {
   min-width: 4.5rem;
   font-size: 0.9rem;
   text-align: center;
+  /* A double click brings it back to C3–B4, and selects nothing. */
+  cursor: default;
+  user-select: none;
 }
 
 .piano-octave,
