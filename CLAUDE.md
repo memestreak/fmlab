@@ -281,7 +281,11 @@ figures subscribe to it. Nothing else passes values around.
   import in `engine.ts`, and may import from `src/dsp` only. `engine.ts`
   (`AudioEngine`) follows the store: worklet, note gain, master gain,
   limiter (a `DynamicsCompressorNode`), speakers. It creates the context
-  on the first Play, inside the gesture, glides params (30 ms linear
+  on the first Play, inside the gesture; the sandbox builds it on arrival
+  instead (`warm`), suspended, so its first key need only resume it
+  rather than wait the better part of 100 ms for the worklet to load, and
+  a struck note sets the master gain at once rather than fading it in.
+  It glides params (30 ms linear
   ramps), fades the master gain in and out, suspends the context after
   Stop, and on a change of chapter fades out, jumps to the new patch and
   fades back in. For a note it schedules the envelope on the note gain
