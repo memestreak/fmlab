@@ -808,6 +808,14 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
   `--grid` (plot grid), `--rule` (axes, hairlines), `--ink`; pens
   `--pen-blue` (carrier and output traces, positive sidebands),
   `--pen-green` (modulator), `--pen-red` (negative sideband phase).
+- The sandbox's control names are silkscreen capitals printed on the
+  chassis (Jeremy, 2026-10-21): every knob's name (`.knob-label`, the LFO
+  row's a little smaller, on the same line box), the curves' names under
+  LIN | EXP, the operator table's column heads and, on a phone, its
+  cards' column names, in `--font-tape` and `--chassis-legend`, the same
+  in either theme. The text stays in its own case and CSS sets the
+  capitals; a unit is a `.unit` span that keeps its case ("LEVEL dB",
+  "DETUNE ¢"). The chapters' names are unchanged.
 - All text is pure `--ink`, never a grey. Use weight, size and italics for
   hierarchy. The exception is text printed on the sandbox's chassis
   panels, which is the light silkscreen `--chassis-legend`, as the push
@@ -863,7 +871,7 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
   `--font-sans` (Figtree 400 to 700, italic for figure captions:
   everything else), `--font-mono` (IBM Plex Mono: numbers, with tabular
   figures; `.num`), `--font-tape` (Barlow Condensed 400: the sandbox's
-  Dymo tape labels only), `--font-logo` (Michroma 400: the logo only). A
+  Dymo tape labels, its knob names and its operator table's heads), `--font-logo` (Michroma 400: the logo only). A
   weight that is not imported there is not available.
 - A canvas has no CSS: draw code reads the tokens with `getComputedStyle`
   and whoever mounts it must redraw on resize, theme change and

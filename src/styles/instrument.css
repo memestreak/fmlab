@@ -2906,3 +2906,36 @@ body:not([data-view='instrument']) .inst-settings {
 :root[data-motion='still'] body[data-view='instrument'] * {
   transition: none !important;
 }
+
+/* The sandbox's control names printed as silkscreen capitals on the
+   chassis (Jeremy, 2026-10-21): every knob's name, the curves' names
+   under LIN | EXP, the operator table's column heads and, on a phone,
+   its cards' column names, in the tapes' condensed face. The text stays
+   in its own case; units keep theirs ("LEVEL dB"). */
+[data-view='instrument'] .knob-label {
+  margin-top: 3px;
+  color: var(--chassis-legend);
+  font: 400 0.76rem / 1 var(--font-tape);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* The LFO's six a little closer, so they keep apart at 1280 wide. */
+[data-view='instrument'] .inst-lfo .knob-label {
+  font-size: 0.68rem;
+  /* The other rows' line box, so the dials stay on one line. */
+  line-height: 0.76rem;
+  letter-spacing: 0.07em;
+}
+
+[data-view='instrument'] #voice-table :is(thead th, .op-cell-label) {
+  color: var(--chassis-legend);
+  font: 400 0.82rem / 1 var(--font-tape);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+[data-view='instrument'] :is(.knob-label, #voice-table thead th, #voice-table .op-cell-label) .unit {
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
