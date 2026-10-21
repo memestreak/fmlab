@@ -871,7 +871,13 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
   same key; keep it in step with `src/model/theme.ts`.
 - Focus rings are for the keyboard: every focus style is on
   `:focus-visible`, never `:focus`, so a click, a tap or a drag leaves
-  none; Tab still rings every control. The sandbox is an instrument,
+  none; Tab still rings every control. A browser also turns
+  `:focus-visible` on for a clicked control as soon as any key is
+  pressed, so in the sandbox `ui/focusSource.ts` marks `<html>` with
+  `data-focus` (pointer or keyboard, set when focus arrives; only Tab
+  counts as keyboard), and the rings, the preset name's underline, the
+  algorithm's glass ring and the Z X hint show only for keyboard focus:
+  playing the keys after clicking a slider leaves it unringed. The sandbox is an instrument,
   not a page to read: nothing on it is selected by a double click or a
   drag (`user-select: none` on its body), and a tap leaves no flash
   (Jeremy, 2026-10-21). The chapters' text stays selectable.
