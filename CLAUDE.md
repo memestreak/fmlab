@@ -567,7 +567,7 @@ tab: the wiring diagram, and under it the algorithm list between ‹ ›
 readout as wide as the list was, the list unseen over it so a click
 opens it and the keys choose, keyboard focus ringing the glass and a
 click's not, and beside them the Feedback knob (`mountFeedbackKnob`, 0
-to 2π), its dial level with ‹ ›, its name beside it and no readout:
+to 2π), its dial level with ‹ ›, its name under it and no readout:
 its value is on the diagram's glass, "FB 3.14", at the right halfway
 down. The LFO tab: a still drawing of the LFO for two seconds after a
 key (`viz/lfoPlot.ts`, the delay shaded, ±1), and under it the wave, six
@@ -590,7 +590,11 @@ panel (`#voice-envelope`) alone, the showing tab's curve filling it. On
 a wide screen the Voice screen and the operator screen share their top
 and bottom edges whichever tabs are open: the heads as tall and as far
 above their screens, and both control rows `--kv-row` high (4rem; 3.6rem
-under 52rem high).
+under 52rem high). Every control row's dials are one size,
+`--row-dial` (2rem, the Pitch EG row's; Jeremy, 2026-10-21), and every
+row's dials, push keys (their bezels a dial tall; the algorithm chooser,
+the LFO's waves and Key sync lifted onto the dials' line) and knob names
+fall on the same two lines in all five rows.
 Under the band the operator table (`#voice-table`) the full width, then
 the foot (`.inst-foot`): the octave control and keyboard on the left, the
 spectrum (`#inst-figures`) filling the rest of the row, no taller than

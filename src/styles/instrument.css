@@ -459,13 +459,6 @@ body:not([data-view='instrument']) #inst-tools {
   gap: 0.1rem;
 }
 
-/* The LFO's and the pitch envelope's dials as small as a short window's,
-   so each row fits under its display. */
-.inst-pitch .knob-dial,
-.inst-lfo .knob-dial {
-  width: 2rem;
-  height: 2rem;
-}
 
 /* LFO: the drawing, then the wave, the four knobs and key sync, closer
    together to fit. The wave's name is for screen readers only: the
@@ -598,15 +591,10 @@ body:not([data-view='instrument']) #inst-tools {
   gap: 0.4rem;
 }
 
-/* Algorithm: the diagram, then ‹ n › and Feedback side by side, the dial
-   level with the buttons, its name beside it. Its value is on the
-   diagram's glass (viz/algorithmPlot.ts); the dial still says it to
-   screen readers. */
-#inst-feedback .knob {
-  grid-auto-flow: column;
-  align-items: center;
-  gap: 0.45rem;
-}
+/* Algorithm: the diagram, then ‹ n › and Feedback side by side, the
+   dial level with the buttons and its name under it, as every knob's.
+   Its value is on the diagram's glass (viz/algorithmPlot.ts); the dial
+   still says it to screen readers. */
 
 /* The LFO's, the pitch envelope's and the operator panel's knobs show
    their values on the screen above them, over each dial (ui/screenValues.ts),
@@ -1135,9 +1123,14 @@ canvas.voice-keys {
   gap: 0.05rem;
 }
 
+/* Every dial one size (Jeremy, 2026-10-21): the Pitch EG row's. */
+:root {
+  --row-dial: 2rem;
+}
+
 .knob-dial {
-  width: 2.4rem;
-  height: 2.4rem;
+  width: var(--row-dial);
+  height: var(--row-dial);
   border-radius: 50%;
   cursor: ns-resize;
   touch-action: none;
@@ -1542,11 +1535,34 @@ canvas.voice-keys {
     padding-top: 0;
   }
 
-  /* The LFO's wave keys and Key sync on the knobs' dials' centre line,
-     not the knobs' (dial and name) (Jeremy, 2026-10-20): room under them
-     as tall as a knob's name lifts them by half of it. */
-  .inst-lfo .inst-voice-controls > :is(.lfo-waves, .lamp-keys) {
+  /* The LFO's wave keys and Key sync, and the algorithm chooser, on the
+     knobs' dials' centre line, not the knobs' (dial and name) (Jeremy,
+     2026-10-20): room under them as tall as a knob's name lifts them by
+     half of it. */
+  .inst-lfo .inst-voice-controls > :is(.lfo-waves, .lamp-keys),
+  .inst-alg-step-row {
     margin-bottom: 1.2rem;
+  }
+
+  /* Every control row's items centred in it, as the Voice rows' are, so
+     the dials, the keys and the names fall on the same lines in all of
+     them, whichever tabs are open. */
+  .voice-envelope-knobs {
+    align-self: center;
+  }
+
+  /* The push keys' bezels in the rows as tall as a dial, so their
+     centres and the names under them fall on the dials' lines exactly. */
+  .inst-voice-controls :is(.lfo-waves, .lamp-keys),
+  .voice-keys-knobs .lamp-keys {
+    box-sizing: border-box;
+    height: var(--row-dial);
+  }
+
+  .inst-voice-controls :is(.lfo-wave, .lamp-key),
+  .voice-keys-knobs .lamp-key {
+    height: auto;
+    min-height: 0;
   }
 
   .voice-envelope {
@@ -1621,11 +1637,6 @@ canvas.voice-keys {
   }
 
 
-
-  .knob-dial {
-    width: 2rem;
-    height: 2rem;
-  }
 
   .voice-envelope-knobs {
     grid-template-columns: repeat(7, 3.3rem);
