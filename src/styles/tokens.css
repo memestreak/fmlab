@@ -92,7 +92,7 @@
      edge. */
   --dymo-tape: #101010;
   --dymo-letter: #dddcd4;
-  --dymo-shadow: 0 1px 1.2px rgba(0, 0, 0, 0.45), 0 0 0 0.5px rgba(0, 0, 0, 0.5), inset 0 0.5px 0 rgba(255, 255, 255, 0.25);
+  --dymo-shadow: 0 1px 1.2px rgba(0, 0, 0, 0.45), 0 0 0 0.5px rgba(0, 0, 0, 0.5), inset 0 0.5px 0 rgba(255, 255, 255, 0.12);
 }
 
 /* Dark: follows the system unless the viewer picked Light, or forced by
@@ -171,7 +171,7 @@
        edge. */
     --dymo-tape: #101010;
     --dymo-letter: #dddcd4;
-    --dymo-shadow: 0 1px 1.5px rgba(0, 0, 0, 0.7), 0 0 0 0.5px rgba(255, 255, 255, 0.16), inset 0 0.5px 0 rgba(255, 255, 255, 0.32);
+    --dymo-shadow: 0 1px 1.5px rgba(0, 0, 0, 0.7), 0 0 0 0.5px rgba(255, 255, 255, 0.16), inset 0 0.5px 0 rgba(255, 255, 255, 0.16);
   }
 }
 :root[data-theme='dark'] {
@@ -247,5 +247,5 @@
      edge. */
   --dymo-tape: #101010;
   --dymo-letter: #dddcd4;
-  --dymo-shadow: 0 1px 1.5px rgba(0, 0, 0, 0.7), 0 0 0 0.5px rgba(255, 255, 255, 0.16), inset 0 0.5px 0 rgba(255, 255, 255, 0.32);
+  --dymo-shadow: 0 1px 1.5px rgba(0, 0, 0, 0.7), 0 0 0 0.5px rgba(255, 255, 255, 0.16), inset 0 0.5px 0 rgba(255, 255, 255, 0.16);
 }
