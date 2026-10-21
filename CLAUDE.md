@@ -611,17 +611,22 @@ bank, or the last chosen's once Edited; a key loads the voice last
 chosen in its bank, A11 E.PIANO 1 and B1 TINE PIANO at first, a preset
 change that glitches the screens; space and the note keys still play
 with one focused; the bank is in neither the link nor storage; on a
-phone they lead the presets on a line of their own, after the tape), then the preset
-menu as the title: the name chosen in
-the display face at 1.45rem with no box (`.preset-name`), the native
+phone they lead the presets on a line of their own, after the tape),
+then the preset menu as the title: the name chosen on a VFD (Jeremy,
+2026-10-21; `.preset-name`): glowing cyan capitals in Plex Mono on dark
+glass in a small bezel of the tab strips' plastic (seven segments
+cannot spell the names), 14 characters wide, the longest name's, so
+nothing moves from voice to voice, a dimmer EDITED once the sound is
+changed, and a ring round the glass for keyboard focus only; the native
 menu over it unseen in the page's own type, so the list it opens is the
-usual size, between ‹ › (`stepInBank`, round the lit bank's 32: the
-algorithm and octave choosers' black push keys, `.chooser-key`, each in
-a `.chooser` bezel of its own, 1.65rem high, the bank keys' height, so
-the title bar keeps its height; stepping on the press, never disabled;
-Jeremy, 2026-10-21; with the menu
-focused the arrows step it the same way, up and left back, down and
-right on, and Enter opens its list); its note, what
+usual size; then right of it the two step keys, up and down, side by
+side in one `.chooser` bezel (`stepInBank`, round the lit bank's 32, up
+back and down on: the algorithm and octave choosers' black push keys,
+their ‹ › turned a quarter, 1.65rem high, the bank keys' height, so the
+title bar keeps its height; stepping on the press, never disabled;
+Jeremy, 2026-10-21); with the menu
+focused the arrows step it as the keys do, up and left back, down and
+right on, and Enter opens its list; its note, what
 the voice plays without, is not shown but is the menu's description for
 screen readers and follows the credit in the name's tip; then Volume, the
 Settings key and the theme; no glossary link (Jeremy, 2026-10-21: the
@@ -772,8 +777,8 @@ shading and in the chapter pages' plots. On a wide screen it is one window high 
 nothing scrolls, at 1440 × 900 and 1280 × 800; the figures' captions are
 for screen readers only there, and under 52rem high the rows, drawings,
 knobs and gaps tighten. Below 62rem it is one column: the masthead
-wraps, the wordmark and the theme, then the presets row (the name at
-1.25rem), then Volume on a line of its own, then Settings; the keyboard
+wraps, the wordmark and the theme, then the presets (the tape and A | B
+on one line, the name's VFD and its up and down keys under them), then Volume on a line of its own, then Settings; the keyboard
 and the spectrum over it docked to the screen's foot in the chassis, the
 full width and square (the spectrum, then the octave control and the
 wheel without their tapes, then the keys), the operator panel
@@ -808,7 +813,7 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
   exception: the VFD readouts (the operator table's, the algorithm's),
   every knob's VFD dial, the line across the sandbox's fader caps, the
   sandbox's algorithm diagram, its envelope, Key scaling, pitch
-  envelope and LFO graphs, large and small, and its spectrum glow cyan on dark glass, in both themes (Jeremy, 2026-10-20;
+  envelope and LFO graphs, large and small, its spectrum and the preset's name glow cyan on dark glass, in both themes (Jeremy, 2026-10-20;
   `--vfd-*` tokens, the same in every theme but for a faint light edge
   in dark and the faders' scale, in ink). They
   are a drawn display, not text, so the ink rule above does not apply

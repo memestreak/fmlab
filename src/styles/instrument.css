@@ -82,11 +82,59 @@ body:not([data-view='instrument']) #inst-tools {
   min-height: 2.25rem;
 }
 
-/* In the sandbox the name's box is as wide as the widest voice's name
-   (A25 ORCH-CHIME), the name centred in it, so the keys either side
-   hold still from voice to voice. */
+/* In the sandbox the name is a VFD (Jeremy, 2026-10-21): glowing cyan
+   capitals in Plex Mono on dark glass, in a small bezel of the tab
+   strips' plastic, as tall as the bank keys' bezel. Seven segments
+   cannot spell the names, so it is a dot-matrix display's look. The
+   glass is 14 characters wide, the longest name's (A25 ORCH-CHIME), so
+   nothing beside it moves from voice to voice; an edited sound shows a
+   dimmer EDITED. */
 [data-view='instrument'] .preset-pick {
-  width: 14.8rem;
+  min-height: 0;
+  padding: 3px 4px 4px;
+  border-radius: 4px;
+  background: linear-gradient(var(--lamp-bezel-1), var(--lamp-bezel-2));
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.8),
+    0 0 0 1px #000,
+    var(--lamp-bezel-edge);
+}
+
+[data-view='instrument'] .preset-name {
+  box-sizing: content-box;
+  width: calc(14ch + 14 * 0.08em);
+  height: 1.65rem;
+  padding: 0 1.45rem 0 0.65rem;
+  border: 0;
+  border-radius: 2px;
+  background:
+    linear-gradient(45deg, transparent 50%, var(--vfd-glow) 50%) calc(100% - 0.7rem) 52% / 0.28rem 0.28rem no-repeat,
+    linear-gradient(135deg, var(--vfd-glow) 50%, transparent 50%) calc(100% - 0.42rem) 52% / 0.28rem 0.28rem no-repeat,
+    radial-gradient(ellipse at 50% 40%, var(--vfd-glass-1), var(--vfd-glass-2));
+  box-shadow: inset 0 0 0 1px #000;
+  color: var(--vfd-lit);
+  font: 500 0.95rem / 1.65rem var(--font-mono);
+  letter-spacing: 0.08em;
+  text-shadow:
+    0 0 2px var(--vfd-glow),
+    0 0 6px color-mix(in srgb, var(--vfd-glow) 60%, transparent);
+  text-transform: uppercase;
+}
+
+[data-view='instrument'] .preset-name.is-edited {
+  color: color-mix(in srgb, var(--vfd-lit) 55%, transparent);
+  text-shadow: 0 0 2px color-mix(in srgb, var(--vfd-glow) 50%, transparent);
+}
+
+/* No underline on the glass: keyboard focus rings it instead. */
+[data-view='instrument'] .preset-pick:hover .preset-name,
+[data-view='instrument'] .preset-pick:has(.preset-menu:focus-visible) .preset-name {
+  border-bottom-color: transparent;
+}
+
+:root:not([data-focus='pointer']) [data-view='instrument'] .preset-pick:has(.preset-menu:focus-visible) {
+  outline: 2px solid var(--lamp-legend-hover);
+  outline-offset: 1px;
 }
 
 .preset-name {
@@ -1014,6 +1062,11 @@ body:not([data-view='instrument']) #inst-tools {
 
 .preset-step .chooser-key {
   height: 1.65rem;
+}
+
+/* The preset steps point up and down: ‹ › turned a quarter. */
+.preset-step .chooser-key {
+  writing-mode: vertical-lr;
 }
 
 .preset-break {
@@ -2346,10 +2399,6 @@ canvas.voice-keys {
     padding: 0 0.5rem 0 0.42rem;
   }
 
-  /* The widest name at this size. */
-  [data-view='instrument'] .preset-pick {
-    width: 12.9rem;
-  }
 
   /* Volume has the line to itself, so its fader keeps its length;
      Settings and the glossary go on the line under it. */
