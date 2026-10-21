@@ -1543,8 +1543,9 @@ canvas.voice-keys {
   display: none;
 }
 
-/* The control panel: Octave and Mod on tape on the top line, the octave
-   chooser and the wheel on the line under, 9px above the chassis's foot. */
+/* The control panel: Octave and Mod on tape on the top line; under
+   them, 6px down, the octave chooser and the wheel, its foot 9px above
+   the chassis's (Jeremy, 2026-10-21: the chooser close to its tape). */
 .piano-panel {
   display: grid;
   grid-template-columns: auto auto;
@@ -1562,7 +1563,7 @@ canvas.voice-keys {
 
 .piano-oct-row {
   display: flex;
-  align-self: end;
+  align-self: start;
   align-items: center;
 }
 
@@ -2470,6 +2471,7 @@ canvas.voice-keys {
 
   .piano-oct-row {
     grid-row: 1;
+    align-self: end;
   }
 
   .mod-wheel {

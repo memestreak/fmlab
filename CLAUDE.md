@@ -431,7 +431,7 @@ figures subscribe to it. Nothing else passes values around.
   grey grooves; a held key sinks, straight down and up, never animated.
   They are let into the foot's chassis, a strip of charcoal felt along
   their top where they run under the rail. On their left the control
-  panel: Octave and Mod on tape on one line, and under them the octave
+  panel: Octave and Mod on tape on one line, and 6px under them the octave
   control (‹ › black push keys either side of a two-place VFD readout of
   the keyboard's first C, C1 to C5, in one bezel as the algorithm
   chooser's; the range in words lies over the readout unseen, for its tip
