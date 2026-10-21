@@ -22,9 +22,17 @@ import type { LabStore } from '../model/lab';
 import { knobValues, redrawOnLayout } from './screenValues';
 import { describeLfo, drawLfo } from '../viz/lfoPlot';
 import { createKnob } from './knob';
+import { glitchScreens } from './screenGlitch';
 import { formatTime } from './voiceFormat';
 
 type VoiceArea = 'algorithm' | 'lfo' | 'pitch';
+
+/** Each tab's screen, the canvas whose glass glitches when it opens. */
+const SCREENS: Record<VoiceArea, string> = {
+  algorithm: 'algorithm-plot',
+  lfo: 'inst-lfo-plot',
+  pitch: 'inst-pitch-curve',
+};
 
 /** Each wave's name and its button's drawing (an SVG path in 24 × 16). */
 const WAVES: Record<LfoWave, { name: string; path: string }> = {
@@ -100,6 +108,8 @@ export function mountVoiceArea(store: LabStore): void {
     if (open === area) return;
     open = area;
     showTabs();
+    // The new picture on the glass, and the glass glitching over it.
+    glitchScreens([document.getElementById(SCREENS[area]) as HTMLCanvasElement | null]);
   };
   tabs.forEach((tab, i) => {
     // The click that follows a press finds the tab open already.

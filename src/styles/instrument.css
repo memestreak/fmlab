@@ -236,6 +236,53 @@ body:not([data-view='instrument']) #inst-tools {
   height: calc(100% - 14px);
 }
 
+/* A screen's glitch (ui/screenGlitch.ts): overlays over the glass alone,
+   never the bezel, gone when it ends. */
+.screen-glitch {
+  position: absolute;
+  inset: 7px;
+  overflow: hidden;
+  border-radius: 3px;
+  pointer-events: none;
+}
+
+.screen-glitch-scan {
+  background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0 1px, transparent 1px 3px);
+}
+
+.screen-glitch-cover,
+.screen-glitch-band {
+  position: absolute;
+  inset: 0;
+}
+
+.screen-glitch-head,
+.screen-glitch-tear {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 1px;
+}
+
+.screen-glitch-head {
+  background: rgba(125, 249, 255, 0.55);
+  box-shadow: 0 0 4px rgba(125, 249, 255, 0.6);
+}
+
+.screen-glitch-tear {
+  background: rgba(125, 249, 255, 0.35);
+}
+
+/* The slice's picture, shifted 3px sideways. */
+.screen-glitch-copy {
+  position: absolute;
+  top: 0;
+  left: 3px;
+  width: 100%;
+  height: 100%;
+}
+
 /* The diagram draws its own glass: its light edge is the bezel's now. */
 [data-view='instrument'] #algorithm-plot {
   --vfd-panel-edge: transparent;

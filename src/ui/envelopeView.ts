@@ -20,6 +20,7 @@ import { knobValues, redrawOnLayout } from './screenValues';
 import { createKnob } from './knob';
 import { roleOf } from './operators';
 import { formatDb, formatTime } from './voiceFormat';
+import { glitchScreens } from './screenGlitch';
 import { penOf, setDxEnvelope } from './voiceTable';
 
 /** The knobs, in the order the envelope runs. */
@@ -50,7 +51,10 @@ export function mountEnvelopeView(store: LabStore): void {
   // choose one.
   const tabs = [...view.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
   const choose = (tab: VoiceTab) => {
-    if (store.get().voiceTab !== tab) store.set({ voiceTab: tab });
+    if (store.get().voiceTab === tab) return;
+    store.set({ voiceTab: tab });
+    // The new tab's screen showing, its glass glitching over it.
+    glitchScreens([document.getElementById(tab === 'keys' ? 'voice-keys-curve' : 'voice-envelope-curve') as HTMLCanvasElement | null]);
   };
   tabs.forEach((button, i) => {
     // The click that follows a press finds the tab chosen already.
