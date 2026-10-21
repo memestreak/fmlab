@@ -843,10 +843,10 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
   2026-10-21): a drawn mark, not a plot.
 - The logo, in every page's masthead and the way home (`.wordmark`,
   index.html; Jeremy, 2026-10-21): "fmlab" in wide lowercase
-  (`--font-logo`, Michroma) over three racing stripes, amber, red and
-  teal (`--logo-*`), slanted forward like speed lines, the paint lightly
-  chipped by a fixed noise mask (the same every visit), in ink on either
-  theme. The word is the link's name; the stripes are hidden from screen
+  (`--font-logo`, Michroma) over three straight racing stripes, amber,
+  red and teal (`--logo-*`), the paint lightly chipped by a fixed noise
+  mask (the same every visit), in ink on either theme; as big as the
+  masthead's height allows (1.82rem, filling its 41px). The word is the link's name; the stripes are hidden from screen
   readers. It keeps the old wordmark's height, so the masthead does. The
   favicon stays the carrier and its sidebands, which reads at 16px where
   the stripes would not.

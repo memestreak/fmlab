@@ -402,9 +402,9 @@ h3 {
 }
 
 /* The logo (Jeremy, 2026-10-21): "fmlab" in wide lowercase over three
-   racing stripes, amber, red and teal, slanted forward like speed lines,
-   the paint lightly chipped (a fixed noise pattern, the same every
-   visit). It keeps the old wordmark's height, so the masthead does too. */
+   straight racing stripes, amber, red and teal, the paint lightly
+   chipped (a fixed noise pattern, the same every visit). As tall as the
+   old wordmark's box, so the masthead keeps its height. */
 .wordmark {
   display: flex;
   align-items: center;
@@ -415,9 +415,10 @@ h3 {
 .wordmark a {
   display: inline-flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 0.13em;
   color: var(--ink);
-  font-size: 1.4rem;
+  /* As big as the masthead's height allows (Jeremy, 2026-10-21). */
+  font-size: 1.82rem;
 }
 
 .logo-word {
@@ -430,10 +431,8 @@ h3 {
 .logo-bars {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: 0.14em;
+  gap: 0.1em;
   height: 0.2em;
-  transform: skewX(-28deg);
-  transform-origin: left;
   -webkit-mask: var(--logo-wear) 30px 0 / 120px;
   mask: var(--logo-wear) 30px 0 / 120px;
 }
