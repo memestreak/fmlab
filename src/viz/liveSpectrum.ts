@@ -89,20 +89,20 @@ function trace(
   // bounds, but a measurement can overshoot by a whisker.
   const y = (amp: number) => ampToY(plot, Math.min(1, amp));
 
-  ctx.beginPath();
-  ctx.moveTo(x(points[0].freq), axis);
-  for (const point of points) ctx.lineTo(x(point.freq), y(point.amp));
-  ctx.lineTo(x(points[points.length - 1].freq), axis);
-  ctx.closePath();
-  // The area under it is a fill, so it never glows.
-  ctx.save();
-  ctx.shadowBlur = 0;
-  ctx.globalAlpha = 0.18;
-  ctx.fillStyle = token('--pen-blue');
-  ctx.fill();
-  ctx.restore();
+  // The area under it is a fill, so it never glows: on the canvas itself,
+  // under the glowing layer where there is one.
+  const { base } = plot;
+  base.save();
+  base.beginPath();
+  base.moveTo(x(points[0].freq), axis);
+  for (const point of points) base.lineTo(x(point.freq), y(point.amp));
+  base.lineTo(x(points[points.length - 1].freq), axis);
+  base.closePath();
+  base.globalAlpha = 0.18;
+  base.fillStyle = token('--pen-blue');
+  base.fill();
+  base.restore();
 
-  ctx.globalAlpha = 1;
   ctx.beginPath();
   points.forEach((point, i) => {
     if (i === 0) ctx.moveTo(x(point.freq), y(point.amp));

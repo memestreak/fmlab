@@ -32,18 +32,27 @@ export function plotArea(width: number, height: number): Area {
 
 /** A canvas ready to draw on, in CSS pixels, with its plot area. */
 export interface Plot extends Area {
+  /**
+   * Where to draw: the canvas, or once `glow()` is called, the layer that
+   * glows.
+   */
   ctx: CanvasRenderingContext2D;
+  /** The canvas's own context, for what must not glow. */
+  base: CanvasRenderingContext2D;
   /** Reads a CSS variable, such as `--pen-blue`, from the canvas. */
   token: (name: string) => string;
   /** Device pixels per CSS pixel. */
   dpr: number;
   /**
    * Lights what is drawn from here on with the canvas's `--plot-glow`, as
-   * a VFD's segments glow (the sandbox's envelope, key scaling and pitch
-   * graphs); nothing where the canvas has none. Called after the area
-   * fills, which do not glow.
+   * a VFD's segments glow (the sandbox's graphs); nothing where the canvas
+   * has none. Called after the area fills, which do not glow; returns the
+   * context to draw the rest on (also `ctx` from then on). The glowing
+   * part is drawn on a layer and laid on the canvas in one shadowed pass,
+   * once the drawing is done: a shadow on every line and label cost each
+   * redraw of a large screen several milliseconds of blurring.
    */
-  glow: () => void;
+  glow: () => CanvasRenderingContext2D;
 }
 
 /**
@@ -71,18 +80,105 @@ export function beginPlot(canvas: HTMLCanvasElement): Plot | null {
   ctx.shadowColor = 'transparent';
 
   const style = getComputedStyle(canvas);
-  return {
+  const plot: Plot = {
     ctx,
+    base: ctx,
     token: name => style.getPropertyValue(name).trim(),
     dpr,
     glow: () => {
       const colour = style.getPropertyValue('--plot-glow').trim();
-      if (!colour) return;
-      ctx.shadowColor = colour;
-      ctx.shadowBlur = 4;
+      if (!colour) return ctx;
+      const layer = glowLayer(canvas, pixelWidth, pixelHeight);
+      const on = layer.getContext('2d');
+      if (!on) return ctx;
+      on.setTransform(1, 0, 0, 1, 0, 0);
+      on.clearRect(0, 0, pixelWidth, pixelHeight);
+      on.setTransform(dpr, 0, 0, dpr, 0, 0);
+      plot.ctx = on;
+      // After this drawing, and any other of this canvas in the same task.
+      if (!pending.has(canvas)) {
+        pending.add(canvas);
+        queueMicrotask(() => {
+          pending.delete(canvas);
+          ctx.save();
+          ctx.setTransform(1, 0, 0, 1, 0, 0);
+          ctx.shadowColor = colour;
+          ctx.shadowBlur = 4;
+          ctx.drawImage(layer, 0, 0);
+          ctx.restore();
+        });
+      }
+      return on;
     },
     ...plotArea(width, height),
   };
+  return plot;
+}
+
+/** Each glowing canvas's layer, kept between redraws. */
+const layers = new WeakMap<HTMLCanvasElement, HTMLCanvasElement>();
+/** The canvases whose layer is yet to be laid on them. */
+const pending = new Set<HTMLCanvasElement>();
+
+function glowLayer(canvas: HTMLCanvasElement, width: number, height: number): HTMLCanvasElement {
+  let layer = layers.get(canvas);
+  if (!layer) {
+    layer = document.createElement('canvas');
+    layers.set(canvas, layer);
+  }
+  if (layer.width !== width) layer.width = width;
+  if (layer.height !== height) layer.height = height;
+  return layer;
+}
+
+/**
+ * The band at the foot of the sandbox's large screens (envelope, key
+ * scaling, pitch envelope, LFO) that shows the values of the knobs under
+ * the screen, in CSS pixels. Their areas end above it.
+ */
+export const VALUE_BAND = 22;
+
+/** A knob's value on a screen: its text, at the knob dial's x. */
+export interface ScreenValue {
+  /** The dial's centre, in the canvas's CSS pixels from its left. */
+  x: number;
+  text: string;
+  /**
+   * Which row of knobs it is in, 0 or 1, where they wrap (on a phone):
+   * each row's values get a line of the band.
+   */
+  line?: number;
+}
+
+/**
+ * Writes the knobs' values in the band at the canvas's foot (Jeremy,
+ * 2026-10-20), each centred over its dial, under a faint rule; the
+ * values glow where the canvas does, the rule does not.
+ */
+export function drawValueStrip(plot: Plot, width: number, height: number, values: readonly ScreenValue[]): void {
+  const { ctx, base, token } = plot;
+  base.save();
+  base.globalAlpha = 0.6;
+  base.strokeStyle = token('--rule');
+  base.lineWidth = 1;
+  const at = Math.round(height - VALUE_BAND) + 0.5;
+  base.beginPath();
+  base.moveTo(6, at);
+  base.lineTo(width - 6, at);
+  base.stroke();
+  base.restore();
+  ctx.save();
+  // One line, or two smaller where the knobs wrap onto two rows.
+  const two = values.some(value => value.line === 1);
+  ctx.font = `600 ${two ? 10 : 12}px ${token('--font-mono')}`;
+  ctx.fillStyle = token('--ink');
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  for (const { x, text, line = 0 } of values) {
+    const y = two ? height - VALUE_BAND + 6 + line * 10 : height - VALUE_BAND / 2;
+    ctx.fillText(text, x, y);
+  }
+  ctx.restore();
 }
 
 /** A half-pixel centre, which keeps a one-pixel line sharp. */

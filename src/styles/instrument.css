@@ -606,7 +606,14 @@ body:not([data-view='instrument']) #inst-tools {
   gap: 0.45rem;
 }
 
-#inst-feedback .knob-readout {
+/* The LFO's, the pitch envelope's and the operator panel's knobs show
+   their values on the screen above them, over each dial (ui/screenValues.ts),
+   not under their names; the curve buttons' words go too, the buttons
+   saying lin or exp. */
+#inst-feedback .knob-readout,
+.inst-lfo .knob-readout,
+.inst-pitch .knob-readout,
+.voice-envelope .knob-readout {
   display: none;
 }
 
@@ -1536,11 +1543,32 @@ canvas.voice-keys {
     column-gap: 2.5rem;
   }
 
+  /* The Voice screen and the operator screen share their top and bottom
+     edges, whichever tabs are open (Jeremy, 2026-10-20): each head is as
+     tall and as far above its screen, and each screen sits on a control
+     row of the same height, --kv-row. */
+  :root {
+    --kv-row: 4rem;
+  }
+
   .inst-left {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.25rem;
     min-height: 0;
+  }
+
+  .inst-voice-tab {
+    grid-template-rows: minmax(0, 1fr) var(--kv-row);
+    padding-top: 0;
+  }
+
+  .voice-envelope {
+    padding-bottom: 0;
+  }
+
+  .voice-envelope-body {
+    grid-template-rows: minmax(0, 1fr) var(--kv-row);
   }
 
   .inst-row {
@@ -1618,8 +1646,12 @@ canvas.voice-keys {
     grid-template-columns: repeat(7, 3.3rem);
   }
 
+  :root {
+    --kv-row: 3.6rem;
+  }
+
   .voice-envelope {
-    padding: 0.35rem 0 0.4rem;
+    padding: 0.4rem 0 0;
   }
 
   .voice-envelope-head .btn {
@@ -1632,7 +1664,7 @@ canvas.voice-keys {
   }
 
   .inst-left {
-    gap: 0.4rem;
+    gap: 0.25rem;
   }
 
   .inst .op-table thead th {

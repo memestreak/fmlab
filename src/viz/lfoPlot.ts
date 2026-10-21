@@ -5,13 +5,13 @@
 
 import type { Dx7Lfo } from '../dsp/dx7';
 import { delayGain, heldValue, nextRandom, SYNC_PHASE, waveAt } from '../dsp/lfo';
-import { beginPlot } from './plot';
+import { beginPlot, drawValueStrip, type ScreenValue, VALUE_BAND } from './plot';
 
 /** How long the drawing shows, in seconds from the key. */
 export const LFO_SECONDS = 2;
 
 /** Space round the drawing for its numbers, in CSS pixels. */
-const MARGIN = { top: 6, right: 6, bottom: 18, left: 24 };
+const MARGIN = { top: 6, right: 6, bottom: 18 + VALUE_BAND, left: 24 };
 
 /**
  * The LFO's swing, -1 to 1, `time` seconds after a key goes down: the
@@ -30,11 +30,12 @@ export function lfoAt(lfo: Dx7Lfo, time: number): number {
   return (2 * waveAt(lfo.wave, phase, held) - 1) * delayGain(lfo.delay, time);
 }
 
-/** Draws `lfo` over two seconds in `canvas`. */
-export function drawLfo(canvas: HTMLCanvasElement, lfo: Dx7Lfo): void {
+/** Draws `lfo` over two seconds in `canvas`, the knobs' `values` at its foot. */
+export function drawLfo(canvas: HTMLCanvasElement, lfo: Dx7Lfo, values?: readonly ScreenValue[]): void {
   const plot = beginPlot(canvas);
   if (!plot) return;
-  const { ctx, token, glow } = plot;
+  const { token, glow } = plot;
+  let { ctx } = plot;
   const { width, height } = canvas.getBoundingClientRect();
   const left = MARGIN.left;
   const right = width - MARGIN.right;
@@ -48,7 +49,7 @@ export function drawLfo(canvas: HTMLCanvasElement, lfo: Dx7Lfo): void {
     ctx.fillStyle = token('--paper-sunken');
     ctx.fillRect(left, top, x(Math.min(LFO_SECONDS, lfo.delay)) - left, bottom - top);
   }
-  glow();
+  ctx = glow();
 
   // The rows at 1, 0 and -1, numbered at the left; the seconds under.
   ctx.lineWidth = 1;
@@ -92,6 +93,7 @@ export function drawLfo(canvas: HTMLCanvasElement, lfo: Dx7Lfo): void {
     else ctx.lineTo(px, py);
   }
   ctx.stroke();
+  if (values) drawValueStrip(plot, width, height, values);
 }
 
 /** What the drawing shows, in words. */
