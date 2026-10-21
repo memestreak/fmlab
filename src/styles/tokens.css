@@ -27,6 +27,8 @@
   --font-display: 'Fraunces', Georgia, serif;
   --font-sans: 'Figtree', system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  /* The sandbox's Dymo tape labels only. */
+  --font-tape: 'Barlow Condensed', var(--font-sans);
   /* The VFD readouts, the knobs' VFD dials, the faders and the
      sandbox's diagram and graphs: the same in either theme (but for a
      faint light edge in dark), as a real display is. */
@@ -86,6 +88,11 @@
   --lamp-on-3: #d9822b;
   --lamp-on-4: #ffd88a;
   --lamp-on-5: #c26a1c;
+  /* The sandbox's Dymo tape labels: the same in either theme but the
+     edge. */
+  --dymo-tape: #101010;
+  --dymo-letter: #dddcd4;
+  --dymo-shadow: 0 1px 1.2px rgba(0, 0, 0, 0.45), 0 0 0 0.5px rgba(0, 0, 0, 0.5), inset 0 0.5px 0 rgba(255, 255, 255, 0.08);
 }
 
 /* Dark: follows the system unless the viewer picked Light, or forced by
@@ -160,6 +167,11 @@
     --lamp-on-3: #d9822b;
     --lamp-on-4: #ffd88a;
     --lamp-on-5: #c26a1c;
+    /* The sandbox's Dymo tape labels: the same in either theme but the
+       edge. */
+    --dymo-tape: #101010;
+    --dymo-letter: #dddcd4;
+    --dymo-shadow: 0 1px 1.5px rgba(0, 0, 0, 0.7), 0 0 0 0.5px rgba(255, 255, 255, 0.16), inset 0 0.5px 0 rgba(255, 255, 255, 0.11);
   }
 }
 :root[data-theme='dark'] {
@@ -231,4 +243,9 @@
   --lamp-on-3: #d9822b;
   --lamp-on-4: #ffd88a;
   --lamp-on-5: #c26a1c;
+  /* The sandbox's Dymo tape labels: the same in either theme but the
+     edge. */
+  --dymo-tape: #101010;
+  --dymo-letter: #dddcd4;
+  --dymo-shadow: 0 1px 1.5px rgba(0, 0, 0, 0.7), 0 0 0 0.5px rgba(255, 255, 255, 0.16), inset 0 0.5px 0 rgba(255, 255, 255, 0.11);
 }

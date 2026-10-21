@@ -241,6 +241,80 @@ body:not([data-view='instrument']) #inst-tools {
   --vfd-panel-edge: transparent;
 }
 
+/* Voice, Operators and Octave on black embossing tape, as a Dymo label
+   maker strikes them (Jeremy, 2026-10-21; ui/dymo.ts): white capitals
+   raised and stress-whitened on one baseline, the vinyl's grain under a
+   gloss, the ends cut square and lifting a little. A drawn object, the
+   same in either theme but its edge; its letters are not ink. */
+[data-view='instrument'] .dymo {
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  width: max-content;
+  height: 24px;
+  margin: 0;
+  padding: 0 0.55em 0 0.6em;
+  /* Cut square, as the machine's cutter leaves it. */
+  border-radius: 0;
+  background:
+    /* The gloss, kept faint (Jeremy, 2026-10-21). */
+    linear-gradient(
+      rgba(255, 255, 255, 0.09),
+      rgba(255, 255, 255, 0.025) 22%,
+      rgba(255, 255, 255, 0) 40%,
+      rgba(255, 255, 255, 0) 75%,
+      rgba(255, 255, 255, 0.03)
+    ),
+    /* Two faint streaks in the gloss. */
+    linear-gradient(
+      97deg,
+      rgba(255, 255, 255, 0) 12%,
+      rgba(255, 255, 255, 0.03) 22%,
+      rgba(255, 255, 255, 0) 32%,
+      rgba(255, 255, 255, 0) 56%,
+      rgba(255, 255, 255, 0.02) 66%,
+      rgba(255, 255, 255, 0) 76%
+    ),
+    /* The vinyl's grain, drawn out lengthwise. */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='24'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012 1.1' numOctaves='2' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0.16 0 0 0 -0.05'/%3E%3C/filter%3E%3Crect width='160' height='24' filter='url(%23g)'/%3E%3C/svg%3E") 0 0 / 160px 24px repeat,
+    var(--dymo-tape);
+  /* The tape's thickness (a lit top edge, a dark bottom one, its side),
+     its shadow, and its ends lifting a little off the panel. */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.7),
+    0 1px 0 #000,
+    var(--dymo-shadow),
+    0 2px 3px -0.5px rgba(0, 0, 0, 0.38),
+    3px 2.5px 3px -2px rgba(0, 0, 0, 0.35);
+  color: var(--dymo-letter);
+  font: 400 16px / 1 var(--font-tape);
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  /* Raised: lit on top, shadowed under; and stress-whitened, the
+     stretched plastic's soft bloom. */
+  text-shadow:
+    0 -0.9px 0 rgba(255, 255, 255, 0.7),
+    0 1.2px 0.3px rgba(0, 0, 0, 1),
+    0 2px 1.4px rgba(0, 0, 0, 0.6),
+    0 0 1.8px rgba(255, 255, 255, 0.34),
+    0 0 3.5px rgba(255, 255, 255, 0.1);
+  white-space: nowrap;
+}
+
+/* Each letter as the die struck it: a hair off the baseline, a hair
+   leaning, the same every load. Only where pixels are fine enough to
+   show it. */
+.dymo-letter {
+  display: inline-block;
+}
+
+@media (min-resolution: 2dppx) {
+  .dymo-letter {
+    transform: translateY(var(--drop, 0)) rotate(var(--tilt, 0));
+  }
+}
+
 /* Voice tops the left column, under the title bar's rule (no rule of
    its own), level with the operator panel's head on the right. */
 .inst-alg-head {

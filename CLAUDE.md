@@ -598,7 +598,11 @@ ends, labelled as the readouts are; a dot at Start and at each part's
 end dragging up and down only), and eight knobs in a row: Start,
 Attack, Peak, Decay 1, Break, Decay 2, Sustain, Release (pitches two-sided, ±48 st; speeds log in st/s).
 `formatPitchBend` writes a bend in cents under a semitone, else in
-semitones; `formatGlideSpeed` a speed in st/s. On the right the operator
+semitones; `formatGlideSpeed` a speed in st/s. Voice, Operators and the
+keyboard's Octave are labelled on Dymo tape (`tapeLabel`: each letter a
+span with the die's fixed tiny drop and tilt from the word, `strike`,
+shown at 2x pixels and finer; the word once more for screen readers).
+On the right the operator
 panel (`#voice-envelope`) alone, the showing tab's curve filling it. Each
 screen keeps its box, and its glass, the canvas, sits 7px inside a
 molded bezel (`.screen-bezel`; the diagram's and spectrum's
@@ -670,7 +674,10 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
   the light behind those keys, and cyan stays the glass displays'
   colour. The sandbox's large screens sit in molded black bezels, the
   tab strips' plastic (Jeremy, 2026-10-21); the operator table's small
-  glass has none.
+  glass has none. The sandbox's Voice, Operators and Octave labels are on
+  black Dymo embossing tape (`ui/dymo.ts`, `--dymo-*`; Jeremy,
+  2026-10-21): a drawn object, the same in either theme but its edge,
+  its white letters not `--ink`.
 - Red means negative phase and nothing else: controls and the focus ring
   are ink. Never let phase rest on colour alone; a negative stem also gets
   a hollow marker. In the sandbox's VFD spectrum, a negative stem is
@@ -684,7 +691,9 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
   `src/main.ts`): `--font-display` (Fraunces 600: wordmark and headings),
   `--font-sans` (Figtree 400 to 700, italic for figure captions:
   everything else), `--font-mono` (IBM Plex Mono: numbers, with tabular
-  figures; `.num`). A weight that is not imported there is not available.
+  figures; `.num`), `--font-tape` (Barlow Condensed 400: the sandbox's
+  Dymo tape labels only). A weight that is not imported there is not
+  available.
 - A canvas has no CSS: draw code reads the tokens with `getComputedStyle`
   and whoever mounts it must redraw on resize, theme change and
   `document.fonts.ready` (`mountFigure` in `src/ui/figures.ts` does).
