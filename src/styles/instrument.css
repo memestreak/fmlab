@@ -2066,10 +2066,13 @@ canvas.voice-keys {
     display: flex;
     flex: 1 1 auto;
     flex-direction: column;
-    /* The three chassis an even 10px apart. */
-    gap: 10px;
+    /* Half the room under the title bar it had (Jeremy, 2026-10-21):
+       0.875rem with the masthead's margin, not 1.75rem; the half freed
+       shared between the panels' two gaps, which are equal, 5px +
+       0.6875rem (16.7px) each, so the page's heights are unchanged. */
+    gap: calc(5px + 0.6875rem);
     min-height: 0;
-    padding: 1rem 0 0.5rem;
+    padding: 0.125rem 0 calc(5px + 0.6875rem);
   }
 
   .inst-top {
@@ -2263,8 +2266,16 @@ canvas.voice-keys {
     height: 1.75rem;
   }
 
+  /* Under 52rem high: 0.675rem under the title bar, half its 1.35rem,
+     and the freed half shared between the gaps, 5px + 0.5875rem each. */
+  [data-view='instrument'] .masthead {
+    margin-bottom: 0.675rem;
+  }
+
   .inst-body {
-    padding-top: 0.6rem;
+    gap: calc(5px + 0.5875rem);
+    padding-top: 0;
+    padding-bottom: calc(5px + 0.5875rem);
   }
 
   .inst-left {
