@@ -153,7 +153,9 @@ figures subscribe to it. Nothing else passes values around.
   and bank B fmlab's own 32 ("B1 TINE PIANO" to "B32 WIND",
   `fmlabVoices.ts`, `FMLAB_VOICES`; hint "fmlab's own TINE PIANO", no
   note, played whole), in one dropdown that is the page's heading (its
-  group named Presets for screen readers), each bank an optgroup, with
+  group named Presets for screen readers), listing only the lit bank's
+  32 under that bank's name, its one optgroup (a bank key swaps the
+  list; Jeremy, 2026-10-21), with
   ‹ › either side that step round the lit bank's 32 from the voice last
   chosen (`presetMenu`, `stepInBank`; Jeremy, 2026-10-18) and a short
   note for the chosen voice ("approximate · no velocity"; `note`), unseen
@@ -594,7 +596,11 @@ Jeremy approved it on 2026-10-18: "the existing app, just full page and
 with a better looking keyboard", six operators only): no text column;
 the masthead is its title bar (Jeremy, 2026-10-20, "more stand alone"):
 the wordmark (home), then in the place of Contents, which the sandbox
-hides with the crumb, the bank keys A | B (the tabs' push keys with
+hides with the crumb, the preset group, centred between the wordmark
+and Volume (Jeremy, 2026-10-21; the page's own centre line leaves it no
+room at 1440 and 1280 wide), the name's box as wide as the widest name
+so nothing in it moves from voice to voice: "Preset" on Dymo tape as
+Volume's, its visible label, then the bank keys A | B (the tabs' push keys with
 their jewel lamps in one bezel, as LIN | EXP; a radio group named Bank,
 each key named "Bank A: DX7 factory voices © Yamaha" or "Bank B: fmlab
 voices"; chosen on the press, arrows between; lit for the shown voice's
@@ -602,7 +608,7 @@ bank, or the last chosen's once Edited; a key loads the voice last
 chosen in its bank, A11 E.PIANO 1 and B1 TINE PIANO at first, a preset
 change that glitches the screens; space and the note keys still play
 with one focused; the bank is in neither the link nor storage; on a
-phone they lead the presets on a line of their own), then the preset
+phone they lead the presets on a line of their own, after the tape), then the preset
 menu as the title: the name chosen in
 the display face at 1.45rem with no box (`.preset-name`), the native
 menu over it unseen in the page's own type, so the list it opens is the
@@ -638,7 +644,7 @@ the computer key that plays each piano key, small at its foot), Wheel
 (Page, Reverse) and Theme (the masthead switch's choice, kept in step);
 `applySettings` sets them on `<html>` (`data-motion`, `data-tips`,
 `data-zx`, `data-note-names`, `data-computer-keys`) for the CSS. On a
-phone the key sits on Volume's line. Chapters have neither the key nor
+phone the key and the glossary share the line under Volume's. Chapters have neither the key nor
 the settings. Their containers
 (`#inst-dx7-presets` in a group named Presets, `#inst-tools`) are in the
 masthead's markup and shown on the sandbox only; `PLACES` moves the
@@ -699,7 +705,7 @@ Attack, Peak, Decay 1, Break, Decay 2, Sustain, Release (pitches two-sided, ±48
 semitones; `formatGlideSpeed` a speed in st/s. Where a row's values on
 the screen would touch (the LFO's six at 1280 wide), `drawValueStrip`
 sets them a size smaller. Voice, Operators, the keyboard's Octave and
-Mod, and the masthead's Volume, five labels, are on Dymo tape
+Mod, and the masthead's Preset and Volume, six labels, are on Dymo tape
 (`tapeLabel`: each letter a span in the word's own case, the tape's CSS
 setting it in capitals, with the die's fixed tiny drop and tilt from
 the word, `strike`, shown at 2x pixels and finer; the word once more for
@@ -746,7 +752,8 @@ nothing scrolls, at 1440 × 900 and 1280 × 800; the figures' captions are
 for screen readers only there, and under 52rem high the rows, drawings,
 knobs and gaps tighten. Below 62rem it is one column: the masthead
 wraps, the wordmark and the theme, then the presets row (the name at
-1.25rem), then Volume and the glossary; the keyboard
+1.25rem), then Volume on a line of its own, then Settings and the
+glossary; the keyboard
 and the spectrum over it docked to the screen's foot in the chassis, the
 full width and square (the spectrum, then the octave control and the
 wheel without their tapes, then the keys), the operator panel
@@ -792,7 +799,7 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
   and the spectrum let into it; the felt under its rail is charcoal, not
   red, because red is reserved for negative phase. The mod wheel's drum
   is black rubber, its index line painted white, and its bar a VFD.
-  The sandbox's Voice, Operators, Octave, Mod and Volume labels are on
+  The sandbox's Voice, Operators, Octave, Mod, Preset and Volume labels are on
   black Dymo embossing tape (`ui/dymo.ts`, `--dymo-*`; Jeremy,
   2026-10-21): a drawn object, the same in either theme but its edge,
   its white letters not `--ink`.

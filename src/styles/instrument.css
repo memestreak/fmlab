@@ -57,8 +57,15 @@ body:not([data-view='instrument']) #inst-tools {
   display: inline-flex;
   flex: none;
   align-items: center;
+  justify-content: center;
   min-height: 2.25rem;
-  border-bottom: 2px solid transparent;
+}
+
+/* In the sandbox the name's box is as wide as the widest voice's name
+   (A25 ORCH-CHIME), the name centred in it, so the keys either side
+   hold still from voice to voice. */
+[data-view='instrument'] .preset-pick {
+  width: 14.8rem;
 }
 
 .preset-name {
@@ -81,8 +88,12 @@ body:not([data-view='instrument']) #inst-tools {
 
 /* Focused, as pointed at: the ink line under the name, no box round it
    (Jeremy, 2026-10-20: the box was distracting). */
-.preset-pick:hover,
-.preset-pick:has(.preset-menu:focus) {
+.preset-name {
+  border-bottom: 2px solid transparent;
+}
+
+.preset-pick:hover .preset-name,
+.preset-pick:has(.preset-menu:focus) .preset-name {
   border-bottom-color: var(--ink);
 }
 
@@ -943,6 +954,30 @@ body:not([data-view='instrument']) #inst-tools {
   align-items: center;
   gap: 0.6rem;
   min-width: 0;
+}
+
+/* The preset group (its tape, A | B, ‹ name ›) centred in the title bar
+   between the wordmark and Volume (Jeremy, 2026-10-21: the page's own
+   centre line leaves it no room at 1440 and 1280 wide). Both sides are
+   of fixed width, so it holds still. */
+@media (min-width: 62rem) {
+  [data-view='instrument'] .masthead .inst-presets {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  [data-view='instrument'] .inst-row #inst-dx7-presets,
+  [data-view='instrument'] .inst-row .presets:has(.preset-menu) {
+    flex: none;
+  }
+}
+
+[data-view='instrument'] .inst-tools .slider-row output {
+  min-width: 2.6em;
+}
+
+.preset-tape {
+  flex: none;
 }
 
 /* The bank keys, A | B, and the preset steps ‹ ›, each in a bezel of
@@ -2200,6 +2235,17 @@ canvas.voice-keys {
 
   .preset-name {
     font-size: 1.25rem;
+  }
+
+  /* The widest name at this size. */
+  [data-view='instrument'] .preset-pick {
+    width: 12.9rem;
+  }
+
+  /* Volume has the line to itself, so its fader keeps its length;
+     Settings and the glossary go on the line under it. */
+  [data-view='instrument'] .masthead .inst-tools {
+    flex-basis: 100%;
   }
 
   [data-view='instrument'] .inst-tools {

@@ -29,6 +29,7 @@ import {
 } from '../chapters/terms';
 import type { Preset, PresetBank } from '../chapters';
 import { FACTORY_CREDIT } from '../chapters/dx7Voices';
+import { tapeLabel } from './dymo';
 import type { LabState, LabStore } from '../model/lab';
 import { mountInstrument } from './instrument';
 import { glitchScreens, topScreens } from './screenGlitch';
@@ -503,16 +504,21 @@ function presetMenu(presets: readonly Preset[], banks: readonly PresetBank[], st
     element.textContent = preset.label;
     return element;
   };
-  // Each bank's voices under its name, which the open list shows as its
-  // group's name: Yamaha's voices credited without a line of their own on
-  // the page. Without banks, the voices under the factory credit.
-  const groups = (banks.length > 0 ? banks : [{ id: undefined, name: FACTORY_CREDIT }]).map(bank => {
-    const group = document.createElement('optgroup');
-    group.label = bank.name;
-    group.append(...presets.flatMap((preset, i) => (preset.bank === bank.id ? [option(preset, i)] : [])));
-    return group;
-  });
-  select.append(edited, ...groups);
+  // The lit bank's voices only (Jeremy, 2026-10-21), under its name, which
+  // the open list shows as its group's name: Yamaha's voices credited
+  // without a line of their own on the page. A bank key swaps the list.
+  // Without banks, every voice under the factory credit.
+  const group = document.createElement('optgroup');
+  let listed: string | undefined | null = null;
+  const list = (bankId: string | undefined) => {
+    if (listed === bankId) return;
+    listed = bankId;
+    group.label = banks.find(bank => bank.id === bankId)?.name ?? FACTORY_CREDIT;
+    group.replaceChildren(
+      ...presets.flatMap((preset, i) => (banks.length === 0 || preset.bank === bankId ? [option(preset, i)] : [])),
+    );
+  };
+  select.append(edited, group);
   const note = document.createElement('span');
   note.className = 'preset-note';
   note.id = 'preset-note';
@@ -603,6 +609,7 @@ function presetMenu(presets: readonly Preset[], banks: readonly PresetBank[], st
       const bank = presets[at].bank;
       if (bank) lastIn.set(bank, at);
     }
+    list(presets[at >= 0 ? at : last]?.bank);
     select.value = at < 0 ? '' : String(at);
     edited.hidden = at >= 0;
     // What the voice plays without, for a screen reader and in the tip.
@@ -669,8 +676,15 @@ function presetMenu(presets: readonly Preset[], banks: readonly PresetBank[], st
   const lineBreak = document.createElement('span');
   lineBreak.className = 'preset-break';
   lineBreak.setAttribute('aria-hidden', 'true');
+  // The group's visible label, on Dymo tape as Volume's (Jeremy,
+  // 2026-10-21); its name for screen readers is the group's own.
+  const tape = document.createElement('span');
+  tape.className = 'preset-tape';
+  tape.textContent = 'Preset';
+  tape.setAttribute('aria-hidden', 'true');
+  tapeLabel(tape);
   return [
-    ...(banks.length > 0 ? [bankGroup, lineBreak] : []),
+    ...(banks.length > 0 ? [tape, bankGroup, lineBreak] : []),
     step('Previous preset', '‹', -1),
     pick,
     step('Next preset', '›', 1),
