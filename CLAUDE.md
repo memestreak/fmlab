@@ -624,13 +624,15 @@ focused the arrows step it the same way, up and left back, down and
 right on, and Enter opens its list); its note, what
 the voice plays without, is not shown but is the menu's description for
 screen readers and follows the credit in the name's tip; then Volume, the
-Settings key, the glossary and the theme. The Settings key
+Settings key and the theme; no glossary link (Jeremy, 2026-10-21: the
+chapters keep theirs). The Settings key
 (`ui/settingsPanel.ts`, `mountSettings`; Jeremy, 2026-10-21, "the
 function panel, named SETTINGS") is one lamp key in its own bezel, lit
 while its panel is open (`aria-pressed`, `aria-expanded`), worked on
 the press; the panel a modal `<dialog>` named Settings, a console of
 the chassis's black plastic the same in either theme over a page dimmed
-35 %: "Settings" on Dymo tape and a Close key, a VFD screen in a molded
+35 %: "Settings" on Dymo tape and a Close key (a push key with no lamp: it
+has no state to show), a VFD screen in a molded
 bezel listing the eight settings one line each (group dim, name, value;
 the selected line lit behind with a bar at its left; a listbox: Up and
 Down, Left and Right change the value, Enter and Space the next choice,
@@ -647,7 +649,8 @@ the computer key that plays each piano key, small at its foot), Wheel
 (Page, Reverse) and Theme (the masthead switch's choice, kept in step);
 `applySettings` sets them on `<html>` (`data-motion`, `data-tips`,
 `data-zx`, `data-note-names`, `data-computer-keys`) for the CSS. On a
-phone the key and the glossary share the line under Volume's. Chapters have neither the key nor
+phone the key has the line under Volume's (beside it the fader would
+be too short to use). Chapters have neither the key nor
 the settings. Their containers
 (`#inst-dx7-presets` in a group named Presets, `#inst-tools`) are in the
 masthead's markup and shown on the sandbox only; `PLACES` moves the
@@ -770,8 +773,7 @@ nothing scrolls, at 1440 × 900 and 1280 × 800; the figures' captions are
 for screen readers only there, and under 52rem high the rows, drawings,
 knobs and gaps tighten. Below 62rem it is one column: the masthead
 wraps, the wordmark and the theme, then the presets row (the name at
-1.25rem), then Volume on a line of its own, then Settings and the
-glossary; the keyboard
+1.25rem), then Volume on a line of its own, then Settings; the keyboard
 and the spectrum over it docked to the screen's foot in the chassis, the
 full width and square (the spectrum, then the octave control and the
 wheel without their tapes, then the keys), the operator panel
@@ -867,6 +869,18 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
   Light, Dark and saves the bare word under
   `localStorage["fmlab.theme"]`. The boot script in `index.html` reads the
   same key; keep it in step with `src/model/theme.ts`.
+- Focus rings are for the keyboard: every focus style is on
+  `:focus-visible`, never `:focus`, so a click, a tap or a drag leaves
+  none; Tab still rings every control. A browser also turns
+  `:focus-visible` on for a clicked control as soon as any key is
+  pressed, so in the sandbox `ui/focusSource.ts` marks `<html>` with
+  `data-focus` (pointer or keyboard, set when focus arrives; only Tab
+  counts as keyboard), and the rings, the preset name's underline, the
+  algorithm's glass ring and the Z X hint show only for keyboard focus:
+  playing the keys after clicking a slider leaves it unringed. The sandbox is an instrument,
+  not a page to read: nothing on it is selected by a double click or a
+  drag (`user-select: none` on its body), and a tap leaves no flash
+  (Jeremy, 2026-10-21). The chapters' text stays selectable.
 - The space bar is Play / Stop on every page, including stopping a note
   that is sounding. It is left alone on a button, link, checkbox, maths
   panel or anything typed into; on a slider, where space means nothing,

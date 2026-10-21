@@ -40,6 +40,7 @@ import { mountPiano } from './ui/piano';
 import { mountSliders } from './ui/sliders';
 import { mountSteps } from './ui/steps';
 import { mountTerms } from './ui/terms';
+import { trackFocusSource } from './ui/focusSource';
 import { mountSettings } from './ui/settingsPanel';
 import { mountThemeSwitch } from './ui/themeSwitch';
 import { mountVoiceTable } from './ui/voiceTable';
@@ -126,6 +127,9 @@ if (theme) mountThemeSwitch(theme, store);
 
 // The sandbox's Settings key and panel, and what the settings govern.
 mountSettings(store);
+
+// Focus rings only for focus the keyboard moved.
+trackFocusSource();
 
 const commit = document.querySelector<HTMLElement>('#commit');
 if (commit) mountCommitHash(commit);

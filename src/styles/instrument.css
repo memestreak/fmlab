@@ -22,6 +22,27 @@
    place of Contents, then Volume, the glossary and the theme. Elsewhere
    the two are not there. The page's title, "Sandbox", is for screen
    readers only. */
+/* An instrument, not a page of text (Jeremy, 2026-10-21): nothing in
+   it is selected by a double click or a drag, and a tap leaves no flash.
+   Focus rings are for the keyboard only (:focus-visible), everywhere. */
+/* And only while focus came from the keyboard (ui/focusSource.ts): a
+   control the pointer focused stays unringed when a key is played. */
+:root[data-focus='pointer'] body[data-view='instrument'] :focus-visible {
+  outline: none;
+}
+
+body[data-view='instrument'] {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* No glossary link in the sandbox's title bar (Jeremy, 2026-10-21): the
+   chapters keep theirs. */
+[data-view='instrument'] .masthead .guide-link {
+  display: none;
+}
+
 body:not([data-view='instrument']) .inst-presets,
 body:not([data-view='instrument']) #inst-tools {
   display: none;
@@ -93,7 +114,7 @@ body:not([data-view='instrument']) #inst-tools {
 }
 
 .preset-pick:hover .preset-name,
-.preset-pick:has(.preset-menu:focus) .preset-name {
+:root:not([data-focus='pointer']) .preset-pick:has(.preset-menu:focus-visible) .preset-name {
   border-bottom-color: var(--ink);
 }
 
@@ -935,7 +956,7 @@ body:not([data-view='instrument']) #inst-tools {
   cursor: pointer;
 }
 
-#inst-algorithm:has(#algorithm:focus-visible:not([data-pointer])) .inst-alg-vfd {
+:root:not([data-focus='pointer']) #inst-algorithm:has(#algorithm:focus-visible:not([data-pointer])) .inst-alg-vfd {
   outline: 2px solid var(--ink);
   outline-offset: 2px;
 }
@@ -1730,7 +1751,7 @@ canvas.voice-keys {
   transition: opacity 0.15s;
 }
 
-.piano:has(:focus-visible) .piano-oct-hint {
+:root:not([data-focus='pointer']) .piano:has(:focus-visible) .piano-oct-hint {
   opacity: 1;
 }
 
@@ -2685,6 +2706,15 @@ body:not([data-view='instrument']) .inst-settings {
 
 .settings-panel::backdrop {
   background: rgba(0, 0, 0, 0.35);
+}
+
+/* Close has no state to show, so no lamp: a plain push key. */
+[data-view='instrument'] .settings-close {
+  padding: 0 0.75rem;
+}
+
+[data-view='instrument'] .settings-close::before {
+  display: none;
 }
 
 .settings-head {
