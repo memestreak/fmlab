@@ -241,6 +241,53 @@ body:not([data-view='instrument']) #inst-tools {
   --vfd-panel-edge: transparent;
 }
 
+/* Voice, Operators and Octave on black embossing tape, as a Dymo label
+   maker strikes them (Jeremy, 2026-10-21; ui/dymo.ts): white capitals
+   raised on one baseline under a gloss, square ends. A drawn object, the
+   same in either theme but its edge; its letters are not ink. */
+[data-view='instrument'] .dymo {
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  width: max-content;
+  height: 24px;
+  margin: 0;
+  padding: 0 0.55em 0 0.6em;
+  border-radius: 1.5px;
+  background:
+    linear-gradient(
+      rgba(255, 255, 255, 0.22),
+      rgba(255, 255, 255, 0.06) 22%,
+      rgba(255, 255, 255, 0) 40%,
+      rgba(255, 255, 255, 0) 75%,
+      rgba(255, 255, 255, 0.07)
+    ),
+    var(--dymo-tape);
+  box-shadow: var(--dymo-shadow);
+  color: var(--dymo-letter);
+  font: 600 16px / 1 var(--font-tape);
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  text-shadow:
+    0 0.8px 0 rgba(0, 0, 0, 0.65),
+    0 -0.6px 0 rgba(255, 255, 255, 0.35),
+    0 0 1.5px rgba(255, 255, 255, 0.25);
+  white-space: nowrap;
+}
+
+/* Each letter as the die struck it: a hair off the baseline, a hair
+   leaning, the same every load. Only where pixels are fine enough to
+   show it. */
+.dymo-letter {
+  display: inline-block;
+}
+
+@media (min-resolution: 2dppx) {
+  .dymo-letter {
+    transform: translateY(var(--drop, 0)) rotate(var(--tilt, 0));
+  }
+}
+
 /* Voice tops the left column, under the title bar's rule (no rule of
    its own), level with the operator panel's head on the right. */
 .inst-alg-head {

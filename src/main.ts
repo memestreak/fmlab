@@ -13,6 +13,8 @@ import '@fontsource/figtree/latin-700-italic.css';
 import '@fontsource/ibm-plex-mono/latin-400.css';
 import '@fontsource/ibm-plex-mono/latin-500.css';
 import '@fontsource/ibm-plex-mono/latin-600.css';
+// The sandbox's Dymo tape labels.
+import '@fontsource/barlow-condensed/latin-600.css';
 import './styles/tokens.css';
 import './styles/base.css';
 import './styles/instrument.css';
@@ -33,6 +35,7 @@ import { mountPitchEgView } from './ui/pitchEgView';
 import { mountFigures } from './ui/figures';
 import { mountAlgorithmSteps, mountFeedbackKnob } from './ui/instrument';
 import { mountOperators } from './ui/operators';
+import { tapeLabel } from './ui/dymo';
 import { mountPiano } from './ui/piano';
 import { mountSliders } from './ui/sliders';
 import { mountSteps } from './ui/steps';
@@ -96,6 +99,11 @@ if (play) mountPlayButton(play, store);
 const piano = document.querySelector<HTMLElement>('#piano');
 if (piano) {
   mountPiano(piano, store, () => chapterById(store.get().chapter)?.hasPiano === true);
+}
+
+// The sandbox's Voice, Operators and Octave labels, on Dymo tape.
+for (const selector of ['.inst-section-title', '#voice-heading', '.piano-oct-label']) {
+  tapeLabel(document.querySelector(selector));
 }
 
 const toggle = document.querySelector<HTMLButtonElement>('#controls-toggle');
