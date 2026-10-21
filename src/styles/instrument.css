@@ -257,22 +257,22 @@ body:not([data-view='instrument']) #inst-tools {
   /* Cut square, as the machine's cutter leaves it. */
   border-radius: 0;
   background:
-    /* The gloss. */
+    /* The gloss, kept faint (Jeremy, 2026-10-21). */
     linear-gradient(
-      rgba(255, 255, 255, 0.2),
-      rgba(255, 255, 255, 0.06) 22%,
+      rgba(255, 255, 255, 0.09),
+      rgba(255, 255, 255, 0.025) 22%,
       rgba(255, 255, 255, 0) 40%,
       rgba(255, 255, 255, 0) 75%,
-      rgba(255, 255, 255, 0.07)
+      rgba(255, 255, 255, 0.03)
     ),
     /* Two faint streaks in the gloss. */
     linear-gradient(
       97deg,
       rgba(255, 255, 255, 0) 12%,
-      rgba(255, 255, 255, 0.07) 22%,
+      rgba(255, 255, 255, 0.03) 22%,
       rgba(255, 255, 255, 0) 32%,
       rgba(255, 255, 255, 0) 56%,
-      rgba(255, 255, 255, 0.05) 66%,
+      rgba(255, 255, 255, 0.02) 66%,
       rgba(255, 255, 255, 0) 76%
     ),
     /* The vinyl's grain, drawn out lengthwise. */
