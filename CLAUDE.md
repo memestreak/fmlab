@@ -804,7 +804,13 @@ the light silkscreen `--chassis-legend`; the number reels keep the
 page's own paper and ink (`--page-*`), and the screens' bezels are
 recesses in the plastic, as the spectrum's. On a phone they are the
 same panels stacked, the Voice column held to the panel's width.
-Under the band the operator table (`#voice-table`) the full width, then
+Under the band the operator table (`#voice-table`) the full width, its
+rows a little taller than they were (Jeremy, 2026-10-22: the table's
+panel is `flex: none` and the band flexes, so taller rows take room from
+both top screens alike): reels, faders and readouts 2.03rem (1.68rem
+under 52rem high), the VFD digits at most 22px (18px), the small
+drawings 2.2rem (1.68rem) and the body cells 0.25rem (0.15rem) top and
+bottom, rows of 46px at 1440 × 900 and 34px at 1280 × 800; then
 the foot (`.inst-foot`), one chassis of the tab strips' molded black
 plastic (Jeremy, 2026-10-21; rounded at the top, square at the foot, the
 same in both themes but its edge): the control panel and the keys on

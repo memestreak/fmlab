@@ -2216,6 +2216,28 @@ canvas.voice-keys {
     flex: none;
   }
 
+  /* The operator table's rows about 6px taller than they were, so the
+     table has a little more room and the two top screens, which take
+     what is left, a little less (Jeremy, 2026-10-22). */
+  .op-reel,
+  .op-vfd,
+  .inst .op-table .op-slider {
+    height: 2.03rem;
+  }
+
+  .op-vfd svg {
+    height: min(22px, 100%);
+  }
+
+  .voice-env-mini,
+  .voice-keys {
+    height: 2.2rem;
+  }
+
+  .inst .op-table tbody td {
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+  }
 
   .piano-bed {
     height: 9rem;
@@ -2256,17 +2278,23 @@ canvas.voice-keys {
   }
 
   .op-reel,
-  .op-vfd {
-    height: 1.4rem;
+  .op-vfd,
+  .inst .op-table .op-slider {
+    height: 1.68rem;
   }
 
-  .inst .op-table .op-slider {
-    height: 1.4rem;
+  .op-vfd svg {
+    height: min(18px, 100%);
   }
 
   .inst .op-table th,
   .inst .op-table td {
     padding: 0.1rem 0.3rem;
+  }
+
+  .inst .op-table tbody td {
+    padding-top: 0.15rem;
+    padding-bottom: 0.15rem;
   }
 
   .inst-voice-tab {
@@ -2279,7 +2307,7 @@ canvas.voice-keys {
 
   .voice-env-mini,
   .voice-keys {
-    height: 1.4rem;
+    height: 1.68rem;
   }
 
 
