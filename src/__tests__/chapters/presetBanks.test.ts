@@ -88,15 +88,25 @@ describe('the sandbox\'s two banks', () => {
     expect(move('ArrowRight', 2)).toBe(10);
     expect(move('ArrowRight', 24)).toBe(32);
     expect(move('ArrowRight', 31)).toBe(39);
-    expect(move('ArrowRight', 63)).toBe(7);
     expect(move('ArrowLeft', 0)).toBe(56);
-    expect(move('ArrowLeft', 33)).toBe(25);
+    const shownB = { first: 32, last: 63 };
+    expect(gridMove('ArrowRight', 63, presets.length, 8, shownB)).toBe(7);
+    expect(gridMove('ArrowLeft', 33, presets.length, 8, shownB)).toBe(25);
     // On a phone, two columns of 16.
     expect(move('ArrowRight', 20, 16)).toBe(36);
     // Home and End: the shown bank's first and last.
     expect(move('Home', 20)).toBe(0);
     expect(move('End', 20)).toBe(31);
     expect(move('Enter', 20)).toBeNull();
+  });
+
+  it('starts in the shown bank when the voice playing is in the other', () => {
+    // A11 playing, bank B shown: on to B1, back to B32, whichever key.
+    const shownB = { first: 32, last: 63 };
+    for (const key of ['ArrowDown', 'ArrowRight']) expect(gridMove(key, 10, presets.length, 8, shownB)).toBe(32);
+    for (const key of ['ArrowUp', 'ArrowLeft']) expect(gridMove(key, 10, presets.length, 8, shownB)).toBe(63);
+    // Once a voice in the shown bank plays, on across the banks as before.
+    expect(gridMove('ArrowDown', 63, presets.length, 8, shownB)).toBe(0);
   });
 
   it('opens the window on the playing voice\'s bank, or once edited the last chosen\'s', () => {

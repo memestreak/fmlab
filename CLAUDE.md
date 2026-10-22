@@ -643,7 +643,10 @@ voice loads it (both top screens glitch) and the window stays open, so
 voices can be heard one after another. On the glass up and down go one
 voice, left and right a column of eight, keeping the row, all across the
 banks and round the ends (A25 right to B1, B32 down to A1), Home and End
-the shown bank's first and last (`gridMove`); each loads its voice.
+the shown bank's first and last (`gridMove`); each loads its voice. With
+the other bank shown than the voice playing's (or, once Edited, the last
+chosen's), the arrows and ‹ › start in the shown bank: on to its first,
+back to its last (Jeremy, 2026-10-22).
 Whenever the glass turns to the other bank, by a bank key or a step
 across, it glitches as the top screens do, alongside theirs. Enter
 closes, keeping the voice; so do Close, Esc, a press and release both on

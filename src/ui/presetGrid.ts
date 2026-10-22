@@ -16,11 +16,14 @@ export function stepPreset(at: number, steps: number, count: number): number {
 }
 
 /**
- * Where a key on the window's glass goes from voice `at`, of `count` in
- * all, the shown bank's voices `first` to `last` in columns of `rows`:
- * up and down one voice, left and right a column (keeping the row), all
- * across the banks and round the ends; Home and End the shown bank's
- * first and last. Null for any other key.
+ * Where a key on the window's glass goes from voice `at` (the one
+ * playing, or the last chosen once edited), of `count` in all, the shown
+ * bank's voices `first` to `last` in columns of `rows`: up and down one
+ * voice, left and right a column (keeping the row), all across the banks
+ * and round the ends; Home and End the shown bank's first and last. From
+ * a voice not in the shown bank, a key going on starts at the shown
+ * bank's first and one going back at its last (Jeremy, 2026-10-22). Null
+ * for any other key. The window's ‹ › are ArrowUp and ArrowDown.
  */
 export function gridMove(
   key: string,
@@ -30,7 +33,10 @@ export function gridMove(
   shown: { first: number; last: number },
 ): number | null {
   const by = { ArrowUp: -1, ArrowDown: 1, ArrowLeft: -rows, ArrowRight: rows }[key];
-  if (by !== undefined) return stepPreset(at, by, count);
+  if (by !== undefined) {
+    if (at < shown.first || at > shown.last) return by > 0 ? shown.first : shown.last;
+    return stepPreset(at, by, count);
+  }
   if (key === 'Home') return shown.first;
   if (key === 'End') return shown.last;
   return null;

@@ -1,6 +1,6 @@
 import type { Preset, PresetBank } from '../chapters/types';
 import { inSandbox } from './motion';
-import { bankVoices, gridMove, openingBank, stepPreset } from './presetGrid';
+import { bankVoices, gridMove, openingBank } from './presetGrid';
 import { glitchScreens } from './screenGlitch';
 
 // The sandbox's preset window (Jeremy, 2026-10-22, "more consistent with
@@ -122,7 +122,10 @@ export function mountPresetPanel({ presets, banks, playing, last, choose, opener
     button.className = 'chooser-key';
     button.textContent = glyph;
     button.setAttribute('aria-label', label);
-    const go = () => load(stepPreset(last(), by, presets.length));
+    const go = () => {
+      const to = move(by > 0 ? 'ArrowDown' : 'ArrowUp');
+      if (to !== null) load(to);
+    };
     button.addEventListener('pointerdown', event => {
       if (event.button === 0) go();
     });
@@ -182,6 +185,19 @@ export function mountPresetPanel({ presets, banks, playing, last, choose, opener
     legend.textContent = [bank?.name ?? credit, ...(note ? [note] : [])].join(' · ');
   };
 
+  /**
+   * Where a key goes: from the voice playing, or the last chosen once
+   * edited; from the shown bank's first or last if that is in the other.
+   */
+  const move = (key: string) => {
+    const voices = bankVoices(presets, shown);
+    const from = playing() >= 0 ? playing() : last();
+    return gridMove(key, from, presets.length, rowsNow(), {
+      first: voices[0] ?? 0,
+      last: voices.at(-1) ?? presets.length - 1,
+    });
+  };
+
   /** Turns the glass to `bank`, glitching it; the sound stays as it is. */
   const showBank = (bank: string | undefined) => {
     if (bank === shown) return;
@@ -214,12 +230,7 @@ export function mountPresetPanel({ presets, banks, playing, last, choose, opener
       shut();
       return;
     }
-    const voices = bankVoices(presets, shown);
-    const from = playing() >= 0 ? playing() : last();
-    const to = gridMove(event.key, from, presets.length, rowsNow(), {
-      first: voices[0] ?? 0,
-      last: voices.at(-1) ?? presets.length - 1,
-    });
+    const to = move(event.key);
     if (to === null) return;
     event.preventDefault();
     // The window's, not the page's.
