@@ -1,8 +1,12 @@
 import type { ViewId } from '../chapters/outline';
 import { type Envelope, envelopeAt } from '../dsp/envelope';
 import {
+  anchorAt,
   dbToAmp,
+  type Dx7Envelope,
+  type Dx7EnvelopeAnchor,
   dx7EnvelopeAt,
+  dx7EnvelopeFrom,
   type Dx7Lfo,
   type Dx7Note,
   dx7Note,
@@ -12,6 +16,7 @@ import {
   FLAT_PITCH_ENVELOPE,
   HELD_LFO,
   heldOperator,
+  keyAnchor,
   keyOf,
   levelAtKey,
 } from '../dsp/dx7';
@@ -114,6 +119,19 @@ export interface LabState {
    * them, are let go then.
    */
   noteHold: number;
+  /**
+   * Counts the voices loaded whole: a preset or a link. Notes already
+   * sounding keep the voice they were struck with; any other change to the
+   * sound is an edit, which reaches them too (Jeremy, 2026-10-22).
+   */
+  voiceLoads: number;
+  /**
+   * `dx7`: where edits made while the last note sounded found its
+   * envelopes, so the figures draw what is heard (dsp/dx7.ts); null until
+   * an edit. They belong to the note struck at `startedAt`, and mean
+   * nothing for any other.
+   */
+  noteAnchors: { startedAt: number; ops: Dx7EnvelopeAnchor[] } | null;
   /**
    * The sideband order (0 is the carrier, 1 the first pair, ...) being
    * pointed at or focused just now, in either linked figure; null for
@@ -229,6 +247,8 @@ export const DEFAULTS: LabState = {
   noteStartedAt: null,
   noteLength: 0,
   noteHold: Infinity,
+  voiceLoads: 0,
+  noteAnchors: null,
   hover: null,
   hoverOp: null,
   pinned: null,
@@ -265,7 +285,15 @@ export const DEFAULTS: LabState = {
 };
 
 export function createLabStore(initial: Partial<LabState> = {}): LabStore {
-  return createStore({ ...DEFAULTS, ...initial });
+  const store = createStore({ ...DEFAULTS, ...initial });
+  // An edit while the last note sounds: where its envelopes had got to,
+  // so the figures draw what the pool plays.
+  store.subscribe((state, previous) => {
+    if (!isLiveEdit(state, previous)) return;
+    const anchors = anchorsAfterEdit(previous, performance.now() / 1000);
+    if (anchors) store.set({ noteAnchors: anchors });
+  });
+  return store;
 }
 
 /**
@@ -335,7 +363,7 @@ export function operatorLevelsAt(state: LabState, time: number | undefined): num
     return state.dxOperators.map((op, i) => {
       const db = levelAtKey(op, key);
       if (db === null) return 0;
-      return dbToAmp(db) * (into === null ? 1 : dx7EnvelopeAt(envelopes[i], into, state.noteHold));
+      return dbToAmp(db) * (into === null ? 1 : noteEnvelopeAt(state, envelopes, i, into));
     });
   }
   if (into === null) return state.operators.map(op => op.level);
@@ -355,8 +383,53 @@ export function dx7KernelLevelsAt(state: LabState, time: number | undefined): nu
   const into = noteProgress(state, time);
   const note = dx7NoteOf(state);
   return Array.from(note.gains, (gain, op) =>
-    into === null ? gain : gain * dx7EnvelopeAt(note.envelopes[op], into, state.noteHold),
+    into === null ? gain : gain * noteEnvelopeAt(state, note.envelopes, op, into),
   );
+}
+
+/** The last note's edits, if any were made while it sounded. */
+function anchorsOf(state: LabState): Dx7EnvelopeAnchor[] | null {
+  const anchors = state.noteAnchors;
+  return anchors && anchors.startedAt === state.noteStartedAt ? anchors.ops : null;
+}
+
+/**
+ * `dx7`: operator `op`'s envelope `into` seconds into the last note, as
+ * heard: from its key, or from where the last edit found it.
+ */
+function noteEnvelopeAt(state: LabState, envelopes: readonly Dx7Envelope[], op: number, into: number): number {
+  const anchor = anchorsOf(state)?.[op];
+  return anchor
+    ? dx7EnvelopeFrom(envelopes[op], anchor, into, state.noteHold)
+    : dx7EnvelopeAt(envelopes[op], into, state.noteHold);
+}
+
+/** Whether a change from `previous` to `state` edits the sandbox's voice, live, as the pool hears it. */
+export function isLiveEdit(state: LabState, previous: LabState): boolean {
+  return (
+    state.voiceModel === 'dx7' &&
+    previous.voiceModel === 'dx7' &&
+    state.chapter === previous.chapter &&
+    state.voiceLoads === previous.voiceLoads &&
+    (state.dxOperators !== previous.dxOperators || state.dxFeedback !== previous.dxFeedback)
+  );
+}
+
+/**
+ * The last note's anchors after an edit made at `time` (on the page's
+ * clock) to `previous`, worked out as the pool does (dsp/voicePool.ts):
+ * where each envelope as it was had got to. Undefined when no note is
+ * sounding then.
+ */
+export function anchorsAfterEdit(previous: LabState, time: number): LabState['noteAnchors'] | undefined {
+  const into = noteProgress(previous, time);
+  if (into === null || previous.noteStartedAt === null) return undefined;
+  const before = dx7NoteOf(previous).envelopes;
+  const anchors = anchorsOf(previous);
+  return {
+    startedAt: previous.noteStartedAt,
+    ops: before.map((env, op) => anchorAt(env, anchors?.[op] ?? keyAnchor(), into, previous.noteHold)),
+  };
 }
 
 /** How long the operators take to fall silent once a note is let go. */

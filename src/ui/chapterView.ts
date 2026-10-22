@@ -376,7 +376,8 @@ export function mountChapters(store: LabStore): void {
           button.className = 'btn btn-quiet';
           button.textContent = preset.label;
           button.setAttribute('aria-label', `${preset.label}: ${preset.hint}`);
-          button.addEventListener('click', () => store.set(preset.patch));
+          // A new voice, not an edit: notes already sounding keep theirs.
+          button.addEventListener('click', () => store.set({ ...preset.patch, voiceLoads: store.get().voiceLoads + 1 }));
           return button;
         }),
       );
@@ -411,6 +412,8 @@ export function mountChapters(store: LabStore): void {
     store.set({
       chapter: chapter.id,
       ...openingFromUrl(chapter),
+      // A link's sound is a new voice, not an edit.
+      voiceLoads: store.get().voiceLoads + 1,
       hover: null,
       hoverOp: null,
       // The sandbox opens on OP1 selected, its envelope showing.
@@ -487,7 +490,8 @@ function presetMenu(presets: readonly Preset[], banks: readonly PresetBank[], st
     const preset = presets[at];
     if (!preset) return;
     last = at;
-    store.set(preset.patch);
+    // A new voice, not an edit: notes already sounding keep theirs.
+    store.set({ ...preset.patch, voiceLoads: store.get().voiceLoads + 1 });
     // Both top screens glitch together as the voice changes, each its own
     // kind, and with them the preset window's glass as it turns to the
     // other bank.

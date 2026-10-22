@@ -224,6 +224,104 @@ export function dx7PitchAt(env: Dx7PitchEnvelope, time: number, hold = Infinity)
   return glide(heldPitch(env, hold), env.start, env.release, time - hold);
 }
 
+/**
+ * Where a live edit found an envelope (Jeremy, 2026-10-22: edits reach
+ * notes already sounding): the part it was in, attack to release. The
+ * curve carries on from there with the envelope as edited, as msfa's Env
+ * does, rather than starting again from the key.
+ */
+export type EnvelopePart = 'attack' | 'decay1' | 'decay2' | 'sustain' | 'release';
+
+/** How long a live edit's glides take: gains, ratios, feedback, an anchored part at least. */
+export const LIVE_GLIDE_SECONDS = 0.02;
+
+/**
+ * Where a pitch envelope was when edited: `at` seconds after the key, at
+ * `cents`, in `part`. The anchor at the key (`at` 0, the attack) is the
+ * curve as struck, from the envelope's start, whatever `cents` says.
+ */
+export interface Dx7PitchAnchor {
+  at: number;
+  cents: number;
+  part: EnvelopePart;
+}
+
+/** The anchor every note is struck with: the curve from its key. */
+export function keyPitchAnchor(): Dx7PitchAnchor {
+  return { at: 0, cents: 0, part: 'attack' };
+}
+
+/** Scratch: the part the last walk of a held curve ended in. */
+let walkedPart: EnvelopePart = 'attack';
+const HELD_PARTS: readonly EnvelopePart[] = ['attack', 'decay1', 'decay2', 'sustain'];
+
+/**
+ * A held pitch envelope from `anchor`: on from its cents, each part a
+ * straight line at that part's speed towards that part's level, then the
+ * later parts as set. A part already passed in the direction it goes is
+ * over at once; the sustain heads for the sustain at the second decay's
+ * speed. The audio thread calls it every sample: it makes nothing new.
+ */
+function heldPitchFrom(env: Dx7PitchEnvelope, anchor: Dx7PitchAnchor, time: number): number {
+  let t = time - anchor.at;
+  let i = HELD_PARTS.indexOf(anchor.part);
+  let cents = anchor.at === 0 && anchor.part === 'attack' ? env.start : anchor.cents;
+  for (; i < 3; i++) {
+    const start = i === 0 ? env.start : i === 1 ? env.peak : env.brk;
+    const end = i === 0 ? env.peak : i === 1 ? env.brk : env.sustain;
+    const speed = i === 0 ? env.attack : i === 1 ? env.decay1 : env.decay2;
+    if (cents === end) continue;
+    // Passed: an edit left the pitch beyond where this part was going.
+    if (start !== end && (end - cents) * Math.sign(end - start) < 0) continue;
+    const length = glideSeconds(cents, end, speed);
+    if (t < length) {
+      walkedPart = HELD_PARTS[i];
+      return cents + ((end - cents) * t) / length;
+    }
+    t -= length;
+    cents = end;
+  }
+  walkedPart = 'sustain';
+  return glide(cents, env.sustain, env.decay2, t);
+}
+
+/**
+ * The pitch envelope, in cents, `time` seconds into a note let go at
+ * `hold`, carried on from `anchor` with `env` as it is now. From the
+ * anchor at the key it is exactly `dx7PitchAt`. Let go, it glides from
+ * wherever it had got to back to start at the release speed; an anchor
+ * in the release glides from its own cents.
+ */
+export function dx7PitchFrom(env: Dx7PitchEnvelope, anchor: Dx7PitchAnchor, time: number, hold = Infinity): number {
+  if (time <= 0) return env.start;
+  if (anchor.at === 0 && anchor.part === 'attack') return dx7PitchAt(env, time, hold);
+  if (anchor.part === 'release') return glide(anchor.cents, env.start, env.release, time - anchor.at);
+  if (time <= hold) return heldPitchFrom(env, anchor, time);
+  return glide(heldPitchFrom(env, anchor, Math.max(hold, anchor.at)), env.start, env.release, time - hold);
+}
+
+/**
+ * The anchor a pitch envelope edited at `time` carries on from: where the
+ * curve as it was (`env` from `anchor`) had got to, and in which part.
+ * Written into `into` if given, so the audio thread makes nothing new.
+ */
+export function pitchAnchorAt(
+  env: Dx7PitchEnvelope,
+  anchor: Dx7PitchAnchor,
+  time: number,
+  hold = Infinity,
+  into: Dx7PitchAnchor = keyPitchAnchor(),
+): Dx7PitchAnchor {
+  const cents = dx7PitchFrom(env, anchor, time, hold);
+  const released = anchor.part === 'release' || time > hold;
+  if (!released && time > 0) heldPitchFrom(env, anchor, time);
+  const part: EnvelopePart = released ? 'release' : time <= 0 ? 'attack' : walkedPart;
+  into.at = Math.max(0, time);
+  into.cents = cents;
+  into.part = part;
+  return into;
+}
+
 /** One of the sandbox's six operators. */
 export interface Dx7Operator {
   ratio: number;
@@ -294,6 +392,138 @@ export function dx7EnvelopeAt(env: Dx7Envelope, time: number, hold = Infinity): 
   const from = ampToDb(heldAmp(env, hold));
   const speed = -SILENCE_DB / Math.max(MIN_STAGE_SECONDS, env.release);
   return dbToAmp(from - (time - hold) * speed);
+}
+
+/**
+ * Where an operator's envelope was when edited: `at` seconds after the
+ * key, at `db`, in `part`. The anchor at the key (`at` 0, the attack) is
+ * the curve as struck, from silence.
+ */
+export interface Dx7EnvelopeAnchor {
+  at: number;
+  db: number;
+  part: EnvelopePart;
+}
+
+/** The anchor every note is struck with: the curve from its key. */
+export function keyAnchor(): Dx7EnvelopeAnchor {
+  return { at: 0, db: SILENCE_DB, part: 'attack' };
+}
+
+/** Whether an anchor is the one at the key: the curve as `dx7EnvelopeAt` draws it. */
+export function atKey(anchor: { at: number; part: EnvelopePart }): boolean {
+  return anchor.at === 0 && anchor.part === 'attack';
+}
+
+/**
+ * A held envelope from `anchor`, 0 to 1: from its level, each part heads
+ * for that part's level at that part's speed (its distance over its time
+ * as set, run faster for the key already), then the later parts as set.
+ * The attack is a straight line in amplitude, at the speed that takes
+ * silence to the peak in the attack's time; the decays are straight lines
+ * in dB. A part already passed in the direction it goes is over at once,
+ * as in msfa when a target is crossed; a part as set that does not move
+ * takes its time. The sustain heads for the sustain at the second
+ * decay's speed. The part an edit lands in takes at least
+ * LIVE_GLIDE_SECONDS, so no edit steps the level. The audio thread calls
+ * it every sample: it makes nothing new.
+ */
+function heldFrom(env: Dx7Envelope, anchor: Dx7EnvelopeAnchor, time: number): number {
+  let t = time - anchor.at;
+  let edited = !atKey(anchor);
+  let i = HELD_PARTS.indexOf(anchor.part);
+  let db = anchor.db;
+  if (i === 0) {
+    const attack = Math.max(MIN_STAGE_SECONDS, env.attack);
+    const peak = dbToAmp(env.peak);
+    const from = edited ? dbToAmp(anchor.db) : 0;
+    if (from < peak || peak === 0) {
+      let length = peak === 0 ? attack : (attack * (peak - from)) / peak;
+      if (edited) length = Math.max(length, LIVE_GLIDE_SECONDS);
+      if (t < length) {
+        walkedPart = 'attack';
+        return peak === 0 ? from * (1 - t / length) : from + ((peak - from) * t) / length;
+      }
+      t -= length;
+      db = env.peak;
+      edited = false;
+    }
+    i = 1;
+  }
+  for (; i < 4; i++) {
+    const start = i === 1 ? env.peak : env.brk;
+    const end = i === 1 ? env.brk : env.sustain;
+    const seconds = i === 1 ? env.decay1 : env.decay2;
+    let length: number;
+    if (i === 3) {
+      // The sustain: held there, or, edited, heading for it.
+      if (db === end) break;
+      length = start === end ? seconds : (seconds * Math.abs(end - db)) / Math.abs(end - start);
+    } else if (start === end) {
+      length = seconds;
+    } else if ((end - db) * Math.sign(end - start) <= 0) {
+      continue;
+    } else {
+      length = (seconds * Math.abs(end - db)) / Math.abs(end - start);
+    }
+    if (edited) length = Math.max(length, LIVE_GLIDE_SECONDS);
+    if (t < length) {
+      walkedPart = HELD_PARTS[i];
+      return dbToAmp(db + ((end - db) * t) / length);
+    }
+    t -= length;
+    db = end;
+    edited = false;
+  }
+  walkedPart = 'sustain';
+  return dbToAmp(db);
+}
+
+/**
+ * The envelope's level, 0 to 1, `time` seconds into a note let go at
+ * `hold`, carried on from `anchor` with `env` as it is now. From the
+ * anchor at the key it is exactly `dx7EnvelopeAt`. Let go, it falls from
+ * wherever it had got to at the release's speed; an anchor in the release
+ * falls from its own level.
+ */
+export function dx7EnvelopeFrom(env: Dx7Envelope, anchor: Dx7EnvelopeAnchor, time: number, hold = Infinity): number {
+  if (time <= 0) return 0;
+  if (atKey(anchor)) return dx7EnvelopeAt(env, time, hold);
+  const speed = -SILENCE_DB / Math.max(MIN_STAGE_SECONDS, env.release);
+  if (anchor.part === 'release') return dbToAmp(anchor.db - (time - anchor.at) * speed);
+  if (time <= hold) return heldFrom(env, anchor, time);
+  const from = ampToDb(heldFrom(env, anchor, Math.max(hold, anchor.at)));
+  return dbToAmp(from - (time - hold) * speed);
+}
+
+/**
+ * The anchor an envelope edited at `time` carries on from: where the
+ * curve as it was (`env` from `anchor`) had got to, and in which part.
+ * Written into `into` if given, so the audio thread makes nothing new;
+ * a second edit anchors from the first.
+ */
+export function anchorAt(
+  env: Dx7Envelope,
+  anchor: Dx7EnvelopeAnchor,
+  time: number,
+  hold = Infinity,
+  into: Dx7EnvelopeAnchor = keyAnchor(),
+): Dx7EnvelopeAnchor {
+  if (time <= 0) {
+    into.at = 0;
+    into.db = SILENCE_DB;
+    into.part = 'attack';
+    return into;
+  }
+  const db = ampToDb(dx7EnvelopeFrom(env, anchor, time, hold));
+  const released = anchor.part === 'release' || time > hold;
+  // The part it is in: the walk of the held curve says.
+  if (!released) heldFrom(env, anchor, time);
+  const part: EnvelopePart = released ? 'release' : walkedPart;
+  into.at = time;
+  into.db = db;
+  into.part = part;
+  return into;
 }
 
 /** When each part of a held envelope ends, in seconds from the key. */

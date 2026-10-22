@@ -109,6 +109,13 @@ figures subscribe to it. Nothing else passes values around.
   all. The figures follow the note struck last: `noteStartedAt`,
   `noteHold` (Infinity while its key is down, then the time it was held)
   and `noteLength` (the hold plus `releaseSecondsOf`; `operatorLevelsAt`).
+  Edits from the sandbox's controls reach the notes sounding (Jeremy,
+  2026-10-22): glided or carried on from where they are (see
+  `voicePool.ts`); a preset or a link is a new voice, counted by
+  `voiceLoads`, and reaches only the next note, as does the algorithm
+  (`isLiveEdit`). `noteAnchors` holds where edits found the last note's
+  envelopes, for that note only (`startedAt`; `anchorsAfterEdit`, kept
+  by `createLabStore`), so the figures draw what is heard.
   `voiceModel` says which operators six-operator chapters play: `basic`
   (`operators`, `feedback`: ratio, level 0 to 1, one decay; `algorithms`)
   or `dx7` (`dxOperators`, `dxFeedback`, `dxLfo`, `dxPitchEnvelope`; the sandbox), the DX7 voice of
@@ -270,7 +277,20 @@ figures subscribe to it. Nothing else passes values around.
   `pitchEnvelopeOn`. `voicePool.ts` (`VoicePool`:
   `VOICES` notes of six operators at once, each a `PmKernel` whose levels
   follow `operatorEnvelope` worked out per sample, summed; a note takes up
-  the patch as it was when struck; a voice is free once its carriers are
+  the patch as it was when struck, and then, a `dx7` note, every `live`
+  patch: the edits from the sandbox's controls (Jeremy, 2026-10-22; not
+  a preset or a link, which are a new voice for the next note). Each
+  sounding note works itself out again at its own key with its own
+  algorithm (the algorithm reaches only the next note): its ratios
+  (in cents), levels, tremolo shares and feedback glide there over
+  `LIVE_GLIDE_SECONDS` (20 ms), and its envelopes and pitch envelope
+  carry on from where they are with the new settings
+  (`anchorAt` / `dx7EnvelopeFrom`, `pitchAnchorAt` / `dx7PitchFrom` in
+  `dx7.ts`: from the anchor, the part it is in heads for its new level
+  at its new speed, then the later parts as set; a part already passed is
+  over at once; the anchor at the key is the curve as struck exactly;
+  no step); `kernelLevelsOf` says what a note's levels are, for the
+  tests; a voice is free once its carriers are
   below -90 dB, measured before tremolo; it plays either kind of patch,
   `basic` or `dx7`; a `dx7` patch's LFO is stepped once a sample before
   the voices, its vibrato multiplying every note's frequency by
