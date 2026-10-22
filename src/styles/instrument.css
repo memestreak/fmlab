@@ -2216,6 +2216,12 @@ canvas.voice-keys {
     flex: none;
   }
 
+  /* Less room under the top band's control rows (Jeremy, 2026-10-22:
+     about half the gap under the knobs' names), given to both screens. */
+  [data-view='instrument'] .inst-top.chassis {
+    padding-bottom: 2px;
+  }
+
   /* The operator table's rows about 6px taller than they were, so the
      table has a little more room and the two top screens, which take
      what is left, a little less (Jeremy, 2026-10-22). */

@@ -810,7 +810,9 @@ panel is `flex: none` and the band flexes, so taller rows take room from
 both top screens alike): reels, faders and readouts 2.03rem (1.68rem
 under 52rem high), the VFD digits at most 22px (18px), the small
 drawings 2.2rem (1.68rem) and the body cells 0.25rem (0.15rem) top and
-bottom, rows of 46px at 1440 × 900 and 34px at 1280 × 800; then
+bottom, rows of 46px at 1440 × 900 and 34px at 1280 × 800; the top band
+keeps only 2px of padding under its control rows (about half the gap
+under the knobs' names), its screens taller by the 7px; then
 the foot (`.inst-foot`), one chassis of the tab strips' molded black
 plastic (Jeremy, 2026-10-21; rounded at the top, square at the foot, the
 same in both themes but its edge): the control panel and the keys on
