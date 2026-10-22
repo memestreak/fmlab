@@ -153,18 +153,19 @@ figures subscribe to it. Nothing else passes values around.
   the DX7 after the bank's letter ("A11 E.PIANO 1", which it opens on),
   and bank B fmlab's own 32 ("B1 TINE PIANO" to "B32 WIND",
   `fmlabVoices.ts`, `FMLAB_VOICES`; hint "fmlab's own TINE PIANO", no
-  note, played whole), in one dropdown that is the page's heading (its
-  group named Presets for screen readers), listing only the lit bank's
-  32 under that bank's name, its one optgroup (a bank key swaps the
-  list; Jeremy, 2026-10-21), with
-  ‹ › either side that step round the lit bank's 32 from the voice last
-  chosen (`presetMenu`, `stepInBank`; Jeremy, 2026-10-18) and a short
-  note for the chosen voice ("approximate · no velocity"; `note`), unseen
-  but read by screen readers and in the name's tip (Jeremy, 2026-10-20),
-  and "Edited" once the sound is changed (`presetOf`, across all 64).
-  Bank A is credited "DX7 factory voices © Yamaha" (`FACTORY_CREDIT`) as
-  its optgroup's label and the name's hover title, not as a line of its
-  own; bank B is "fmlab voices" (`FMLAB_CREDIT`) in both places. Each of
+  note, played whole). The masthead shows the voice's name, a button
+  that opens the preset window (`presetMenu` in `chapterView.ts`,
+  `presetPanel.ts`; Jeremy, 2026-10-22: no native menu and no bank keys
+  in the masthead), with up and down keys beside it that step through
+  all 64 from the voice last chosen, across the banks, A32 on to B1 and
+  round both ends (`stepPreset` in `presetGrid.ts`; Jeremy, 2026-10-22).
+  The chosen voice has a short note ("approximate · no velocity";
+  `note`), unseen but read by screen readers and in the name's tip
+  (Jeremy, 2026-10-20), and the name says "Edited" once the sound is
+  changed (`presetOf`, across all 64). Bank A is credited "DX7 factory
+  voices © Yamaha" (`FACTORY_CREDIT`) in the name's hover title and its
+  bank key's name in the preset window, not as a line of its own on the
+  page; bank B is "fmlab voices" (`FMLAB_CREDIT`) in both places. Each of
   bank A's hints says it is a close approximation
   and what it plays without (velocity, fixed frequency, played as a
   ratio from middle C, transpose, an envelope ending above silence);
@@ -432,9 +433,10 @@ figures subscribe to it. Nothing else passes values around.
   `envelopeControls.ts` drags the envelope's dots; `piano.ts` is the
   sandbox's keyboard, on screen and on the computer's keys
   (by `KeyboardEvent.code`: A to K the white notes, W E T Y U O P the
-  black, Z and X an octave down and up; with a menu focused too, a
-  preset just picked or the algorithm, which then takes neither them nor
-  the space bar as the start of a name, its arrows still its own).
+  black, Z and X an octave down and up; with a menu focused too, the
+  algorithm's, which then takes neither them nor the space bar as the
+  start of a name, its arrows still its own; and with the preset window
+  or Settings open).
   Every key held sounds: it writes
   `held`, and the key struck last's pitch into `carrierHz` and its moment
   into `noteStartedAt` / `noteLength`. Keys are let go on blur, a hidden
@@ -603,36 +605,59 @@ hides with the crumb, the preset group, centred between the wordmark
 and Volume (Jeremy, 2026-10-21; the page's own centre line leaves it no
 room at 1440 and 1280 wide), the name's box as wide as the widest name
 so nothing in it moves from voice to voice: "Preset" on Dymo tape as
-Volume's, its visible label, then the bank keys A | B (the tabs' push keys with
-their jewel lamps in one bezel, as LIN | EXP; a group named Bank, each
-key a tab stop named "Bank A: DX7 factory voices © Yamaha" or "Bank B:
-fmlab voices", the lit one pressed (`aria-pressed`); chosen on the
-press, a click or Enter, never by the arrows, which step the lit bank's
-voices from anywhere in the group, the bank keys, ‹ › and the name alike
-(Jeremy, 2026-10-21); lit for the shown voice's
-bank, or the last chosen's once Edited; a key loads the voice last
-chosen in its bank, A11 E.PIANO 1 and B1 TINE PIANO at first, a preset
-change that glitches the screens; space and the note keys still play
-with one focused; the bank is in neither the link nor storage; on a
-phone they lead the presets on a line of their own, after the tape),
-then the preset menu as the title: the name chosen on a VFD (Jeremy,
+Volume's, its visible label, then the voice's name on a VFD (Jeremy,
 2026-10-21; `.preset-name`): glowing cyan capitals in Plex Mono on dark
 glass in a small bezel of the tab strips' plastic (seven segments
 cannot spell the names), 14 characters wide, the longest name's, so
-nothing moves from voice to voice, a dimmer EDITED once the sound is
-changed, and a ring round the glass for keyboard focus only; the native
-menu over it unseen in the page's own type, so the list it opens is the
-usual size; then right of it the two step keys, up and down, side by
-side in one `.chooser` bezel (`stepInBank`, round the lit bank's 32, up
-back and down on: the algorithm and octave choosers' black push keys,
-their ‹ › turned a quarter, 1.65rem high, the bank keys' height, so the
-title bar keeps its height; stepping on the press, never disabled;
-Jeremy, 2026-10-21); with the menu
-focused the arrows step it as the keys do, up and left back, down and
-right on, and Enter opens its list; its note, what
-the voice plays without, is not shown but is the menu's description for
-screen readers and follows the credit in the name's tip; then Volume, the
-Settings key; no glossary link (Jeremy, 2026-10-21: the chapters keep
+nothing moves from voice to voice, its ▾ the sign that it opens
+something, a dimmer EDITED once the sound is changed, and a ring round
+the glass for keyboard focus only. The name is a button (Jeremy,
+2026-10-22; `.preset-pick`, named "Preset: A11 E.PIANO 1" or "Preset:
+Edited", `aria-haspopup="dialog"`): a press, Enter or Space opens the
+preset window (space never plays on it), and its arrows step the voices
+as its two step keys do. Those are right of it, up and down, side by
+side in one `.chooser` bezel (`stepPreset` over all 64 from the voice
+last chosen, across the banks, up back and down on: the algorithm and
+octave choosers' black push keys, their ‹ › turned a quarter, 1.65rem
+high, so the title bar keeps its height; stepping on the press, never
+disabled; Jeremy, 2026-10-21); on the name and the keys the arrows step
+too, up and left back, down and right on. Its note, what the voice plays
+without, is not shown but is the name's description for screen readers
+and follows the credit in its tip.
+
+The preset window (`presetPanel.ts`, `mountPresetPanel`; Jeremy,
+2026-10-22, "more consistent with the settings UI ... use a modal
+window"): a modal dialog named Presets in the Settings case
+(`.settings-panel`, 760px wide or the window less 32px), every label in
+it silkscreen (`--font-tape` capitals in `--chassis-legend`, as the
+knobs' names; no Dymo tape). Its head: the title, then the bank keys A |
+B with a "Bank" legend (a group named Bank, each key "Bank A: DX7 factory
+voices © Yamaha" or "Bank B: fmlab voices", lit for the bank shown), and
+Close at the right. Its glass, a listbox, shows the shown bank's 32 in
+four columns of eight numbered down them ("11 E.PIANO 1", the number
+dim), the voice playing lit as Settings' selected line while its bank
+is shown (none once Edited). Under it ‹ › step all 64; no legend (Jeremy,
+2026-10-22): bank A's credit is in its key's name and the name's tip. A
+bank key only shows its bank: it never changes the sound; a press on a
+voice loads it (both top screens glitch) and the window stays open, so
+voices can be heard one after another. On the glass up and down go one
+voice, left and right a column of eight, keeping the row, all across the
+banks and round the ends (A25 right to B1, B32 down to A1), Home and End
+the shown bank's first and last (`gridMove`); each loads its voice. With
+the other bank shown than the voice playing's (or, once Edited, the last
+chosen's), the arrows and ‹ › start in the shown bank: on to its first,
+back to its last (Jeremy, 2026-10-22).
+Whenever the glass turns to the other bank, by a bank key or a step
+across, it glitches as the top screens do, alongside theirs. Enter
+closes, keeping the voice; so do Close, Esc, a press and release both on
+the dimmed page, or the name again, and focus goes back to the name. It
+opens on the playing voice's bank, or the last chosen's once Edited
+(`openingBank`); the note keys, Z / X and the space bar play while it is
+open. The shown bank is in neither the link nor storage. On a phone it
+is the window's width less 16px a side, two columns of 16 (left and
+right then move by 16), the bank keys under the title if they must wrap.
+
+After the preset group, Volume, the Settings key; no glossary link (Jeremy, 2026-10-21: the chapters keep
 theirs) and no theme switch: the sandbox is dark only (Jeremy,
 2026-10-22). Whatever is saved or the system says, `applyTheme(choice,
 sandbox)` sets `data-theme="dark"` while the sandbox shows (set where
@@ -787,8 +812,8 @@ shading and in the chapter pages' plots. On a wide screen it is one window high 
 nothing scrolls, at 1440 × 900 and 1280 × 800; the figures' captions are
 for screen readers only there, and under 52rem high the rows, drawings,
 knobs and gaps tighten. Below 62rem it is one column: the masthead
-wraps, the wordmark and the theme, then the presets (the tape and A | B
-on one line, the name's VFD and its up and down keys under them), then Volume on a line of its own, then Settings; the keyboard
+wraps, the wordmark and the theme, then the presets (the tape, the
+name's VFD and its up and down keys on one line), then Volume on a line of its own, then Settings; the keyboard
 and the spectrum over it docked to the screen's foot in the chassis, the
 full width and square (the spectrum, then the octave control and the
 wheel without their tapes, then the keys), the operator panel
@@ -937,7 +962,9 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
   plays (it opens on a 0.5 Hz modulator, a slide slow enough to follow).
   Under `prefers-reduced-motion` it stays still and the caption says
   why. The sandbox's two top screens play a short analog glitch when
-  their tab changes, and both when a preset is chosen: one of phosphor
+  their tab changes, and both when a preset is chosen (with the preset
+window's glass when it turns to the other bank, `glitchScreens` taking
+any element): one of phosphor
   flash, segment refresh, jitter, tear line and scanline flicker, at
   random, never the same twice in a row on a screen, and on a preset the
   two screens never alike (`nextGlitch`, `nextGlitches`), 120 to 190 ms

@@ -74,11 +74,8 @@ body:not([data-view='instrument']) #inst-tools {
   min-width: 0;
 }
 
-/* The voice's name: the page's heading, in the display face, with no
-   box, as wide as the name, its chevron after it in ink, underlined on
-   hover. It is a picture of the menu: the menu itself lies over it,
-   unseen, in the page's own type, so the list it opens is the usual size
-   (a native list takes its menu's font). */
+/* The voice's name: a button opening the preset window
+   (ui/presetPanel.ts), its chevron the sign that it opens something. */
 .preset-pick {
   position: relative;
   display: inline-flex;
@@ -86,6 +83,12 @@ body:not([data-view='instrument']) #inst-tools {
   align-items: center;
   justify-content: center;
   min-height: 2.25rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
 }
 
 /* In the sandbox the name is a VFD (Jeremy, 2026-10-21): glowing cyan
@@ -134,11 +137,15 @@ body:not([data-view='instrument']) #inst-tools {
 
 /* No underline on the glass: keyboard focus rings it instead. */
 [data-view='instrument'] .preset-pick:hover .preset-name,
-[data-view='instrument'] .preset-pick:has(.preset-menu:focus-visible) .preset-name {
+[data-view='instrument'] .preset-pick:focus-visible .preset-name {
   border-bottom-color: transparent;
 }
 
-:root:not([data-focus='pointer']) [data-view='instrument'] .preset-pick:has(.preset-menu:focus-visible) {
+[data-view='instrument'] .preset-pick:focus {
+  outline: none;
+}
+
+:root:not([data-focus='pointer']) [data-view='instrument'] .preset-pick:focus-visible {
   outline: 2px solid var(--lamp-legend-hover);
   outline-offset: 1px;
 }
@@ -168,22 +175,8 @@ body:not([data-view='instrument']) #inst-tools {
 }
 
 .preset-pick:hover .preset-name,
-:root:not([data-focus='pointer']) .preset-pick:has(.preset-menu:focus-visible) .preset-name {
+:root:not([data-focus='pointer']) .preset-pick:focus-visible .preset-name {
   border-bottom-color: var(--ink);
-}
-
-[data-view='instrument'] .preset-pick .preset-menu:focus {
-  outline: none;
-}
-
-[data-view='instrument'] .preset-pick .preset-menu {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  min-height: 0;
-  height: 100%;
-  opacity: 0;
-  cursor: pointer;
 }
 
 .inst-tools {
@@ -915,8 +908,7 @@ body:not([data-view='instrument']) #inst-tools {
   white-space: nowrap;
 }
 
-.inst #algorithm,
-[data-view='instrument'] .preset-menu {
+.inst #algorithm {
   min-height: 2.25rem;
 }
 
@@ -1024,14 +1016,14 @@ body:not([data-view='instrument']) #inst-tools {
   min-width: 0;
 }
 
-[data-view='instrument'] .inst-row .presets:has(.preset-menu) {
+[data-view='instrument'] .inst-row .presets:has(.preset-pick) {
   flex: 1 1 auto;
   align-items: center;
   gap: 0.6rem;
   min-width: 0;
 }
 
-/* The preset group (its tape, A | B, ‹ name ›) centred in the title bar
+/* The preset group (its tape, the name, ‹ ›) centred in the title bar
    between the wordmark and Volume (Jeremy, 2026-10-21: the page's own
    centre line leaves it no room at 1440 and 1280 wide). Both sides are
    of fixed width, so it holds still. */
@@ -1042,7 +1034,7 @@ body:not([data-view='instrument']) #inst-tools {
   }
 
   [data-view='instrument'] .inst-row #inst-dx7-presets,
-  [data-view='instrument'] .inst-row .presets:has(.preset-menu) {
+  [data-view='instrument'] .inst-row .presets:has(.preset-pick) {
     flex: none;
   }
 }
@@ -1055,13 +1047,9 @@ body:not([data-view='instrument']) #inst-tools {
   flex: none;
 }
 
-/* The bank keys, A | B, and the preset steps ‹ ›, each in a bezel of
-   its own as the choosers' are (Jeremy, 2026-10-21): the steps as low
-   as the bank keys, so the title bar keeps its height. */
-.preset-banks {
-  flex: none;
-}
-
+/* The preset steps ‹ ›, in a bezel of their own as the choosers' are
+   (Jeremy, 2026-10-21): as low as a lamp key's bezel, so the title bar
+   keeps its height. */
 .preset-step {
   flex: none;
 }
@@ -1073,10 +1061,6 @@ body:not([data-view='instrument']) #inst-tools {
 /* The preset steps point up and down: ‹ › turned a quarter. */
 .preset-step .chooser-key {
   writing-mode: vertical-lr;
-}
-
-.preset-break {
-  display: none;
 }
 
 /* What the voice plays without: for screen readers (the menu's
@@ -2427,22 +2411,10 @@ canvas.voice-keys {
     flex-wrap: wrap;
   }
 
-  /* The name, ‹ › and the note on one line, the note cut short; the
-     bank keys on a line of their own above them. */
+  /* The tape, the name and ‹ › on one line. */
   [data-view='instrument'] .inst-presets,
   [data-view='instrument'] .inst-row .presets {
     flex-wrap: nowrap;
-  }
-
-  [data-view='instrument'] .inst-row .presets:has(.preset-banks) {
-    flex-wrap: wrap;
-    row-gap: 0.4rem;
-  }
-
-  .preset-break {
-    display: block;
-    flex-basis: 100%;
-    height: 0;
   }
 
   /* The envelope view first, over the algorithms. */
@@ -2861,6 +2833,102 @@ body:not([data-view='instrument']) .inst-settings {
     order: -1;
     flex-basis: 100%;
     text-align: left;
+  }
+}
+
+/* The preset window (ui/presetPanel.ts; Jeremy, 2026-10-22): the
+   Settings case, wider, its voices on the glass in four columns of eight,
+   numbered down the columns. Every label in it is silkscreen on the
+   plastic, as the knobs' names: no Dymo tape. */
+:root:has(.preset-panel[open]) {
+  overflow: hidden;
+}
+
+.preset-panel {
+  width: min(760px, calc(100vw - 32px));
+}
+
+.preset-head {
+  gap: 12px;
+}
+
+.preset-title,
+.preset-legend {
+  color: var(--chassis-legend);
+  font-family: var(--font-tape);
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.preset-title {
+  font-size: 0.95rem;
+}
+
+.preset-legend {
+  font-size: 0.76rem;
+}
+
+.preset-bank-row {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  margin-right: auto;
+  margin-left: 12px;
+}
+
+.preset-close-bezel {
+  flex: none;
+}
+
+.preset-glass {
+  grid-auto-flow: column;
+  grid-template-rows: repeat(8, auto);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.preset-cell {
+  display: flex;
+  gap: 0.6em;
+  min-width: 0;
+  padding: 3px 12px;
+  overflow: hidden;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.preset-cell[aria-selected='true'] {
+  background: color-mix(in srgb, var(--vfd-glow) 16%, transparent);
+  box-shadow: inset 2px 0 0 var(--vfd-lit);
+}
+
+.preset-number {
+  flex: none;
+  min-width: 2ch;
+  opacity: 0.45;
+  text-align: right;
+}
+
+/* On a phone: two columns of 16, and the bank keys under the title if
+   they must. */
+@media (max-width: 30rem) {
+  .preset-panel {
+    width: calc(100vw - 32px);
+  }
+
+  .preset-head {
+    flex-wrap: wrap;
+  }
+
+  .preset-glass {
+    grid-template-rows: repeat(16, auto);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .preset-cell {
+    padding: 2px 8px;
   }
 }
 

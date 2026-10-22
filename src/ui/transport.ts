@@ -37,13 +37,12 @@ export function pressPlay(state: LabState, time: number): Partial<LabState> {
  * button (it presses it, so the Play button still works), a link, a
  * checkbox (it ticks it), a maths panel's heading (it opens it), or
  * anything typed into. On a slider, the Bessel plot included, space has
- * no meaning, so there it plays and stops. In the sandbox a menu (a
- * preset just picked, or the algorithm) leaves it free too, so that
- * picking from one does not take the keys from the keyboard; its arrows
- * still step it. So does a bank key (A | B), chosen on its press.
+ * no meaning, so there it plays and stops. In the sandbox a menu (the
+ * algorithm's) leaves it free too, so that picking from one does not take
+ * the keys from the keyboard; its arrows still step it.
  */
 export function spaceIsFree(target: Element | null, sandbox = false): boolean {
-  if (sandbox && target?.closest('select, .preset-bank')) return true;
+  if (sandbox && target?.closest('select')) return true;
   return !target?.closest(
     'button, a, summary, input[type="checkbox"], input[type="text"], textarea, select, [contenteditable="true"]',
   );
