@@ -163,9 +163,9 @@ figures subscribe to it. Nothing else passes values around.
   `note`), unseen but read by screen readers and in the name's tip
   (Jeremy, 2026-10-20), and the name says "Edited" once the sound is
   changed (`presetOf`, across all 64). Bank A is credited "DX7 factory
-  voices © Yamaha" (`FACTORY_CREDIT`) in the name's hover title and the
-  preset window, not as a line of its own on the page; bank B is "fmlab
-  voices" (`FMLAB_CREDIT`) in both places. Each of
+  voices © Yamaha" (`FACTORY_CREDIT`) in the name's hover title and its
+  bank key's name in the preset window, not as a line of its own on the
+  page; bank B is "fmlab voices" (`FMLAB_CREDIT`) in both places. Each of
   bank A's hints says it is a close approximation
   and what it plays without (velocity, fixed frequency, played as a
   ratio from middle C, transpose, an envelope ending above silence);
@@ -636,8 +636,8 @@ voices © Yamaha" or "Bank B: fmlab voices", lit for the bank shown), and
 Close at the right. Its glass, a listbox, shows the shown bank's 32 in
 four columns of eight numbered down them ("11 E.PIANO 1", the number
 dim), the voice playing lit as Settings' selected line while its bank
-is shown (none once Edited). Under it ‹ › step all 64, and the legend is
-the shown bank's credit and, if the voice playing is in it, its note. A
+is shown (none once Edited). Under it ‹ › step all 64; no legend (Jeremy,
+2026-10-22): bank A's credit is in its key's name and the name's tip. A
 bank key only shows its bank: it never changes the sound; a press on a
 voice loads it (both top screens glitch) and the window stays open, so
 voices can be heard one after another. On the glass up and down go one

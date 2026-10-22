@@ -8,7 +8,7 @@ import { glitchScreens } from './screenGlitch';
 // this new window"): the voice's name in the title bar opens a modal
 // console in the Settings case, its bank keys A | B, a VFD glass showing
 // the shown bank's 32 voices in four columns of eight, and under it ‹ ›
-// with the bank's credit. A bank key only shows its bank: it never changes
+// (no legend: Jeremy, 2026-10-22, "we don't need that"). A bank key only shows its bank: it never changes
 // the sound. A press on a voice loads it, and the window stays open, so
 // voices can be heard one after another. The arrows go through all 64,
 // across the banks; the glass glitches as it turns to the other bank.
@@ -18,7 +18,7 @@ export interface PresetPanel {
   open: () => void;
   shut: () => void;
   isOpen: () => boolean;
-  /** Draws the window again from the sound now (the lit voice, the legend). */
+  /** Draws the window again from the sound now (the lit voice). */
   show: () => void;
 }
 
@@ -33,8 +33,6 @@ interface Options {
   choose: (at: number, glitch: readonly HTMLElement[]) => void;
   /** The name in the title bar: it opens the window and has focus back. */
   opener: HTMLElement;
-  /** The credit for voices with no bank of their own. */
-  credit: string;
 }
 
 /** The window mounted last, taken down when the sandbox is drawn again. */
@@ -47,7 +45,7 @@ const rowsNow = () => (window.matchMedia('(max-width: 30rem)').matches ? 16 : 8)
 const bare = (label: string) => label.replace(/^\S+\s+/, '');
 
 /** Builds the preset window, shut, at the end of the page. */
-export function mountPresetPanel({ presets, banks, playing, last, choose, opener, credit }: Options): PresetPanel {
+export function mountPresetPanel({ presets, banks, playing, last, choose, opener }: Options): PresetPanel {
   if (mounted) {
     mounted.observer.disconnect();
     mounted.dialog.remove();
@@ -113,7 +111,7 @@ export function mountPresetPanel({ presets, banks, playing, last, choose, opener
   glass.setAttribute('aria-label', 'Voices');
   screen.append(glass);
 
-  // Under the glass: ‹ › through all the voices, then the bank's credit.
+  // Under the glass: ‹ › through all the voices.
   const steps = document.createElement('span');
   steps.className = 'chooser settings-steps';
   const step = (label: string, glyph: string, by: number) => {
@@ -135,11 +133,9 @@ export function mountPresetPanel({ presets, banks, playing, last, choose, opener
     return button;
   };
   steps.append(step('Previous preset', '‹', -1), step('Next preset', '›', 1));
-  const legend = document.createElement('span');
-  legend.className = 'preset-legend preset-credit';
   const controls = document.createElement('div');
   controls.className = 'settings-controls preset-controls';
-  controls.append(steps, legend);
+  controls.append(steps);
 
   dialog.append(head, screen, controls);
   document.body.append(dialog);
@@ -180,9 +176,6 @@ export function mountPresetPanel({ presets, banks, playing, last, choose, opener
     if (active) glass.setAttribute('aria-activedescendant', active.id);
     else glass.removeAttribute('aria-activedescendant');
     bankKeys.forEach((key, i) => key.setAttribute('aria-pressed', String(banks[i].id === shown)));
-    const bank = banks.find(b => b.id === shown);
-    const note = now >= 0 && presets[now].bank === shown ? presets[now].note : undefined;
-    legend.textContent = [bank?.name ?? credit, ...(note ? [note] : [])].join(' · ');
   };
 
   /**

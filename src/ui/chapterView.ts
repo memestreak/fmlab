@@ -548,7 +548,6 @@ function presetMenu(presets: readonly Preset[], banks: readonly PresetBank[], st
     last: () => last,
     choose,
     opener: pick,
-    credit: FACTORY_CREDIT,
   });
   const toggle = () => (panel.isOpen() ? panel.shut : panel.open)();
   pick.addEventListener('pointerdown', event => {
