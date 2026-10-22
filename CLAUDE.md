@@ -790,9 +790,9 @@ row's dials, push keys (their bezels a dial tall; the algorithm chooser,
 the LFO's waves and Key sync lifted onto the dials' line) and knob names
 fall on the same two lines in all five rows.
 The page is three bodies of the same molded black plastic, the
-`.chassis` (Jeremy, 2026-10-21), an even 16.7px apart (15px under 52rem
-high; half the room the title bar had above them given to these two
-gaps) with no rules
+`.chassis` (Jeremy, 2026-10-21), an even 10px apart, and 10px under the
+title bar (Jeremy, 2026-10-22: a little less than the 15 to 17px they
+were, the room given to the top band's screens) with no rules
 between them or under the title bar, and only a black edge (no light
 one, which read as a white line): the top band (Voice and the operator panel, padded 9px
 12px, all four corners rounded), the operator table's panel (its
