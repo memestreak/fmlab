@@ -1,6 +1,7 @@
 import { CHAPTERS } from '../../chapters';
 import { DEFAULTS } from '../../model/lab';
-import { presetOf, stepPreset } from '../../ui/chapterView';
+import { presetOf } from '../../ui/chapterView';
+import { stepPreset } from '../../ui/presetGrid';
 import { PLACES, stepAlgorithm } from '../../ui/instrument';
 
 describe('the instrument page', () => {

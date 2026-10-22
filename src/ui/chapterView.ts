@@ -33,6 +33,8 @@ import { FACTORY_CREDIT } from '../chapters/dx7Voices';
 import { tapeLabel } from './dymo';
 import type { LabState, LabStore } from '../model/lab';
 import { mountInstrument } from './instrument';
+import { mountPresetPanel } from './presetPanel';
+import { stepPreset } from './presetGrid';
 import { glitchScreens, topScreens } from './screenGlitch';
 
 /** How long the sound must rest before the address is brought up to date. */
@@ -464,91 +466,42 @@ export function presetOf(presets: readonly Preset[], state: LabState): number {
   return presets.findIndex(preset => sound(preset.patch) === now);
 }
 
-/**
- * The voice `steps` along from `at` in a list of `count`, round from the
- * last to the first and back; from no voice (-1), the first or the last.
- */
-export function stepPreset(at: number, steps: number, count: number): number {
-  if (at < 0) return steps > 0 ? 0 : count - 1;
-  return (((at + steps) % count) + count) % count;
-}
-
-/**
- * The voice `steps` along from `at` within its own bank, round its ends:
- * an index into all of `presets`. Without banks, round the whole list.
- */
-export function stepInBank(presets: readonly Preset[], at: number, steps: number): number {
-  const bank = presets[at]?.bank;
-  const inBank = presets.flatMap((preset, i) => (preset.bank === bank ? [i] : []));
-  if (at < 0 || inBank.length === 0) return stepPreset(at, steps, presets.length);
-  return inBank[stepPreset(inBank.indexOf(at), steps, inBank.length)];
-}
-
 export { FACTORY_CREDIT };
 
 /**
- * The sandbox's presets: the bank keys (A | B, where there are banks),
- * then the voices as one dropdown, its name a heading, with ‹ › either
- * side stepping round the shown bank as the diagram's step round the
- * algorithms. It shows the voice the sound is, or "Edited" once it has
- * been changed; the steps then go on from the voice last chosen, and the
- * lit bank is that voice's.
+ * The sandbox's presets: the voice's name on VFD glass, a button opening
+ * the preset window (ui/presetPanel.ts), where the bank keys are (Jeremy,
+ * 2026-10-22), with ‹ › right of it stepping through all the voices, both
+ * banks, as the diagram's step round the algorithms. It shows the voice
+ * the sound is, or "Edited" once it has been changed; the steps then go
+ * on from the voice last chosen.
  */
 function presetMenu(presets: readonly Preset[], banks: readonly PresetBank[], store: LabStore): HTMLElement[] {
-  const select = document.createElement('select');
-  select.className = 'input num preset-menu';
-  select.setAttribute('aria-label', 'Voice');
-  const edited = document.createElement('option');
-  edited.value = '';
-  edited.textContent = 'Edited';
-  edited.disabled = true;
-  const option = (preset: Preset, i: number) => {
-    const element = document.createElement('option');
-    element.value = String(i);
-    element.textContent = preset.label;
-    return element;
-  };
-  // The lit bank's voices only (Jeremy, 2026-10-21), under its name, which
-  // the open list shows as its group's name: Yamaha's voices credited
-  // without a line of their own on the page. A bank key swaps the list.
-  // Without banks, every voice under the factory credit.
-  const group = document.createElement('optgroup');
-  let listed: string | undefined | null = null;
-  const list = (bankId: string | undefined) => {
-    if (listed === bankId) return;
-    listed = bankId;
-    group.label = banks.find(bank => bank.id === bankId)?.name ?? FACTORY_CREDIT;
-    group.replaceChildren(
-      ...presets.flatMap((preset, i) => (banks.length === 0 || preset.bank === bankId ? [option(preset, i)] : [])),
-    );
-  };
-  select.append(edited, group);
   const note = document.createElement('span');
   note.className = 'preset-note';
   note.id = 'preset-note';
-  select.setAttribute('aria-describedby', note.id);
 
-  /** The voice last chosen, which the steps go on from, and each bank's. */
+  /** The voice last chosen, which the steps go on from. */
   let last = banks[0]?.start ?? -1;
-  const lastIn = new Map(banks.map(bank => [bank.id, bank.start]));
-  const choose = (at: number) => {
+  const choose = (at: number, glitch: readonly HTMLElement[] = []) => {
     const preset = presets[at];
     if (!preset) return;
     last = at;
-    if (preset.bank) lastIn.set(preset.bank, at);
     store.set(preset.patch);
-    // Both top screens glitch together as the voice changes, each its own kind.
-    glitchScreens(topScreens());
+    // Both top screens glitch together as the voice changes, each its own
+    // kind, and with them the preset window's glass as it turns to the
+    // other bank.
+    glitchScreens([...topScreens(), ...glitch]);
   };
 
-  // The arrows step round the lit bank's voices from anywhere in the
-  // group, the bank keys and ‹ › as the name (Jeremy, 2026-10-21): up
-  // and left back, down and right on. They never change the bank.
+  // The arrows step through all the voices from the name and ‹ › (Jeremy,
+  // 2026-10-22: across the banks, A32 on to B1, round both ends): up and
+  // left back, down and right on.
   const arrowSteps = (event: KeyboardEvent) => {
     const steps = { ArrowUp: -1, ArrowLeft: -1, ArrowDown: 1, ArrowRight: 1 }[event.key];
     if (steps === undefined || event.altKey || event.ctrlKey || event.metaKey) return;
     event.preventDefault();
-    choose(stepInBank(presets, last, steps));
+    choose(stepPreset(last, steps, presets.length));
   };
 
   // ‹ ›, turned to point up and down: the algorithm and octave choosers'
@@ -563,7 +516,7 @@ function presetMenu(presets: readonly Preset[], banks: readonly PresetBank[], st
     button.className = 'chooser-key';
     button.textContent = glyph;
     button.setAttribute('aria-label', label);
-    const go = () => choose(stepInBank(presets, last, steps));
+    const go = () => choose(stepPreset(last, steps, presets.length));
     button.addEventListener('pointerdown', event => {
       if (event.button === 0) go();
     });
@@ -574,85 +527,60 @@ function presetMenu(presets: readonly Preset[], banks: readonly PresetBank[], st
     return button;
   };
 
-  // The bank keys, A | B: the tabs' push keys with their lamps, in a
-  // group named Bank, the lit one pressed. Each is a tab stop; a press, a
-  // click or Enter loads the voice last chosen in its bank. The arrows on
-  // them step the voices, as everywhere in the group.
-  const bankGroup = document.createElement('span');
-  bankGroup.className = 'lamp-keys preset-banks';
-  bankGroup.setAttribute('role', 'group');
-  bankGroup.setAttribute('aria-label', 'Bank');
-  const bankKeys = banks.map(bank => {
-    const key = document.createElement('button');
-    key.type = 'button';
-    key.className = 'lamp-key preset-bank';
-    key.textContent = bank.id;
-    key.title = `Bank ${bank.id}: ${bank.name}`;
-    key.setAttribute('aria-label', key.title);
-    const open = () => {
-      if (litBank() !== bank.id) choose(lastIn.get(bank.id) ?? bank.start);
-    };
-    key.addEventListener('pointerdown', event => {
-      if (event.button === 0) open();
-    });
-    key.addEventListener('click', open);
-    return key;
+  // The voice's name on VFD glass (Jeremy, 2026-10-21), its ▾ the sign
+  // that it opens something: a button opening the preset window.
+  const pick = document.createElement('button');
+  pick.type = 'button';
+  pick.className = 'preset-pick';
+  pick.setAttribute('aria-haspopup', 'dialog');
+  pick.setAttribute('aria-controls', 'preset-panel');
+  pick.setAttribute('aria-expanded', 'false');
+  pick.setAttribute('aria-describedby', note.id);
+  const name = document.createElement('span');
+  name.className = 'preset-name';
+  name.setAttribute('aria-hidden', 'true');
+  pick.append(name);
+
+  const panel = mountPresetPanel({
+    presets,
+    banks,
+    playing: () => presetOf(presets, store.get()),
+    last: () => last,
+    choose,
+    opener: pick,
+    credit: FACTORY_CREDIT,
   });
-  for (const key of bankKeys) key.addEventListener('keydown', arrowSteps);
-  bankGroup.append(...bankKeys);
-  /** The bank lit: the shown voice's, or, once edited, the last chosen's. */
-  const litBank = () => {
-    const at = presetOf(presets, store.get());
-    return presets[at >= 0 ? at : last]?.bank;
-  };
+  const toggle = () => (panel.isOpen() ? panel.shut : panel.open)();
+  pick.addEventListener('pointerdown', event => {
+    if (event.button !== 0) return;
+    // Not the press's own focusing, which would take focus from the window.
+    event.preventDefault();
+    toggle();
+  });
+  pick.addEventListener('click', event => {
+    if (event.detail === 0) toggle();
+  });
+  pick.addEventListener('keydown', arrowSteps);
 
   const show = (state: LabState) => {
     const at = presetOf(presets, state);
-    if (at >= 0) {
-      last = at;
-      const bank = presets[at].bank;
-      if (bank) lastIn.set(bank, at);
-    }
-    list(presets[at >= 0 ? at : last]?.bank);
-    select.value = at < 0 ? '' : String(at);
-    edited.hidden = at >= 0;
+    if (at >= 0) last = at;
     // What the voice plays without, for a screen reader and in the tip.
     const preset = at < 0 ? null : presets[at];
     note.textContent = preset ? (preset.note ?? preset.hint) : 'your own, from a preset voice';
     note.title = preset ? preset.hint : note.textContent;
     // The name's tip: whose the voices are, then, for Yamaha's, what this
     // one plays without; fmlab's own say only whose they are.
-    const lit = presets[at >= 0 ? at : last]?.bank;
-    const bank = banks.find(b => b.id === lit);
+    const bank = banks.find(b => b.id === presets[at >= 0 ? at : last]?.bank);
     pick.title = bank && bank.id !== banks[0]?.id ? bank.name : `${FACTORY_CREDIT} · ${note.textContent}`;
     // On the glass: the voice, or a dimmer EDITED once the sound is changed.
-    name.textContent = select.selectedOptions[0]?.textContent ?? '';
+    name.textContent = preset ? preset.label : 'Edited';
     name.classList.toggle('is-edited', at < 0);
-    bankKeys.forEach((key, i) => {
-      const on = banks[i].id === lit;
-      key.setAttribute('aria-pressed', String(on));
-    });
+    pick.setAttribute('aria-label', `Preset: ${name.textContent}`);
+    panel.show();
   };
-  select.addEventListener('change', () => choose(Number(select.value)));
-  // The arrows step the voices as ‹ › do, round the bank's 32, rather
-  // than open the list (as up and down do on a Mac) or stop at its ends
-  // (Jeremy, 2026-10-21): up and left back, down and right on, held to
-  // keep going. Enter opens the list (space plays, in the sandbox), and so
-  // does Alt + down where the browser does it.
-  select.addEventListener('keydown', event => {
-    if (event.key === 'Enter' && !event.repeat && 'showPicker' in select) {
-      event.preventDefault();
-      try {
-        select.showPicker();
-      } catch {
-        // Not allowed here: the list opens by a click as before.
-      }
-      return;
-    }
-    arrowSteps(event);
-  });
   const stop = store.subscribe((state, previous) => {
-    if (!select.isConnected) return stop();
+    if (!pick.isConnected) return stop();
     if (
       state.dxOperators !== previous.dxOperators ||
       state.algorithm !== previous.algorithm ||
@@ -663,21 +591,7 @@ function presetMenu(presets: readonly Preset[], banks: readonly PresetBank[], st
       show(state);
     }
   });
-  // The voice's name shown as a heading, the menu itself over it, unseen,
-  // so the list the menu opens keeps the page's own type, not the
-  // heading's (a native list takes the menu's font). In the sandbox the
-  // name is on VFD glass (Jeremy, 2026-10-21).
-  const pick = document.createElement('span');
-  pick.className = 'preset-pick';
-  const name = document.createElement('span');
-  name.className = 'preset-name';
-  name.setAttribute('aria-hidden', 'true');
-  pick.append(name, select);
   show(store.get());
-  // On a phone the bank keys lead the row on a line of their own.
-  const lineBreak = document.createElement('span');
-  lineBreak.className = 'preset-break';
-  lineBreak.setAttribute('aria-hidden', 'true');
   // The group's visible label, on Dymo tape as Volume's (Jeremy,
   // 2026-10-21); its name for screen readers is the group's own.
   const tape = document.createElement('span');
@@ -690,5 +604,5 @@ function presetMenu(presets: readonly Preset[], banks: readonly PresetBank[], st
   // Up and down, right of the name (Jeremy, 2026-10-21): up back, down
   // on, as the arrow keys step.
   steps.append(step('Previous preset', '‹', -1), step('Next preset', '›', 1));
-  return [...(banks.length > 0 ? [tape, bankGroup] : []), lineBreak, pick, steps, note];
+  return [tape, pick, steps, note];
 }

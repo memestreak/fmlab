@@ -4,7 +4,8 @@ import { motionReduced } from './motion';
 // The sandbox's top screens glitch, briefly, as an analog display does,
 // when what they show changes (Jeremy, 2026-10-21): a tab opened on the
 // Voice screen or the operator panel, or a preset chosen (both screens at
-// once, each its own kind, never the two alike). One of five, at random,
+// once, each its own kind, never the two alike), and the preset window's
+// glass as it turns to the other bank (Jeremy, 2026-10-22). One of five, at random,
 // never the same twice in a row on a screen. Only the glass moves: the canvas inside its bezel, by Web
 // Animations on it or on an overlay over it, so nothing is drawn again
 // and nothing in the layout moves. None under reduced motion (motion.ts),
@@ -37,24 +38,30 @@ export function nextGlitches(previous: readonly (Glitch | null)[], random: () =>
   return picks;
 }
 
-/** The two top screens, each with its own record of the kind played last. */
-type Screen = 'voice' | 'operator';
-const last: Record<Screen, Glitch | null> = { voice: null, operator: null };
-const screenOf = (canvas: HTMLCanvasElement): Screen => (canvas.closest('#voice-envelope') ? 'operator' : 'voice');
+/**
+ * The two top screens and the preset window's glass, each with its own
+ * record of the kind played last.
+ */
+type Screen = 'voice' | 'operator' | 'presets';
+const last: Record<Screen, Glitch | null> = { voice: null, operator: null, presets: null };
+const screenOf = (glass: HTMLElement): Screen =>
+  glass.closest('#voice-envelope') ? 'operator' : glass.closest('.preset-panel') ? 'presets' : 'voice';
 
-/** What is running on a canvas, to be cancelled by the next change on it. */
-const running = new Map<HTMLCanvasElement, () => void>();
+/** What is running on a screen, to be cancelled by the next change on it. */
+const running = new Map<HTMLElement, () => void>();
 
 /** Held: each keyframe's value stays until the next (not the whole effect's easing). */
 const HELD = 'steps(1, end)';
 
 /**
  * Plays a glitch on each of `canvases` (a tab's, or both top screens' on a
- * preset), each its own kind. Call it straight after the switch: nothing
- * waits for it.
+ * preset, with the preset window's glass when it turns to the other
+ * bank), each its own kind. Call it straight after the switch: nothing
+ * waits for it. A glass need not be a canvas: the preset window's is the
+ * listbox of its voices.
  */
-export function glitchScreens(canvases: readonly (HTMLCanvasElement | null)[]): void {
-  const screens = canvases.filter((canvas): canvas is HTMLCanvasElement => canvas !== null && canvas.isConnected);
+export function glitchScreens(canvases: readonly (HTMLElement | null)[]): void {
+  const screens = canvases.filter((canvas): canvas is HTMLElement => canvas !== null && canvas.isConnected);
   // A new change cancels what is still running on these screens, and on
   // any no longer showing (the tab just closed): nothing stacks.
   for (const [canvas, stop] of [...running]) {
@@ -79,7 +86,7 @@ export function topScreens(): HTMLCanvasElement[] {
     .filter((canvas): canvas is HTMLCanvasElement => canvas instanceof HTMLCanvasElement && canvas.offsetParent !== null);
 }
 
-function play(kind: Glitch, canvas: HTMLCanvasElement): void {
+function play(kind: Glitch, canvas: HTMLElement): void {
   const duration = GLITCH_MS[kind];
   const animations: Animation[] = [];
   const overlays: HTMLElement[] = [];
@@ -151,11 +158,6 @@ function play(kind: Glitch, canvas: HTMLCanvasElement): void {
     const band = document.createElement('div');
     band.className = 'screen-glitch-band';
     band.style.background = glassOf(canvas);
-    const copy = document.createElement('canvas');
-    copy.className = 'screen-glitch-copy';
-    copy.width = canvas.width;
-    copy.height = canvas.height;
-    band.append(copy);
     const line = document.createElement('div');
     line.className = 'screen-glitch-tear';
     box.append(band, line);
@@ -166,19 +168,39 @@ function play(kind: Glitch, canvas: HTMLCanvasElement): void {
       { clipPath: `inset(${to}px 0 calc(100% - ${to + slice}px) 0)` },
     ]);
     animate(line, [{ transform: `translateY(${from}px)` }, { transform: `translateY(${to}px)` }]);
-    const context = copy.getContext('2d');
-    const draw = () => {
-      context?.clearRect(0, 0, copy.width, copy.height);
-      context?.drawImage(canvas, 0, 0);
-      frame = requestAnimationFrame(draw);
-    };
-    draw();
+    if (canvas instanceof HTMLCanvasElement) {
+      const copy = document.createElement('canvas');
+      copy.className = 'screen-glitch-copy';
+      copy.width = canvas.width;
+      copy.height = canvas.height;
+      band.append(copy);
+      const context = copy.getContext('2d');
+      const draw = () => {
+        context?.clearRect(0, 0, copy.width, copy.height);
+        context?.drawImage(canvas, 0, 0);
+        frame = requestAnimationFrame(draw);
+      };
+      draw();
+    } else {
+      // Not a canvas: a still copy of the glass, its ids and focus taken
+      // out, so nothing on the page is named twice.
+      const copy = canvas.cloneNode(true) as HTMLElement;
+      copy.removeAttribute('id');
+      copy.removeAttribute('tabindex');
+      copy.removeAttribute('role');
+      for (const element of copy.querySelectorAll('[id], [role]')) {
+        element.removeAttribute('id');
+        element.removeAttribute('role');
+      }
+      copy.classList.add('screen-glitch-copy');
+      band.append(copy);
+    }
   }
   main.addEventListener('finish', stop);
 }
 
 /** Plain glass: the canvas's own background, or the screens' from the tokens. */
-function glassOf(canvas: HTMLCanvasElement): string {
+function glassOf(canvas: HTMLElement): string {
   const image = getComputedStyle(canvas).backgroundImage;
   return image && image !== 'none' ? image : 'radial-gradient(ellipse at 50% 40%, var(--vfd-glass-1), var(--vfd-glass-2))';
 }

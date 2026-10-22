@@ -19,7 +19,8 @@ import {
   SILENCE_DB,
 } from '../../dsp/dx7';
 import { DEFAULTS, type LabState, type Range } from '../../model/lab';
-import { presetOf, stepInBank } from '../../ui/chapterView';
+import { presetOf } from '../../ui/chapterView';
+import { bankVoices, gridMove, openingBank, stepPreset } from '../../ui/presetGrid';
 
 const sandbox = chapterById('sandbox')!;
 const presets = sandbox.presets;
@@ -65,15 +66,45 @@ describe('the sandbox\'s two banks', () => {
     expect(presetOf(presets, edited)).toBe(-1);
   });
 
-  it('steps round the shown bank only', () => {
-    // A11 on to A12, A32 round to A1, A1 back to A32.
-    expect(stepInBank(presets, 10, 1)).toBe(11);
-    expect(stepInBank(presets, 31, 1)).toBe(0);
-    expect(stepInBank(presets, 0, -1)).toBe(31);
-    // B1 back to B32, B32 on to B1.
-    expect(stepInBank(presets, 32, -1)).toBe(63);
-    expect(stepInBank(presets, 63, 1)).toBe(32);
-    expect(stepInBank(presets, 40, 1)).toBe(41);
+  it('steps through all 64 across the banks, round both ends', () => {
+    const step = (at: number, by: number) => stepPreset(at, by, presets.length);
+    // A11 on to A12; A32 on to B1; B32 round to A1; A1 back to B32.
+    expect(step(10, 1)).toBe(11);
+    expect(step(31, 1)).toBe(32);
+    expect(step(32, -1)).toBe(31);
+    expect(step(63, 1)).toBe(0);
+    expect(step(0, -1)).toBe(63);
+  });
+
+  it('moves a column of eight on the window\'s glass, across the banks', () => {
+    const shownA = { first: 0, last: 31 };
+    const move = (key: string, at: number, rows = 8) => gridMove(key, at, presets.length, rows, shownA);
+    // Up and down one voice, A32 down to B1.
+    expect(move('ArrowDown', 10)).toBe(11);
+    expect(move('ArrowUp', 10)).toBe(9);
+    expect(move('ArrowDown', 31)).toBe(32);
+    // Left and right a column, keeping the row: A25-A32 right to B1-B8,
+    // B25-B32 round to A1-A8, A1 left to B25.
+    expect(move('ArrowRight', 2)).toBe(10);
+    expect(move('ArrowRight', 24)).toBe(32);
+    expect(move('ArrowRight', 31)).toBe(39);
+    expect(move('ArrowRight', 63)).toBe(7);
+    expect(move('ArrowLeft', 0)).toBe(56);
+    expect(move('ArrowLeft', 33)).toBe(25);
+    // On a phone, two columns of 16.
+    expect(move('ArrowRight', 20, 16)).toBe(36);
+    // Home and End: the shown bank's first and last.
+    expect(move('Home', 20)).toBe(0);
+    expect(move('End', 20)).toBe(31);
+    expect(move('Enter', 20)).toBeNull();
+  });
+
+  it('opens the window on the playing voice\'s bank, or once edited the last chosen\'s', () => {
+    expect(openingBank(presets, 10, 40)).toBe('A');
+    expect(openingBank(presets, 40, 10)).toBe('B');
+    expect(openingBank(presets, -1, 40)).toBe('B');
+    expect(openingBank(presets, -1, 10)).toBe('A');
+    expect(bankVoices(presets, 'B')).toEqual(Array.from({ length: 32 }, (_, i) => 32 + i));
   });
 });
 
