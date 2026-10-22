@@ -674,6 +674,17 @@ body:not([data-view='instrument']) #inst-tools {
   box-shadow: 0 0 3px var(--lamp-on-3);
 }
 
+/* The Reverb key's light is always there, unlit amber glass while the
+   reverb is off, so the key never changes its width (Jeremy, 2026-10-22). */
+[data-view='instrument'] .pill-tab[data-tab='reverb'] .pill-mark {
+  display: inline-block;
+}
+
+[data-view='instrument'] .pill-tab[data-tab='reverb']:not(.is-marked) .pill-mark {
+  background: var(--lamp-off-1);
+  box-shadow: none;
+}
+
 .inst-voice-tab[hidden] {
   display: none;
 }
