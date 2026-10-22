@@ -83,7 +83,15 @@ export function mountVoiceArea(store: LabStore): void {
   // between them, open one.
   const tabs = [...head.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
   // The tabs whose feature can be on, and when it is.
-  const features: { tab: HTMLButtonElement | undefined; area: VoiceArea; name: string; on: () => boolean }[] = [
+  // The Reverb's dot shows while its tab is open too (Jeremy, 2026-10-22):
+  // its lamp says the reverb is on, wherever one is looking.
+  const features: {
+    tab: HTMLButtonElement | undefined;
+    area: VoiceArea;
+    name: string;
+    on: () => boolean;
+    whileOpen?: boolean;
+  }[] = [
     {
       tab: tabs.find(tab => tab.dataset.tab === 'lfo'),
       area: 'lfo',
@@ -101,6 +109,7 @@ export function mountVoiceArea(store: LabStore): void {
       area: 'reverb',
       name: 'Reverb',
       on: () => settings.get().reverb === 'on',
+      whileOpen: true,
     },
   ];
   let open: VoiceArea = 'algorithm';
@@ -113,8 +122,8 @@ export function mountVoiceArea(store: LabStore): void {
       if (panel) panel.hidden = !on;
     }
     // A feature's dot, while it is on and its tab closed.
-    for (const { tab, area, name, on } of features) {
-      const marked = open !== area && on();
+    for (const { tab, area, name, on, whileOpen } of features) {
+      const marked = (whileOpen || open !== area) && on();
       tab?.classList.toggle('is-marked', marked);
       tab?.setAttribute('aria-label', marked ? `${name}, on` : name);
     }

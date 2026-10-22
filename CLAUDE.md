@@ -789,8 +789,8 @@ operator selected); the sandbox always opens on Algorithm, and the open tab is i
 neither the link nor storage; while closed, the LFO's key shows a dot
 (amber in the sandbox), "LFO, on", when vibrato or tremolo, the mod
 wheel's share counted, is above 0, the Pitch EG's,
-"Pitch EG, on", when the pitch envelope is not flat, and the Reverb's,
-"Reverb, on", when the reverb is on, a setting). Each tab is laid
+"Pitch EG, on", when the pitch envelope is not flat; and the Reverb's,
+"Reverb, on", whenever the reverb is on, a setting, its tab open or not). Each tab is laid
 out as the operator panel is (Jeremy, 2026-10-20; `.inst-voice-tab`):
 its display the panel's width, the same size whichever tab is open (the
 row under it is one height for all four), over one row of its controls;
