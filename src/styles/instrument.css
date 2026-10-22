@@ -2092,7 +2092,7 @@ canvas.voice-keys {
 
   [data-view='instrument'] .masthead {
     flex: none;
-    margin-bottom: 0.75rem;
+    margin-bottom: 10px;
   }
 
   /* One line, as on every page: the note is cut short first. */
@@ -2113,13 +2113,13 @@ canvas.voice-keys {
     display: flex;
     flex: 1 1 auto;
     flex-direction: column;
-    /* Half the room under the title bar it had (Jeremy, 2026-10-21):
-       0.875rem with the masthead's margin, not 1.75rem; the half freed
-       shared between the panels' two gaps, which are equal, 5px +
-       0.6875rem (16.7px) each, so the page's heights are unchanged. */
-    gap: calc(5px + 0.6875rem);
+    /* The three gaps between the panels equal, 10px each (Jeremy,
+       2026-10-22: a little less than they were, 15 to 17px), under the
+       title bar too (the masthead's margin); the room saved goes to the
+       top band, so both its screens. */
+    gap: 10px;
     min-height: 0;
-    padding: 0.125rem 0 calc(5px + 0.6875rem);
+    padding: 0 0 10px;
   }
 
   .inst-top {
@@ -2216,6 +2216,34 @@ canvas.voice-keys {
     flex: none;
   }
 
+  /* Less room under the top band's control rows (Jeremy, 2026-10-22:
+     about half the gap under the knobs' names), given to both screens. */
+  [data-view='instrument'] .inst-top.chassis {
+    padding-bottom: 2px;
+  }
+
+  /* The operator table's rows about 6px taller than they were, so the
+     table has a little more room and the two top screens, which take
+     what is left, a little less (Jeremy, 2026-10-22). */
+  .op-reel,
+  .op-vfd,
+  .inst .op-table .op-slider {
+    height: 2.03rem;
+  }
+
+  .op-vfd svg {
+    height: min(22px, 100%);
+  }
+
+  .voice-env-mini,
+  .voice-keys {
+    height: 2.2rem;
+  }
+
+  .inst .op-table tbody td {
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+  }
 
   .piano-bed {
     height: 9rem;
@@ -2256,17 +2284,23 @@ canvas.voice-keys {
   }
 
   .op-reel,
-  .op-vfd {
-    height: 1.4rem;
+  .op-vfd,
+  .inst .op-table .op-slider {
+    height: 1.68rem;
   }
 
-  .inst .op-table .op-slider {
-    height: 1.4rem;
+  .op-vfd svg {
+    height: min(18px, 100%);
   }
 
   .inst .op-table th,
   .inst .op-table td {
     padding: 0.1rem 0.3rem;
+  }
+
+  .inst .op-table tbody td {
+    padding-top: 0.15rem;
+    padding-bottom: 0.15rem;
   }
 
   .inst-voice-tab {
@@ -2279,7 +2313,7 @@ canvas.voice-keys {
 
   .voice-env-mini,
   .voice-keys {
-    height: 1.4rem;
+    height: 1.68rem;
   }
 
 
@@ -2311,18 +2345,6 @@ canvas.voice-keys {
 
   .voice-envelope-head .btn {
     height: 1.75rem;
-  }
-
-  /* Under 52rem high: 0.675rem under the title bar, half its 1.35rem,
-     and the freed half shared between the gaps, 5px + 0.5875rem each. */
-  [data-view='instrument'] .masthead {
-    margin-bottom: 0.675rem;
-  }
-
-  .inst-body {
-    gap: calc(5px + 0.5875rem);
-    padding-top: 0;
-    padding-bottom: calc(5px + 0.5875rem);
   }
 
   .inst-left {
