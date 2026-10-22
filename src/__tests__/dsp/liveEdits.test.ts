@@ -200,7 +200,13 @@ describe('the pool, edited while a note sounds', () => {
     voices.noteOn(60, HZ);
     render(voices, 4800);
     voices.setPatch(patchOf({ ...state, algorithm: 32 }), true);
-    expect(Array.from(render(voices, 2400))).toEqual(Array.from(render(plain, 2400)));
+    // The same note: an edit starts a new control run of the envelopes
+    // (CONTROL_SAMPLES), so not to the last bit, but far under hearing.
+    const heard = render(voices, 2400);
+    const unedited = render(plain, 2400);
+    const rms = (xs: ArrayLike<number>) => Math.sqrt(Array.from(xs).reduce((sum, x) => sum + x * x, 0) / xs.length);
+    const difference = rms(heard.map((x, i) => x - unedited[i]));
+    expect(20 * Math.log10(difference / rms(unedited))).toBeLessThan(-80);
   });
 
   it('strikes the next note with the edited patch whole', () => {

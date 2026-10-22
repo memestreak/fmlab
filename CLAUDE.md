@@ -45,7 +45,8 @@ npm run build    # Production build to dist/
 npm run preview  # Serve dist/ at localhost:4173
 npm run lint     # ESLint
 npm test         # Vitest
-npm run typecheck  # tsc --noEmit (covers tests and config files too)
+npm run typecheck  # tsc --noEmit (covers tests, scripts and config files too)
+npm run bench:voices  # The voice pool's cost per block (not in CI; scripts/bench-voices.ts)
 ```
 
 `.github/workflows/ci.yml` runs lint, test, build and typecheck for every
@@ -276,7 +277,15 @@ figures subscribe to it. Nothing else passes values around.
   start at the release speed, exactly as msfa. `FLAT_PITCH_ENVELOPE`,
   `pitchEnvelopeOn`. `voicePool.ts` (`VoicePool`:
   `VOICES` notes of six operators at once, each a `PmKernel` whose levels
-  follow `operatorEnvelope` worked out per sample, summed; a note takes up
+  follow `operatorEnvelope` worked out per sample, summed (a `dx7`
+  note's envelopes and pitch envelope every `CONTROL_SAMPLES`, 32, and
+  followed between: an attack in a straight line in amplitude, a decay
+  or a release by a factor a sample, a straight line in dB, so held
+  notes are the per-sample sound to the last bit and released ones within
+  -120 dB; a run never crosses a part's corner but in one sample, so the
+  peaks are where they belong; the tremolo's factor once a sample for
+  each AMS share, for every voice; nothing made new in `render`,
+  Jeremy, 2026-10-22); a note takes up
   the patch as it was when struck, and then, a `dx7` note, every `live`
   patch: the edits from the sandbox's controls (Jeremy, 2026-10-22; not
   a preset or a link, which are a new voice for the next note). Each
@@ -304,7 +313,9 @@ figures subscribe to it. Nothing else passes values around.
   voice taken is faded over `STEAL_SECONDS` first; and `midiToHz`).
   `pmKernel.ts` (`PmKernel`:
   phase modulation a sample at a time, up to six operators through an
-  `Algorithm`, now `TWO_OPERATORS`; no feedback yet) keeps each operator's
+  `Algorithm`, now `TWO_OPERATORS`; no feedback yet; its sines from a
+  4096-point table, interpolated, `sineCycles`, within 3e-7 of
+  `Math.sin`) keeps each operator's
   phase locked to its ratio of the base frequency, easing it back after a
   ratio moves, so the sound stays the signal the figures draw.
   `fmKernel.ts` (`FmKernel`) is true FM for `vibrato` only, with no lock.
@@ -963,6 +974,12 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
 - A canvas has no CSS: draw code reads the tokens with `getComputedStyle`
   and whoever mounts it must redraw on resize, theme change and
   `document.fonts.ready` (`mountFigure` in `src/ui/figures.ts` does).
+  A figure the page hides (no box) is neither drawn nor animated; its
+  ResizeObserver draws it when it is shown again (Jeremy, 2026-10-22).
+  While a note sounds the sandbox's predicted stems are worked out at
+  most every 100 ms, or when a level moves half a dB (`soundingLinesHold`);
+  the measured trace every frame. The Play label's timer is armed only
+  for a note with an end (`labelTimeout`): a key held has none.
   Give every canvas `role="img"` and an `aria-label` saying what it shows.
   A canvas that is a control (the Bessel plot) is a `role="slider"`
   instead, focusable, with its value kept in `aria-valuenow` and

@@ -14,16 +14,18 @@ import {
   type Dx7PitchAnchor,
   type Dx7PitchEnvelope,
   FLAT_PITCH_ENVELOPE,
+  glideSeconds,
   keyAnchor,
   keyOf,
   keyPitchAnchor,
   lfoDepths,
   LIVE_GLIDE_SECONDS,
   pitchAnchorAt,
+  MIN_STAGE_SECONDS,
   pitchEnvelopeOn,
 } from './dx7';
 import { type Envelope, envelopeAt } from './envelope';
-import { Lfo } from './lfo';
+import { AMS_SHARES, Lfo } from './lfo';
 import { kernelLevels, type Operator, operatorEnvelope } from './operators';
 import { type Algorithm, MAX_OPERATORS, PmKernel } from './pmKernel';
 import { chooseVoice, type VoiceState } from './voices';
@@ -76,6 +78,16 @@ export type VoiceMessage =
   | { type: 'allOff' }
   /** The mod wheel, 0 to 1: glided to over WHEEL_GLIDE_SECONDS. */
   | { type: 'wheel'; amount: number };
+
+/**
+ * A DX7 note's envelopes and pitch envelope are worked out every this many
+ * samples (0.67 ms at 48 kHz), and followed in straight lines between
+ * (the DX7 and Dexed step theirs every 64): the curves' own functions
+ * (dx7.ts) at a control rate, not every sample. A run ends early where an
+ * envelope turns a corner (the end of a part, the moment it is let go),
+ * so the corners are where they belong.
+ */
+export const CONTROL_SAMPLES = 32;
 
 /** How long the pool takes to follow the mod wheel, so a drag does not zipper. */
 export const WHEEL_GLIDE_SECONDS = 0.03;
@@ -135,6 +147,22 @@ class Voice implements VoiceState {
   feedbackTo = 0;
   glideLeft = 0;
   glideTotal = 1;
+  /**
+   * The control rate's run: each operator's envelope level now, and how
+   * it moves a sample, times `envTimes` plus `envStep` (an attack is a
+   * straight line in amplitude, a step; a decay or a release a straight
+   * line in dB, a factor); the pitch envelope's factor and its factor a
+   * sample (straight in cents); and the samples left of the run (0: work
+   * out the next).
+   */
+  readonly envNow = new Float64Array(MAX_OPERATORS);
+  readonly envTimes = new Float64Array(MAX_OPERATORS).fill(1);
+  readonly envStep = new Float64Array(MAX_OPERATORS);
+  pitchNow = 1;
+  pitchTimes = 1;
+  controlLeft = 0;
+  /** The longest attack of its envelopes, in seconds: before it ends a voice is not checked for silence. */
+  longestAttack = 0;
   /** When the note is let go, in seconds; Infinity while it is held. */
   hold = Infinity;
   /** Samples since the note started. */
@@ -179,6 +207,12 @@ export class VoicePool {
   private pitch = 1;
   /** This sample's tremolo, in dB, for an operator that takes all of it. */
   private pull = 0;
+  /** The LFO's depths with the wheel, worked out into this (nothing new a sample). */
+  private readonly depths = { vibrato: 0, tremolo: 0 };
+  /** This sample's tremolo factor for each of the DX7's AMS shares but none. */
+  private trem1 = 1;
+  private trem2 = 1;
+  private trem3 = 1;
   /** The mod wheel as heard, gliding towards `wheelTarget`. */
   private wheel = 0;
   private wheelTarget = 0;
@@ -189,6 +223,8 @@ export class VoicePool {
     count: number,
     private readonly sampleRate: number,
     lockSamples: number,
+    /** How often the envelopes are worked out, in samples: 1 is every sample, for the tests. */
+    private readonly controlSamples = CONTROL_SAMPLES,
   ) {
     this.voices = Array.from({ length: count }, () => new Voice(lockSamples));
     this.fadeSamples = Math.max(1, Math.round(STEAL_SECONDS * sampleRate));
@@ -250,6 +286,9 @@ export class VoicePool {
     voice.feedbackTo = note.feedback;
     voice.glideTotal = Math.max(1, Math.round(LIVE_GLIDE_SECONDS * this.sampleRate));
     voice.glideLeft = voice.glideTotal;
+    voice.longestAttack = longestAttack(voice.envelopes7);
+    // A new run from here: the curves have changed under it.
+    voice.controlLeft = 0;
   }
 
   /** One sample further along an edit's glide: ratios in cents, the rest straight. */
@@ -335,7 +374,12 @@ export class VoicePool {
     const { voices, sampleRate } = this;
     const dx7 = this.patch.kind === 'dx7';
     const lfoPatch = dx7 ? (this.patch as Dx7Patch).lfo : null;
-    let { vibrato, tremolo } = lfoPatch ? lfoDepths(lfoPatch, this.wheel) : { vibrato: 0, tremolo: 0 };
+    const depths = this.depths;
+    // The tremolo's factors only while a voice sounds to take them.
+    let sounding = false;
+    for (let v = 0; v < voices.length; v++) if (voices[v].sounding) sounding = true;
+    if (lfoPatch) lfoDepths(lfoPatch, this.wheel, depths);
+    else depths.vibrato = depths.tremolo = 0;
     for (let i = 0; i < out.length; i++) {
       // The LFO once a sample, before the voices, which all share it.
       if (lfoPatch) {
@@ -343,20 +387,28 @@ export class VoicePool {
         if (this.wheel !== this.wheelTarget) {
           const gap = this.wheelTarget - this.wheel;
           this.wheel = Math.abs(gap) <= this.wheelStep ? this.wheelTarget : this.wheel + Math.sign(gap) * this.wheelStep;
-          ({ vibrato, tremolo } = lfoDepths(lfoPatch, this.wheel));
+          lfoDepths(lfoPatch, this.wheel, depths);
         }
         const lfo = this.lfo.next();
-        this.pitch = 2 ** ((vibrato * lfo.pitch) / 1200);
-        this.pull = tremolo * lfo.amp;
+        this.pitch = 2 ** ((depths.vibrato * lfo.pitch) / 1200);
+        const pull = depths.tremolo * lfo.amp;
+        this.pull = pull;
+        // The tremolo's factor for each AMS share, once for every voice.
+        if (pull > 0 && sounding) {
+          this.trem1 = 10 ** ((-pull * AMS_SHARES[1]) / 20);
+          this.trem2 = 10 ** ((-pull * AMS_SHARES[2]) / 20);
+          this.trem3 = 10 ** ((-pull * AMS_SHARES[3]) / 20);
+        }
       }
       let sample = 0;
-      for (const voice of voices) {
+      for (let v = 0; v < voices.length; v++) {
+        const voice = voices[v];
         if (voice.sounding) sample += this.tick(voice, sampleRate);
       }
       out[i] = sample;
       this.now++;
     }
-    for (const voice of voices) this.settle(voice);
+    for (let v = 0; v < voices.length; v++) this.settle(voices[v]);
   }
 
   /** One voice's next sample. */
@@ -365,20 +417,31 @@ export class VoicePool {
     let sample: number;
     if (voice.dx7) {
       if (voice.glideLeft > 0) this.glide(voice);
+      if (voice.controlLeft === 0) this.control(voice, time);
+      voice.controlLeft--;
       const pull = this.pull;
+      const { envNow, envTimes, envStep, gains, tremolo, scaled } = voice;
       for (let op = 0; op < MAX_OPERATORS; op++) {
-        let level = voice.gains[op] * this.envelopeLevel(voice, op, time);
+        let level = gains[op] * envNow[op];
+        envNow[op] = envNow[op] * envTimes[op] + envStep[op];
         // Tremolo only ever lowers a level, by the operator's share.
-        const share = voice.tremolo[op];
-        if (share > 0 && pull > 0) level *= 10 ** ((-pull * share) / 20);
-        voice.scaled[op] = level;
+        const share = tremolo[op];
+        if (share > 0 && pull > 0) {
+          level *=
+            share === AMS_SHARES[1] ? this.trem1
+            : share === AMS_SHARES[2] ? this.trem2
+            : share === AMS_SHARES[3] ? this.trem3
+            : 10 ** ((-pull * share) / 20);
+        }
+        scaled[op] = level;
       }
       // The note's own pitch envelope, and the LFO's vibrato, in cents.
       let freq = voice.baseFreq * this.pitch;
       if (voice.pitchEnvelope) {
-        freq *= 2 ** (dx7PitchFrom(voice.pitchEnvelope, voice.pitchAnchor, time, voice.hold) / 1200);
+        freq *= voice.pitchNow;
+        voice.pitchNow *= voice.pitchTimes;
       }
-      sample = voice.kernel.tick(freq, voice.ratios, voice.scaled, voice.feedback);
+      sample = voice.kernel.tick(freq, voice.ratios, scaled, voice.feedback);
     } else {
       for (let op = 0; op < MAX_OPERATORS; op++) {
         voice.heard[op] = voice.levels[op] * envelopeAt(voice.envelopes[op], time);
@@ -402,6 +465,62 @@ export class VoicePool {
     return sample;
   }
 
+  /**
+   * The next control run of a DX7 note, from `time`: each envelope (and
+   * the pitch envelope) at the curve's own value now, heading in a
+   * straight line for its value at the run's end, CONTROL_SAMPLES on or
+   * sooner where a curve turns a corner first.
+   */
+  private control(voice: Voice, time: number): void {
+    const rate = this.sampleRate;
+    const age = voice.age;
+    let samples = this.controlSamples;
+    if (Number.isFinite(voice.hold)) samples = cornerRun(voice.hold, rate, age, samples);
+    for (let op = 0; op < MAX_OPERATORS; op++) {
+      if (!atKey(voice.anchors[op])) continue;
+      const env = voice.envelopes7[op];
+      const attack = Math.max(MIN_STAGE_SECONDS, env.attack);
+      samples = cornerRun(attack, rate, age, samples);
+      samples = cornerRun(attack + env.decay1, rate, age, samples);
+      samples = cornerRun(attack + env.decay1 + env.decay2, rate, age, samples);
+    }
+    const pitch = voice.pitchEnvelope;
+    if (pitch && atKey(voice.pitchAnchor)) {
+      const attack = glideSeconds(pitch.start, pitch.peak, pitch.attack);
+      const decay1 = attack + glideSeconds(pitch.peak, pitch.brk, pitch.decay1);
+      samples = cornerRun(attack, rate, age, samples);
+      samples = cornerRun(decay1, rate, age, samples);
+      samples = cornerRun(decay1 + glideSeconds(pitch.brk, pitch.sustain, pitch.decay2), rate, age, samples);
+    }
+    const end = (age + samples) / rate;
+    for (let op = 0; op < MAX_OPERATORS; op++) {
+      const now = this.envelopeLevel(voice, op, time);
+      const then = this.envelopeLevel(voice, op, end);
+      voice.envNow[op] = now;
+      // In the attack, or to or from silence, a step a sample; otherwise
+      // the factor a straight line in dB takes.
+      const anchor = voice.anchors[op];
+      // (A run never crosses a corner but in one sample, so it is in the
+      // attack if it starts there.)
+      const attack = atKey(anchor)
+        ? time < Math.max(MIN_STAGE_SECONDS, voice.envelopes7[op].attack)
+        : anchor.part === 'attack';
+      if (attack || now <= 0 || then <= 0) {
+        voice.envTimes[op] = 1;
+        voice.envStep[op] = (then - now) / samples;
+      } else {
+        voice.envTimes[op] = (then / now) ** (1 / samples);
+        voice.envStep[op] = 0;
+      }
+    }
+    if (pitch) {
+      const now = dx7PitchFrom(pitch, voice.pitchAnchor, time, voice.hold);
+      voice.pitchNow = 2 ** (now / 1200);
+      voice.pitchTimes = 2 ** ((dx7PitchFrom(pitch, voice.pitchAnchor, end, voice.hold) - now) / 1200 / samples);
+    }
+    voice.controlLeft = samples;
+  }
+
   /** A DX7 note's operator `op`'s envelope, 0 to 1, from its key or its last edit. */
   private envelopeLevel(voice: Voice, op: number, time: number): number {
     const anchor = voice.anchors[op];
@@ -419,12 +538,14 @@ export class VoicePool {
     const time = voice.age / this.sampleRate;
     if (voice.releasedAt === null && time >= voice.hold) voice.releasedAt = this.now;
     const dx7 = voice.dx7;
-    const attacks = dx7 ? voice.envelopes7 : voice.envelopes;
-    const attack = Math.max(...attacks.map((envelope: Envelope | Dx7Envelope) => envelope.attack));
-    if (time <= attack) return;
-    const silent = voice.alg.carriers.every(op =>
-      dx7 ? this.envelopeLevel(voice, op, time) < SILENT : envelopeAt(voice.envelopes[op], time) < SILENT,
-    );
+    if (time <= voice.longestAttack) return;
+    const { carriers } = voice.alg;
+    let silent = true;
+    for (let i = 0; i < carriers.length && silent; i++) {
+      const op = carriers[i];
+      const level = dx7 ? this.envelopeLevel(voice, op, time) : envelopeAt(voice.envelopes[op], time);
+      if (level >= SILENT) silent = false;
+    }
     if (silent) {
       voice.sounding = false;
       voice.note = null;
@@ -452,6 +573,7 @@ export class VoicePool {
       for (const anchor of voice.anchors) Object.assign(anchor, keyAnchor());
       voice.pitchEnvelope = pitchEnvelopeOn(patch.pitchEnvelope) ? patch.pitchEnvelope : null;
       Object.assign(voice.pitchAnchor, keyPitchAnchor());
+      voice.longestAttack = longestAttack(note.envelopes);
       voice.glideLeft = 0;
     } else {
       voice.dx7 = null;
@@ -462,7 +584,9 @@ export class VoicePool {
         voice.levels[op] = patch.operators[op]?.level ?? 0;
       }
       voice.envelopes = this.envelopesFor(patch.operators, hold);
+      voice.longestAttack = longestAttack(voice.envelopes);
     }
+    voice.controlLeft = 0;
     voice.age = 0;
     voice.fadeLeft = 0;
     voice.sounding = true;
@@ -473,6 +597,8 @@ export class VoicePool {
     if (!voice.sounding) return;
     voice.hold = voice.age / this.sampleRate;
     if (!voice.dx7) voice.envelopes = this.envelopesFor(voice.operators, voice.hold);
+    // The release from here: a new control run, from the curve's level now.
+    voice.controlLeft = 0;
   }
 
   private envelopesFor(operators: readonly Operator[], hold: number): Envelope[] {
@@ -480,6 +606,27 @@ export class VoicePool {
       operatorEnvelope(operators[op] ?? { ratio: 1, level: 0, decay: 0 }, hold),
     );
   }
+}
+
+/**
+ * The length of a control run from sample `age`, at most `samples`, that
+ * a curve's corner `seconds` from the key leaves it: the run ends at the
+ * last sample before the corner, and the next one crosses it in a single
+ * sample, so every sample but those two runs' ends lies on a straight
+ * part of the curve, and those are its own values.
+ */
+function cornerRun(seconds: number, rate: number, age: number, samples: number): number {
+  const before = Math.floor(seconds * rate + 1e-9);
+  if (before > age && before - age < samples) return before - age;
+  if (before === age && samples > 1) return 1;
+  return samples;
+}
+
+/** The longest attack of a note's envelopes, in seconds. */
+function longestAttack(envelopes: readonly (Envelope | Dx7Envelope)[]): number {
+  let longest = 0;
+  for (const envelope of envelopes) longest = Math.max(longest, envelope.attack);
+  return longest;
 }
 
 /** A copy of a patch, so later changes to the one sent do not reach it. */

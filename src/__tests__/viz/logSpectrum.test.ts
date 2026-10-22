@@ -11,6 +11,7 @@ import {
   isLogSpectrum,
   keptLabels,
   LOG_HZ_TICKS,
+  soundingLinesHold,
 } from '../../viz/spectrumPlot';
 
 // The sandbox's spectrum on log frequency and dB axes (Jeremy, 2026-10-22).
@@ -83,5 +84,17 @@ describe('the sandbox spectrum\'s axes', () => {
     const played = { ...state, noteStartedAt: 10, noteHold: 1, noteLength: 2 };
     expect(heardLines(played, 10.5).length).toBeGreaterThan(0);
     expect(heardLines(played, 12.5)).toEqual([]);
+  });
+
+  it('reuses a sounding note\'s lines within 100 ms, or while no level has moved half a dB', () => {
+    const levels = [0.5, 0.1, 0, 0.02];
+    // Within 100 ms, whatever the levels.
+    expect(soundingLinesHold(10, levels, 10.05, [0.25, 0.1, 0, 0.02])).toBe(true);
+    // After, only while every level is within half a dB (silence counts as equal).
+    expect(soundingLinesHold(10, levels, 10.2, [0.5 * 10 ** (0.4 / 20), 0.1, 0, 0.02])).toBe(true);
+    expect(soundingLinesHold(10, levels, 10.2, [0.5 * 10 ** (0.6 / 20), 0.1, 0, 0.02])).toBe(false);
+    expect(soundingLinesHold(10, levels, 10.2, [0.5, 0.1, 0.01, 0.02])).toBe(false);
+    // A time before the last working out (a new note's clock) does not hold.
+    expect(soundingLinesHold(10, levels, 9.99, [0.3, 0.1, 0, 0.02])).toBe(false);
   });
 });

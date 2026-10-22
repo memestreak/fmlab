@@ -126,11 +126,15 @@ export const HELD_LFO: Dx7Lfo = {
  * `wheel`, 0 to 1: the LFO's own depth and the wheel's share of its
  * depth at full, held under the LFO's ranges.
  */
-export function lfoDepths(lfo: Dx7Lfo, wheel: number): { vibrato: number; tremolo: number } {
-  return {
-    vibrato: Math.min(LFO_VIBRATO.max, lfo.vibrato + wheel * lfo.wheelVibrato),
-    tremolo: Math.min(LFO_TREMOLO.max, lfo.tremolo + wheel * lfo.wheelTremolo),
-  };
+export function lfoDepths(
+  lfo: Dx7Lfo,
+  wheel: number,
+  into: { vibrato: number; tremolo: number } = { vibrato: 0, tremolo: 0 },
+): { vibrato: number; tremolo: number } {
+  // Written into `into` where given: the audio thread makes nothing new.
+  into.vibrato = Math.min(LFO_VIBRATO.max, lfo.vibrato + wheel * lfo.wheelVibrato);
+  into.tremolo = Math.min(LFO_TREMOLO.max, lfo.tremolo + wheel * lfo.wheelTremolo);
+  return into;
 }
 
 /** Whether an LFO does anything, with the wheel at `wheel`: vibrato or tremolo above zero. */

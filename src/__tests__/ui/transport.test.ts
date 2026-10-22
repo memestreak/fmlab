@@ -2,7 +2,7 @@ import { envelopeOf } from '../../model/lab';
 import { noteSeconds } from '../../dsp/envelope';
 import { chapterById, landing, LANDING } from '../../chapters';
 import { DEFAULTS, type LabState, noteSounding } from '../../model/lab';
-import { playLabel, pressPlay, spaceIsFree } from '../../ui/transport';
+import { labelTimeout, playLabel, pressPlay, spaceIsFree } from '../../ui/transport';
 
 /**
  * A state with a note started at `at` on the page's clock, as the engine
@@ -114,5 +114,17 @@ describe('where the space bar is left alone', () => {
     // Typing and buttons keep it in the sandbox too.
     expect(spaceIsFree(element(['input[type="text"]']), true)).toBe(false);
     expect(spaceIsFree(element(['button']), true)).toBe(false);
+  });
+});
+
+describe('the Play label\'s timer', () => {
+  const note = { ...DEFAULTS, noteMode: true, noteStartedAt: 10 };
+  it('waits for a note that ends, a little past its end', () => {
+    expect(labelTimeout({ ...note, noteLength: 2 }, 11)).toBeCloseTo(1050, 6);
+  });
+  it('sets no timer for a key held (its length Infinity), nor when nothing sounds', () => {
+    expect(labelTimeout({ ...note, noteLength: Infinity }, 11)).toBeNull();
+    expect(labelTimeout({ ...note, noteLength: 2 }, 13)).toBeNull();
+    expect(labelTimeout({ ...DEFAULTS, noteMode: false }, 11)).toBeNull();
   });
 });

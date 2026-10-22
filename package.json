@@ -13,7 +13,8 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "bench:voices": "vitest run --config scripts/bench.config.ts"
   },
   "dependencies": {
     "@fontsource/barlow-condensed": "^5.3.0",

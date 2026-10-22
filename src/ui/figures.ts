@@ -107,6 +107,10 @@ function mountFigure(
 ): void {
   let frame = 0;
   const run = (now: number) => {
+    // Not drawn, nor animated, while the page hides it (the sandbox's
+    // waveform, say): it has no box. The ResizeObserver below draws it
+    // once it has one again, and starts it moving if it should.
+    if (canvas.clientWidth === 0 || canvas.clientHeight === 0) return;
     const state = store.get();
     const time = now / 1000;
     if (moves(state, time)) {
@@ -131,6 +135,7 @@ function mountFigure(
     }
   });
   onMotionChange(schedule);
+  // Its size changing, and its being shown again after hidden (0 to a size).
   new ResizeObserver(schedule).observe(canvas);
   window
     .matchMedia('(prefers-color-scheme: dark)')

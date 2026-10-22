@@ -48,6 +48,19 @@ export function spaceIsFree(target: Element | null, sandbox = false): boolean {
   );
 }
 
+/**
+ * How long until the Play button's label must change by itself, in ms: a
+ * little after the note sounding at `time` ends; null when there is
+ * nothing to wait for, or no end yet (a key held: its note's length is
+ * Infinity until it is let go). A timer of Infinity ms would fire at once
+ * in a browser, again and again (Jeremy, 2026-10-22).
+ */
+export function labelTimeout(state: LabState, time: number): number | null {
+  if (!state.noteMode || !noteSounding(state, time)) return null;
+  const left = state.noteStartedAt! + state.noteLength - time;
+  return Number.isFinite(left) ? left * 1000 + 50 : null;
+}
+
 /** The Play / Stop button, or Play note. Space does the same. */
 export function mountPlayButton(button: HTMLButtonElement, store: LabStore): void {
   // Inside the click or key press, so the engine may start audio: see
@@ -65,15 +78,16 @@ export function mountPlayButton(button: HTMLButtonElement, store: LabStore): voi
     press();
   });
 
-  // A note ends by itself: the label goes back to Play when it does.
+  // A note ends by itself: the label goes back to Play when it does. A
+  // key held has no end yet; its timer is armed when it is let go.
   let ending: number | undefined;
   const show = (state: LabState) => {
-    button.textContent = playLabel(state, now());
+    const label = playLabel(state, now());
+    // Only a change is written: each write makes the page recalculate style.
+    if (button.textContent !== label) button.textContent = label;
     window.clearTimeout(ending);
-    if (state.noteMode && noteSounding(state, now())) {
-      const left = state.noteStartedAt! + state.noteLength - now();
-      ending = window.setTimeout(() => show(store.get()), left * 1000 + 50);
-    }
+    const wait = labelTimeout(state, now());
+    if (wait !== null) ending = window.setTimeout(() => show(store.get()), wait);
   };
   store.subscribe((state, previous) => {
     if (
@@ -81,6 +95,7 @@ export function mountPlayButton(button: HTMLButtonElement, store: LabStore): voi
       state.noteMode !== previous.noteMode ||
       state.chapter !== previous.chapter ||
       state.noteStartedAt !== previous.noteStartedAt ||
+      state.noteLength !== previous.noteLength ||
       state.notes !== previous.notes
     ) {
       show(state);

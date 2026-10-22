@@ -4,6 +4,23 @@ export const MAX_OPERATORS = 6;
 const TWO_PI = 2 * Math.PI;
 
 /**
+ * One cycle of a sine in SINE_POINTS steps, and the first again at the
+ * end, for `sineCycles`: looked up and interpolated in a straight line,
+ * the error is under 3e-7 of full scale (-130 dB), far under hearing and
+ * the figures' drawing, and much cheaper than Math.sin a sample.
+ */
+export const SINE_POINTS = 4096;
+const SINE = Float64Array.from({ length: SINE_POINTS + 1 }, (_, i) => Math.sin((TWO_PI * i) / SINE_POINTS));
+
+/** sin(2π x), x in cycles, any size (a modulation can be many cycles): from the table. */
+export function sineCycles(x: number): number {
+  const at = (x - Math.floor(x)) * SINE_POINTS;
+  const i = at | 0;
+  const a = SINE[i];
+  return a + (SINE[i + 1] - a) * (at - i);
+}
+
+/**
  * How the operators are wired. Operators are numbered from 0, and a
  * modulator always has a higher number than the operator it modulates, so
  * one pass from the top down has every modulator's output ready when it is
@@ -103,8 +120,9 @@ export class PmKernel {
 
     for (let op = modulators.length - 1; op >= 0; op--) {
       let modulation = loop && op === loop.to ? fed : 0;
-      for (const from of modulators[op]) modulation += outputs[from];
-      outputs[op] = levels[op] * Math.sin(TWO_PI * phases[op] + modulation);
+      const from = modulators[op];
+      for (let m = 0; m < from.length; m++) modulation += outputs[from[m]];
+      outputs[op] = levels[op] * sineCycles(phases[op] + modulation / TWO_PI);
 
       const ratio = ratios[op];
       let phase = phases[op] + baseFreq * ratio;
@@ -123,7 +141,7 @@ export class PmKernel {
     }
 
     let sample = 0;
-    for (const op of carriers) sample += outputs[op];
+    for (let c = 0; c < carriers.length; c++) sample += outputs[carriers[c]];
     return sample;
   }
 }

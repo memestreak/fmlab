@@ -1,5 +1,5 @@
 import { fmSpectrum } from '../../dsp/fmSpectrum';
-import { MAX_OPERATORS, PmKernel, TWO_OPERATORS } from '../../dsp/pmKernel';
+import { MAX_OPERATORS, PmKernel, sineCycles, TWO_OPERATORS } from '../../dsp/pmKernel';
 import { fmSample } from '../../dsp/waveform';
 
 const SAMPLE_RATE = 48000;
@@ -28,7 +28,8 @@ describe('PmKernel as two operators', () => {
   it('is a sine at the carrier frequency when the index is 0', () => {
     const out = twoOperators().render(1000, 480, 3, 0);
     for (const n of [0, 1, 25, 333, 999]) {
-      expect(out[n]).toBeCloseTo(Math.sin((2 * Math.PI * 480 * n) / SAMPLE_RATE), 9);
+      // To 5e-7 (-126 dB): the kernel's sines come from a table (sineCycles).
+      expect(out[n]).toBeCloseTo(Math.sin((2 * Math.PI * 480 * n) / SAMPLE_RATE), 6);
     }
   });
 
@@ -36,7 +37,9 @@ describe('PmKernel as two operators', () => {
     // 480 Hz is 100 samples a cycle.
     const out = twoOperators().render(1000, 480, 1.4, 3);
     for (let n = 0; n < out.length; n++) {
-      expect(out[n]).toBeCloseTo(fmSample(n / 100, 1.4, 3), 9);
+      // To 5e-6 (-106 dB): the table's error, carried through a modulator
+      // at index 3, which multiplies it by up to the index.
+      expect(out[n]).toBeCloseTo(fmSample(n / 100, 1.4, 3), 5);
     }
   });
 
@@ -99,5 +102,16 @@ describe('PmKernel as two operators', () => {
       worst = Math.max(worst, Math.abs(out[n] - fmSample((start + n) / 100, 1, 2)));
     }
     expect(worst).toBeGreaterThan(0.1);
+  });
+});
+
+describe('the kernel\'s sine table', () => {
+  it('is within 3e-7 of Math.sin (under -100 dB) over many cycles, either way round', () => {
+    let worst = 0;
+    for (let x = -40; x < 40; x += 0.000731) {
+      worst = Math.max(worst, Math.abs(sineCycles(x) - Math.sin(2 * Math.PI * x)));
+    }
+    expect(worst).toBeLessThan(3e-7);
+    expect(20 * Math.log10(worst)).toBeLessThan(-100);
   });
 });
