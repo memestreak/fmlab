@@ -201,8 +201,16 @@ export class AudioEngine {
       state.dxLfo !== previous.dxLfo ||
       state.dxPitchEnvelope !== previous.dxPitchEnvelope
     ) {
-      // Taken up by the next note struck; the LFO at once.
-      this.tell({ type: 'patch', patch: voicePatch(state) });
+      // Taken up by the next note struck, the LFO at once; and an edit
+      // from the sandbox's controls by the notes sounding too (not a
+      // preset or a link: a new voice). The algorithm only ever reaches
+      // the next note.
+      const live =
+        state.voiceModel === 'dx7' &&
+        previous.voiceModel === 'dx7' &&
+        state.chapter === previous.chapter &&
+        state.voiceLoads === previous.voiceLoads;
+      this.tell({ type: 'patch', patch: voicePatch(state), live });
     }
     // The wheel on its own, lighter than the whole patch at every step of a drag.
     if (state.modWheel !== previous.modWheel) this.tell({ type: 'wheel', amount: state.modWheel });

@@ -1,15 +1,25 @@
 import { algorithm } from './algorithms';
 import {
+  anchorAt,
+  atKey,
   type Dx7Envelope,
+  type Dx7EnvelopeAnchor,
   dx7EnvelopeAt,
+  dx7EnvelopeFrom,
   type Dx7Lfo,
   type Dx7Note,
   dx7Note,
   type Dx7Operator,
-  dx7PitchAt,
+  dx7PitchFrom,
+  type Dx7PitchAnchor,
   type Dx7PitchEnvelope,
+  FLAT_PITCH_ENVELOPE,
+  keyAnchor,
   keyOf,
+  keyPitchAnchor,
   lfoDepths,
+  LIVE_GLIDE_SECONDS,
+  pitchAnchorAt,
   pitchEnvelopeOn,
 } from './dx7';
 import { type Envelope, envelopeAt } from './envelope';
@@ -53,7 +63,12 @@ export interface Dx7Patch {
 
 /** What the main thread tells the pool, over the worklet's port. */
 export type VoiceMessage =
-  | { type: 'patch'; patch: VoicePatch }
+  /**
+   * `live`: an edit from the sandbox's controls, which reaches the notes
+   * already sounding too (Jeremy, 2026-10-22); otherwise (a preset, a
+   * link) only the notes struck next.
+   */
+  | { type: 'patch'; patch: VoicePatch; live?: boolean }
   /** `hold`: seconds until the note lets itself go; Infinity until noteOff. */
   | { type: 'noteOn'; note: number; hz: number; hold: number }
   | { type: 'noteOff'; note: number }
@@ -91,10 +106,35 @@ class Voice implements VoiceState {
   readonly levels = new Float64Array(MAX_OPERATORS);
   operators: readonly Operator[] = [];
   envelopes: Envelope[] = [];
-  /** A DX7 voice's note, or null for simple operators. */
+  /** A DX7 voice's note as struck, or null for simple operators. */
   dx7: Dx7Note | null = null;
-  /** A DX7 note's pitch envelope, as the patch was when struck; null if flat. */
+  /** A DX7 note's algorithm and key: an edit keeps both. */
+  algorithm = 1;
+  key = 60;
+  /**
+   * A DX7 note's levels as the kernel takes them and its tremolo shares,
+   * as heard (gliding after an edit); its ratios are `ratios`, its
+   * feedback `feedback`.
+   */
+  readonly gains = new Float64Array(MAX_OPERATORS);
+  readonly tremolo = new Float64Array(MAX_OPERATORS);
+  /** Each operator's envelope as it is now, and where an edit found it. */
+  envelopes7: Dx7Envelope[] = [];
+  readonly anchors: Dx7EnvelopeAnchor[] = Array.from({ length: MAX_OPERATORS }, keyAnchor);
+  /** A DX7 note's pitch envelope as it is now; null if flat. */
   pitchEnvelope: Dx7PitchEnvelope | null = null;
+  readonly pitchAnchor: Dx7PitchAnchor = keyPitchAnchor();
+  /** An edit's glide: from and to, and the samples left of it. */
+  readonly gainsFrom = new Float64Array(MAX_OPERATORS);
+  readonly gainsTo = new Float64Array(MAX_OPERATORS);
+  readonly ratiosFrom = new Float64Array(MAX_OPERATORS);
+  readonly ratiosTo = new Float64Array(MAX_OPERATORS);
+  readonly tremoloFrom = new Float64Array(MAX_OPERATORS);
+  readonly tremoloTo = new Float64Array(MAX_OPERATORS);
+  feedbackFrom = 0;
+  feedbackTo = 0;
+  glideLeft = 0;
+  glideTotal = 1;
   /** When the note is let go, in seconds; Infinity while it is held. */
   hold = Infinity;
   /** Samples since the note started. */
@@ -119,7 +159,13 @@ class Voice implements VoiceState {
  *
  * Each voice is a PmKernel whose operator levels follow their envelopes
  * (`operatorEnvelope`, as the figures draw them), computed here on the
- * audio thread. A note takes up the patch as it was when struck.
+ * audio thread. A note takes up the patch as it was when struck; then a
+ * DX7 voice's edits from the controls (`live`) reach it too (Jeremy,
+ * 2026-10-22): its ratios, levels, tremolo shares and feedback glide to
+ * the new ones over LIVE_GLIDE_SECONDS, and its envelopes and pitch
+ * envelope carry on from where they are with the new settings. It keeps
+ * the algorithm it was struck with. A preset or a link is a new voice,
+ * for the notes struck next.
  */
 export class VoicePool {
   private readonly voices: Voice[];
@@ -149,7 +195,7 @@ export class VoicePool {
   }
 
   handle(message: VoiceMessage): void {
-    if (message.type === 'patch') this.setPatch(message.patch);
+    if (message.type === 'patch') this.setPatch(message.patch, message.live === true);
     else if (message.type === 'noteOn') this.noteOn(message.note, message.hz, message.hold);
     else if (message.type === 'noteOff') this.noteOff(message.note);
     else if (message.type === 'wheel') this.setWheel(message.amount);
@@ -162,9 +208,62 @@ export class VoicePool {
     this.wheelStep = Math.abs(this.wheelTarget - this.wheel) / Math.max(1, WHEEL_GLIDE_SECONDS * this.sampleRate);
   }
 
-  setPatch(patch: VoicePatch): void {
+  /** The patch the next note takes; `live`, the notes sounding too. */
+  setPatch(patch: VoicePatch, live = false): void {
     this.patch = structuredCloneOf(patch);
-    if (this.patch.kind === 'dx7') this.lfo.set(this.patch.lfo, this.sampleRate);
+    const now = this.patch;
+    if (now.kind !== 'dx7') return;
+    this.lfo.set(now.lfo, this.sampleRate);
+    if (!live) return;
+    for (const voice of this.voices) {
+      // A note waiting for its voice takes the edit too, but keeps its algorithm.
+      if (voice.waiting) voice.waiting.patch = { ...now, algorithm: voice.waiting.patch.algorithm };
+      else if (voice.sounding && voice.dx7 && voice.fadeLeft === 0) this.edit(voice, now);
+    }
+  }
+
+  /**
+   * An edit reaching a sounding note: the note worked out again at its
+   * key with its own algorithm; its gains, ratios, tremolo shares and
+   * feedback glide there; each envelope carries on from where it is.
+   */
+  private edit(voice: Voice, patch: Dx7Patch): void {
+    const time = voice.age / this.sampleRate;
+    const note = dx7Note(voice.algorithm, patch.operators, patch.feedback, voice.key);
+    for (let op = 0; op < MAX_OPERATORS; op++) {
+      anchorAt(voice.envelopes7[op], voice.anchors[op], time, voice.hold, voice.anchors[op]);
+    }
+    voice.envelopes7 = note.envelopes;
+    // The pitch envelope from where it is; one turned flat glides back to
+    // the note rather than stopping where it was.
+    pitchAnchorAt(voice.pitchEnvelope ?? FLAT_PITCH_ENVELOPE, voice.pitchAnchor, time, voice.hold, voice.pitchAnchor);
+    const bends = pitchEnvelopeOn(patch.pitchEnvelope) || voice.pitchAnchor.cents !== 0;
+    voice.pitchEnvelope = bends ? patch.pitchEnvelope : null;
+    if (!bends) Object.assign(voice.pitchAnchor, keyPitchAnchor());
+    voice.gainsFrom.set(voice.gains);
+    voice.ratiosFrom.set(voice.ratios);
+    voice.tremoloFrom.set(voice.tremolo);
+    voice.feedbackFrom = voice.feedback;
+    voice.gainsTo.set(note.gains);
+    voice.ratiosTo.set(note.ratios);
+    voice.tremoloTo.set(note.tremolo);
+    voice.feedbackTo = note.feedback;
+    voice.glideTotal = Math.max(1, Math.round(LIVE_GLIDE_SECONDS * this.sampleRate));
+    voice.glideLeft = voice.glideTotal;
+  }
+
+  /** One sample further along an edit's glide: ratios in cents, the rest straight. */
+  private glide(voice: Voice): void {
+    voice.glideLeft--;
+    const f = 1 - voice.glideLeft / voice.glideTotal;
+    for (let op = 0; op < MAX_OPERATORS; op++) {
+      voice.gains[op] = voice.gainsFrom[op] + (voice.gainsTo[op] - voice.gainsFrom[op]) * f;
+      voice.tremolo[op] = voice.tremoloFrom[op] + (voice.tremoloTo[op] - voice.tremoloFrom[op]) * f;
+      const from = voice.ratiosFrom[op];
+      const to = voice.ratiosTo[op];
+      voice.ratios[op] = voice.glideLeft === 0 || from <= 0 ? to : from * (to / from) ** f;
+    }
+    voice.feedback = voice.feedbackFrom + (voice.feedbackTo - voice.feedbackFrom) * f;
   }
 
   /** Strikes `note` at `hz`; it lets itself go after `hold` seconds. */
@@ -215,6 +314,17 @@ export class VoicePool {
     }
   }
 
+  /**
+   * A DX7 note's levels as the kernel takes them now, before tremolo:
+   * what the figures should draw of it. Null if `note` is not sounding.
+   */
+  kernelLevelsOf(note: number): number[] | null {
+    const voice = this.voices.find(v => v.note === note && v.sounding && v.dx7);
+    if (!voice) return null;
+    const time = voice.age / this.sampleRate;
+    return Array.from(voice.gains, (gain, op) => gain * this.envelopeLevel(voice, op, time));
+  }
+
   /** How many voices are sounding. */
   get active(): number {
     return this.voices.filter(voice => voice.sounding).length;
@@ -253,20 +363,22 @@ export class VoicePool {
   private tick(voice: Voice, sampleRate: number): number {
     const time = voice.age / sampleRate;
     let sample: number;
-    const dx7 = voice.dx7;
-    if (dx7) {
+    if (voice.dx7) {
+      if (voice.glideLeft > 0) this.glide(voice);
       const pull = this.pull;
       for (let op = 0; op < MAX_OPERATORS; op++) {
-        let level = dx7.gains[op] * dx7EnvelopeAt(dx7.envelopes[op], time, voice.hold);
+        let level = voice.gains[op] * this.envelopeLevel(voice, op, time);
         // Tremolo only ever lowers a level, by the operator's share.
-        const share = dx7.tremolo[op];
+        const share = voice.tremolo[op];
         if (share > 0 && pull > 0) level *= 10 ** ((-pull * share) / 20);
         voice.scaled[op] = level;
       }
       // The note's own pitch envelope, and the LFO's vibrato, in cents.
       let freq = voice.baseFreq * this.pitch;
-      if (voice.pitchEnvelope) freq *= 2 ** (dx7PitchAt(voice.pitchEnvelope, time, voice.hold) / 1200);
-      sample = voice.kernel.tick(freq, dx7.ratios, voice.scaled, dx7.feedback);
+      if (voice.pitchEnvelope) {
+        freq *= 2 ** (dx7PitchFrom(voice.pitchEnvelope, voice.pitchAnchor, time, voice.hold) / 1200);
+      }
+      sample = voice.kernel.tick(freq, voice.ratios, voice.scaled, voice.feedback);
     } else {
       for (let op = 0; op < MAX_OPERATORS; op++) {
         voice.heard[op] = voice.levels[op] * envelopeAt(voice.envelopes[op], time);
@@ -290,6 +402,14 @@ export class VoicePool {
     return sample;
   }
 
+  /** A DX7 note's operator `op`'s envelope, 0 to 1, from its key or its last edit. */
+  private envelopeLevel(voice: Voice, op: number, time: number): number {
+    const anchor = voice.anchors[op];
+    return atKey(anchor)
+      ? dx7EnvelopeAt(voice.envelopes7[op], time, voice.hold)
+      : dx7EnvelopeFrom(voice.envelopes7[op], anchor, time, voice.hold);
+  }
+
   /**
    * After each block: a note that lets itself go does so, and a voice
    * whose carriers have all died away is free.
@@ -299,13 +419,11 @@ export class VoicePool {
     const time = voice.age / this.sampleRate;
     if (voice.releasedAt === null && time >= voice.hold) voice.releasedAt = this.now;
     const dx7 = voice.dx7;
-    const attacks = dx7 ? dx7.envelopes : voice.envelopes;
+    const attacks = dx7 ? voice.envelopes7 : voice.envelopes;
     const attack = Math.max(...attacks.map((envelope: Envelope | Dx7Envelope) => envelope.attack));
     if (time <= attack) return;
     const silent = voice.alg.carriers.every(op =>
-      dx7
-        ? dx7EnvelopeAt(dx7.envelopes[op], time, voice.hold) < SILENT
-        : envelopeAt(voice.envelopes[op], time) < SILENT,
+      dx7 ? this.envelopeLevel(voice, op, time) < SILENT : envelopeAt(voice.envelopes[op], time) < SILENT,
     );
     if (silent) {
       voice.sounding = false;
@@ -322,8 +440,19 @@ export class VoicePool {
     voice.baseFreq = hz / this.sampleRate;
     voice.hold = hold;
     if (patch.kind === 'dx7') {
-      voice.dx7 = dx7Note(patch.algorithm, patch.operators, patch.feedback, keyOf(hz));
+      voice.algorithm = patch.algorithm;
+      voice.key = keyOf(hz);
+      const note = dx7Note(patch.algorithm, patch.operators, patch.feedback, voice.key);
+      voice.dx7 = note;
+      voice.gains.set(note.gains);
+      voice.ratios.set(note.ratios);
+      voice.tremolo.set(note.tremolo);
+      voice.feedback = note.feedback;
+      voice.envelopes7 = note.envelopes;
+      for (const anchor of voice.anchors) Object.assign(anchor, keyAnchor());
       voice.pitchEnvelope = pitchEnvelopeOn(patch.pitchEnvelope) ? patch.pitchEnvelope : null;
+      Object.assign(voice.pitchAnchor, keyPitchAnchor());
+      voice.glideLeft = 0;
     } else {
       voice.dx7 = null;
       voice.feedback = patch.feedback;
