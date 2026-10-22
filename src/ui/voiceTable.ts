@@ -128,9 +128,18 @@ export function mountVoiceTable(store: LabStore): void {
       const td = document.createElement('td');
       td.className = className;
       // Its column's name, shown only where the table is cards (phones).
+      // A unit ("dB", "¢") in a span of its own, so it keeps its case
+      // when the sandbox sets the name in capitals.
       const heading = document.createElement('span');
       heading.className = 'op-cell-label';
-      heading.textContent = label;
+      const [, name, unit] = /^(.*?)(?: (dB|¢))?$/.exec(label) ?? [label, label];
+      heading.textContent = name;
+      if (unit) {
+        const units = document.createElement('span');
+        units.className = 'unit';
+        units.textContent = unit;
+        heading.append(' ', units);
+      }
       heading.setAttribute('aria-hidden', 'true');
       td.append(heading, ...content);
       return td;
