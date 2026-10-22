@@ -2825,6 +2825,13 @@ body:not([data-view='instrument']) .inst-settings {
   cursor: pointer;
 }
 
+/* A number keeps its own case ("1.5 s", not "1.5 S"), and a click on it
+   does nothing: its keys are under the glass. */
+.settings-value.is-number {
+  text-transform: none;
+  cursor: default;
+}
+
 /* Under the screen: ‹ › through the lines, the selected one's name
    silkscreened grey, its choices as lamp keys. */
 .settings-controls {

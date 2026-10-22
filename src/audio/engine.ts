@@ -10,6 +10,8 @@ import {
   noteSounding,
   releaseSecondsOf,
 } from '../model/lab';
+import type { ReverbMessage } from '../dsp/plateReverb';
+import { settings } from '../model/settings';
 import type { Measurement } from '../viz/liveSpectrum';
 import { unlockIosAudio } from './iosUnlock';
 import { PROCESSOR_NAME } from './processorName';
@@ -74,6 +76,12 @@ interface Graph {
   synth: AudioWorkletNode;
   /** The envelope's loudness, for a chapter that plays notes; else 1. */
   note: GainNode;
+  /**
+   * The same, on the worklet's second output, the dry sound alone (no
+   * reverb), which the analyser measures: every change to `note` is made
+   * to it too.
+   */
+  noteDry: GainNode;
   master: GainNode;
   /** Measures the spectrum for the live view, before the volume. */
   analyser: AnalyserNode;
@@ -91,8 +99,12 @@ const FFT_SIZE = 8192;
 /**
  * Plays the model: it follows the store and owns everything Web Audio.
  *
- *   worklet (the synth) -> note gain -> master gain -> limiter -> speakers
- *                                  \-> analyser (the live spectrum)
+ *   worklet (the synth, stereo) -> note gain -> master gain -> limiter -> speakers
+ *   worklet (its dry output) -> note gain (the same) -> analyser (the live spectrum)
+ *
+ * The first output carries the sandbox's plate reverb when it is on (a
+ * Setting; dsp/plateReverb.ts), the second the dry sound alone, so the
+ * spectrum is the notes, never the tail.
  *
  * There are three ways of playing. Most chapters hold one steady sound
  * while `playing` is true. A chapter in `noteMode` plays one note each
@@ -126,7 +138,19 @@ export class AudioEngine {
 
   constructor(private readonly store: LabStore) {
     if (store.get().chapter === 'sandbox') this.warm();
+    // The reverb follows its settings, and is off outside the sandbox.
+    settings.subscribe((now, before) => {
+      if (
+        now.reverb !== before.reverb ||
+        now.reverbDecay !== before.reverbDecay ||
+        now.reverbMix !== before.reverbMix ||
+        now.reverbTone !== before.reverbTone
+      ) {
+        this.tell(this.reverbMessage());
+      }
+    });
     store.subscribe((state, previous) => {
+      if (state.chapter !== previous.chapter) this.tell(this.reverbMessage());
       if (state.chapter === 'sandbox' && previous.chapter !== 'sandbox') this.warm();
       if (state.mode === 'ops' && this.followVoices(state, previous)) return;
       // Out of six operators: whatever they were playing stops.
@@ -175,7 +199,8 @@ export class AudioEngine {
       for (const note of previous.held) {
         if (!state.held.includes(note)) this.tell({ type: 'noteOff', note });
       }
-      if (state.held.length === 0) this.suspendSoon((releaseSecondsOf(state) + 1) * 1000);
+      // Not before the reverb's tail has rung out.
+      if (state.held.length === 0) this.suspendSoon((releaseSecondsOf(state) + 1) * 1000 + this.tailMs());
     }
     if (state.notes !== previous.notes) {
       // Play note, or the space bar: held as long as the slowest
@@ -188,7 +213,7 @@ export class AudioEngine {
           noteLength: seconds,
           noteHold: hold,
         });
-        this.suspendSoon((seconds + 1) * 1000);
+        this.suspendSoon((seconds + 1) * 1000 + this.tailMs());
       });
     }
     if (
@@ -226,13 +251,15 @@ export class AudioEngine {
     const ready = this.wake();
     this.voiceQueue = this.voiceQueue
       .then(async () => {
-        const { context, synth, note: noteGain, master } = await ready;
+        const { context, synth, note: noteGain, noteDry, master } = await ready;
         const state = this.store.get();
         if (state.mode !== 'ops') return;
         const now = context.currentTime;
         synth.parameters.get('mode')?.setValueAtTime(2, now);
-        noteGain.gain.cancelScheduledValues(now);
-        noteGain.gain.setValueAtTime(1, now);
+        for (const gain of [noteGain.gain, noteDry.gain]) {
+          gain.cancelScheduledValues(now);
+          gain.setValueAtTime(1, now);
+        }
         // Straight to the volume, not faded in: the note's own envelope
         // starts from silence, and a fade would soften its attack.
         master.gain.cancelScheduledValues(now);
@@ -248,8 +275,8 @@ export class AudioEngine {
       });
   }
 
-  /** Tells the voice pool something, once there is one; never starts audio. */
-  private tell(message: VoiceMessage): void {
+  /** Tells the worklet something (the voice pool, the reverb), once there is one; never starts audio. */
+  private tell(message: VoiceMessage | ReverbMessage): void {
     const loading = this.loading;
     if (!loading) return;
     this.voiceQueue = this.voiceQueue
@@ -407,7 +434,7 @@ export class AudioEngine {
    */
   private async playNote(): Promise<void> {
     try {
-      const { context, synth, note, master } = await this.wake();
+      const { context, synth, note, noteDry, master } = await this.wake();
       const state = this.store.get();
       if (!state.noteMode) return;
 
@@ -444,6 +471,7 @@ export class AudioEngine {
       // The pitch changes in the silence between notes, not through one.
       jump('frequency', state.carrierHz);
       shape(note.gain, 1);
+      shape(noteDry.gain, 1);
       const index = synth.parameters.get('index');
       if (index && state.indexFollows) shape(index, state.index);
       else jump('index', state.index);
@@ -491,11 +519,15 @@ export class AudioEngine {
     const context = new AudioContext({ latencyHint: 'interactive' });
     await context.audioWorklet.addModule(processorUrl);
 
+    // Two outputs: the sound, stereo (the reverb's wet in it), and the
+    // dry sound alone, mono, for the analyser.
     const synth = new AudioWorkletNode(context, PROCESSOR_NAME, {
       numberOfInputs: 0,
-      outputChannelCount: [1],
+      numberOfOutputs: 2,
+      outputChannelCount: [2, 1],
     });
     const note = new GainNode(context, { gain: 1 });
+    const noteDry = new GainNode(context, { gain: 1 });
     const master = new GainNode(context, { gain: 0 });
     // A compressor set hard enough to be a limiter: a safety net, not an
     // effect. Even at full volume the signal stays under its threshold,
@@ -509,7 +541,7 @@ export class AudioEngine {
       release: 0.1,
     });
     synth
-      .connect(note)
+      .connect(note, 0)
       .connect(master)
       .connect(limiter)
       .connect(context.destination);
@@ -523,17 +555,42 @@ export class AudioEngine {
       minDecibels: -100,
       maxDecibels: 0,
     });
-    note.connect(analyser);
+    synth.connect(noteDry, 1).connect(analyser);
 
     this.graph = {
       context,
       synth,
       note,
+      noteDry,
       master,
       analyser,
       bins: new Float32Array(analyser.frequencyBinCount),
     };
+    // The reverb as the settings and the page say, from the start.
+    synth.port.postMessage(this.reverbMessage());
     return this.graph;
+  }
+
+  /**
+   * The plate reverb as the worklet should have it: on only in the sandbox
+   * with the Reverb setting on (Jeremy, 2026-10-22), and its Decay, Mix and
+   * Tone as set, which the worklet turns into the plate's coefficients.
+   */
+  private reverbMessage(): ReverbMessage {
+    const now = settings.get();
+    return {
+      type: 'reverb',
+      on: now.reverb === 'on' && this.store.get().chapter === 'sandbox',
+      seconds: now.reverbDecay,
+      mix: now.reverbMix,
+      tone: now.reverbTone,
+    };
+  }
+
+  /** How much longer a note's sound lasts for the reverb's tail, in ms: none when it is off. */
+  private tailMs(): number {
+    const { on, seconds } = this.reverbMessage();
+    return on ? (seconds + 0.1) * 1000 : 0;
   }
 
   /**
@@ -542,7 +599,7 @@ export class AudioEngine {
    */
   private sendPatch(state: LabState, seconds: number): void {
     if (!this.graph) return;
-    const { context, synth, note, master } = this.graph;
+    const { context, synth, note, noteDry, master } = this.graph;
     const now = context.currentTime;
     const glide = (name: string, value: number) => {
       const param = synth.parameters.get(name);
@@ -567,8 +624,10 @@ export class AudioEngine {
     if (seconds > 0) {
       master.gain.setTargetAtTime(state.volume, now, FADE_SECONDS);
     } else {
-      note.gain.cancelScheduledValues(now);
-      note.gain.setValueAtTime(1, now);
+      for (const gain of [note.gain, noteDry.gain]) {
+        gain.cancelScheduledValues(now);
+        gain.setValueAtTime(1, now);
+      }
     }
   }
 }

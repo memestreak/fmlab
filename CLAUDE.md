@@ -78,9 +78,13 @@ figures subscribe to it. Nothing else passes values around.
   `theme.ts` (the choice, its storage key, `applyTheme`) and
   `settings.ts`, the sandbox's settings (its Settings panel), outside the
   lab's store, the link and the sound: `Settings` (Screen glitch, Motion,
-  Tips on hover, Z X hint, Note names, Computer keys, Wheel),
-  `DEFAULT_SETTINGS` (today's behaviour), `parseSettings` (anything
-  missing, unknown or unreadable its default), `loadSettings` and
+  Tips on hover, Z X hint, Note names, Computer keys, Wheel, and the
+  plate reverb's Reverb, Decay, Mix and Tone), `DEFAULT_SETTINGS`
+  (today's behaviour; the reverb off, 1.5 s, 25 %, 70), the choice
+  settings' `SETTING_CHOICES` and the number settings' `SETTING_RANGES`
+  (min, max, step; `inRange`, `stepSetting`), `parseSettings` (anything
+  missing, unknown or unreadable its default; a number held in range
+  and rounded to its step), `loadSettings` and
   `saveSettings`, all together as JSON under
   `localStorage["fmlab.settings"]`, and `settings`, a store of their own
   that whatever they govern subscribes to. The theme is not among them:
@@ -311,6 +315,18 @@ figures subscribe to it. Nothing else passes values around.
   its envelope, by 10^(−dB × share × amp / 20)) and `voices.ts` (`chooseVoice`: a key's own voice, else a
   free one, else the one let go longest ago, else the oldest held; a
   voice taken is faded over `STEAL_SECONDS` first; and `midiToHz`).
+  `plateReverb.ts` (`PlateReverb`: the sandbox's reverb, Dattorro's
+  plate, J. Audio Eng. Soc. 45(9), 1997, figure 1 and tables 1 and 2,
+  every length scaled from 29,761 Hz; 10 ms pre-delay, four input
+  diffusers, the figure-eight tank with its two modulated allpasses (1 Hz,
+  ±16 paper samples, in quadrature, read in a straight line), table 2's
+  taps for left and right; Decay sets the decay coefficient from the
+  loop's length (`decayFor`, held under 0.9995, `DECAY_FIT` 0.94 so 0.5 to
+  20 s measure within 15%, about 0.33 s the shortest), and eases the
+  tank's first diffusers for short times (`diffusionFor`); Tone the
+  damping (`dampingFor`); Mix the dry and wet (`mixGains`); every change
+  glided over 50 ms; off, it glides the wet out, then stops and clears and
+  costs nothing; nothing made new in `process`).
   `pmKernel.ts` (`PmKernel`:
   phase modulation a sample at a time, up to six operators through an
   `Algorithm`, now `TWO_OPERATORS`; no feedback yet; its sines from a
@@ -344,7 +360,12 @@ figures subscribe to it. Nothing else passes values around.
   (1 is true FM; 2 the voice pool, told what to play by messages on its
   port, `VoiceMessage`: `patch`, `noteOn`, `noteOff`, `allOff`, and
   `wheel`, the mod wheel alone, lighter than the whole patch at every
-  step of a drag; the engine sends it on a change and with each note). It is
+  step of a drag; the engine sends it on a change and with each note).
+  Its first output is stereo: the sound in both channels and, in mode 2,
+  the plate reverb's wet added (`ReverbMessage`, `reverb`: on, seconds,
+  mix, tone; dsp/plateReverb.ts); its second, mono, the dry sound alone,
+  which the analyser measures, so the spectrum is the notes, never the
+  tail. Modes 0 and 1 never run the reverb. It is
   bundled on its own through the `?worker&url`
   import in `engine.ts`, and may import from `src/dsp` only. `engine.ts`
   (`AudioEngine`) follows the store: worklet, note gain, master gain,
@@ -361,9 +382,13 @@ figures subscribe to it. Nothing else passes values around.
   note can be brought down first. For six operators it tells the voice
   pool which keys went down and up (`held`), strikes `PLAYED_NOTE` for
   Play note, and sends `allOff` for Stop and a change of chapter; the
-  context is suspended once nothing is held or sounding.
-  An `AnalyserNode` taps the sound before the volume, and `measure()`
-  hands its spectrum to the live view.
+  context is suspended once nothing is held or sounding, and, with the
+  reverb on, its tail rung out (`tailMs`). It sends the reverb on load,
+  when its settings change and on a change of chapter: on only in the
+  sandbox with Reverb on (Jeremy, 2026-10-22).
+  An `AnalyserNode` taps the dry output before the volume (through
+  `noteDry`, which every change to the note gain is made to too), and
+  `measure()` hands its spectrum to the live view.
   `iosUnlock.ts` keeps iOS's ringer switch from muting it;
   `worklet-globals.d.ts` types the worklet's globals.
 - `src/viz/` — Canvas 2D drawing. A renderer is a function of
@@ -720,11 +745,17 @@ the press; the panel a modal `<dialog>` named Settings, a console of
 the chassis's black plastic the same in either theme over a page dimmed
 35 %: "Settings" on Dymo tape and a Close key (a push key with no lamp: it
 has no state to show), a VFD screen in a molded
-bezel listing the seven settings one line each (group dim, name, value;
+bezel listing the eleven settings one line each (group dim, name, value;
 the selected line lit behind with a bar at its left; a listbox: Up and
 Down, Left and Right change the value, Enter and Space the next choice,
 a click on a value too), and under it ‹ › through the lines, the
-selected one's name silkscreened grey and its choices as lamp keys.
+selected one's name silkscreened grey and its choices as lamp keys. A
+number line (Decay, Mix, Tone; Jeremy, 2026-10-22) is stepped by Left and
+Right (Shift: ten steps), held at its ends; Enter, Space and a click on
+its value do nothing; under the glass it has minus and plus, the
+choosers' black keys, repeating while held (after 400 ms, every 60 ms);
+its value, in its own case ("1.5 s", "25 %"), is a `role="slider"` with
+its range and words for screen readers.
 Changes apply and are saved as they are made; Esc, Close, the key or a
 click round the case closes it, focus going back to the key; the note
 keys and Z / X still play while it is open. The settings: Screen glitch
@@ -733,7 +764,11 @@ sandbox's native titles put away in `data-tip-off` and the terms' tips
 hidden, names and descriptions kept), Z X hint (Hover, Always, Off),
 Note names (C only, All: every white key, Off), Computer keys (Off, On:
 the computer key that plays each piano key, small at its foot), Wheel
-(Page, Reverse);
+(Page, Reverse), and the Reverb group: Reverb (Off, On), Decay (0.2 to
+20 s by 0.1, the -60 dB time), Mix (0 to 100 % by 1: dry
+min(1, 2(1 - mix)), wet min(1, 2 mix), so both are full at 50 %) and Tone
+(0 to 100: damping 0.7 (1 - tone / 100)); with Reverb Off the other three
+can still be set;
 `applySettings` sets them on `<html>` (`data-motion`, `data-tips`,
 `data-zx`, `data-note-names`, `data-computer-keys`) for the CSS. On a
 phone the key has the line under Volume's (beside it the fader would

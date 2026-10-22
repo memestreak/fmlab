@@ -21,10 +21,43 @@ export interface Settings {
   computerKeys: 'off' | 'on';
   /** A wheel's direction: as the page scrolls (positive deltaY the value below), or reversed. */
   wheel: 'page' | 'reverse';
+  /** The plate reverb (dsp/plateReverb.ts; Jeremy, 2026-10-22): heard or not. */
+  reverb: 'off' | 'on';
+  /** Its -60 dB time, in seconds. */
+  reverbDecay: number;
+  /** Its dry and wet balance, 0 (dry only) to 100 (wet only). */
+  reverbMix: number;
+  /** Its tail's brightness, 0 (darkest) to 100 (brightest). */
+  reverbTone: number;
 }
 
-/** Every setting's choices, the default first. */
-export const SETTING_CHOICES: { [K in keyof Settings]: readonly Settings[K][] } = {
+/** The settings that are numbers, each in a range; the rest are choices. */
+export type NumberSetting = 'reverbDecay' | 'reverbMix' | 'reverbTone';
+export type ChoiceSetting = Exclude<keyof Settings, NumberSetting>;
+
+/** Every number setting's range and step. */
+export const SETTING_RANGES: Record<NumberSetting, { min: number; max: number; step: number }> = {
+  reverbDecay: { min: 0.2, max: 20, step: 0.1 },
+  reverbMix: { min: 0, max: 100, step: 1 },
+  reverbTone: { min: 0, max: 100, step: 1 },
+};
+
+/** A number setting's value held in its range and rounded to its step. */
+export function inRange(key: NumberSetting, value: number): number {
+  const { min, max, step } = SETTING_RANGES[key];
+  const steps = Math.round((Math.min(max, Math.max(min, value)) - min) / step);
+  // To the step's own decimals, so 0.1 steps do not drift (1.5000000000000002).
+  const decimals = Math.max(0, -Math.floor(Math.log10(step)));
+  return Number((min + steps * step).toFixed(decimals));
+}
+
+/** A number setting `steps` steps on from `value` (back for negative), held at its ends. */
+export function stepSetting(key: NumberSetting, value: number, steps: number): number {
+  return inRange(key, value + steps * SETTING_RANGES[key].step);
+}
+
+/** Every choice setting's choices, the default first. */
+export const SETTING_CHOICES: { [K in ChoiceSetting]: readonly Settings[K][] } = {
   screenGlitch: ['on', 'off'],
   motion: ['system', 'still'],
   tips: ['on', 'off'],
@@ -32,6 +65,7 @@ export const SETTING_CHOICES: { [K in keyof Settings]: readonly Settings[K][] } 
   noteNames: ['c', 'all', 'off'],
   computerKeys: ['off', 'on'],
   wheel: ['page', 'reverse'],
+  reverb: ['off', 'on'],
 };
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -42,6 +76,10 @@ export const DEFAULT_SETTINGS: Settings = {
   noteNames: 'c',
   computerKeys: 'off',
   wheel: 'page',
+  reverb: 'off',
+  reverbDecay: 1.5,
+  reverbMix: 25,
+  reverbTone: 70,
 };
 
 /** Where they are saved, as JSON. */
@@ -57,11 +95,16 @@ export function parseSettings(raw: string | null): Settings {
   }
   const settings = { ...DEFAULT_SETTINGS };
   if (typeof saved !== 'object' || saved === null) return settings;
-  for (const key of Object.keys(SETTING_CHOICES) as (keyof Settings)[]) {
+  for (const key of Object.keys(SETTING_CHOICES) as ChoiceSetting[]) {
     const value = (saved as Record<string, unknown>)[key];
     if ((SETTING_CHOICES[key] as readonly unknown[]).includes(value)) {
       (settings as Record<keyof Settings, unknown>)[key] = value;
     }
+  }
+  // A number: held in range and rounded to its step; anything else the default.
+  for (const key of Object.keys(SETTING_RANGES) as NumberSetting[]) {
+    const value = (saved as Record<string, unknown>)[key];
+    if (typeof value === 'number' && Number.isFinite(value)) settings[key] = inRange(key, value);
   }
   return settings;
 }

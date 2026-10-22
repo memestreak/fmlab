@@ -2,6 +2,7 @@
 // (see the `?worker&url` import in engine.ts), so it may import from
 // src/dsp but must not touch the DOM.
 import { FmKernel } from '../dsp/fmKernel';
+import { PlateReverb, type ReverbMessage } from '../dsp/plateReverb';
 import { MAX_OPERATORS, PmKernel, TWO_OPERATORS } from '../dsp/pmKernel';
 import { type VoiceMessage, VoicePool, VOICES } from '../dsp/voicePool';
 import { PROCESSOR_NAME } from './processorName';
@@ -21,6 +22,12 @@ const LOCK_SECONDS = 0.05;
  * algorithms and the sandbox. Those notes are messages on the port, not
  * params: `patch`, `noteOn`, `noteOff` and `allOff` (VoiceMessage).
  *
+ * Its first output is stereo: the sound in both channels, and in mode 2
+ * the sandbox's plate reverb's wet added in each when it is on
+ * (dsp/plateReverb.ts; a `reverb` message). Its second, mono, is the dry
+ * sound alone, which the analyser measures: the spectrum is the notes,
+ * never the tail.
+ *
  * `mode` at 1 switches to true FM instead, for the vibrato chapter:
  * `modFrequency` and `deviation`, both in Hz, move the carrier's
  * frequency. The engine only flips `mode` while the output is faded out.
@@ -39,6 +46,9 @@ class SynthProcessor extends AudioWorkletProcessor {
 
   private readonly pm = new PmKernel(TWO_OPERATORS, LOCK_SECONDS * sampleRate);
   private readonly voices = new VoicePool(VOICES, sampleRate, LOCK_SECONDS * sampleRate);
+  private readonly reverb = new PlateReverb(sampleRate);
+  /** The dry sound of a block, before the reverb: grown only if a block is longer. */
+  private dry = new Float32Array(128);
   /** The mode of the last block rendered. */
   private mode = 0;
   private readonly fm = new FmKernel();
@@ -49,11 +59,16 @@ class SynthProcessor extends AudioWorkletProcessor {
 
   constructor() {
     super();
-    this.port.onmessage = (event: MessageEvent<VoiceMessage>) => {
+    this.port.onmessage = (event: MessageEvent<VoiceMessage | ReverbMessage>) => {
+      const message = event.data;
+      if (message.type === 'reverb') {
+        this.reverb.set({ seconds: message.seconds, tone: message.tone, mix: message.mix }, message.on);
+        return;
+      }
       // Outside mode 2 the voices are not rendered, so they could not fade:
       // there, all off is at once (the engine has faded the output anyway).
-      if (event.data.type === 'allOff' && this.mode !== 2) this.voices.reset();
-      else this.voices.handle(event.data);
+      if (message.type === 'allOff' && this.mode !== 2) this.voices.reset();
+      else this.voices.handle(message);
     };
   }
 
@@ -64,6 +79,8 @@ class SynthProcessor extends AudioWorkletProcessor {
   ): boolean {
     const channels = outputs[0];
     const out = channels[0];
+    // The second output: the dry sound alone, for the analyser.
+    const dryOut = outputs[1]?.[0];
     const { frequency, ratio, index, modFrequency, deviation } = parameters;
     // A param that is not moving arrives as a single value.
     const at = (param: Float32Array, i: number) =>
@@ -72,8 +89,12 @@ class SynthProcessor extends AudioWorkletProcessor {
     const mode = Math.round(parameters.mode[0]);
     this.mode = mode;
     if (mode === 2) {
-      this.voices.render(out);
-      for (let c = 1; c < channels.length; c++) channels[c].set(out);
+      if (this.dry.length < out.length) this.dry = new Float32Array(out.length);
+      const dry = this.dry.subarray(0, out.length);
+      this.voices.render(dry);
+      dryOut?.set(dry);
+      // Both channels the dry, and the plate's wet when it runs.
+      this.reverb.process(dry, out, channels[1] ?? out, out.length);
       return true;
     }
     const isFm = mode === 1;
@@ -98,6 +119,7 @@ class SynthProcessor extends AudioWorkletProcessor {
       }
     }
     for (let c = 1; c < channels.length; c++) channels[c].set(out);
+    dryOut?.set(out);
     return true;
   }
 }
