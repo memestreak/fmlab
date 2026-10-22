@@ -23,6 +23,7 @@ import {
   LABEL_SIZE,
   type Plot,
   plotArea,
+  shareToY,
 } from './plot';
 import { hzTicks, spectrumTicks } from './ticks';
 
@@ -210,6 +211,7 @@ export function drawSpectrum(
   canvas: HTMLCanvasElement,
   time?: number,
 ): SpectralLine[] {
+  if (isLogSpectrum(state)) return drawLogSpectrum(state, canvas, time);
   const plot = beginPlot(canvas);
   if (!plot) return spectrumOf(state, time);
   plot.glow();
@@ -344,4 +346,232 @@ export function orderAtX(
   const side = freq < 1 ? -1 : 1;
   const stemX = left + ((1 + side * order * ratio) / maxFreq) * (right - left);
   return Math.abs(stemX - px) <= HIT_DISTANCE ? order : null;
+}
+
+/*
+ * The sandbox's spectrum (Jeremy, 2026-10-22: "it needs a non-linear
+ * x-axis"): frequency in Hz on a log axis fixed from 20 Hz to 20 kHz,
+ * the same for every voice and key, so the partials move when another key
+ * is played and spread evenly by octave; and level in dB, 0 dB at the
+ * top to DB_FLOOR at the foot, so quiet partials and a note's decay show.
+ * The chapters keep their axes.
+ */
+
+/**
+ * What the analyser measured (liveSpectrum.ts): dB per bin, and the bin's
+ * amplitude on the stems' scale, where a full sine reads 1.
+ */
+export interface Measured {
+  db: Float32Array;
+  sampleRate: number;
+  fftSize: number;
+  amplitude: (db: number) => number;
+}
+
+/** The log frequency axis's ends, in Hz. */
+export const LOG_HZ = { min: 20, max: 20000 } as const;
+/** The foot of the dB axis: lines quieter than this are not drawn. */
+export const DB_FLOOR = -72;
+/** A gridline every this many dB. */
+const DB_STEP = 12;
+/** The least clear space between two of the frequency axis's labels. */
+const LOG_LABEL_GAP = 6;
+/** The foot's margin with one row of numbers. */
+const LOG_BOTTOM = 22;
+
+/** Whether the state's spectrum is drawn on the log axes: the sandbox's. */
+export function isLogSpectrum(state: LabState): boolean {
+  return state.chapter === 'sandbox';
+}
+
+/** How far along the log axis a frequency in Hz is: 0 at 20 Hz, 1 at 20 kHz. */
+export function hzToShare(hz: number): number {
+  return Math.log(hz / LOG_HZ.min) / Math.log(LOG_HZ.max / LOG_HZ.min);
+}
+
+/** An amplitude's size in dB; a full sine (1) is 0 dB, nothing -Infinity. */
+export function ampDb(amp: number): number {
+  const size = Math.abs(amp);
+  return size > 0 ? 20 * Math.log10(size) : -Infinity;
+}
+
+/**
+ * How far up the dB axis a level is: 1 at 0 dB (and above, held there),
+ * 0 at the floor; null below the floor, where nothing is drawn.
+ */
+export function dbToShare(db: number): number | null {
+  if (!(db >= DB_FLOOR)) return null;
+  return Math.min(1, (db - DB_FLOOR) / -DB_FLOOR);
+}
+
+/** The log axis's ticks: 20, 50, 100, 200, 500, 1k, 2k, 5k, 10k, 20k. */
+export const LOG_HZ_TICKS: readonly { hz: number; label: string }[] = [
+  20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000,
+].map(hz => ({ hz, label: hz >= 1000 ? `${hz / 1000}k` : String(hz) }));
+
+/**
+ * Which labels to keep where they would touch: from the left, each one
+ * whose box clears the last kept by `gap`; the last label is kept over the
+ * one before it. `xs` are the labels' centres, `widths` their widths.
+ */
+export function keptLabels(xs: readonly number[], widths: readonly number[], gap: number): boolean[] {
+  const kept = xs.map(() => false);
+  let edge = -Infinity;
+  xs.forEach((x, i) => {
+    if (x - widths[i] / 2 >= edge + gap) {
+      kept[i] = true;
+      edge = x + widths[i] / 2;
+    }
+  });
+  const last = xs.length - 1;
+  if (last > 0 && !kept[last]) {
+    // The top of the axis, 20k, matters more than the one before it.
+    for (let i = last - 1; i >= 0; i--) {
+      if (!kept[i]) continue;
+      kept[i] = false;
+      const before = kept.lastIndexOf(true, i - 1);
+      const clear = before < 0 || xs[last] - widths[last] / 2 >= xs[before] + widths[before] / 2 + gap;
+      kept[last] = clear;
+      if (clear) break;
+    }
+  }
+  return kept;
+}
+
+/** The dB gridlines, 0 at the top to the floor, each with its label. */
+const DB_ROWS = Array.from({ length: -DB_FLOOR / DB_STEP + 1 }, (_, i) => -i * DB_STEP);
+
+/**
+ * Draws the log axes' frame on the sandbox's spectrum: the dB gridlines,
+ * labelled where there is room (every other where they are close), the
+ * floor as the axis, faint uprights at the frequency ticks and their
+ * numbers. Returns the x pixel for a frequency in Hz and the y pixel for
+ * a level in dB (null below the floor).
+ */
+function drawLogFrame(plot: Plot): { x: (hz: number) => number; y: (db: number) => number | null } {
+  const { ctx, token, left, right, bottom } = plot;
+  const x = (hz: number) => left + hzToShare(hz) * (right - left);
+  const y = (db: number) => {
+    const share = dbToShare(db);
+    return share === null ? null : shareToY(plot, share);
+  };
+  const crisp = (v: number) => Math.round(v) + 0.5;
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = token('--grid');
+  for (const { hz } of LOG_HZ_TICKS) {
+    const at = crisp(x(hz));
+    ctx.beginPath();
+    ctx.moveTo(at, plot.top);
+    ctx.lineTo(at, bottom);
+    ctx.stroke();
+  }
+  for (const db of DB_ROWS) {
+    const at = crisp(y(db) ?? bottom);
+    ctx.strokeStyle = token(db === DB_FLOOR ? '--rule' : '--grid');
+    ctx.beginPath();
+    ctx.moveTo(left, at);
+    ctx.lineTo(right, at);
+    ctx.stroke();
+  }
+  ctx.fillStyle = token('--ink');
+  ctx.font = `${LABEL_SIZE}px ${token('--font-mono')}`;
+  ctx.textBaseline = 'middle';
+  ctx.textAlign = 'right';
+  const rowGap = (bottom - plot.top) / (DB_ROWS.length - 1);
+  const every = rowGap >= LABEL_SIZE + 2 ? 1 : 2;
+  DB_ROWS.forEach((db, i) => {
+    if (i % every === 0) ctx.fillText(db === 0 ? '0' : `−${-db}`, left - 6, y(db) ?? bottom);
+  });
+  ctx.textBaseline = 'top';
+  ctx.textAlign = 'center';
+  const xs = LOG_HZ_TICKS.map(tick => x(tick.hz));
+  const widths = LOG_HZ_TICKS.map(tick => ctx.measureText(tick.label).width);
+  const kept = keptLabels(xs, widths, LOG_LABEL_GAP);
+  LOG_HZ_TICKS.forEach((tick, i) => {
+    if (kept[i]) ctx.fillText(tick.label, xs[i], bottom + 6);
+  });
+  return { x, y };
+}
+
+/**
+ * Draws the sandbox's spectrum on the log axes: the predicted lines as
+ * stems standing up from the floor by their level in dB (a negative one
+ * in --pen-red, ending in a hollow marker), and, while sound plays, the
+ * measured spectrum over them, the same axes. Returns the lines.
+ */
+export function drawLogSpectrum(
+  state: LabState,
+  canvas: HTMLCanvasElement,
+  time?: number,
+  measured?: Measured,
+): SpectralLine[] {
+  const lines = spectrumOf(state, time);
+  const plot = beginPlot(canvas);
+  if (!plot) return lines;
+  // One row of numbers under the axis, not two: the plot takes the rest.
+  plot.bottom = canvas.getBoundingClientRect().height - LOG_BOTTOM;
+  plot.glow();
+  const { x, y } = drawLogFrame(plot);
+  const { ctx, token, bottom } = plot;
+  for (const { freq, amp } of lines) {
+    const hz = freq * state.carrierHz;
+    if (hz < LOG_HZ.min || hz > LOG_HZ.max) continue;
+    const top = y(ampDb(amp));
+    if (top === null || bottom - top < MIN_STEM) continue;
+    const negative = amp < 0;
+    ctx.lineWidth = STEM_WIDTH;
+    ctx.strokeStyle = token(negative ? '--pen-red' : '--pen-blue');
+    ctx.beginPath();
+    ctx.moveTo(x(hz), bottom);
+    ctx.lineTo(x(hz), top);
+    ctx.stroke();
+    if (negative) {
+      ctx.fillStyle = token('--paper');
+      ctx.beginPath();
+      ctx.arc(x(hz), top, MARKER_RADIUS, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.stroke();
+    }
+  }
+  if (measured) logTrace(plot, measured, x, y);
+  return lines;
+}
+
+/**
+ * The measured spectrum on the log axes: each bin from 20 Hz to 20 kHz at
+ * its own frequency and level (a full sine reads 0 dB, as the stems do),
+ * joined bin to bin, nothing smoothed between them; below the floor, on
+ * it. Filled down to the floor.
+ */
+function logTrace(
+  plot: Plot,
+  { db, sampleRate, fftSize, amplitude }: Measured,
+  x: (hz: number) => number,
+  y: (db: number) => number | null,
+): void {
+  const { ctx, base, token, bottom } = plot;
+  const points: [number, number][] = [];
+  for (let bin = 1; bin < db.length; bin++) {
+    const hz = (bin * sampleRate) / fftSize;
+    if (hz < LOG_HZ.min) continue;
+    if (hz > LOG_HZ.max) break;
+    points.push([x(hz), y(ampDb(amplitude(db[bin]))) ?? bottom]);
+  }
+  if (points.length < 2) return;
+  base.save();
+  base.beginPath();
+  base.moveTo(points[0][0], bottom);
+  for (const [px, py] of points) base.lineTo(px, py);
+  base.lineTo(points[points.length - 1][0], bottom);
+  base.closePath();
+  base.globalAlpha = 0.18;
+  base.fillStyle = token('--pen-blue');
+  base.fill();
+  base.restore();
+  ctx.beginPath();
+  points.forEach(([px, py], i) => (i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py)));
+  ctx.lineWidth = 1.5;
+  ctx.lineJoin = 'round';
+  ctx.strokeStyle = token('--pen-blue');
+  ctx.stroke();
 }

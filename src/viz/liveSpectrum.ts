@@ -1,6 +1,6 @@
 import type { LabState } from '../model/lab';
 import { ampToY, beginPlot, type Plot } from './plot';
-import { axisSpan, drawPredicted, drawSpectrumFrame } from './spectrumPlot';
+import { axisSpan, drawLogSpectrum, drawPredicted, drawSpectrumFrame, isLogSpectrum } from './spectrumPlot';
 
 /**
  * What the audio engine measures: the output's spectrum as Web Audio's
@@ -70,6 +70,11 @@ export function drawLiveSpectrum(
   measured: Measurement,
   time?: number,
 ): void {
+  // The sandbox's: on its log axes, in dB (spectrumPlot.ts).
+  if (isLogSpectrum(state)) {
+    drawLogSpectrum(state, canvas, time, { ...measured, amplitude: amplitudeFromDb });
+    return;
+  }
   const plot = beginPlot(canvas);
   if (!plot) return;
   plot.glow();

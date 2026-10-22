@@ -14,7 +14,7 @@ import { drawBessel } from '../viz/besselPlot';
 import { drawEnvelope } from '../viz/envelopePlot';
 import { drawSpectrogram, sliceAt } from '../viz/spectrogramPlot';
 import { drawLiveSpectrum } from '../viz/liveSpectrum';
-import { drawSpectrum, spectrumOf } from '../viz/spectrumPlot';
+import { ampDb, DB_FLOOR, drawSpectrum, isLogSpectrum, LOG_HZ, spectrumOf } from '../viz/spectrumPlot';
 import type { AudioEngine } from '../audio/engine';
 import { motionReduced, onMotionChange } from './motion';
 import {
@@ -162,6 +162,7 @@ export function describeSpectrum(
 ): string {
   // While sound plays, its measured spectrum is drawn over the stems.
   const over = measured ? ' Measured from the sound now playing, drawn over them.' : '';
+  if (isLogSpectrum(state)) return describeLogSpectrum(state, lines, over);
   if (lines.length === 0) return `Line spectrum for ${patchText(state)}: silent.${over}`;
   const strongest = lines.reduce((a, b) =>
     Math.abs(b.amp) > Math.abs(a.amp) ? b : a,
@@ -174,6 +175,27 @@ export function describeSpectrum(
   return (
     `Line spectrum for ${patchText(state)}: ${count}, the strongest at ` +
     `${where}, ${negative} with negative phase.${over}`
+  );
+}
+
+/**
+ * The sandbox's spectrum in words: its axes, and the lines it draws (in
+ * 20 Hz to 20 kHz, above the dB floor), the strongest by Hz and level.
+ */
+function describeLogSpectrum(state: LabState, lines: SpectralLine[], over: string): string {
+  const axes = 'Spectrum, frequency on a log scale from 20 Hz to 20 kHz, level in dB';
+  const shown = lines.filter(line => {
+    const hz = line.freq * state.carrierHz;
+    return hz >= LOG_HZ.min && hz <= LOG_HZ.max && ampDb(line.amp) >= DB_FLOOR;
+  });
+  if (shown.length === 0) return `${axes}: silent.${over}`;
+  const strongest = shown.reduce((a, b) => (Math.abs(b.amp) > Math.abs(a.amp) ? b : a));
+  const negative = shown.filter(line => line.amp < 0).length;
+  const count = shown.length === 1 ? '1 partial' : `${shown.length} partials`;
+  return (
+    `${axes}: ${count} above ${DB_FLOOR} dB, the strongest at ` +
+    `${(strongest.freq * state.carrierHz).toFixed(0)} Hz, ${ampDb(strongest.amp).toFixed(0)} dB, ` +
+    `${negative} with negative phase.${over}`
   );
 }
 
