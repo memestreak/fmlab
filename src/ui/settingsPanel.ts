@@ -1,4 +1,12 @@
-import { saveSettings, type Settings, settings } from '../model/settings';
+import {
+  type ChoiceSetting,
+  type NumberSetting,
+  saveSettings,
+  SETTING_RANGES,
+  type Settings,
+  settings,
+  stepSetting,
+} from '../model/settings';
 import { tapeLabel } from './dymo';
 import { inSandbox } from './motion';
 
@@ -9,8 +17,9 @@ import { inSandbox } from './motion';
 // saved (model/settings.ts). No theme: the sandbox is dark only
 // (Jeremy, 2026-10-22).
 
-/** One line of the panel: its group, its name, its choices and how to read and set it. */
-interface Line {
+/** A line of choices: its group, its name, its choices and how to read and set it. */
+interface ChoiceLine {
+  kind: 'choice';
   group: string;
   name: string;
   choices: readonly { value: string; label: string }[];
@@ -18,21 +27,64 @@ interface Line {
   set: (value: string) => void;
 }
 
+/**
+ * A line that is a number in a range (the reverb's Decay, Mix and Tone;
+ * Jeremy, 2026-10-22): stepped by Left and Right, or the minus and plus
+ * keys under the glass, held at its ends; written as `text` says, and
+ * said as `spoken` says.
+ */
+interface NumberLine {
+  kind: 'number';
+  group: string;
+  name: string;
+  key: NumberSetting;
+  text: (value: number) => string;
+  spoken: (value: number) => string;
+  get: () => number;
+  step: (steps: number) => void;
+}
+
+/** One line of the panel: a setting. */
+type Line = ChoiceLine | NumberLine;
+
+/** How many steps Shift takes at once on a number line. */
+const SHIFT_STEPS = 10;
+/** A minus or plus key held: it repeats after this long, then this often, in ms. */
+const REPEAT_AFTER_MS = 400;
+const REPEAT_EVERY_MS = 60;
+
 const choice = (value: string, label: string) => ({ value, label });
 
 /** The lines, in order; each one a setting. */
 function lines(): Line[] {
-  const setting = <K extends keyof Settings>(
+  const setting = <K extends ChoiceSetting>(
     group: string,
     name: string,
     key: K,
     labels: Record<Settings[K], string>,
-  ): Line => ({
+  ): ChoiceLine => ({
+    kind: 'choice',
     group,
     name,
     choices: (Object.keys(labels) as Settings[K][]).map(value => choice(value, labels[value])),
     get: () => settings.get()[key],
     set: value => settings.set({ [key]: value } as Partial<Settings>),
+  });
+  const number = (
+    group: string,
+    name: string,
+    key: NumberSetting,
+    text: (value: number) => string,
+    spoken: (value: number) => string,
+  ): NumberLine => ({
+    kind: 'number',
+    group,
+    name,
+    key,
+    text,
+    spoken,
+    get: () => settings.get()[key],
+    step: steps => settings.set({ [key]: stepSetting(key, settings.get()[key], steps) }),
   });
   return [
     setting('Screens', 'Screen glitch', 'screenGlitch', { on: 'On', off: 'Off' }),
@@ -42,6 +94,10 @@ function lines(): Line[] {
     setting('Keyboard', 'Note names', 'noteNames', { c: 'C only', all: 'All', off: 'Off' }),
     setting('Keyboard', 'Computer keys', 'computerKeys', { off: 'Off', on: 'On' }),
     setting('Controls', 'Wheel', 'wheel', { page: 'Page', reverse: 'Reverse' }),
+    setting('Reverb', 'Reverb', 'reverb', { off: 'Off', on: 'On' }),
+    number('Reverb', 'Decay', 'reverbDecay', v => `${v.toFixed(1)} s`, v => `${v.toFixed(1)} seconds`),
+    number('Reverb', 'Mix', 'reverbMix', v => `${v} %`, v => `${v} percent`),
+    number('Reverb', 'Tone', 'reverbTone', v => String(v), v => String(v)),
   ];
 }
 
@@ -156,11 +212,21 @@ export function mountSettings(): void {
     name.textContent = line.name;
     const value = document.createElement('span');
     value.className = 'settings-value';
+    if (line.kind === 'number') {
+      // Its value a slider for screen readers, its range and its words.
+      const { min, max } = SETTING_RANGES[line.key];
+      value.setAttribute('role', 'slider');
+      value.setAttribute('aria-label', line.name);
+      value.setAttribute('aria-valuemin', String(min));
+      value.setAttribute('aria-valuemax', String(max));
+      value.classList.add('is-number');
+    }
     row.append(group, name, value);
-    // A click selects the line; on its value, it also turns it to its next choice.
+    // A click selects the line; on a choice's value, it also turns it to
+    // its next choice (a number's does nothing).
     row.addEventListener('click', event => {
       select(i);
-      if (event.target instanceof Element && event.target.closest('.settings-value')) cycle(1);
+      if (line.kind === 'choice' && event.target instanceof Element && event.target.closest('.settings-value')) cycle(1);
       glass.focus({ preventScroll: true });
     });
     return { row, value };
@@ -200,17 +266,64 @@ export function mountSettings(): void {
   document.body.append(dialog);
   tapeLabel(title);
 
-  const labelOf = (line: Line) => line.choices.find(c => c.value === line.get())?.label ?? '';
-  /** Moves the line's value `by` choices on (Enter, Space, a click), round or held at the ends. */
+  const labelOf = (line: Line) =>
+    line.kind === 'number' ? line.text(line.get()) : (line.choices.find(c => c.value === line.get())?.label ?? '');
+  /**
+   * Moves the line's value `by` on: a choice's by choices (Enter, Space, a
+   * click), round or held at the ends; a number's by steps, held there.
+   */
   const cycle = (by: number, wrap = true) => {
     const line = all[selected];
+    if (line.kind === 'number') {
+      line.step(by);
+      return;
+    }
     const at = line.choices.findIndex(c => c.value === line.get());
     const to = wrap ? round(at, by, line.choices.length) : Math.min(line.choices.length - 1, Math.max(0, at + by));
     if (to !== at) line.set(line.choices[to].value);
   };
+  /** A minus or plus key held: the timer repeating it. */
+  let repeat: number | undefined;
+  const stopRepeat = () => {
+    window.clearTimeout(repeat);
+    window.clearInterval(repeat);
+    repeat = undefined;
+  };
+  /** A number line's minus and plus: the choosers' black keys, no lamps; repeating while held. */
+  const stepKey = (line: NumberLine, label: string, glyph: string, by: number) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'chooser-key';
+    button.textContent = glyph;
+    button.setAttribute('aria-label', `${label} ${line.name}`);
+    button.addEventListener('pointerdown', event => {
+      if (event.button !== 0) return;
+      line.step(by);
+      stopRepeat();
+      repeat = window.setTimeout(() => {
+        repeat = window.setInterval(() => line.step(by), REPEAT_EVERY_MS);
+      }, REPEAT_AFTER_MS);
+    });
+    for (const end of ['pointerup', 'pointerleave', 'pointercancel', 'blur'] as const) {
+      button.addEventListener(end, stopRepeat);
+    }
+    button.addEventListener('click', event => {
+      if (event.detail === 0) line.step(by);
+    });
+    return button;
+  };
   const buildChoices = () => {
+    stopRepeat();
     const line = all[selected];
     options.setAttribute('aria-label', line.name);
+    if (line.kind === 'number') {
+      options.className = 'chooser settings-choices';
+      options.setAttribute('role', 'group');
+      options.replaceChildren(stepKey(line, 'Less', '−', -1), stepKey(line, 'More', '+', 1));
+      return;
+    }
+    options.className = 'lamp-keys settings-choices';
+    options.setAttribute('role', 'radiogroup');
     const keys = line.choices.map((c, i) => {
       const button = document.createElement('button');
       button.type = 'button';
@@ -240,11 +353,18 @@ export function mountSettings(): void {
       const line = all[i];
       value.textContent = labelOf(line);
       row.setAttribute('aria-selected', String(i === selected));
-      row.setAttribute('aria-label', `${line.name}: ${labelOf(line)}`);
+      if (line.kind === 'number') {
+        value.setAttribute('aria-valuenow', String(line.get()));
+        value.setAttribute('aria-valuetext', line.spoken(line.get()));
+        row.setAttribute('aria-label', `${line.name}: ${line.spoken(line.get())}`);
+      } else {
+        row.setAttribute('aria-label', `${line.name}: ${labelOf(line)}`);
+      }
     });
     glass.setAttribute('aria-activedescendant', rows[selected].row.id);
     legend.textContent = all[selected].name;
     const line = all[selected];
+    if (line.kind === 'number') return;
     [...options.children].forEach((button, i) => {
       const on = line.choices[i].value === line.get();
       button.setAttribute('aria-checked', String(on));
@@ -265,12 +385,15 @@ export function mountSettings(): void {
     const handled: Record<string, () => void> = {
       ArrowUp: () => select(round(selected, -1, all.length)),
       ArrowDown: () => select(round(selected, 1, all.length)),
-      ArrowLeft: () => cycle(-1, false),
-      ArrowRight: () => cycle(1, false),
+      // Shift on a number line: ten steps at a time.
+      ArrowLeft: () => cycle(event.shiftKey && all[selected].kind === 'number' ? -SHIFT_STEPS : -1, false),
+      ArrowRight: () => cycle(event.shiftKey && all[selected].kind === 'number' ? SHIFT_STEPS : 1, false),
       Home: () => select(0),
       End: () => select(all.length - 1),
-      Enter: () => cycle(1),
-      ' ': () => cycle(1),
+      // On a number line, Enter and Space do nothing (and the space bar
+      // still does not play).
+      Enter: () => all[selected].kind === 'choice' && cycle(1),
+      ' ': () => all[selected].kind === 'choice' && cycle(1),
     };
     const act = handled[event.key];
     if (!act) return;
@@ -293,6 +416,7 @@ export function mountSettings(): void {
     if (isOpen()) dialog.close();
   };
   dialog.addEventListener('close', () => {
+    stopRepeat();
     key.setAttribute('aria-pressed', 'false');
     key.setAttribute('aria-expanded', 'false');
     key.focus({ preventScroll: true });
