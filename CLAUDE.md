@@ -621,7 +621,7 @@ Jeremy approved it on 2026-10-18: "the existing app, just full page and
 with a better looking keyboard", six operators only): no text column;
 the masthead is its title bar (Jeremy, 2026-10-20, "more stand alone"):
 the wordmark (home), then in the place of Contents, which the sandbox
-hides with the crumb, the preset group, 24px after the wordmark, the
+hides with the crumb, the preset group, 40px after the wordmark, the
 free room right of it (Jeremy, 2026-10-22; it was centred between the
 wordmark and Volume), the name's box as wide as the widest name so
 nothing in it moves from voice to voice, with no label of its own
@@ -791,6 +791,10 @@ under 52rem high). Every control row's dials are one size,
 row's dials, push keys (their bezels a dial tall; the algorithm chooser,
 the LFO's waves and Key sync lifted onto the dials' line) and knob names
 fall on the same two lines in all five rows.
+The top band's tab keys' bezels end where the screens under them do
+(Jeremy, 2026-10-22): their lit edge reaches past the box by
+`--lamp-bezel-reach` (2px), a screen's black edge by 1px, so they stand
+in by the difference (on a phone, on both sides of the line).
 The page is three bodies of the same molded black plastic, the
 `.chassis` (Jeremy, 2026-10-21), an even 10px apart, and 10px under the
 title bar (Jeremy, 2026-10-22: a little less than the 15 to 17px they
