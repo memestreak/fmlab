@@ -384,9 +384,9 @@
                under both. -->
           <div class="inst-top chassis chassis-ink">
             <div class="inst-left">
-              <!-- The voice: its title, and a switch between three tabs,
-                   the algorithm, the LFO and the pitch envelope
-                   (ui/lfoView.ts). -->
+              <!-- The voice: its title, and a switch between four tabs,
+                   the algorithm, the LFO, the pitch envelope and the
+                   reverb (ui/lfoView.ts). -->
               <div class="inst-alg-head">
                 <h3 class="panel-title inst-section-title">Voice</h3>
                 <div class="pill-tabs" role="tablist" aria-label="Voice">
@@ -419,6 +419,16 @@
                     data-tab="pitch"
                   >
                     Pitch EG<span class="pill-mark" aria-hidden="true"></span>
+                  </button>
+                  <button
+                    type="button"
+                    id="inst-tab-reverb"
+                    class="pill-tab"
+                    role="tab"
+                    aria-controls="inst-reverb-panel"
+                    data-tab="reverb"
+                  >
+                    Reverb<span class="pill-mark" aria-hidden="true"></span>
                   </button>
                 </div>
               </div>
@@ -501,6 +511,34 @@
                 </div>
                 <div class="inst-voice-controls">
                   <div id="inst-pitch-knobs" class="inst-pitch-knobs"></div>
+                </div>
+              </div>
+              <!-- The plate reverb: its response to a click, its four knobs
+                   and its On key at the row's right end (ui/reverbView.ts).
+                   Settings of the instrument, not of the voice. -->
+              <div
+                id="inst-reverb-panel"
+                class="inst-reverb inst-voice-tab"
+                role="tabpanel"
+                aria-labelledby="inst-tab-reverb"
+                hidden
+              >
+                <div class="screen-bezel inst-voice-display">
+                  <canvas id="inst-reverb-plot" class="inst-reverb-plot" role="img"></canvas>
+                </div>
+                <div class="inst-voice-controls inst-reverb-controls">
+                  <div id="inst-reverb-knobs" class="inst-pitch-knobs inst-reverb-knobs"></div>
+                  <span class="lamp-keys inst-reverb-on">
+                    <button
+                      id="inst-reverb-on"
+                      type="button"
+                      class="lamp-key"
+                      aria-pressed="false"
+                      aria-label="Reverb"
+                    >
+                      On
+                    </button>
+                  </span>
                 </div>
               </div>
             </div>

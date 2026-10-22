@@ -8,8 +8,8 @@
 /** The paper's sample rate: every length below is in its samples. */
 const PAPER_RATE = 29761;
 
-/** Pre-delay, fixed, in seconds. */
-export const PRE_DELAY_SECONDS = 0.01;
+/** The longest pre-delay, in seconds (the Pre-delay setting's top; Jeremy, 2026-10-22). */
+export const MAX_PRE_DELAY_SECONDS = 0.5;
 /** The input low-pass's coefficient (table 1's bandwidth). */
 const BANDWIDTH = 0.9995;
 /** The four input diffusers (figure 1): lengths and coefficients (input diffusion 1, 2). */
@@ -119,7 +119,7 @@ function allpass(line: Delay, length: number, g: number, x: number): number {
 /**
  * What the main thread tells the worklet about the reverb (engine.ts):
  * whether it is heard (on in the sandbox alone), its -60 dB time in
- * seconds, its mix and its tone, 0 to 100. The worklet turns them into
+ * seconds, its mix and its tone, 0 to 100, and its pre-delay in seconds. The worklet turns them into
  * the plate's coefficients.
  */
 export interface ReverbMessage {
@@ -128,13 +128,19 @@ export interface ReverbMessage {
   seconds: number;
   mix: number;
   tone: number;
+  /** In seconds. */
+  preDelay: number;
 }
 
-/** What the reverb is asked for: its -60 dB time in seconds, its tone 0 to 100, its mix 0 to 100. */
+/**
+ * What the reverb is asked for: its -60 dB time in seconds, its tone 0
+ * to 100, its mix 0 to 100, and its pre-delay in seconds.
+ */
 export interface ReverbSettings {
   seconds: number;
   tone: number;
   mix: number;
+  preDelay: number;
 }
 
 /** The paper's decay coefficient for a -60 dB time of `seconds`, at `rate`, round a loop of `loop` samples. */
@@ -183,7 +189,18 @@ export class PlateReverb {
   private readonly rate: number;
   private readonly scale: number;
   private readonly preDelay: Delay;
-  private readonly preDelaySamples: number;
+  /**
+   * The pre-delay's taps, in samples back: `tap` the one set; while a turn
+   * fades (equal power, REVERB_GLIDE_SECONDS), `fromA` and `fromB`, the
+   * sound playing when it was turned, at their weights. The read point is
+   * never moved, so the wet's pitch never bends.
+   */
+  private tap = 0;
+  private fromA = 0;
+  private fromB = 0;
+  private weightA = 1;
+  private weightB = 0;
+  private fadeLeft = 0;
   private readonly diffusers: { line: Delay; length: number; g: number }[];
   private readonly lines: Record<Line, Delay>;
   private readonly lengths: Record<Line | 'leftModulated' | 'rightModulated', number>;
@@ -209,13 +226,14 @@ export class PlateReverb {
   private running = false;
   private on = false;
   private seconds = 1.5;
+  private preDelaySeconds = 0;
 
   constructor(sampleRate: number) {
     this.rate = sampleRate;
     this.scale = sampleRate / PAPER_RATE;
     const at = (paper: number) => Math.max(1, Math.round(paper * this.scale));
-    this.preDelaySamples = Math.max(1, Math.round(PRE_DELAY_SECONDS * sampleRate));
-    this.preDelay = new Delay(this.preDelaySamples);
+    // Its longest, once: a turn of Pre-delay never makes anything new.
+    this.preDelay = new Delay(Math.ceil(MAX_PRE_DELAY_SECONDS * sampleRate) + 2);
     this.diffusers = INPUT_DIFFUSERS.map(([length, g]) => ({ line: new Delay(at(length)), length: at(length), g }));
     this.excursion = EXCURSION * this.scale;
     this.lengths = {
@@ -248,14 +266,15 @@ export class PlateReverb {
       l.leftModulated + l.leftDelay1 + l.leftAllpass + l.leftDelay2 + l.rightModulated + l.rightDelay1 + l.rightAllpass + l.rightDelay2;
     this.phaseStep = (2 * Math.PI * MODULATION_HZ) / sampleRate;
     this.glideSamples = Math.max(1, Math.round(REVERB_GLIDE_SECONDS * sampleRate));
-    this.set({ seconds: 1.5, tone: 70, mix: 25 }, false);
+    this.set({ seconds: 1.5, tone: 70, mix: 25, preDelay: 0 }, false);
     // At rest: the first set does not glide.
     for (const glide of [this.decay, this.diffusion, this.damping, this.dry, this.wet]) glide.now = glide.target;
+    this.fadeLeft = 0;
   }
 
   /** The -60 dB time now, and the pre-delay: how long the tail rings. */
   get tailSeconds(): number {
-    return this.on ? this.seconds + PRE_DELAY_SECONDS : 0;
+    return this.on ? this.seconds + this.preDelaySeconds : 0;
   }
 
   /** Whether it is running (on, or gliding off). */
@@ -268,7 +287,7 @@ export class PlateReverb {
    * wet down, then stops and clears; on starts from clear lines and glides
    * the wet up from nothing.
    */
-  set({ seconds, tone, mix }: ReverbSettings, on = this.on): void {
+  set({ seconds, tone, mix, preDelay }: ReverbSettings, on = this.on): void {
     if (on && !this.running) {
       this.clear();
       this.wet.now = 0;
@@ -276,12 +295,39 @@ export class PlateReverb {
     }
     this.on = on;
     this.seconds = seconds;
+    this.preDelaySeconds = Math.min(MAX_PRE_DELAY_SECONDS, Math.max(0, preDelay));
+    this.turnTap(Math.round(this.preDelaySeconds * this.rate));
     const gains = mixGains(mix);
     this.aim(this.decay, decayFor(seconds, this.rate, this.loop));
     this.aim(this.diffusion, diffusionFor(seconds, this.rate, this.lengths.leftModulated));
     this.aim(this.damping, dampingFor(tone));
     this.aim(this.dry, on ? gains.dry : 1);
     this.aim(this.wet, on ? gains.wet : 0);
+  }
+
+  /**
+   * A new pre-delay: the tap fades over from the sound playing now. Mid
+   * fade, that sound is the old taps and the new at their weights now; the
+   * two loudest are kept (the third, fading, is let go).
+   */
+  private turnTap(to: number): void {
+    if (to === this.tap && this.fadeLeft === 0) return;
+    if (this.fadeLeft === 0) {
+      this.fromA = this.fromB = this.tap;
+      this.weightA = 1;
+      this.weightB = 0;
+    } else {
+      const angle = (Math.PI / 2) * (1 - this.fadeLeft / this.glideSamples);
+      const playing: [number, number][] = [
+        [this.fromA, this.weightA * Math.cos(angle)],
+        [this.fromB, this.weightB * Math.cos(angle)],
+        [this.tap, Math.sin(angle)],
+      ];
+      playing.sort((a, b) => b[1] - a[1]);
+      [[this.fromA, this.weightA], [this.fromB, this.weightB]] = playing;
+    }
+    this.tap = to;
+    this.fadeLeft = this.glideSamples;
   }
 
   private aim(glide: Glide, target: number): void {
@@ -292,6 +338,7 @@ export class PlateReverb {
   /** Empties every line and filter. */
   clear(): void {
     this.preDelay.clear();
+    this.fadeLeft = 0;
     for (const { line } of this.diffusers) line.clear();
     for (const line of Object.values(this.lines)) line.clear();
     this.leftModulated.clear();
@@ -318,9 +365,17 @@ export class PlateReverb {
       const damping = step(this.damping);
       const dry = step(this.dry);
       const wet = step(this.wet);
-      // The input: pre-delay, the bandwidth's low-pass, four diffusers.
+      // The input: pre-delay (at 0 straight through; a turn crossfades
+      // from the old tap to the new, equal power), the bandwidth's
+      // low-pass, four diffusers.
       this.preDelay.write(input[i]);
-      let x = this.preDelay.read(this.preDelaySamples - 1);
+      let x = this.preDelay.read(this.tap);
+      if (this.fadeLeft > 0) {
+        this.fadeLeft--;
+        const angle = (Math.PI / 2) * (1 - this.fadeLeft / this.glideSamples);
+        const from = this.weightA * this.preDelay.read(this.fromA) + this.weightB * this.preDelay.read(this.fromB);
+        x = Math.cos(angle) * from + Math.sin(angle) * x;
+      }
       this.bandwidthState += BANDWIDTH * (x - this.bandwidthState);
       x = this.bandwidthState;
       for (let d = 0; d < diffusers.length; d++) {

@@ -1,8 +1,9 @@
-// The sandbox's Voice section: three tabs, Algorithm (the chooser, the
-// diagram and Feedback), LFO and Pitch EG (ui/pitchEgView.ts). The
+// The sandbox's Voice section: four tabs, Algorithm (the chooser, the
+// diagram and Feedback), LFO, Pitch EG (ui/pitchEgView.ts) and Reverb
+// (ui/reverbView.ts; Jeremy, 2026-10-22). The
 // sandbox always opens on Algorithm; which tab is open is the page's
-// alone, in neither the link nor storage. While the LFO or the Pitch EG
-// tab is closed its pill shows a dot when that feature is on. The LFO tab: the wave, six buttons each drawing its shape, with
+// alone, in neither the link nor storage. While the LFO, the Pitch EG or
+// the Reverb tab is closed its pill shows a dot when that feature is on. The LFO tab: the wave, six buttons each drawing its shape, with
 // a drawing of the LFO under them (viz/lfoPlot.ts); Speed, Delay,
 // Vibrato and Tremolo, and what the mod wheel adds to those two at full,
 // Wheel vibrato and Wheel tremolo: six knobs; and key sync, a push key,
@@ -21,19 +22,21 @@ import {
 } from '../dsp/dx7';
 import { dx7LfoDelay, dx7TremoloDb, dx7VibratoCents } from '../dsp/lfo';
 import type { LabStore } from '../model/lab';
+import { settings } from '../model/settings';
 import { knobValues, redrawOnLayout } from './screenValues';
 import { describeLfo, drawLfo } from '../viz/lfoPlot';
 import { createKnob } from './knob';
 import { glitchScreens } from './screenGlitch';
 import { formatTime } from './voiceFormat';
 
-type VoiceArea = 'algorithm' | 'lfo' | 'pitch';
+type VoiceArea = 'algorithm' | 'lfo' | 'pitch' | 'reverb';
 
 /** Each tab's screen, the canvas whose glass glitches when it opens. */
 const SCREENS: Record<VoiceArea, string> = {
   algorithm: 'algorithm-plot',
   lfo: 'inst-lfo-plot',
   pitch: 'inst-pitch-curve',
+  reverb: 'inst-reverb-plot',
 };
 
 /** Each wave's name and its button's drawing (an SVG path in 24 × 16). */
@@ -80,7 +83,15 @@ export function mountVoiceArea(store: LabStore): void {
   // between them, open one.
   const tabs = [...head.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
   // The tabs whose feature can be on, and when it is.
-  const features: { tab: HTMLButtonElement | undefined; area: VoiceArea; name: string; on: () => boolean }[] = [
+  // The Reverb's dot shows while its tab is open too (Jeremy, 2026-10-22):
+  // its lamp says the reverb is on, wherever one is looking.
+  const features: {
+    tab: HTMLButtonElement | undefined;
+    area: VoiceArea;
+    name: string;
+    on: () => boolean;
+    whileOpen?: boolean;
+  }[] = [
     {
       tab: tabs.find(tab => tab.dataset.tab === 'lfo'),
       area: 'lfo',
@@ -93,6 +104,13 @@ export function mountVoiceArea(store: LabStore): void {
       name: 'Pitch EG',
       on: () => pitchEnvelopeOn(store.get().dxPitchEnvelope),
     },
+    {
+      tab: tabs.find(tab => tab.dataset.tab === 'reverb'),
+      area: 'reverb',
+      name: 'Reverb',
+      on: () => settings.get().reverb === 'on',
+      whileOpen: true,
+    },
   ];
   let open: VoiceArea = 'algorithm';
   const showTabs = () => {
@@ -104,8 +122,8 @@ export function mountVoiceArea(store: LabStore): void {
       if (panel) panel.hidden = !on;
     }
     // A feature's dot, while it is on and its tab closed.
-    for (const { tab, area, name, on } of features) {
-      const marked = open !== area && on();
+    for (const { tab, area, name, on, whileOpen } of features) {
+      const marked = (whileOpen || open !== area) && on();
       tab?.classList.toggle('is-marked', marked);
       tab?.setAttribute('aria-label', marked ? `${name}, on` : name);
     }
@@ -276,6 +294,10 @@ export function mountVoiceArea(store: LabStore): void {
     if (state.chapter !== previous.chapter || state.dxLfo !== previous.dxLfo) show();
     else if (state.dxPitchEnvelope !== previous.dxPitchEnvelope || state.modWheel !== previous.modWheel) showTabs();
     else if (state.theme !== previous.theme && open === 'lfo') drawPlot();
+  });
+  // The Reverb tab's dot follows its On key, a setting.
+  settings.subscribe((state, before) => {
+    if (state.reverb !== before.reverb) showTabs();
   });
   new ResizeObserver(() => {
     if (open === 'lfo') drawPlot();

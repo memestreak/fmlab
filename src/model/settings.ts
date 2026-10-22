@@ -21,7 +21,11 @@ export interface Settings {
   computerKeys: 'off' | 'on';
   /** A wheel's direction: as the page scrolls (positive deltaY the value below), or reversed. */
   wheel: 'page' | 'reverse';
-  /** The plate reverb (dsp/plateReverb.ts; Jeremy, 2026-10-22): heard or not. */
+  /**
+   * The plate reverb (dsp/plateReverb.ts; Jeremy, 2026-10-22): heard or
+   * not. It and the four below are set on the Voice section's Reverb tab
+   * (ui/reverbView.ts), not in the Settings panel.
+   */
   reverb: 'off' | 'on';
   /** Its -60 dB time, in seconds. */
   reverbDecay: number;
@@ -29,10 +33,12 @@ export interface Settings {
   reverbMix: number;
   /** Its tail's brightness, 0 (darkest) to 100 (brightest). */
   reverbTone: number;
+  /** How long after the sound its tail starts, in ms (Jeremy, 2026-10-22). */
+  reverbPreDelay: number;
 }
 
 /** The settings that are numbers, each in a range; the rest are choices. */
-export type NumberSetting = 'reverbDecay' | 'reverbMix' | 'reverbTone';
+export type NumberSetting = 'reverbDecay' | 'reverbMix' | 'reverbTone' | 'reverbPreDelay';
 export type ChoiceSetting = Exclude<keyof Settings, NumberSetting>;
 
 /** Every number setting's range and step. */
@@ -40,6 +46,7 @@ export const SETTING_RANGES: Record<NumberSetting, { min: number; max: number; s
   reverbDecay: { min: 0.2, max: 20, step: 0.1 },
   reverbMix: { min: 0, max: 100, step: 1 },
   reverbTone: { min: 0, max: 100, step: 1 },
+  reverbPreDelay: { min: 0, max: 500, step: 1 },
 };
 
 /** A number setting's value held in its range and rounded to its step. */
@@ -49,11 +56,6 @@ export function inRange(key: NumberSetting, value: number): number {
   // To the step's own decimals, so 0.1 steps do not drift (1.5000000000000002).
   const decimals = Math.max(0, -Math.floor(Math.log10(step)));
   return Number((min + steps * step).toFixed(decimals));
-}
-
-/** A number setting `steps` steps on from `value` (back for negative), held at its ends. */
-export function stepSetting(key: NumberSetting, value: number, steps: number): number {
-  return inRange(key, value + steps * SETTING_RANGES[key].step);
 }
 
 /** Every choice setting's choices, the default first. */
@@ -80,6 +82,7 @@ export const DEFAULT_SETTINGS: Settings = {
   reverbDecay: 1.5,
   reverbMix: 25,
   reverbTone: 70,
+  reverbPreDelay: 0,
 };
 
 /** Where they are saved, as JSON. */

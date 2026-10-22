@@ -76,13 +76,14 @@ figures subscribe to it. Nothing else passes values around.
   `set` and get the previous state too), `lab.ts` (`LabState`; the ranges
   and defaults; the log scales of the carrier and modulator sliders),
   `theme.ts` (the choice, its storage key, `applyTheme`) and
-  `settings.ts`, the sandbox's settings (its Settings panel), outside the
-  lab's store, the link and the sound: `Settings` (Screen glitch, Motion,
-  Tips on hover, Z X hint, Note names, Computer keys, Wheel, and the
-  plate reverb's Reverb, Decay, Mix and Tone), `DEFAULT_SETTINGS`
-  (today's behaviour; the reverb off, 1.5 s, 25 %, 70), the choice
+  `settings.ts`, the sandbox's settings (its Settings panel, and the
+  Voice section's Reverb tab), outside the lab's store, the link and the
+  sound: `Settings` (Screen glitch, Motion, Tips on hover, Z X hint, Note
+  names, Computer keys, Wheel; and the plate reverb's Reverb, Decay, Mix,
+  Tone and Pre-delay, set on the Reverb tab), `DEFAULT_SETTINGS`
+  (today's behaviour; the reverb off, 1.5 s, 25 %, 70, 0 ms), the choice
   settings' `SETTING_CHOICES` and the number settings' `SETTING_RANGES`
-  (min, max, step; `inRange`, `stepSetting`), `parseSettings` (anything
+  (min, max, step; `inRange`), `parseSettings` (anything
   missing, unknown or unreadable its default; a number held in range
   and rounded to its step), `loadSettings` and
   `saveSettings`, all together as JSON under
@@ -317,7 +318,9 @@ figures subscribe to it. Nothing else passes values around.
   voice taken is faded over `STEAL_SECONDS` first; and `midiToHz`).
   `plateReverb.ts` (`PlateReverb`: the sandbox's reverb, Dattorro's
   plate, J. Audio Eng. Soc. 45(9), 1997, figure 1 and tables 1 and 2,
-  every length scaled from 29,761 Hz; 10 ms pre-delay, four input
+  every length scaled from 29,761 Hz; the Pre-delay setting, 0 to 500 ms
+  (a line of 500 ms made once; a turn crossfades from the old tap to the
+  new over 50 ms, equal power, so the wet's pitch never bends), four input
   diffusers, the figure-eight tank with its two modulated allpasses (1 Hz,
   ±16 paper samples, in quadrature, read in a straight line), table 2's
   taps for left and right; Decay sets the decay coefficient from the
@@ -745,17 +748,11 @@ the press; the panel a modal `<dialog>` named Settings, a console of
 the chassis's black plastic the same in either theme over a page dimmed
 35 %: "Settings" on Dymo tape and a Close key (a push key with no lamp: it
 has no state to show), a VFD screen in a molded
-bezel listing the eleven settings one line each (group dim, name, value;
+bezel listing the seven settings one line each (group dim, name, value;
 the selected line lit behind with a bar at its left; a listbox: Up and
 Down, Left and Right change the value, Enter and Space the next choice,
 a click on a value too), and under it ‹ › through the lines, the
-selected one's name silkscreened grey and its choices as lamp keys. A
-number line (Decay, Mix, Tone; Jeremy, 2026-10-22) is stepped by Left and
-Right (Shift: ten steps), held at its ends; Enter, Space and a click on
-its value do nothing; under the glass it has minus and plus, the
-choosers' black keys, repeating while held (after 400 ms, every 60 ms);
-its value, in its own case ("1.5 s", "25 %"), is a `role="slider"` with
-its range and words for screen readers.
+selected one's name silkscreened grey and its choices as lamp keys.
 Changes apply and are saved as they are made; Esc, Close, the key or a
 click round the case closes it, focus going back to the key; the note
 keys and Z / X still play while it is open. The settings: Screen glitch
@@ -764,11 +761,8 @@ sandbox's native titles put away in `data-tip-off` and the terms' tips
 hidden, names and descriptions kept), Z X hint (Hover, Always, Off),
 Note names (C only, All: every white key, Off), Computer keys (Off, On:
 the computer key that plays each piano key, small at its foot), Wheel
-(Page, Reverse), and the Reverb group: Reverb (Off, On), Decay (0.2 to
-20 s by 0.1, the -60 dB time), Mix (0 to 100 % by 1: dry
-min(1, 2(1 - mix)), wet min(1, 2 mix), so both are full at 50 %) and Tone
-(0 to 100: damping 0.7 (1 - tone / 100)); with Reverb Off the other three
-can still be set;
+(Page, Reverse) (the reverb's are on the Voice section's Reverb tab,
+Jeremy, 2026-10-22);
 `applySettings` sets them on `<html>` (`data-motion`, `data-tips`,
 `data-zx`, `data-note-names`, `data-computer-keys`) for the CSS. On a
 phone the key has the line under Volume's (beside it the fader would
@@ -782,7 +776,8 @@ and the space bar play, and the address bar keeps the sound. The page's
 title, "Sandbox" (`#inst-title`), is for screen readers only. Then,
 in layout F (Jeremy, 2026-10-18), a top band: on the left, the
 title Voice at the top left, the band's first row, with
-a row of tabs, Algorithm | LFO | Pitch EG, at the right of its line (`lfoView.ts`;
+a row of tabs, Algorithm | LFO | Pitch EG | Reverb, at the right of its line (`lfoView.ts`;
+on a phone on a line of its own under the title, the keys sharing it;
 `.pill-tabs`, shared with the operator panel, drawn in the sandbox as an
 8-track player's black push keys in a bezel, the open one pressed in
 with its amber jewel lamp lit and its legend glowing warm, the others
@@ -793,11 +788,14 @@ alike (`ui/screenGlitch.ts`, `glitchScreens`, `topScreens`; not on load, a link,
 operator selected); the sandbox always opens on Algorithm, and the open tab is in
 neither the link nor storage; while closed, the LFO's key shows a dot
 (amber in the sandbox), "LFO, on", when vibrato or tremolo, the mod
-wheel's share counted, is above 0, and the Pitch EG's,
-"Pitch EG, on", when the pitch envelope is not flat). Each tab is laid
+wheel's share counted, is above 0, the Pitch EG's,
+"Pitch EG, on", when the pitch envelope is not flat; and the Reverb's,
+"Reverb, on", whenever the reverb is on, a setting, its tab open or not;
+the Reverb key's light is always there, unlit while it is off, so the
+key keeps its width). Each tab is laid
 out as the operator panel is (Jeremy, 2026-10-20; `.inst-voice-tab`):
 its display the panel's width, the same size whichever tab is open (the
-row under it is one height for all three), over one row of its controls;
+row under it is one height for all four), over one row of its controls;
 on a phone each display is 9rem high and its row wraps. The Algorithm
 tab: the wiring diagram, and under it the algorithm list between ‹ ›
 (`stepAlgorithm`, round the 32; the ‹ › the tabs' black push keys
@@ -829,6 +827,29 @@ fitting the largest bend and never under ±1 st, settled when a drag
 ends, labelled as the readouts are; a dot at Start and at each part's
 end dragging up and down only), and eight knobs in a row: Start,
 Attack, Peak, Decay 1, Break, Decay 2, Sustain, Release (pitches two-sided, ±48 st; speeds log in st/s).
+The Reverb tab (`reverbView.ts`; Jeremy, 2026-10-22, mock B): the plate
+reverb's controls, settings of the instrument (`settings.ts`, saved per
+browser; not the voice, the link or a preset), moved there from the
+Settings panel. Its screen (`viz/reverbPlot.ts`) is the plate's response
+to a click as two decay curves, LOWS under about 500 Hz lit full and
+HIGHS over about 4 kHz at half (`bandEnvelopes`, energy in windows of
+50 ms or a column), each set against its own start (`fromStart`) and
+starting at the wet's level for the Mix, level in dB 0 to -72 down the
+left, time from the key to 1.25 times the decay plus the pre-delay
+(dotted where it ends), a dashed marker at -60 dB under the start at
+the Decay set, "DRY … WET …" at the top right, and everything but the
+frame at about 45 % with OFF beside it while the reverb is off; still,
+not moving while notes sound. The curves are worked out on the real
+plate in a module worker (`dsp/reverbResponse.ts`,
+`reverbResponse.worker.ts`, made when the tab is first shown), only the
+last asked counting, the last eight kept; Mix and Pre-delay only move
+them. Under it four knobs centred as the Pitch EG's, Pre-delay (0 to
+500 ms, log from 1 ms, 0 at the bottom), Decay (0.2 to 20 s, log), Mix
+(0 to 100 %: dry min(1, 2(1 - mix)), wet min(1, 2 mix)) and Tone (0 to
+100: damping 0.7 (1 - tone / 100)), their values on the screen, and the
+On key at the row's right end (three columns, 1fr auto 1fr; its bezel
+in by its lit edge's reach so its edge is the screen's; on a phone after
+the knobs at the right).
 `formatPitchBend` writes a bend in cents under a semitone, else in
 semitones; `formatGlideSpeed` a speed in st/s. Where a row's values on
 the screen would touch (the LFO's six at 1280 wide), `drawValueStrip`

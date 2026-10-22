@@ -36,7 +36,7 @@ function rt60(left: Float32Array, right: Float32Array): number {
 
 const wetOnly = (seconds: number, tone = 70) => {
   const verb = new PlateReverb(RATE);
-  verb.set({ seconds, tone, mix: 100 }, true);
+  verb.set({ seconds, tone, mix: 100, preDelay: 0 }, true);
   return verb;
 };
 
@@ -79,7 +79,7 @@ describe('the plate reverb', () => {
     const noise = Float32Array.from({ length: RATE / 2 }, () => Math.random() * 2 - 1);
     // 0%: exactly the dry, nothing added (once glided there).
     const dryOnly = new PlateReverb(RATE);
-    dryOnly.set({ seconds: 1.5, tone: 70, mix: 0 }, true);
+    dryOnly.set({ seconds: 1.5, tone: 70, mix: 0, preDelay: 0 }, true);
     const { left } = run(dryOnly, noise, 0.5);
     for (let i = RATE / 10; i < left.length; i++) expect(left[i]).toBeCloseTo(noise[i], 6);
     expect(mixGains(0)).toEqual({ dry: 1, wet: 0 });
@@ -129,10 +129,10 @@ describe('the plate reverb', () => {
 
   it('turns off by gliding the wet down, then stops and costs nothing', () => {
     const verb = new PlateReverb(RATE);
-    verb.set({ seconds: 3, tone: 70, mix: 50 }, true);
+    verb.set({ seconds: 3, tone: 70, mix: 50, preDelay: 0 }, true);
     run(verb, impulse(), 0.2);
     expect(verb.active).toBe(true);
-    verb.set({ seconds: 3, tone: 70, mix: 50 }, false);
+    verb.set({ seconds: 3, tone: 70, mix: 50, preDelay: 0 }, false);
     run(verb, new Float32Array(1), 0.1);
     expect(verb.active).toBe(false);
     expect(verb.tailSeconds).toBe(0);
@@ -142,4 +142,37 @@ describe('the plate reverb', () => {
     expect(decayFor(1e9, RATE, 35000)).toBe(MAX_DECAY);
     expect(decayFor(1.5, RATE, 35000)).toBeLessThan(MAX_DECAY);
   });
+
+  it('starts the tail the pre-delay after the sound, within a sample', () => {
+    const first = (preDelay: number) => {
+      const verb = new PlateReverb(RATE);
+      verb.set({ seconds: 1.5, tone: 70, mix: 100, preDelay }, true);
+      // Past the 50 ms glides (the dry out, the pre-delay to its place).
+      run(verb, new Float32Array(1), 0.1);
+      const { left, right } = run(verb, impulse(), 0.8);
+      return left.findIndex((x, i) => x !== 0 || right[i] !== 0);
+    };
+    // The plate's own way through to its taps, with no pre-delay.
+    const own = first(0);
+    expect(own).toBeGreaterThan(0);
+    for (const ms of [40, 500]) expect(Math.abs(first(ms / 1000) - own - (ms / 1000) * RATE)).toBeLessThanOrEqual(1);
+  });
+
+  it('crossfades a turn of the pre-delay: no jump in the wet beyond the noise\'s own', () => {
+    const verb = new PlateReverb(RATE);
+    verb.set({ seconds: 1.5, tone: 70, mix: 100, preDelay: 0 }, true);
+    const noise = Float32Array.from({ length: RATE }, () => Math.random() * 2 - 1);
+    const steadyRun = run(verb, noise, 1);
+    const steepest = (xs: Float32Array) => {
+      let most = 0;
+      for (let i = 1; i < xs.length; i++) most = Math.max(most, Math.abs(xs[i] - xs[i - 1]));
+      return most;
+    };
+    const steady = steepest(steadyRun.left.subarray(RATE / 2));
+    verb.set({ seconds: 1.5, tone: 70, mix: 100, preDelay: 0.5 }, true);
+    const turned = run(verb, noise.subarray(0, RATE / 5), 0.2);
+    expect(steepest(turned.left)).toBeLessThan(steady * 1.5);
+    expect(verb.tailSeconds).toBeCloseTo(2, 9);
+  });
 });
+

@@ -45,7 +45,7 @@ function run(patch: Dx7Patch, notes: number, seconds = MEASURE_SECONDS, reverb =
   pool.setPatch(patch);
   for (const key of KEYS.slice(0, notes)) pool.noteOn(key, hz(key));
   const plate = new PlateReverb(SAMPLE_RATE);
-  plate.set({ seconds: 1.5, tone: 70, mix: 25 }, reverb);
+  plate.set({ seconds: 1.5, tone: 70, mix: 25, preDelay: 0 }, reverb);
   const dry = new Float32Array(BLOCK);
   const left = new Float32Array(BLOCK);
   const right = new Float32Array(BLOCK);
