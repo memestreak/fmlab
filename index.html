@@ -17,6 +17,8 @@
     <script>
       try {
         var theme = localStorage.getItem('fmlab.theme');
+        // The sandbox is dark only, whatever the saved choice.
+        if (/^#\/sandbox\b/.test(location.hash)) theme = 'dark';
         if (theme === 'light' || theme === 'dark') {
           document.documentElement.dataset.theme = theme;
         }

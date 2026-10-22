@@ -43,6 +43,12 @@ body[data-view='instrument'] {
   display: none;
 }
 
+/* The sandbox is dark only (Jeremy, 2026-10-22): no theme switch there;
+   the chapters keep theirs. */
+[data-view='instrument'] .masthead .theme-switch {
+  display: none;
+}
+
 body:not([data-view='instrument']) .inst-presets,
 body:not([data-view='instrument']) #inst-tools {
   display: none;

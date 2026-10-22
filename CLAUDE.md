@@ -82,8 +82,9 @@ figures subscribe to it. Nothing else passes values around.
   missing, unknown or unreadable its default), `loadSettings` and
   `saveSettings`, all together as JSON under
   `localStorage["fmlab.settings"]`, and `settings`, a store of their own
-  that whatever they govern subscribes to; the theme, the panel's last
-  line, keeps its own key and `theme.ts`.
+  that whatever they govern subscribes to. The theme is not among them:
+  the sandbox is dark only, and the chapters' theme keeps its own key and
+  `theme.ts`.
   The URL holds
   the section and, for one with `sharesSound` (the sandbox), its
   sound (see `sandbox.ts` below). `state.chapter`
@@ -631,8 +632,14 @@ focused the arrows step it as the keys do, up and left back, down and
 right on, and Enter opens its list; its note, what
 the voice plays without, is not shown but is the menu's description for
 screen readers and follows the credit in the name's tip; then Volume, the
-Settings key and the theme; no glossary link (Jeremy, 2026-10-21: the
-chapters keep theirs). The Settings key
+Settings key; no glossary link (Jeremy, 2026-10-21: the chapters keep
+theirs) and no theme switch: the sandbox is dark only (Jeremy,
+2026-10-22). Whatever is saved or the system says, `applyTheme(choice,
+sandbox)` sets `data-theme="dark"` while the sandbox shows (set where
+`chapterView` sets the view, before anything redraws) and puts the saved
+choice back on leaving it; the boot script in `index.html` does the same
+for an address of `#/sandbox`, so the first paint is dark. The light
+sandbox rules still in the CSS are unused. The Settings key
 (`ui/settingsPanel.ts`, `mountSettings`; Jeremy, 2026-10-21, "the
 function panel, named SETTINGS") is one lamp key in its own bezel, lit
 while its panel is open (`aria-pressed`, `aria-expanded`), worked on
@@ -640,7 +647,7 @@ the press; the panel a modal `<dialog>` named Settings, a console of
 the chassis's black plastic the same in either theme over a page dimmed
 35 %: "Settings" on Dymo tape and a Close key (a push key with no lamp: it
 has no state to show), a VFD screen in a molded
-bezel listing the eight settings one line each (group dim, name, value;
+bezel listing the seven settings one line each (group dim, name, value;
 the selected line lit behind with a bar at its left; a listbox: Up and
 Down, Left and Right change the value, Enter and Space the next choice,
 a click on a value too), and under it ‹ › through the lines, the
@@ -653,7 +660,7 @@ sandbox's native titles put away in `data-tip-off` and the terms' tips
 hidden, names and descriptions kept), Z X hint (Hover, Always, Off),
 Note names (C only, All: every white key, Off), Computer keys (Off, On:
 the computer key that plays each piano key, small at its foot), Wheel
-(Page, Reverse) and Theme (the masthead switch's choice, kept in step);
+(Page, Reverse);
 `applySettings` sets them on `<html>` (`data-motion`, `data-tips`,
 `data-zx`, `data-note-names`, `data-computer-keys`) for the CSS. On a
 phone the key has the line under Volume's (beside it the fader would
@@ -803,7 +810,8 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
 - Every colour is a token from `src/styles/tokens.css`, light on `:root`,
   dark under `prefers-color-scheme` (unless `data-theme='light'`) and under
   `data-theme='dark'`. The dark values are written in both blocks; keep
-  them identical. Both themes must work.
+  them identical. Both themes must work, but for the sandbox, which is
+  dark only.
 - Tokens: `--paper` (page), `--paper-sunken` (wells, control tracks),
   `--grid` (plot grid), `--rule` (axes, hairlines), `--ink`; pens
   `--pen-blue` (carrier and output traces, positive sidebands),
@@ -902,7 +910,8 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
   "Theme: Auto" and its tip says what a click does. It cycles Auto,
   Light, Dark and saves the bare word under
   `localStorage["fmlab.theme"]`. The boot script in `index.html` reads the
-  same key; keep it in step with `src/model/theme.ts`.
+  same key; keep it in step with `src/model/theme.ts`. It is on every page
+  but the sandbox, which is dark only.
 - Focus rings are for the keyboard: every focus style is on
   `:focus-visible`, never `:focus`, so a click, a tap or a drag leaves
   none; Tab still rings every control. A browser also turns
