@@ -844,6 +844,35 @@ body:not([data-view='instrument']) #inst-tools {
   min-height: 5rem;
 }
 
+/* Reverb (Jeremy, 2026-10-22): its screen, then its four knobs centred
+   under it as the Pitch EG's are, and its On key at the row's right end,
+   which does not push the knobs off centre (three columns, the knobs in
+   the middle). The key's bezel stands in by its lit edge's reach past the
+   screen's black one, so their right edges line up, as the tab strips'. */
+.inst-reverb-plot {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 4rem;
+}
+
+.inst-reverb-controls {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+
+.inst-reverb-knobs {
+  grid-column: 2;
+  grid-template-columns: repeat(4, 4.2rem);
+}
+
+.inst-reverb-on {
+  grid-column: 3;
+  justify-self: end;
+  margin-right: max(0px, calc(var(--lamp-bezel-reach) - 1px));
+}
+
 .inst-lfo-knobs {
   display: grid;
   grid-template-columns: repeat(6, 3.6rem);
@@ -866,6 +895,7 @@ body:not([data-view='instrument']) #inst-tools {
 #inst-feedback .knob-readout,
 .inst-lfo .knob-readout,
 .inst-pitch .knob-readout,
+.inst-reverb .knob-readout,
 .voice-envelope .knob-readout {
   display: none;
 }
@@ -1360,7 +1390,7 @@ canvas.voice-keys {
    keep their place below the axis and their hollow end, so phase still
    reads without colour. The focus ring keeps the page's ink. */
 [data-view='instrument']
-  :is(.voice-envelope-curve, .inst-pitch-curve, .inst-lfo-plot, .voice-env-mini, canvas.voice-keys, #inst-figures #spectrum) {
+  :is(.voice-envelope-curve, .inst-pitch-curve, .inst-lfo-plot, .inst-reverb-plot, .voice-env-mini, canvas.voice-keys, #inst-figures #spectrum) {
   --paper: var(--vfd-graph-paper);
   --paper-sunken: var(--vfd-graph-sunken);
   --ink: var(--vfd-lit);
@@ -1378,13 +1408,13 @@ canvas.voice-keys {
 /* The large screens' glass, in its bezel: a black edge, the bezel
    carrying the light edge in dark. (The table's small drawings, without
    a bezel, keep the edge above.) */
-[data-view='instrument'] :is(.voice-envelope-curve, .inst-pitch-curve, .inst-lfo-plot, #inst-figures #spectrum) {
+[data-view='instrument'] :is(.voice-envelope-curve, .inst-pitch-curve, .inst-lfo-plot, .inst-reverb-plot, #inst-figures #spectrum) {
   border-radius: 3px;
   box-shadow: 0 0 0 1px #000;
 }
 
 [data-view='instrument']
-  :is(.voice-envelope-curve, .inst-pitch-curve, .inst-lfo-plot, .voice-env-mini, canvas.voice-keys):focus-visible {
+  :is(.voice-envelope-curve, .inst-pitch-curve, .inst-lfo-plot, .inst-reverb-plot, .voice-env-mini, canvas.voice-keys):focus-visible {
   outline-color: currentColor;
 }
 
@@ -2171,6 +2201,7 @@ canvas.voice-keys {
      2026-10-20): room under them as tall as a knob's name lifts them by
      half of it. */
   .inst-lfo .inst-voice-controls > :is(.lfo-waves, .lamp-keys),
+  .inst-reverb-controls > .lamp-keys,
   .inst-alg-step-row {
     margin-bottom: 1.2rem;
   }
@@ -2327,6 +2358,10 @@ canvas.voice-keys {
     grid-template-columns: repeat(8, 3.9rem);
   }
 
+  .inst-reverb-knobs {
+    grid-template-columns: repeat(4, 3.9rem);
+  }
+
   .voice-env-mini,
   .voice-keys {
     height: 1.68rem;
@@ -2403,11 +2438,26 @@ canvas.voice-keys {
     font-size: 1.25rem;
   }
 
-  /* The Voice tabs a little closer, to fit beside the tape inside the
-     panel. */
+  /* The Voice tabs on a line of their own under the title, the keys
+     sharing it, as the operator panel's are: four did not fit beside the
+     tape (Jeremy, 2026-10-22: Reverb the fourth). */
+  .inst-alg-head {
+    flex-wrap: wrap;
+    row-gap: 0.3rem;
+  }
+
+  [data-view='instrument'] .inst-alg-head > .pill-tabs {
+    --stand-in: max(0px, calc(var(--lamp-bezel-reach) - 1px));
+    flex-basis: calc(100% - 2 * var(--stand-in));
+    margin-left: var(--stand-in);
+  }
+
   [data-view='instrument'] .inst-alg-head .pill-tab {
-    gap: 0.35rem;
-    padding: 0 0.5rem 0 0.42rem;
+    flex: 1 1 auto;
+    justify-content: center;
+    gap: 0.25rem;
+    padding: 0 0.2rem;
+    letter-spacing: 0.04em;
   }
 
 
@@ -2569,6 +2619,18 @@ canvas.voice-keys {
     flex-basis: 100%;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     row-gap: 0.5rem;
+  }
+
+  /* Reverb: the knobs on one line, the On key after them at the right,
+     as the LFO's Key sync wraps. */
+  .inst-reverb-controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .inst-reverb-knobs {
+    grid-column: auto;
   }
 
   /* The operator table as one card per operator. */
@@ -2823,13 +2885,6 @@ body:not([data-view='instrument']) .inst-settings {
 .settings-value {
   text-align: right;
   cursor: pointer;
-}
-
-/* A number keeps its own case ("1.5 s", not "1.5 S"), and a click on it
-   does nothing: its keys are under the glass. */
-.settings-value.is-number {
-  text-transform: none;
-  cursor: default;
 }
 
 /* Under the screen: ‹ › through the lines, the selected one's name

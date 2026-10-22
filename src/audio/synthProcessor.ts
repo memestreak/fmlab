@@ -62,7 +62,10 @@ class SynthProcessor extends AudioWorkletProcessor {
     this.port.onmessage = (event: MessageEvent<VoiceMessage | ReverbMessage>) => {
       const message = event.data;
       if (message.type === 'reverb') {
-        this.reverb.set({ seconds: message.seconds, tone: message.tone, mix: message.mix }, message.on);
+        this.reverb.set(
+          { seconds: message.seconds, tone: message.tone, mix: message.mix, preDelay: message.preDelay },
+          message.on,
+        );
         return;
       }
       // Outside mode 2 the voices are not rendered, so they could not fade:

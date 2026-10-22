@@ -4,7 +4,6 @@ import {
   parseSettings,
   saveSettings,
   SETTINGS_KEY,
-  stepSetting,
 } from '../../model/settings';
 
 describe('the sandbox\'s settings', () => {
@@ -22,6 +21,7 @@ describe('the sandbox\'s settings', () => {
       reverbDecay: 1.5,
       reverbMix: 25,
       reverbTone: 70,
+      reverbPreDelay: 0,
     });
     expect(SETTINGS_KEY).toBe('fmlab.settings');
   });
@@ -42,18 +42,6 @@ describe('the sandbox\'s settings', () => {
     expect(parseSettings('{"reverbDecay":1e999}')).toEqual(DEFAULT_SETTINGS);
   });
 
-  it('step a number line by one or ten, held at its ends, never drifting', () => {
-    expect(stepSetting('reverbDecay', 1.5, 1)).toBe(1.6);
-    expect(stepSetting('reverbDecay', 1.5, -10)).toBe(0.5);
-    expect(stepSetting('reverbDecay', 0.3, -10)).toBe(0.2);
-    expect(stepSetting('reverbDecay', 19.95, 10)).toBe(20);
-    expect(stepSetting('reverbMix', 99, 10)).toBe(100);
-    expect(stepSetting('reverbTone', 3, -10)).toBe(0);
-    // A hundred tenths up from 0.2 lands on 10.2 exactly.
-    let decay = 0.2;
-    for (let i = 0; i < 100; i++) decay = stepSetting('reverbDecay', decay, 1);
-    expect(decay).toBe(10.2);
-  });
 
   it('fall back to the defaults on bad or partial JSON, field by field', () => {
     expect(parseSettings(null)).toEqual(DEFAULT_SETTINGS);

@@ -144,7 +144,8 @@ export class AudioEngine {
         now.reverb !== before.reverb ||
         now.reverbDecay !== before.reverbDecay ||
         now.reverbMix !== before.reverbMix ||
-        now.reverbTone !== before.reverbTone
+        now.reverbTone !== before.reverbTone ||
+        now.reverbPreDelay !== before.reverbPreDelay
       ) {
         this.tell(this.reverbMessage());
       }
@@ -573,8 +574,9 @@ export class AudioEngine {
 
   /**
    * The plate reverb as the worklet should have it: on only in the sandbox
-   * with the Reverb setting on (Jeremy, 2026-10-22), and its Decay, Mix and
-   * Tone as set, which the worklet turns into the plate's coefficients.
+   * with the Reverb setting on (Jeremy, 2026-10-22), and its Pre-delay,
+   * Decay, Mix and Tone as set, which the worklet turns into the plate's
+   * coefficients.
    */
   private reverbMessage(): ReverbMessage {
     const now = settings.get();
@@ -584,13 +586,14 @@ export class AudioEngine {
       seconds: now.reverbDecay,
       mix: now.reverbMix,
       tone: now.reverbTone,
+      preDelay: now.reverbPreDelay / 1000,
     };
   }
 
   /** How much longer a note's sound lasts for the reverb's tail, in ms: none when it is off. */
   private tailMs(): number {
-    const { on, seconds } = this.reverbMessage();
-    return on ? (seconds + 0.1) * 1000 : 0;
+    const { on, seconds, preDelay } = this.reverbMessage();
+    return on ? (preDelay + seconds + 0.1) * 1000 : 0;
   }
 
   /**
