@@ -124,6 +124,35 @@ export function operatorsAxisEnd(state: LabState): number {
  */
 let lastSteady: { key: number[]; lines: SpectralLine[] } | null = null;
 
+/** While a note sounds, its predicted lines are worked out at most this often, in seconds. */
+export const SOUNDING_REFRESH = 0.1;
+/** ... or when an operator's level has moved by more than this many dB since. */
+export const SOUNDING_DB = 0.5;
+
+/**
+ * The sounding note's spectrum, last worked out: when (on the page's
+ * clock), what of the kernel's input stays put through a note (algorithm,
+ * feedback, ratios) and its levels then.
+ */
+let lastSounding: { at: number; fixed: number[]; levels: number[]; lines: SpectralLine[] } | null = null;
+
+/**
+ * Whether the sounding note's lines worked out at `at` for `levels` still
+ * do at `time` for `now`: within SOUNDING_REFRESH of then, or every
+ * operator's level within SOUNDING_DB of what it was (a held sustain).
+ * Levels below silence's floor count as equal.
+ */
+export function soundingLinesHold(at: number, levels: readonly number[], time: number, now: readonly number[]): boolean {
+  if (time >= at && time - at < SOUNDING_REFRESH) return true;
+  return now.every((level, op) => {
+    const was = Math.abs(levels[op]);
+    const is = Math.abs(level);
+    if (was < 1e-5 && is < 1e-5) return true;
+    if (was < 1e-5 || is < 1e-5) return false;
+    return Math.abs(20 * Math.log10(is / was)) <= SOUNDING_DB;
+  });
+}
+
 /**
  * The patch's line spectrum, by whichever kind of modulation it uses. For
  * a patch that plays notes, `time` makes it the note at that moment: that
@@ -142,8 +171,23 @@ export function spectrumOf(state: LabState, time?: number): SpectralLine[] {
     const steady = noteProgress(state, time) === null;
     const key = [state.algorithm, note.feedback, ...note.ratios, ...levels];
     if (steady && lastSteady && key.every((value, i) => value === lastSteady?.key[i])) return lastSteady.lines;
+    // While a note sounds (16,384 samples of the kernel and a transform, a
+    // few ms, every frame otherwise): the last lines, until 100 ms have
+    // passed and a level has moved by half a dB. The measured trace is
+    // drawn every frame regardless; only the stems lag, by at most that.
+    const fixed = key.slice(0, 2 + note.ratios.length);
+    if (
+      !steady &&
+      time !== undefined &&
+      lastSounding &&
+      fixed.every((value, i) => value === lastSounding?.fixed[i]) &&
+      soundingLinesHold(lastSounding.at, lastSounding.levels, time, levels)
+    ) {
+      return lastSounding.lines;
+    }
     const lines = kernelSpectrum(state.algorithm, note.ratios, levels, note.feedback);
     if (steady) lastSteady = { key, lines };
+    else if (time !== undefined) lastSounding = { at: time, fixed, levels, lines };
     return lines;
   }
   if (state.mode === 'ops') {
