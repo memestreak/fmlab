@@ -30,7 +30,6 @@ import {
 import type { Preset, PresetBank } from '../chapters';
 import { applyTheme } from '../model/theme';
 import { FACTORY_CREDIT } from '../chapters/dx7Voices';
-import { tapeLabel } from './dymo';
 import type { LabState, LabStore } from '../model/lab';
 import { mountInstrument } from './instrument';
 import { mountPresetPanel } from './presetPanel';
@@ -595,17 +594,12 @@ function presetMenu(presets: readonly Preset[], banks: readonly PresetBank[], st
     }
   });
   show(store.get());
-  // The group's visible label, on Dymo tape as Volume's (Jeremy,
-  // 2026-10-21); its name for screen readers is the group's own.
-  const tape = document.createElement('span');
-  tape.className = 'preset-tape';
-  tape.textContent = 'Preset';
-  tape.setAttribute('aria-hidden', 'true');
-  tapeLabel(tape);
   const steps = document.createElement('span');
   steps.className = 'chooser preset-step';
   // Up and down, right of the name (Jeremy, 2026-10-21): up back, down
   // on, as the arrow keys step.
   steps.append(step('Previous preset', '‹', -1), step('Next preset', '›', 1));
-  return [tape, pick, steps, note];
+  // No label of its own (Jeremy, 2026-10-22): the name on the glass says
+  // what it is; for screen readers the group is named Presets.
+  return [pick, steps, note];
 }

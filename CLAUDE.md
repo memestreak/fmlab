@@ -621,11 +621,12 @@ Jeremy approved it on 2026-10-18: "the existing app, just full page and
 with a better looking keyboard", six operators only): no text column;
 the masthead is its title bar (Jeremy, 2026-10-20, "more stand alone"):
 the wordmark (home), then in the place of Contents, which the sandbox
-hides with the crumb, the preset group, centred between the wordmark
-and Volume (Jeremy, 2026-10-21; the page's own centre line leaves it no
-room at 1440 and 1280 wide), the name's box as wide as the widest name
-so nothing in it moves from voice to voice: "Preset" on Dymo tape as
-Volume's, its visible label, then the voice's name on a VFD (Jeremy,
+hides with the crumb, the preset group, 40px after the wordmark, the
+free room right of it (Jeremy, 2026-10-22; it was centred between the
+wordmark and Volume), the name's box as wide as the widest name so
+nothing in it moves from voice to voice, with no label of its own
+(Jeremy, 2026-10-22: the Preset tape is gone; for screen readers the
+group is named Presets): the voice's name on a VFD (Jeremy,
 2026-10-21; `.preset-name`): glowing cyan capitals in Plex Mono on dark
 glass in a small bezel of the tab strips' plastic (seven segments
 cannot spell the names), 14 characters wide, the longest name's, so
@@ -677,7 +678,9 @@ open. The shown bank is in neither the link nor storage. On a phone it
 is the window's width less 16px a side, two columns of 16 (left and
 right then move by 16), the bank keys under the title if they must wrap.
 
-After the preset group, Volume, the Settings key; no glossary link (Jeremy, 2026-10-21: the chapters keep
+After the preset group, Volume, its name silkscreened on the chassis in
+the thicker weight (`--font-tape` 500 capitals in `--chassis-legend`, as
+the operators' roles; Jeremy, 2026-10-22: no tape), the Settings key; no glossary link (Jeremy, 2026-10-21: the chapters keep
 theirs) and no theme switch: the sandbox is dark only (Jeremy,
 2026-10-22). Whatever is saved or the system says, `applyTheme(choice,
 sandbox)` sets `data-theme="dark"` while the sandbox shows (set where
@@ -770,12 +773,11 @@ Attack, Peak, Decay 1, Break, Decay 2, Sustain, Release (pitches two-sided, ±48
 semitones; `formatGlideSpeed` a speed in st/s. Where a row's values on
 the screen would touch (the LFO's six at 1280 wide), `drawValueStrip`
 sets them a size smaller. Voice, Operators, the keyboard's Octave and
-Mod, and the masthead's Preset and Volume, six labels, are on Dymo tape
+Mod, four labels, are on Dymo tape
 (`tapeLabel`: each letter a span in the word's own case, the tape's CSS
 setting it in capitals, with the die's fixed tiny drop and tilt from
 the word, `strike`, shown at 2x pixels and finer; the word once more for
-screen readers). Volume's label is the lab's own, taped only while it is
-in the sandbox's masthead; back in a chapter's lab it reads as before.
+screen readers).
 On the right the operator
 panel (`#voice-envelope`) alone, the showing tab's curve filling it. Each
 screen keeps its box, and its glass, the canvas, sits 7px inside a
@@ -789,6 +791,10 @@ under 52rem high). Every control row's dials are one size,
 row's dials, push keys (their bezels a dial tall; the algorithm chooser,
 the LFO's waves and Key sync lifted onto the dials' line) and knob names
 fall on the same two lines in all five rows.
+The top band's tab keys' bezels end where the screens under them do
+(Jeremy, 2026-10-22): their lit edge reaches past the box by
+`--lamp-bezel-reach` (2px), a screen's black edge by 1px, so they stand
+in by the difference (on a phone, on both sides of the line).
 The page is three bodies of the same molded black plastic, the
 `.chassis` (Jeremy, 2026-10-21), an even 10px apart, and 10px under the
 title bar (Jeremy, 2026-10-22: a little less than the 15 to 17px they
@@ -840,8 +846,8 @@ shading and in the chapter pages' plots. On a wide screen it is one window high 
 nothing scrolls, at 1440 × 900 and 1280 × 800; the figures' captions are
 for screen readers only there, and under 52rem high the rows, drawings,
 knobs and gaps tighten. Below 62rem it is one column: the masthead
-wraps, the wordmark and the theme, then the presets (the tape, the
-name's VFD and its up and down keys on one line), then Volume on a line of its own, then Settings; the keyboard
+wraps, the wordmark and the theme, then the presets (the name's VFD and
+its up and down keys on one line), then Volume on a line of its own, then Settings; the keyboard
 and the spectrum over it docked to the screen's foot in the chassis, the
 full width and square (the spectrum, then the octave control and the
 wheel without their tapes, then the keys), the operator panel
@@ -903,7 +909,7 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
   and the spectrum let into it; the felt under its rail is charcoal, not
   red, because red is reserved for negative phase. The mod wheel's drum
   is black rubber, its index line painted white, and its bar a VFD.
-  The sandbox's Voice, Operators, Octave, Mod, Preset and Volume labels are on
+  The sandbox's Voice, Operators, Octave and Mod labels are on
   black Dymo embossing tape (`ui/dymo.ts`, `--dymo-*`; Jeremy,
   2026-10-21): a drawn object, the same in either theme but its edge,
   its white letters not `--ink`.
@@ -936,7 +942,7 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
   everything else), `--font-mono` (IBM Plex Mono: numbers, with tabular
   figures; `.num`), `--font-tape` (Barlow Condensed 400: the sandbox's
   Dymo tape labels, its knob names, its operator table's heads, and at
-  500 the operators' roles), `--font-logo` (Michroma 400: the logo only). A
+  500 the operators' roles and Volume's name), `--font-logo` (Michroma 400: the logo only). A
   weight that is not imported there is not available.
 - A canvas has no CSS: draw code reads the tokens with `getComputedStyle`
   and whoever mounts it must redraw on resize, theme change and
