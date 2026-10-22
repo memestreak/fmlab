@@ -406,7 +406,21 @@ figures subscribe to it. Nothing else passes values around.
   switch): the measured FFT as a filled --pen-blue curve over the
   predicted stems, which are drawn as ever, on the same axes
   (`drawSpectrumFrame`) and scale (`amplitudeFromDb` undoes the analyser's
-  window, so a full sine reads 1). `besselPlot.ts` draws J_0
+  window, so a full sine reads 1). The sandbox's spectrum has its own
+  axes (Jeremy, 2026-10-22, "it needs a non-linear x-axis";
+  `isLogSpectrum`, `drawLogSpectrum`): frequency in Hz on a log axis
+  fixed from 20 Hz to 20 kHz for every voice and key (`LOG_HZ`,
+  `hzToShare`; ticks 20, 50 ... 20k, `LOG_HZ_TICKS`, thinned where they
+  would touch, 20k kept, `keptLabels`), so the stems move when another key
+  is played; and level in dB (`ampDb`), 0 dB at the top to `DB_FLOOR`
+  (-72) at the foot, gridlines every 12 dB (labelled every other where
+  close), stems standing up from the floor, none below it
+  (`dbToShare`), so a note's decay shows. The live trace is on the same
+  axes, bin by bin, nothing smoothed between bins. It draws only what
+  sounds: the note at that moment, and nothing (the frame alone) while
+  no note does, on load as after a note (`heardLines`; Jeremy,
+  2026-10-22). Its description says the axes and the strongest partial
+  in Hz and dB, or "silent". `besselPlot.ts` draws J_0
   to J_8 against the index, with an ink line at the patch's index and a
   dot where it crosses each curve. The spectrum and the Bessel plot are
   linked: `highlightOf(state)` is a sideband order to pick out, and both
@@ -830,7 +844,9 @@ keyboard, its bezel a recess in the chassis with 9px of it underneath,
 with no ink rules round it (its glass is its frame), and no x-axis
 title (Jeremy, 2026-10-21: its canvas's `--plot-title: none`; `drawFrame`
 draws none and `beginPlot` gives the plot that line, `UNTITLED_BOTTOM`);
-its numbers and its screen-reader description stay. Carriers are solid blue and modulators
+its numbers and its screen-reader description stay. It is on log
+frequency (20 Hz to 20 kHz) and dB axes (`drawLogSpectrum`, one row of
+numbers under it). Carriers are solid blue and modulators
 green outlines in the table (filled or outlined tags, carrier rows
 shaded); the diagram is a VFD panel, carriers lit solid and modulators
 dimmer cyan outlines. The envelope, Key scaling and pitch envelope
