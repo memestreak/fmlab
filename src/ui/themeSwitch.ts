@@ -65,7 +65,7 @@ export function mountThemeSwitch(button: HTMLButtonElement, store: LabStore): vo
   });
   store.subscribe((state, previous) => {
     if (state.theme === previous.theme) return;
-    applyTheme(state.theme);
+    applyTheme(state.theme, document.body.dataset.view === 'instrument');
     saveTheme(state.theme);
     show(state.theme);
   });

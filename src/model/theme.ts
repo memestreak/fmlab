@@ -38,10 +38,16 @@ export function saveTheme(choice: ThemeChoice): void {
   }
 }
 
-/** Sets `data-theme` on <html>, which tokens.css keys its dark values off. */
-export function applyTheme(choice: ThemeChoice): void {
+/**
+ * Sets `data-theme` on <html>, which tokens.css keys its dark values off.
+ * The sandbox is dark only (Jeremy, 2026-10-22): there the choice is set
+ * aside, and put back on the way out.
+ */
+export function applyTheme(choice: ThemeChoice, sandbox = false): void {
   const root = document.documentElement;
-  if (choice === 'auto') {
+  if (sandbox) {
+    root.dataset.theme = 'dark';
+  } else if (choice === 'auto') {
     delete root.dataset.theme;
   } else {
     root.dataset.theme = choice;

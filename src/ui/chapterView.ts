@@ -28,6 +28,7 @@ import {
   wikiLink,
 } from '../chapters/terms';
 import type { Preset, PresetBank } from '../chapters';
+import { applyTheme } from '../model/theme';
 import { FACTORY_CREDIT } from '../chapters/dx7Voices';
 import { tapeLabel } from './dymo';
 import type { LabState, LabStore } from '../model/lab';
@@ -285,6 +286,9 @@ export function mountChapters(store: LabStore): void {
     // and not where it is.
     document.body.dataset.view =
       chapter.id === GLOSSARY ? 'glossary' : chapter.instrument ? 'instrument' : 'chapter';
+    // The sandbox is dark only; the chapters have the saved choice back.
+    // Before anything redraws for the new page.
+    applyTheme(store.get().theme, chapter.instrument === true);
     showLab(chapter);
   };
 

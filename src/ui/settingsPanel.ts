@@ -1,6 +1,4 @@
-import type { LabStore } from '../model/lab';
 import { saveSettings, type Settings, settings } from '../model/settings';
-import type { ThemeChoice } from '../model/theme';
 import { tapeLabel } from './dymo';
 import { inSandbox } from './motion';
 
@@ -8,8 +6,8 @@ import { inSandbox } from './motion';
 // SETTINGS"): a push key in the masthead opens a modal console, a VFD
 // screen listing every setting, one line each, the selected one's
 // choices as lamp keys under it. Changes apply as they are made and are
-// saved (model/settings.ts); the theme is the masthead switch's own
-// choice, kept in step through the lab's store.
+// saved (model/settings.ts). No theme: the sandbox is dark only
+// (Jeremy, 2026-10-22).
 
 /** One line of the panel: its group, its name, its choices and how to read and set it. */
 interface Line {
@@ -23,7 +21,7 @@ interface Line {
 const choice = (value: string, label: string) => ({ value, label });
 
 /** The lines, in order; each one a setting. */
-function lines(store: LabStore): Line[] {
+function lines(): Line[] {
   const setting = <K extends keyof Settings>(
     group: string,
     name: string,
@@ -44,13 +42,6 @@ function lines(store: LabStore): Line[] {
     setting('Keyboard', 'Note names', 'noteNames', { c: 'C only', all: 'All', off: 'Off' }),
     setting('Keyboard', 'Computer keys', 'computerKeys', { off: 'Off', on: 'On' }),
     setting('Controls', 'Wheel', 'wheel', { page: 'Page', reverse: 'Reverse' }),
-    {
-      group: 'Look',
-      name: 'Theme',
-      choices: [choice('auto', 'Auto'), choice('light', 'Light'), choice('dark', 'Dark')],
-      get: () => store.get().theme,
-      set: value => store.set({ theme: value as ThemeChoice }),
-    },
   ];
 }
 
@@ -97,7 +88,7 @@ function governTips(): void {
 }
 
 /** Builds the Settings key, beside the glossary link, and its panel. */
-export function mountSettings(store: LabStore): void {
+export function mountSettings(): void {
   const glossary = document.querySelector('.guide-link');
   if (!glossary) return;
   applySettings(settings.get());
@@ -107,7 +98,7 @@ export function mountSettings(store: LabStore): void {
   });
   governTips();
 
-  const all = lines(store);
+  const all = lines();
   let selected = 0;
 
   // The key: one lamp key in its own bezel, as Key sync, lit while open.
@@ -331,9 +322,6 @@ export function mountSettings(store: LabStore): void {
 
   settings.subscribe(() => {
     if (isOpen()) show();
-  });
-  store.subscribe((state, previous) => {
-    if (state.theme !== previous.theme && isOpen()) show();
   });
   buildChoices();
   show();

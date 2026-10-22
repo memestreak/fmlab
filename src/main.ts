@@ -128,7 +128,7 @@ const theme = document.querySelector<HTMLButtonElement>('#theme');
 if (theme) mountThemeSwitch(theme, store);
 
 // The sandbox's Settings key and panel, and what the settings govern.
-mountSettings(store);
+mountSettings();
 
 // Focus rings only for focus the keyboard moved.
 trackFocusSource();
