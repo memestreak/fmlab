@@ -416,8 +416,11 @@ figures subscribe to it. Nothing else passes values around.
   (-72) at the foot, gridlines every 12 dB (labelled every other where
   close), stems standing up from the floor, none below it
   (`dbToShare`), so a note's decay shows. The live trace is on the same
-  axes, bin by bin, nothing smoothed between bins. Its description says
-  the axes and the strongest partial in Hz and dB. `besselPlot.ts` draws J_0
+  axes, bin by bin, nothing smoothed between bins. It draws only what
+  sounds: the note at that moment, and nothing (the frame alone) while
+  no note does, on load as after a note (`heardLines`; Jeremy,
+  2026-10-22). Its description says the axes and the strongest partial
+  in Hz and dB, or "silent". `besselPlot.ts` draws J_0
   to J_8 against the index, with an ink line at the patch's index and a
   dot where it crosses each curve. The spectrum and the Bessel plot are
   linked: `highlightOf(state)` is a sideband order to pick out, and both

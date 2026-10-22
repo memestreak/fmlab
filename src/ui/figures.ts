@@ -291,7 +291,10 @@ export function mountFigures(store: LabStore, engine: AudioEngine): void {
         }
         // The description is of the patch as set, not of each moment of a
         // note: a screen reader has no use for sixty of them a second.
-        const label = describeSpectrum(state, spectrumOf(state), isSounding(state, now));
+        // The sandbox's draws nothing while nothing sounds, and says so.
+        const sounding = isSounding(state, now);
+        const shown = isLogSpectrum(state) && !sounding ? [] : spectrumOf(state);
+        const label = describeSpectrum(state, shown, sounding);
         if (canvas.getAttribute('aria-label') !== label) {
           canvas.setAttribute('aria-label', label);
         }

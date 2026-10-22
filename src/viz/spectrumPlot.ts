@@ -384,6 +384,16 @@ export function isLogSpectrum(state: LabState): boolean {
   return state.chapter === 'sandbox';
 }
 
+/**
+ * The lines the sandbox's spectrum draws at `time`: the note sounding
+ * then, and nothing while none does (Jeremy, 2026-10-22: it showed the
+ * voice at rest on load, until the first note). The chapters draw the
+ * patch at rest instead.
+ */
+export function heardLines(state: LabState, time?: number): SpectralLine[] {
+  return noteProgress(state, time) === null ? [] : spectrumOf(state, time);
+}
+
 /** How far along the log axis a frequency in Hz is: 0 at 20 Hz, 1 at 20 kHz. */
 export function hzToShare(hz: number): number {
   return Math.log(hz / LOG_HZ.min) / Math.log(LOG_HZ.max / LOG_HZ.min);
@@ -494,8 +504,8 @@ function drawLogFrame(plot: Plot): { x: (hz: number) => number; y: (db: number) 
 }
 
 /**
- * Draws the sandbox's spectrum on the log axes: the predicted lines as
- * stems standing up from the floor by their level in dB (a negative one
+ * Draws the sandbox's spectrum on the log axes: the note sounding's
+ * predicted lines (none when no note sounds) as stems standing up from the floor by their level in dB (a negative one
  * in --pen-red, ending in a hollow marker), and, while sound plays, the
  * measured spectrum over them, the same axes. Returns the lines.
  */
@@ -505,7 +515,7 @@ export function drawLogSpectrum(
   time?: number,
   measured?: Measured,
 ): SpectralLine[] {
-  const lines = spectrumOf(state, time);
+  const lines = heardLines(state, time);
   const plot = beginPlot(canvas);
   if (!plot) return lines;
   // One row of numbers under the axis, not two: the plot takes the rest.

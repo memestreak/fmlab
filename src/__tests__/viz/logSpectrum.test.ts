@@ -1,3 +1,4 @@
+import { CHAPTERS } from '../../chapters';
 import { DEFAULTS, type LabState } from '../../model/lab';
 import { describeSpectrum } from '../../ui/figures';
 import { amplitudeFromDb } from '../../viz/liveSpectrum';
@@ -5,6 +6,7 @@ import {
   ampDb,
   DB_FLOOR,
   dbToShare,
+  heardLines,
   hzToShare,
   isLogSpectrum,
   keptLabels,
@@ -69,5 +71,17 @@ describe('the sandbox spectrum\'s axes', () => {
       'Spectrum, frequency on a log scale from 20 Hz to 20 kHz, level in dB: 2 partials above -72 dB, ' +
         'the strongest at 220 Hz, -6 dB, 1 with negative phase.',
     );
+  });
+
+  it('draws nothing while no note sounds: on load, and once a note is over', () => {
+    const sandbox = CHAPTERS.find(c => c.id === 'sandbox')!;
+    const state = { ...DEFAULTS, ...sandbox.patch, chapter: 'sandbox', carrierHz: 220 } as LabState;
+    // Never played.
+    expect(heardLines(state, 10)).toEqual([]);
+    expect(heardLines(state)).toEqual([]);
+    // A note struck at 10 s, held 1 s, 2 s long in all.
+    const played = { ...state, noteStartedAt: 10, noteHold: 1, noteLength: 2 };
+    expect(heardLines(played, 10.5).length).toBeGreaterThan(0);
+    expect(heardLines(played, 12.5)).toEqual([]);
   });
 });
