@@ -23,7 +23,7 @@ function slope(curve: Float32Array, span: number, from: number, to: number): num
 }
 
 /** A seeded noise, so the test is the same every run. */
-function noise(n: number, seed: number): () => number {
+function noise(seed: number): () => number {
   let state = seed;
   return () => {
     state = (state * 1664525 + 1013904223) % 2 ** 32;
@@ -36,7 +36,7 @@ describe('the reverb screen\'s curves', () => {
     // White noise falling 40 dB a second, for 2 s.
     const n = 2 * RATE;
     const burst = (seed: number) => {
-      const next = noise(n, seed);
+      const next = noise(seed);
       return Float32Array.from({ length: n }, (_, i) => next() * 10 ** ((-40 * i) / RATE / 20));
     };
     const { lows, highs } = bandEnvelopes(burst(1), burst(2), RATE, 200, 2);
