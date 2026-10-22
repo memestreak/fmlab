@@ -28,11 +28,11 @@ glossary, outside the sequence. The header's Contents button opens a panel
 of every group and section (`ui/contents.ts`); each section ends with
 Previous and Next by name, except the sandbox, an instrument page with no
 text (its way back is the Contents panel). The masthead's crumb (`#where`,
-"Two operators · The modulation index") has the same two ways either side
-of it, ‹ and › (`#where-prev`, `#where-next`, `whereSteps` in
-`ui/contents.ts`; Jeremy, 2026-10-20): small ink-outlined squares named
-"Previous: …" and "Next: …"; on the landing view the ‹ keeps its place
-unseen, so the crumb holds still; none on the glossary or the sandbox;
+"Two operators · The modulation index") has the same two ways side by side
+just left of it, ‹ then › (`#where-prev`, `#where-next`, `whereSteps` in
+`ui/contents.ts`; Jeremy, 2026-10-20, moved together 2026-10-22): small
+ink-outlined squares named "Previous: …" and "Next: …"; on the landing
+view the ‹ keeps its place unseen, so › and the crumb hold still; none on the glossary or the sandbox;
 on a phone, where the crumb is hidden, the two sit after Contents. In the code a section is still a "chapter".
 Never write a section's number in its copy: link to it by name with
 `sectionLink(id)`.

@@ -224,10 +224,10 @@ a.btn {
   white-space: nowrap;
 }
 
-/* The previous and next section, either side of the crumb: small
-   ink-outlined squares, as the sandbox's steps are drawn. Where there is
-   no previous (the landing view) the place is kept, so the crumb holds
-   still. */
+/* The previous and next section, side by side left of the crumb (Jeremy,
+   2026-10-22): small ink-outlined squares, as the sandbox's steps are
+   drawn. Where there is no previous (the landing view) the place is kept,
+   so › and the crumb hold still. */
 .where-step {
   display: inline-grid;
   flex: none;
@@ -260,13 +260,14 @@ a.btn {
   visibility: hidden;
 }
 
-/* A step's 0.5rem to the crumb, inside the nav's wider gap. */
+/* The two 0.3rem apart, and 0.5rem from › to the crumb, inside the
+   nav's wider gap. */
 #where-prev {
-  margin-right: -0.5rem;
+  margin-right: -0.7rem;
 }
 
 #where-next {
-  margin-left: -0.5rem;
+  margin-right: -0.5rem;
 }
 
 .guide-link {
@@ -295,7 +296,7 @@ a.btn {
 
   /* The two steps side by side after Contents, 0.5rem apart. */
   #where-prev {
-    margin-right: 0;
+    margin-right: -0.5rem;
   }
 }
 
