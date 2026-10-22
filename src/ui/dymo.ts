@@ -1,4 +1,4 @@
-// The sandbox's Voice, Operators and Octave labels on black embossing
+// The sandbox's Voice, Operators, Octave and Mod labels on black embossing
 // tape, as a Dymo label maker strikes them (Jeremy, 2026-10-21): white
 // capitals raised on one baseline, each letter with the die's own tiny
 // unevenness. The unevenness is fixed per label, from the word itself,
@@ -43,9 +43,7 @@ export function strike(word: string, i: number): { drop: number; tilt: number } 
 export function tapeLabel(element: Element | null): void {
   if (!element || element.classList.contains('dymo')) return;
   const word = (element.textContent ?? '').trim();
-  // The word's own case: the tape's CSS sets it in capitals, and where
-  // the label is untaped (Volume, back in a chapter's lab) it reads as it
-  // always did.
+  // The word's own case: the tape's CSS sets it in capitals.
   const letters = [...word].map((letter, i) => {
     const span = document.createElement('span');
     span.className = 'dymo-letter';

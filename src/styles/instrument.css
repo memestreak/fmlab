@@ -1023,14 +1023,18 @@ body:not([data-view='instrument']) #inst-tools {
   min-width: 0;
 }
 
-/* The preset group (its tape, the name, ‹ ›) centred in the title bar
-   between the wordmark and Volume (Jeremy, 2026-10-21: the page's own
-   centre line leaves it no room at 1440 and 1280 wide). Both sides are
-   of fixed width, so it holds still. */
+/* The preset group (the name and ‹ ›) 24px after the wordmark (Jeremy,
+   2026-10-22: closer to the logo; it was centred between the wordmark
+   and Volume), the free room right of it. The masthead's 1rem gap and
+   the nav's margin make the 24px. */
 @media (min-width: 62rem) {
+  [data-view='instrument'] .guide-nav {
+    margin-left: calc(24px - 1rem);
+  }
+
   [data-view='instrument'] .masthead .inst-presets {
     flex: 1 1 auto;
-    justify-content: center;
+    justify-content: flex-start;
   }
 
   [data-view='instrument'] .inst-row #inst-dx7-presets,
@@ -1043,8 +1047,13 @@ body:not([data-view='instrument']) #inst-tools {
   min-width: 2.6em;
 }
 
-.preset-tape {
-  flex: none;
+/* Volume's name silkscreened on the chassis, a weight heavier, as the
+   operators' roles (Jeremy, 2026-10-22): no tape. */
+[data-view='instrument'] .inst-tools .slider-row > label {
+  color: var(--chassis-legend);
+  font: 500 0.9rem / 1 var(--font-tape);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
 /* The preset steps ‹ ›, in a bezel of their own as the choosers' are
