@@ -815,7 +815,10 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
   cards' column names, in `--font-tape` and `--chassis-legend`, the same
   in either theme. The text stays in its own case and CSS sets the
   capitals; a unit is a `.unit` span that keeps its case ("LEVEL dB",
-  "DETUNE ¢"). The chapters' names are unchanged.
+  "DETUNE ¢"). The operators' roles, carrier and modulator, in the
+  table and on the operator panel's head, are the same capitals a weight
+  heavier (Barlow Condensed 500, not italic; Jeremy, 2026-10-22). The
+  chapters' names and roles are unchanged.
 - All text is pure `--ink`, never a grey. Use weight, size and italics for
   hierarchy. The exception is text printed on the sandbox's chassis
   panels, which is the light silkscreen `--chassis-legend`, as the push
@@ -871,7 +874,8 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
   `--font-sans` (Figtree 400 to 700, italic for figure captions:
   everything else), `--font-mono` (IBM Plex Mono: numbers, with tabular
   figures; `.num`), `--font-tape` (Barlow Condensed 400: the sandbox's
-  Dymo tape labels, its knob names and its operator table's heads), `--font-logo` (Michroma 400: the logo only). A
+  Dymo tape labels, its knob names, its operator table's heads, and at
+  500 the operators' roles), `--font-logo` (Michroma 400: the logo only). A
   weight that is not imported there is not available.
 - A canvas has no CSS: draw code reads the tokens with `getComputedStyle`
   and whoever mounts it must redraw on resize, theme change and

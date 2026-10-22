@@ -2939,3 +2939,23 @@ body:not([data-view='instrument']) .inst-settings {
   letter-spacing: 0.04em;
   text-transform: none;
 }
+
+/* The operators' roles, carrier and modulator, in the same silkscreen
+   capitals, a weight heavier (Jeremy, 2026-10-22): in the table and with
+   the selected operator on the panel's head, both on the chassis. */
+[data-view='instrument'] :is(#voice-table .op-role, .voice-envelope-head .op-role) {
+  color: var(--chassis-legend);
+  font-family: var(--font-tape);
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+[data-view='instrument'] #voice-table .op-role {
+  font-size: 0.86rem;
+}
+
+[data-view='instrument'] .voice-envelope-head .op-role {
+  font-size: 1.05rem;
+}

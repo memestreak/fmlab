@@ -15,6 +15,7 @@ import '@fontsource/ibm-plex-mono/latin-500.css';
 import '@fontsource/ibm-plex-mono/latin-600.css';
 // The sandbox's Dymo tape labels.
 import '@fontsource/barlow-condensed/latin-400.css';
+import '@fontsource/barlow-condensed/latin-500.css';
 import '@fontsource/michroma/latin-400.css';
 import './styles/tokens.css';
 import './styles/base.css';
