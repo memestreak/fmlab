@@ -39,13 +39,16 @@ export function nextGlitches(previous: readonly (Glitch | null)[], random: () =>
 }
 
 /**
- * The two top screens and the preset window's glass, each with its own
- * record of the kind played last.
+ * The two top screens and the preset window's and the Settings panel's
+ * glass, each with its own record of the kind played last.
  */
-type Screen = 'voice' | 'operator' | 'presets';
-const last: Record<Screen, Glitch | null> = { voice: null, operator: null, presets: null };
+type Screen = 'voice' | 'operator' | 'presets' | 'settings';
+const last: Record<Screen, Glitch | null> = { voice: null, operator: null, presets: null, settings: null };
 const screenOf = (glass: HTMLElement): Screen =>
-  glass.closest('#voice-envelope') ? 'operator' : glass.closest('.preset-panel') ? 'presets' : 'voice';
+  glass.closest('#voice-envelope') ? 'operator'
+  : glass.closest('.preset-panel') ? 'presets'
+  : glass.closest('.settings-panel') ? 'settings'
+  : 'voice';
 
 /** What is running on a screen, to be cancelled by the next change on it. */
 const running = new Map<HTMLElement, () => void>();

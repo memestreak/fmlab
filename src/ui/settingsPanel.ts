@@ -1,22 +1,26 @@
 import { type ChoiceSetting, SETTING_CHOICES, saveSettings, type Settings, settings } from '../model/settings';
 import { tapeLabel } from './dymo';
 import { midiInputs } from './midi';
+import { glitchScreens } from './screenGlitch';
 import { createVfdReadout } from './vfdReadout';
 import { inSandbox } from './motion';
 
 // The sandbox's Settings (Jeremy, 2026-10-21, "a function panel, named
-// SETTINGS"): a push key in the masthead opens a modal console, a VFD
-// screen listing every setting, one line each, the selected one's
-// choices as lamp keys under it (or, for MIDI's Channel, ‹ › round a VFD
-// readout). Changes apply as they are made and are
+// SETTINGS"): a push key in the masthead opens a modal console, its
+// settings on two tabs, General and MIDI (Jeremy, 2026-10-23), a VFD
+// screen listing the tab's, one line each, the selected one's
+// choices as lamp keys under it (or, for MIDI's lines, ‹ ›, round a VFD
+// readout for Channel). Changes apply as they are made and are
 // saved (model/settings.ts). No theme: the sandbox is dark only
 // (Jeremy, 2026-10-22).
 
 /**
  * One line of the panel: its group, its name, its choices (worked out
  * when shown: the MIDI inputs come and go) and how to read and set it.
- * With `readout`, too many choices for lamp keys: under the glass, ‹ ›
- * round a two-place VFD readout of the choice instead (MIDI Channel).
+ * With `stepper`, too many choices for lamp keys (or too long: an
+ * interface's ports): under the glass, ‹ › instead, the choice read on
+ * the glass; with `readout` too, round a two-place VFD readout of it
+ * (MIDI Channel).
  */
 interface Line {
   group: string;
@@ -24,10 +28,19 @@ interface Line {
   choices: () => readonly { value: string; label: string }[];
   get: () => string;
   set: (value: string) => void;
+  stepper?: boolean;
   readout?: (value: string) => string;
 }
 
 const choice = (value: string, label: string) => ({ value, label });
+
+/** The panel's tabs: MIDI's lines on their own, everything else General. */
+type Page = 'general' | 'midi';
+const PAGES: { page: Page; name: string }[] = [
+  { page: 'general', name: 'General' },
+  { page: 'midi', name: 'MIDI' },
+];
+const pageOf = (line: Line): Page => (line.group === 'MIDI' ? 'midi' : 'general');
 
 /** The lines, in order; each one a setting. */
 function lines(): Line[] {
@@ -36,9 +49,11 @@ function lines(): Line[] {
     name: string,
     key: K,
     labels: Record<Settings[K], string>,
+    stepper = false,
   ): Line => ({
     group,
     name,
+    stepper,
     choices: () => (Object.keys(labels) as `${Settings[K]}`[]).map(value => choice(value, labels[value as Settings[K]])),
     get: () => String(settings.get()[key]),
     // A choice of numbers (Bend range) is set as its number.
@@ -58,6 +73,7 @@ function lines(): Line[] {
     },
     get: () => settings.get().midiInput,
     set: value => settings.set({ midiInput: value }),
+    stepper: true,
   };
   const channel: Line = {
     group: 'MIDI',
@@ -65,6 +81,7 @@ function lines(): Line[] {
     choices: () => Array.from({ length: 17 }, (_, n) => choice(String(n), n === 0 ? 'All' : String(n))),
     get: () => String(settings.get().midiChannel),
     set: value => settings.set({ midiChannel: Number(value) }),
+    stepper: true,
     readout: value => (value === '0' ? 'AL' : value),
   };
   return [
@@ -84,7 +101,7 @@ function lines(): Line[] {
       5: '±5 st',
       7: '±7 st',
       12: '±12 st',
-    }),
+    }, true),
   ];
 }
 
@@ -176,7 +193,36 @@ export function mountSettings(): void {
   close.className = 'lamp-key settings-close';
   close.textContent = 'Close';
   closeBezel.append(close);
-  head.append(title, closeBezel);
+  const tabs = document.createElement('div');
+  tabs.className = 'pill-tabs settings-tabs';
+  tabs.setAttribute('role', 'tablist');
+  tabs.setAttribute('aria-label', 'Settings');
+  const tabKeys = PAGES.map(({ page, name }, i) => {
+    const tab = document.createElement('button');
+    tab.type = 'button';
+    tab.id = `settings-tab-${page}`;
+    tab.className = 'pill-tab';
+    tab.setAttribute('role', 'tab');
+    tab.setAttribute('aria-controls', `settings-page-${page}`);
+    tab.textContent = name;
+    // Chosen on the press, as the Voice tabs are; the click after finds it open.
+    tab.addEventListener('pointerdown', event => {
+      if (event.button === 0) choosePage(page);
+    });
+    tab.addEventListener('click', () => choosePage(page));
+    tab.addEventListener('keydown', event => {
+      const to = { ArrowLeft: i - 1, ArrowRight: i + 1, Home: 0, End: PAGES.length - 1 }[event.key];
+      if (to === undefined) return;
+      event.preventDefault();
+      event.stopPropagation();
+      const next = (to + PAGES.length) % PAGES.length;
+      choosePage(PAGES[next].page);
+      tabKeys[next].focus();
+    });
+    return tab;
+  });
+  tabs.append(...tabKeys);
+  head.append(title, tabs, closeBezel);
 
   // The screen: a listbox of the lines.
   const screen = document.createElement('div');
@@ -208,7 +254,21 @@ export function mountSettings(): void {
     });
     return { row, value };
   });
-  glass.append(...rows.map(r => r.row));
+  // One page of lines a tab, both in the glass's one cell, the closed one
+  // unseen: the glass keeps the longer one's size whichever is open.
+  const pages = new Map(
+    PAGES.map(({ page, name }) => {
+      const element = document.createElement('div');
+      element.className = 'settings-page';
+      element.id = `settings-page-${page}`;
+      element.dataset.page = page;
+      element.setAttribute('role', 'group');
+      element.setAttribute('aria-label', name);
+      element.append(...rows.filter((_, i) => pageOf(all[i]) === page).map(r => r.row));
+      return [page, element];
+    }),
+  );
+  glass.append(...pages.values());
   screen.append(glass);
 
   // Under the screen: ‹ › through the lines, the selected one's name, its choices.
@@ -221,14 +281,42 @@ export function mountSettings(): void {
     button.textContent = glyph;
     button.setAttribute('aria-label', label);
     button.addEventListener('pointerdown', event => {
-      if (event.button === 0) select(round(selected, by, all.length));
+      if (event.button === 0) select(along(by));
     });
     button.addEventListener('click', event => {
-      if (event.detail === 0) select(round(selected, by, all.length));
+      if (event.detail === 0) select(along(by));
     });
     return button;
   };
   steps.append(step('Previous setting', '‹', -1), step('Next setting', '›', 1));
+  let page: Page = 'general';
+  /** The lines of the open tab, by index. */
+  const shown = () => all.flatMap((line, i) => (pageOf(line) === page ? [i] : []));
+  /** The line `by` along from the selected one in the open tab, round its ends. */
+  const along = (by: number) => {
+    const lines = shown();
+    return lines[round(lines.indexOf(selected), by, lines.length)];
+  };
+  const showPage = () => {
+    tabKeys.forEach((tab, i) => {
+      const on = PAGES[i].page === page;
+      tab.setAttribute('aria-selected', String(on));
+      tab.tabIndex = on ? 0 : -1;
+    });
+    for (const [name, element] of pages) {
+      const on = name === page;
+      element.classList.toggle('is-closed', !on);
+      element.inert = !on;
+    }
+  };
+  /** Opens a tab, its first line selected; the glass glitches over the change. */
+  function choosePage(to: Page): void {
+    if (to === page) return;
+    page = to;
+    showPage();
+    select(shown()[0]);
+    glitchScreens([glass]);
+  }
   const legend = document.createElement('span');
   legend.className = 'settings-legend';
   legend.setAttribute('aria-hidden', 'true');
@@ -252,18 +340,20 @@ export function mountSettings(): void {
     const to = wrap ? round(at, by, choices.length) : Math.min(choices.length - 1, Math.max(0, at + by));
     if (to !== at) line.set(choices[to].value);
   };
-  /** A line with a readout: its VFD under the glass, kept with its value. */
+  /** A stepper line: its VFD under the glass, if it has one, kept with its value. */
   let readout: { update: () => void } | null = null;
   const buildChoices = () => {
     const line = all[selected];
     options.setAttribute('aria-label', line.name);
     readout = null;
-    if (line.readout) {
-      // ‹ › round its readout, the octave chooser's: a step on the press,
-      // held at the ends, as Left and Right on the line.
+    if (line.stepper) {
+      // ‹ ›, round its readout if it has one, the octave chooser's: a step
+      // on the press, held at the ends, as Left and Right on the line.
       const format = line.readout;
-      const vfd = createVfdReadout({ get: () => Number(line.get()), format: value => format(String(value)), places: 2 });
-      readout = vfd;
+      const vfd = format
+        ? createVfdReadout({ get: () => Number(line.get()), format: value => format(String(value)), places: 2 })
+        : null;
+      readout = vfd ?? { update: () => {} };
       const key = (label: string, glyph: string, by: number) => {
         const button = document.createElement('button');
         button.type = 'button';
@@ -278,9 +368,9 @@ export function mountSettings(): void {
         });
         return button;
       };
-      options.className = 'chooser settings-choices settings-readout';
+      options.className = `chooser settings-choices${vfd ? ' settings-readout' : ' settings-stepper'}`;
       options.setAttribute('role', 'group');
-      options.replaceChildren(key('Previous', '‹', -1), vfd.element, key('Next', '›', 1));
+      options.replaceChildren(key('Previous', '‹', -1), ...(vfd ? [vfd.element] : []), key('Next', '›', 1));
       return;
     }
     options.className = 'lamp-keys settings-choices';
@@ -314,6 +404,8 @@ export function mountSettings(): void {
     rows.forEach(({ row, value }, i) => {
       const line = all[i];
       value.textContent = labelOf(line);
+      // The whole of a long one (an input's name), cut short on the glass.
+      value.title = labelOf(line);
       row.setAttribute('aria-selected', String(i === selected));
       row.setAttribute('aria-label', `${line.name}: ${labelOf(line)}`);
     });
@@ -343,12 +435,12 @@ export function mountSettings(): void {
   glass.addEventListener('keydown', event => {
     if (event.altKey || event.ctrlKey || event.metaKey) return;
     const handled: Record<string, () => void> = {
-      ArrowUp: () => select(round(selected, -1, all.length)),
-      ArrowDown: () => select(round(selected, 1, all.length)),
+      ArrowUp: () => select(along(-1)),
+      ArrowDown: () => select(along(1)),
       ArrowLeft: () => cycle(-1, false),
       ArrowRight: () => cycle(1, false),
-      Home: () => select(0),
-      End: () => select(all.length - 1),
+      Home: () => select(shown()[0]),
+      End: () => select(shown().at(-1) ?? selected),
       Enter: () => cycle(1),
       ' ': () => cycle(1),
     };
@@ -363,6 +455,9 @@ export function mountSettings(): void {
   const isOpen = () => dialog.open;
   const open = () => {
     if (isOpen()) return;
+    // Always on General: the open tab is not kept.
+    page = 'general';
+    showPage();
     select(0);
     dialog.showModal();
     key.setAttribute('aria-pressed', 'true');
@@ -400,16 +495,17 @@ export function mountSettings(): void {
     if (!inSandbox()) shut();
   }).observe(document.body, { attributes: true, attributeFilter: ['data-view'] });
 
-  // The Input line's choices come and go with the inputs: its keys are
-  // made again when their count changes.
+  // The Input line's choices come and go with the inputs, read on the
+  // glass; a line of lamp keys is made again when its count changes.
   const refresh = () => {
     if (!isOpen()) return;
     const line = all[selected];
-    if (!line.readout && options.children.length !== line.choices().length) buildChoices();
+    if (!line.stepper && options.children.length !== line.choices().length) buildChoices();
     show();
   };
   settings.subscribe(refresh);
   midiInputs.subscribe(refresh);
+  showPage();
   buildChoices();
   show();
 }

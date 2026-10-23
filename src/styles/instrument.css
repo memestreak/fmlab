@@ -1774,14 +1774,14 @@ canvas.voice-keys {
   display: none;
 }
 
-/* The control panel: Octave, Mod and MIDI on tape on the top line;
-   under them, 6px down, the octave chooser, the wheel (its foot 9px
-   above the chassis's; Jeremy, 2026-10-21: the chooser close to its
-   tape) and MIDI's In key, on the chooser's line (Jeremy, 2026-10-23). */
+/* The control panel: Octave and Mod on tape on the top line; under
+   them, 6px down, the octave chooser and the wheel, its foot 9px above
+   the chassis's (Jeremy, 2026-10-21: the chooser close to its tape);
+   and under the chooser, centred, the MIDI key (Jeremy, 2026-10-23). */
 .piano-panel {
   display: grid;
-  grid-template-columns: auto auto auto;
-  grid-template-rows: 24px minmax(0, 1fr);
+  grid-template-columns: auto auto;
+  grid-template-rows: 24px auto minmax(0, 1fr);
   gap: 6px 14px;
   padding-bottom: 9px;
 }
@@ -1799,28 +1799,23 @@ canvas.voice-keys {
 }
 
 .piano-panel .mod-wheel {
-  grid-area: 2 / 2;
-}
-
-.midi-label {
-  grid-area: 1 / 3;
-  justify-self: start;
+  grid-area: 2 / 2 / 4 / 3;
 }
 
 .midi-bezel {
-  grid-area: 2 / 3;
+  grid-area: 3 / 1;
   align-self: start;
-  justify-self: start;
+  justify-self: center;
 }
 
-/* In, waiting for the page's first gesture (MIDI on, the sound not yet
-   allowed to start) or for the browser's answer: its lamp half lit. */
+/* The MIDI key, waiting for the page's first gesture (MIDI on, the sound
+   not yet allowed to start) or for the browser's answer: its lamp half lit. */
 [data-view='instrument'] .midi-in[data-state='waiting']::before,
 [data-view='instrument'] .midi-in[data-state='asking']::before {
   opacity: 0.5;
 }
 
-/* No MIDI in this browser: In kept in its place, dimmed and dead. */
+/* No MIDI in this browser: the key kept in its place, dimmed and dead. */
 [data-view='instrument'] .midi-in:disabled {
   opacity: 0.45;
   cursor: default;
@@ -2370,14 +2365,6 @@ canvas.voice-keys {
   }
 }
 
-/* Under 1100px narrower still, so the keyboard panel's MIDI column
-   leaves the page no wider than the window. */
-@media (min-width: 62rem) and (max-width: 1099.98px) {
-  .piano {
-    --w: 2.7rem;
-  }
-}
-
 /* A shorter window, as 1280 × 800: the diagram's caption for screen
    readers only, the table's rows closer, the diagram allowed lower. */
 @media (min-width: 62rem) and (max-height: 52rem) {
@@ -2799,7 +2786,8 @@ canvas.voice-keys {
     max-width: 40rem;
   }
 
-  /* The tapes are hidden here: the chooser, the wheel and In side by side. */
+  /* The tapes are hidden here: the chooser, the wheel and the MIDI key
+     side by side. */
   .piano-panel {
     grid-template-columns: auto auto auto;
     grid-template-rows: auto;
@@ -2808,14 +2796,13 @@ canvas.voice-keys {
   }
 
   .piano-oct-head,
-  .piano-panel .mod-wheel-label,
-  .piano-panel .midi-label {
+  .piano-panel .mod-wheel-label {
     display: none;
   }
 
-  /* MIDI's In after the wheel, on the chooser's line. */
+  /* The MIDI key after the wheel, on the chooser's line. */
   .midi-bezel {
-    grid-row: 1;
+    grid-area: 1 / 3;
     align-self: end;
   }
 
@@ -2825,7 +2812,7 @@ canvas.voice-keys {
   }
 
   .piano-panel .mod-wheel {
-    grid-row: 1;
+    grid-area: 1 / 2;
     height: 2.75rem;
   }
 
@@ -2904,6 +2891,11 @@ body:not([data-view='instrument']) .inst-settings {
   margin-bottom: 12px;
 }
 
+/* General | MIDI, between the title and Close. */
+.settings-tabs {
+  margin: 0 12px 0 auto;
+}
+
 .settings-screen {
   min-height: 0;
   padding: 7px;
@@ -2933,9 +2925,32 @@ body:not([data-view='instrument']) .inst-settings {
   outline-offset: 9px;
 }
 
+/* A tab's lines: both pages in the glass's one cell, the closed one
+   unseen, so the glass is the longer one's size whichever is open. */
+.settings-page {
+  display: grid;
+  grid-area: 1 / 1;
+  align-content: start;
+}
+
+.settings-page.is-closed {
+  visibility: hidden;
+}
+
+/* MIDI's tab: no group column, which would only say MIDI again. */
+.settings-page[data-page='midi'] .settings-group {
+  display: none;
+}
+
+.settings-page[data-page='midi'] .settings-line {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
 .settings-line {
   display: grid;
-  grid-template-columns: 7.5rem minmax(0, 1fr) auto;
+  /* The value takes the rest, so a long one (an input's name) is cut short
+     with an ellipsis rather than widening the case. */
+  grid-template-columns: 7.5rem auto minmax(0, 1fr);
   gap: 0 12px;
   padding: 3px 12px;
 }
@@ -2950,7 +2965,10 @@ body:not([data-view='instrument']) .inst-settings {
 }
 
 .settings-value {
+  overflow: hidden;
   text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   cursor: pointer;
 }
 
@@ -2963,7 +2981,11 @@ body:not([data-view='instrument']) .inst-settings {
   margin-top: 12px;
 }
 
-.settings-steps .chooser-key {
+/* Every ‹ › here, and Channel's readout, as tall as a lamp key: the
+   row under the glass is one height on either tab. */
+.settings-steps .chooser-key,
+.settings-choices .chooser-key,
+[data-view='instrument'] .settings-choices .op-vfd {
   height: 1.65rem;
 }
 
@@ -2984,10 +3006,21 @@ body:not([data-view='instrument']) .inst-settings {
   flex: none;
 }
 
-/* On a phone the group goes under the name. */
+/* On a phone the group goes under the name, and the tabs under the title
+   and Close, on a line of their own. */
 @media (max-width: 30rem) {
+  .settings-head {
+    flex-wrap: wrap;
+    row-gap: 10px;
+  }
+
+  .settings-tabs {
+    order: 1;
+    margin: 0;
+  }
+
   .settings-line {
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: auto minmax(0, 1fr);
   }
 
   .settings-group {

@@ -81,7 +81,7 @@ figures subscribe to it. Nothing else passes values around.
   `settings.ts`, the sandbox's settings (its Settings panel, and the
   Voice section's Reverb tab), outside the lab's store, the link and the
   sound: `Settings` (Screen glitch, Motion, Tips on hover, Z X hint, Note
-  names, Computer keys, Wheel; MIDI In's `midi` (off, on: set by the In key),
+  names, Computer keys, Wheel; MIDI In's `midi` (off, on: set by the MIDI key),
   `midiInput` (an input's name, '' for all, at most `MAX_TEXT_SETTING`, 100,
   characters, the one text setting), `midiChannel` (0 for all, or 1 to 16)
   and `bendRange` (1, 2, 3, 5, 7 or 12 semitones); and the plate reverb's Reverb, Decay, Mix,
@@ -570,9 +570,9 @@ figures subscribe to it. Nothing else passes values around.
   press), scrolled (down for more, 1 % per 10 px), the arrows (1 %), Page
   Up / Down (10 %), Home, End, and a double click back to 0; no spring;
   the note keys, Z / X and space still play while it has focus.
-  The panel's third column is MIDI In (`ui/midi.ts`, `mountMidi`; Jeremy,
-  2026-10-23): MIDI on tape over one lamp key, In, worked on the press,
-  which turns the `midi` setting on and off; on, `requestMIDIAccess()`
+  Under the octave chooser, centred, MIDI In's one lamp key, MIDI (no
+  tape; named "MIDI in"; `ui/midi.ts`, `mountMidi`; Jeremy, 2026-10-23),
+  the wheel running down beside it; worked on the press, it turns the `midi` setting on and off; on, `requestMIDIAccess()`
   (never sysex) is asked, and again on load with on saved. Its tip and
   `data-state` (`midiTip`): "MIDI off"; "MIDI on: <names>" or "MIDI on: no
   keyboard connected"; `waiting`, the lamp half lit, "Click anywhere to
@@ -581,19 +581,21 @@ figures subscribe to it. Nothing else passes values around.
   is out ("MIDI: asking the browser; allow it in the prompt by the
   address bar"); `blocked`, "MIDI blocked: allow it in the site's settings
   (in Brave: Settings, Site and Shields settings, MIDI devices)" (a
-  press asks again, inside the press); and `unsupported`, the key disabled, "This browser has
-  no MIDI: use Chrome, Edge, Brave or Firefox". Each press, request, answer
-  (with a refusal's error), input listened to and the first message are
-  logged to the console as "fmlab: MIDI ...", for debugging a real
-  keyboard. It listens to every input
+  press asks again, inside the press); and `unsupported`, the key
+  disabled, kept in its place, "This browser has no MIDI: use Chrome,
+  Edge, Brave or Firefox". The answer (a refusal with its error), each
+  input listened to and the first message are logged to the console as
+  "fmlab: MIDI ...". It listens to every input
   the Input setting names (hot-plugged ones too) on the Channel set, read
   by `midiMessage.ts` (`parseMidi`, pure): note on and off (on at velocity
   0 is off; A0 to C8 only), the sustain pedal (CC64, down from 64), the mod
   wheel (CC1), all off (CC120, CC123, as Stop) and the pitch wheel (14
   bits about 8192, to `pitchBend`); system messages, program change,
   aftertouch and the rest are ignored. A note goes to the engine's
-  `noteOn` first, then into the key bed. On a phone the tapes are hidden
-  and In sits after the wheel on the chooser's line.
+  `noteOn` first, then into the key bed. Under 60rem high the key makes
+  the panel 11px taller than the keys' bed (125 against 114). On a phone
+  the tapes are hidden and the key sits after the wheel on the chooser's
+  line.
 It shows two octaves, from C1–B2 to C5–B6 (`STARTS`; Jeremy, 2026-10-21),
 starting at C3–B4, where a double click on the range brings it back;
 every key it can show plays (`playable`, C1 to B6). Every held
@@ -803,25 +805,36 @@ function panel, named SETTINGS") is one lamp key in its own bezel, lit
 while its panel is open (`aria-pressed`, `aria-expanded`), worked on
 the press; the panel a modal `<dialog>` named Settings, a console of
 the chassis's black plastic the same in either theme over a page dimmed
-35 %: "Settings" on Dymo tape and a Close key (a push key with no lamp: it
-has no state to show), a VFD screen in a molded
-bezel listing the seven settings one line each (group dim, name, value;
+35 %: "Settings" on Dymo tape, two tabs, General and MIDI (Jeremy,
+2026-10-23; `.pill-tabs`, the Voice tabs' keys, the arrows between them,
+on a line of their own under the title on a phone; always opening on
+General, the tab not kept; a change glitches the glass) and a Close key
+(a push key with no lamp: it has no state to show), a VFD screen in a
+molded bezel listing the open tab's settings one line each (both tabs'
+lines in the glass's one cell, the closed one unseen, so the glass is
+the longer list's size on either; group dim, but none on the MIDI tab,
+name, value, a long one cut short with an ellipsis, its whole in its
+tip;
 the selected line lit behind with a bar at its left; a listbox: Up and
 Down, Left and Right change the value, Enter and Space the next choice,
-a click on a value too), and under it ‹ › through the lines, the
-selected one's name silkscreened grey and its choices as lamp keys.
+a click on a value too), and under it ‹ › through the tab's lines, the
+selected one's name silkscreened grey and its choices as lamp keys, or,
+for MIDI's three (`stepper`), ‹ › held at the ends, the choice read on
+the glass (Channel's round a VFD readout too), every key the row's one
+height.
 Changes apply and are saved as they are made; Esc, Close, the key or a
 click round the case closes it, focus going back to the key; the note
-keys and Z / X still play while it is open. The settings: Screen glitch
+keys and Z / X still play while it is open. The settings, General's: Screen glitch
 (On, Off), Motion (System, Still), Tips on hover (On, Off: the
 sandbox's native titles put away in `data-tip-off` and the terms' tips
 hidden, names and descriptions kept), Z X hint (Hover, Always, Off),
 Note names (C only, All: every white key, Off), Computer keys (Off, On:
 the computer key that plays each piano key, small at its foot), Wheel
-(Page, Reverse), then MIDI's three: Input (All inputs and each
-connected input by name, `midiInputs`; a chosen input not connected
-shown "(not connected)"), Channel (‹ › either side of a two-place VFD
-reading AL or 1 to 16) and Bend range (±1, ±2, ±3, ±5, ±7, ±12 st) (the
+(Page, Reverse); MIDI's: Input (All inputs, then each connected input
+by name in the browser's order, `midiInputs`; a chosen input not
+connected stays, "(not connected)", until another is chosen), Channel
+(a two-place VFD reading AL or 1 to 16) and Bend range (±1, ±2, ±3, ±5,
+±7, ±12 st) (the
 reverb's are on the Voice section's Reverb tab, Jeremy, 2026-10-22);
 `applySettings` sets them on `<html>` (`data-motion`, `data-tips`,
 `data-zx`, `data-note-names`, `data-computer-keys`) for the CSS. On a

@@ -1,6 +1,6 @@
 // MIDI In (Jeremy, 2026-10-23): a USB MIDI keyboard plays the sandbox.
-// The keyboard panel's third column, MIDI, has one lamp key, In, which
-// turns it on and off (the `midi` setting, kept between visits). On, every
+// One lamp key under the keyboard panel's octave chooser, MIDI, turns it
+// on and off (the `midi` setting, kept between visits). On, every
 // input the Input setting names is listened to (all by default), on the
 // Channel set: notes, the sustain pedal, the mod wheel, the pitch wheel
 // and all-off; nothing else. Notes go to the sound first (the engine's
@@ -13,13 +13,12 @@ import { settings } from '../model/settings';
 import { createStore } from '../model/store';
 import type { KeyBed } from './keyBed';
 import { parseMidi } from './midiMessage';
-import { tapeLabel } from './dymo';
 
 /** The inputs connected, by name, for the Settings panel's Input line. */
 export const midiInputs = createStore<{ names: string[] }>({ names: [] });
 
 /**
- * What the In key shows: MIDI off, on, asking the browser (its permission
+ * What the MIDI key shows: MIDI off, on, asking the browser (its permission
  * prompt open, or the answer not back yet), waiting for a gesture,
  * blocked, or not in this browser.
  */
@@ -43,25 +42,20 @@ interface Sound {
 }
 
 /**
- * Builds the MIDI column in the keyboard's control `panel`, and listens
- * while `active()` says the sandbox is showing.
+ * Builds the MIDI key under the octave chooser in the keyboard's control
+ * `panel`, and listens while `active()` says the sandbox is showing.
  */
 export function mountMidi(panel: HTMLElement, store: LabStore, sound: Sound, bed: KeyBed, active: () => boolean): void {
-  const tape = document.createElement('span');
-  tape.className = 'midi-label';
-  tape.textContent = 'MIDI';
-  tape.setAttribute('aria-hidden', 'true');
   const bezel = document.createElement('span');
   bezel.className = 'lamp-keys midi-bezel';
   const key = document.createElement('button');
   key.type = 'button';
   key.className = 'lamp-key midi-in';
-  key.textContent = 'In';
+  key.textContent = 'MIDI';
   key.setAttribute('aria-label', 'MIDI in');
   key.setAttribute('aria-pressed', 'false');
   bezel.append(key);
-  panel.append(tape, bezel);
-  tapeLabel(tape);
+  panel.append(bezel);
 
   const supported = typeof navigator.requestMIDIAccess === 'function';
   let access: MIDIAccess | null = null;
@@ -144,7 +138,6 @@ export function mountMidi(panel: HTMLElement, store: LabStore, sound: Sound, bed
   const request = () => {
     if (!supported || asking) return;
     asking = true;
-    console.info('fmlab: MIDI requesting access');
     // No sysex: that brings a stronger prompt.
     navigator.requestMIDIAccess().then(
       granted => {
@@ -204,10 +197,9 @@ export function mountMidi(panel: HTMLElement, store: LabStore, sound: Sound, bed
     }
   };
 
-  // In, worked on the press: on asks for MIDI (and, as a gesture, wakes
+  // The key, worked on the press: on asks for MIDI (and, as a gesture, wakes
   // the sound); off lets it all go. Blocked, a press asks again.
   const press = () => {
-    console.info(`fmlab: MIDI In pressed (${state()})`);
     if (!supported) return;
     if (settings.get().midi === 'on' && !blocked) {
       settings.set({ midi: 'off' });
