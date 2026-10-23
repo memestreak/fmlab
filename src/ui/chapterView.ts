@@ -471,6 +471,24 @@ export function presetOf(presets: readonly Preset[], state: LabState): number {
 export { FACTORY_CREDIT };
 
 /**
+ * The preset's up and down keys, right of its name, in order: ˄ (‹
+ * turned a quarter) on to the next voice, ˅ back to the one before
+ * (Jeremy, 2026-10-23: the other way was "wired in reverse").
+ */
+export const PRESET_STEP_KEYS = [
+  { label: 'Next preset', glyph: '‹', steps: 1 },
+  { label: 'Previous preset', glyph: '›', steps: -1 },
+] as const;
+
+/** The arrow keys on the name and those keys: up on and down back, as they go; right on and left back. */
+export const PRESET_ARROW_STEPS: Readonly<Record<string, number>> = {
+  ArrowUp: 1,
+  ArrowDown: -1,
+  ArrowLeft: -1,
+  ArrowRight: 1,
+};
+
+/**
  * The sandbox's presets: the voice's name on VFD glass, a button opening
  * the preset window (ui/presetPanel.ts), where the bank keys are (Jeremy,
  * 2026-10-22), with ‹ › right of it stepping through all the voices, both
@@ -497,11 +515,11 @@ function presetMenu(presets: readonly Preset[], banks: readonly PresetBank[], st
     glitchScreens([...topScreens(), ...glitch]);
   };
 
-  // The arrows step through all the voices from the name and ‹ › (Jeremy,
-  // 2026-10-22: across the banks, A32 on to B1, round both ends): up and
-  // left back, down and right on.
+  // The arrows step through all the voices from the name and its up and
+  // down keys (Jeremy, 2026-10-22: across the banks, A32 on to B1, round
+  // both ends), as the keys do.
   const arrowSteps = (event: KeyboardEvent) => {
-    const steps = { ArrowUp: -1, ArrowLeft: -1, ArrowDown: 1, ArrowRight: 1 }[event.key];
+    const steps = PRESET_ARROW_STEPS[event.key];
     if (steps === undefined || event.altKey || event.ctrlKey || event.metaKey) return;
     event.preventDefault();
     choose(stepPreset(last, steps, presets.length));
@@ -596,9 +614,9 @@ function presetMenu(presets: readonly Preset[], banks: readonly PresetBank[], st
   show(store.get());
   const steps = document.createElement('span');
   steps.className = 'chooser preset-step';
-  // Up and down, right of the name (Jeremy, 2026-10-21): up back, down
-  // on, as the arrow keys step.
-  steps.append(step('Previous preset', '‹', -1), step('Next preset', '›', 1));
+  // Up and down, right of the name (Jeremy, 2026-10-21): up on, down back
+  // (Jeremy, 2026-10-23: the other way was "wired in reverse").
+  steps.append(...PRESET_STEP_KEYS.map(({ label, glyph, steps: by }) => step(label, glyph, by)));
   // No label of its own (Jeremy, 2026-10-22): the name on the glass says
   // what it is; for screen readers the group is named Presets.
   return [pick, steps, note];
