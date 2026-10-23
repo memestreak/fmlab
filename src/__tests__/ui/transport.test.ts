@@ -2,7 +2,7 @@ import { envelopeOf } from '../../model/lab';
 import { noteSeconds } from '../../dsp/envelope';
 import { chapterById, landing, LANDING } from '../../chapters';
 import { DEFAULTS, type LabState, noteSounding } from '../../model/lab';
-import { labelTimeout, playLabel, pressPlay, spaceIsFree } from '../../ui/transport';
+import { labelTimeout, playLabel, pressPlay, pressSpace, spaceIsFree } from '../../ui/transport';
 
 /**
  * A state with a note started at `at` on the page's clock, as the engine
@@ -75,6 +75,26 @@ describe('the main button and the space bar start and stop the sound', () => {
     expect(playLabel(sounding, 101)).toBe('Play note');
     expect(playLabel(home, 0)).toBe('Play');
     expect(playLabel(started({ ...home }, 10), 11)).toBe('Stop');
+  });
+});
+
+describe('the space bar in the sandbox', () => {
+  const sandbox: LabState = { ...DEFAULTS, ...chapterById('sandbox')!.patch, chapter: 'sandbox' };
+
+  // Jeremy, 2026-10-23: "<space> causes a note to play".
+  it('never strikes a note: it only stops', () => {
+    expect(sandbox.noteMode).toBe(true);
+    expect(pressSpace(sandbox, 100)).toEqual({ stops: 1, noteStartedAt: null });
+    const playing = started({ ...sandbox, notes: 1 }, 100);
+    expect(pressSpace(playing, 100.3)).toEqual({ stops: 1, noteStartedAt: null });
+    expect(pressSpace(sandbox, 100)).not.toHaveProperty('notes');
+  });
+
+  it('is the main button everywhere else', () => {
+    expect(pressSpace(brass, 100)).toEqual(pressPlay(brass, 100));
+    expect(pressSpace(sounding, 100.3)).toEqual(pressPlay(sounding, 100.3));
+    expect(pressSpace(home, 0)).toEqual(pressPlay(home, 0));
+    expect(pressSpace(DEFAULTS, 0)).toEqual({ playing: true });
   });
 });
 
