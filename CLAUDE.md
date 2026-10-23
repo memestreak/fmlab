@@ -832,7 +832,15 @@ Note names (C only, All: every white key, Off), Computer keys (Off, On:
 the computer key that plays each piano key, small at its foot), Wheel
 (Page, Reverse); MIDI's: Input (All inputs, then each connected input
 by name in the browser's order, `midiInputs`; a chosen input not
-connected stays, "(not connected)", until another is chosen), Channel
+connected stays, "(not connected)", until another is chosen; with too
+many to step through, its value, Enter or Space also opens a drop-down,
+`menu` (Jeremy, 2026-10-23): a listbox on the same VFD glass under the
+line, over the screen, scrolling inside itself within the case and the
+window, the option the keys are on lit, the chosen one barred, a long
+name cut short with its whole in the tip; Up, Down, Home, End, Page Up
+and Down move, Enter, Space or a click choose and close it, Esc (the list
+only, not the case), Tab or a press elsewhere close it as it was, focus
+back on the line; the note keys still play), Channel
 (a two-place VFD reading AL or 1 to 16) and Bend range (±1, ±2, ±3, ±5,
 ±7, ±12 st) (the
 reverb's are on the Voice section's Reverb tab, Jeremy, 2026-10-22);

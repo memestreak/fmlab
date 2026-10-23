@@ -30,6 +30,8 @@ interface Line {
   set: (value: string) => void;
   stepper?: boolean;
   readout?: (value: string) => string;
+  /** A list too long to step through (the MIDI inputs): its value, Enter or Space opens it as a drop-down. */
+  menu?: boolean;
 }
 
 const choice = (value: string, label: string) => ({ value, label });
@@ -74,6 +76,7 @@ function lines(): Line[] {
     get: () => settings.get().midiInput,
     set: value => settings.set({ midiInput: value }),
     stepper: true,
+    menu: true,
   };
   const channel: Line = {
     group: 'MIDI',
@@ -249,8 +252,11 @@ export function mountSettings(): void {
     // A click selects the line; on its value, it also turns it to its next choice.
     row.addEventListener('click', event => {
       select(i);
-      if (event.target instanceof Element && event.target.closest('.settings-value')) cycle(1);
       glass.focus({ preventScroll: true });
+      if (event.target instanceof Element && event.target.closest('.settings-value')) {
+        if (all[i].menu) toggleMenu();
+        else cycle(1);
+      }
     });
     return { row, value };
   });
@@ -313,6 +319,7 @@ export function mountSettings(): void {
   function choosePage(to: Page): void {
     if (to === page) return;
     page = to;
+    closeMenu(false);
     showPage();
     select(shown()[0]);
     glitchScreens([glass]);
@@ -423,7 +430,124 @@ export function mountSettings(): void {
       (button as HTMLElement).tabIndex = on ? 0 : -1;
     });
   };
+  // The drop-down (Jeremy, 2026-10-23: "way too many MIDI devices" to
+  // step through): a list on VFD glass under the line, over the screen,
+  // scrolling inside itself, never past the case or the window. Up, Down,
+  // Home, End move; Enter, Space or a click choose and close it; Esc, Tab
+  // or a click elsewhere close it as it was. Focus goes back to the line.
+  const menu = document.createElement('div');
+  menu.className = 'settings-menu';
+  menu.id = 'settings-menu';
+  menu.tabIndex = -1;
+  menu.setAttribute('role', 'listbox');
+  menu.hidden = true;
+  dialog.append(menu);
+  let menuAt = 0;
+  const menuChoices = () => all[selected].choices();
+  const menuOpen = () => !menu.hidden;
+  const markMenu = () => {
+    const chosen = all[selected].get();
+    [...menu.children].forEach((option, i) => {
+      option.setAttribute('aria-selected', String(menuChoices()[i]?.value === chosen));
+      option.classList.toggle('is-active', i === menuAt);
+    });
+    const active = menu.children[menuAt] as HTMLElement | undefined;
+    if (active) {
+      menu.setAttribute('aria-activedescendant', active.id);
+      active.scrollIntoView({ block: 'nearest' });
+    }
+  };
+  const fillMenu = () => {
+    const line = all[selected];
+    menu.setAttribute('aria-label', line.name);
+    menu.replaceChildren(
+      ...line.choices().map((c, i) => {
+        const option = document.createElement('div');
+        option.className = 'settings-menu-option';
+        option.id = `settings-menu-${i}`;
+        option.setAttribute('role', 'option');
+        option.textContent = c.label;
+        // The whole name, cut short on the glass.
+        option.title = c.label;
+        option.setAttribute('aria-label', c.label);
+        option.addEventListener('click', () => chooseFromMenu(i));
+        return option;
+      }),
+    );
+    menuAt = Math.max(0, Math.min(menuAt, menu.children.length - 1));
+  };
+  /** Under the selected line, as wide, as tall as its list or the room left in the case and the window. */
+  const placeMenu = () => {
+    const box = dialog.getBoundingClientRect();
+    const row = rows[selected].row.getBoundingClientRect();
+    const floor = Math.min(box.bottom, window.innerHeight) - 12;
+    // Placed from inside the case's border.
+    menu.style.left = `${row.left - box.left - dialog.clientLeft}px`;
+    menu.style.top = `${row.bottom - box.top - dialog.clientTop}px`;
+    menu.style.width = `${row.width}px`;
+    menu.style.maxHeight = `${Math.max(48, floor - row.bottom)}px`;
+  };
+  function openMenu(): void {
+    if (menuOpen()) return;
+    fillMenu();
+    menuAt = Math.max(0, menuChoices().findIndex(c => c.value === all[selected].get()));
+    menu.hidden = false;
+    placeMenu();
+    markMenu();
+    menu.focus({ preventScroll: true });
+  }
+  function closeMenu(refocus = true): void {
+    if (!menuOpen()) return;
+    menu.hidden = true;
+    if (refocus && dialog.open) glass.focus({ preventScroll: true });
+  }
+  function toggleMenu(): void {
+    if (menuOpen()) closeMenu();
+    else openMenu();
+  }
+  function chooseFromMenu(i: number): void {
+    const c = menuChoices()[i];
+    if (c) all[selected].set(c.value);
+    closeMenu();
+  }
+  menu.addEventListener('keydown', event => {
+    if (event.altKey || event.ctrlKey || event.metaKey) return;
+    const count = menu.children.length;
+    const moves: Record<string, number> = { ArrowUp: menuAt - 1, ArrowDown: menuAt + 1, Home: 0, End: count - 1, PageUp: menuAt - 8, PageDown: menuAt + 8 };
+    if (event.key in moves) {
+      menuAt = Math.max(0, Math.min(count - 1, moves[event.key]));
+      markMenu();
+    } else if (event.key === 'Enter' || event.key === ' ') {
+      chooseFromMenu(menuAt);
+    } else if (event.key === 'Escape') {
+      // The list only, not the case round it.
+      closeMenu();
+    } else if (event.key === 'Tab') {
+      closeMenu();
+    } else {
+      // The note keys still play.
+      return;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+  });
+  // A press anywhere else closes it as it was; the line's value toggles it itself.
+  document.addEventListener(
+    'pointerdown',
+    event => {
+      if (!menuOpen() || !(event.target instanceof Node)) return;
+      if (menu.contains(event.target)) return;
+      if (event.target instanceof Element && event.target.closest('.settings-line[aria-selected="true"] .settings-value')) return;
+      closeMenu(false);
+    },
+    { capture: true },
+  );
+  window.addEventListener('resize', () => {
+    if (menuOpen()) placeMenu();
+  });
+
   const select = (i: number) => {
+    if (i !== selected) closeMenu(false);
     if (i !== selected) {
       selected = i;
       buildChoices();
@@ -441,8 +565,8 @@ export function mountSettings(): void {
       ArrowRight: () => cycle(1, false),
       Home: () => select(shown()[0]),
       End: () => select(shown().at(-1) ?? selected),
-      Enter: () => cycle(1),
-      ' ': () => cycle(1),
+      Enter: () => (all[selected].menu ? openMenu() : cycle(1)),
+      ' ': () => (all[selected].menu ? openMenu() : cycle(1)),
     };
     const act = handled[event.key];
     if (!act) return;
@@ -468,6 +592,7 @@ export function mountSettings(): void {
     if (isOpen()) dialog.close();
   };
   dialog.addEventListener('close', () => {
+    closeMenu(false);
     key.setAttribute('aria-pressed', 'false');
     key.setAttribute('aria-expanded', 'false');
     key.focus({ preventScroll: true });
@@ -499,6 +624,11 @@ export function mountSettings(): void {
   // glass; a line of lamp keys is made again when its count changes.
   const refresh = () => {
     if (!isOpen()) return;
+    // The inputs came or went, or the choice changed: the open list follows.
+    if (menuOpen()) {
+      fillMenu();
+      markMenu();
+    }
     const line = all[selected];
     if (!line.stepper && options.children.length !== line.choices().length) buildChoices();
     show();

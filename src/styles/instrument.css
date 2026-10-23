@@ -2902,8 +2902,10 @@ body:not([data-view='instrument']) .inst-settings {
 }
 
 /* The glass: one line a setting, its group dim, its name, its value at
-   the right, glowing; the selected one lit behind, a bar at its left. */
-.settings-glass {
+   the right, glowing; the selected one lit behind, a bar at its left.
+   The Input line's drop-down is the same glass. */
+.settings-glass,
+.settings-menu {
   display: grid;
   padding: 6px 0;
   border-radius: 3px;
@@ -2923,6 +2925,46 @@ body:not([data-view='instrument']) .inst-settings {
 .settings-glass:focus-visible {
   outline: 2px solid var(--lamp-legend-hover);
   outline-offset: 9px;
+}
+
+/* The Input line's drop-down: under the line, over the screen, its own
+   scroll; the option the keys are on lit behind, the one chosen with the
+   bar; a long name cut short. */
+.settings-menu {
+  position: absolute;
+  z-index: 2;
+  box-sizing: border-box;
+  align-content: start;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  box-shadow:
+    0 0 0 1px #000,
+    0 6px 18px rgba(0, 0, 0, 0.7);
+}
+
+.settings-menu[hidden] {
+  display: none;
+}
+
+.settings-menu:focus {
+  outline: none;
+}
+
+.settings-menu-option {
+  overflow: hidden;
+  padding: 3px 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.settings-menu-option.is-active,
+.settings-menu-option:hover {
+  background: color-mix(in srgb, var(--vfd-glow) 16%, transparent);
+}
+
+.settings-menu-option[aria-selected='true'] {
+  box-shadow: inset 2px 0 0 var(--vfd-lit);
 }
 
 /* A tab's lines: both pages in the glass's one cell, the closed one
