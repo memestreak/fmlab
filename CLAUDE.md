@@ -756,11 +756,13 @@ Edited", `aria-haspopup="dialog"`): a press, Enter or Space opens the
 preset window (space never plays on it), and its arrows step the voices
 as its two step keys do. Those are right of it, up and down, side by
 side in one `.chooser` bezel (`stepPreset` over all 64 from the voice
-last chosen, across the banks, up back and down on: the algorithm and
+last chosen, across the banks, ˄ on and ˅ back, "Next preset" then
+"Previous preset" (`PRESET_STEP_KEYS`; Jeremy, 2026-10-23: the other
+way was "wired in reverse"): the algorithm and
 octave choosers' black push keys, their ‹ › turned a quarter, 1.65rem
 high, so the title bar keeps its height; stepping on the press, never
 disabled; Jeremy, 2026-10-21); on the name and the keys the arrows step
-too, up and left back, down and right on. Its note, what the voice plays
+too (`PRESET_ARROW_STEPS`), up and right on, down and left back. Its note, what the voice plays
 without, is not shown but is the name's description for screen readers
 and follows the credit in its tip.
 
