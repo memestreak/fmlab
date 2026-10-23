@@ -4935,122 +4935,22 @@ export const FMLAB_VOICES: FactoryVoice[] = [
     'missing': []
   },
   {
-    'name': 'LOG DRUM',
-    'algorithm': 1,
-    'dxFeedback': 0.0,
+    'name': 'DARK PAD',
+    'algorithm': 5,
+    'dxFeedback': 0.3926,
     'dxOperators': [
       {
         'ratio': 1.0,
         'detune': 0.0,
         'level': 0.0,
         'envelope': {
-          'attack': 0.001,
+          'attack': 0.4059,
           'peak': 0.0,
-          'decay1': 0.4412,
-          'brk': -28.6,
-          'decay2': 3.028,
-          'sustain': -96.0,
-          'release': 0.4937
-        },
-        'breakKey': 60,
-        'left': {
-          'curve': 'lin',
-          'depth': 0.0
-        },
-        'right': {
-          'curve': 'lin',
-          'depth': 0.0
-        },
-        'rateScaling': 1.1892,
-        'tremolo': 0.0
-      },
-      {
-        'ratio': 1.41,
-        'detune': 0.0,
-        'level': -8.25,
-        'envelope': {
-          'attack': 0.001,
-          'peak': 0.0,
-          'decay1': 0.2632,
-          'brk': -51.18,
-          'decay2': 0.7524,
-          'sustain': -96.0,
-          'release': 0.4937
-        },
-        'breakKey': 60,
-        'left': {
-          'curve': 'lin',
-          'depth': 0.0
-        },
-        'right': {
-          'curve': 'lin',
-          'depth': 0.0
-        },
-        'rateScaling': 1.1892,
-        'tremolo': 0.0
-      },
-      {
-        'ratio': 2.5,
-        'detune': 0.0,
-        'level': -21.75,
-        'envelope': {
-          'attack': 0.001,
-          'peak': 0.0,
-          'decay1': 0.1501,
-          'brk': -96.0,
+          'decay1': 0.2123,
+          'brk': -1.51,
           'decay2': 0.0,
-          'sustain': -96.0,
-          'release': 0.4937
-        },
-        'breakKey': 60,
-        'left': {
-          'curve': 'lin',
-          'depth': 0.0
-        },
-        'right': {
-          'curve': 'lin',
-          'depth': 0.0
-        },
-        'rateScaling': 1.1892,
-        'tremolo': 0.0
-      },
-      {
-        'ratio': 1.0,
-        'detune': 0.0,
-        'level': -29.25,
-        'envelope': {
-          'attack': 0.001,
-          'peak': 0.0,
-          'decay1': 0.1168,
-          'brk': -96.0,
-          'decay2': 0.0,
-          'sustain': -96.0,
-          'release': 0.4937
-        },
-        'breakKey': 60,
-        'left': {
-          'curve': 'lin',
-          'depth': 0.0
-        },
-        'right': {
-          'curve': 'lin',
-          'depth': 0.0
-        },
-        'rateScaling': 1.1892,
-        'tremolo': 0.0
-      },
-      {
-        'ratio': 1.0,
-        'detune': 0.0,
-        'level': null,
-        'envelope': {
-          'attack': 0.001,
-          'peak': 0.0,
-          'decay1': 0.0,
-          'brk': 0.0,
-          'decay2': 0.0,
-          'sustain': 0.0,
-          'release': 0.4937
+          'sustain': -1.51,
+          'release': 4.7393
         },
         'breakKey': 60,
         'left': {
@@ -5066,92 +4966,16 @@ export const FMLAB_VOICES: FactoryVoice[] = [
       },
       {
         'ratio': 1.0,
-        'detune': 0.0,
-        'level': null,
-        'envelope': {
-          'attack': 0.001,
-          'peak': 0.0,
-          'decay1': 0.0,
-          'brk': 0.0,
-          'decay2': 0.0,
-          'sustain': 0.0,
-          'release': 0.4937
-        },
-        'breakKey': 60,
-        'left': {
-          'curve': 'lin',
-          'depth': 0.0
-        },
-        'right': {
-          'curve': 'lin',
-          'depth': 0.0
-        },
-        'rateScaling': 1.0,
-        'tremolo': 0.0
-      }
-    ],
-    'dxLfo': {
-      'wave': 'triangle',
-      'speed': 5.8065,
-      'delay': 0.0,
-      'vibrato': 0.0,
-      'tremolo': 0.0,
-      'sync': true
-    },
-    'dxPitchEnvelope': {
-      'start': 150.0,
-      'attack': 5521.13,
-      'peak': 0.0,
-      'decay1': 14366.2,
-      'brk': 0.0,
-      'decay2': 14366.2,
-      'sustain': 0.0,
-      'release': 14366.2
-    },
-    'missing': []
-  },
-  {
-    'name': 'SNARE',
-    'algorithm': 7,
-    'dxFeedback': 6.2831,
-    'dxOperators': [
-      {
-        'ratio': 1.0,
-        'detune': 0.0,
-        'level': 0.0,
-        'envelope': {
-          'attack': 0.001,
-          'peak': 0.0,
-          'decay1': 0.3964,
-          'brk': -96.0,
-          'decay2': 0.0,
-          'sustain': -96.0,
-          'release': 0.2962
-        },
-        'breakKey': 60,
-        'left': {
-          'curve': 'lin',
-          'depth': 0.0
-        },
-        'right': {
-          'curve': 'lin',
-          'depth': 0.0
-        },
-        'rateScaling': 1.0,
-        'tremolo': 0.0
-      },
-      {
-        'ratio': 1.5,
         'detune': 0.0,
         'level': -17.25,
         'envelope': {
-          'attack': 0.001,
-          'peak': 0.0,
-          'decay1': 0.1867,
-          'brk': -96.0,
-          'decay2': 0.0,
-          'sustain': -96.0,
-          'release': 0.2962
+          'attack': 0.4765,
+          'peak': -6.02,
+          'decay1': 0.3169,
+          'brk': 0.0,
+          'decay2': 0.2123,
+          'sustain': -1.51,
+          'release': 4.7393
         },
         'breakKey': 60,
         'left': {
@@ -5159,24 +4983,24 @@ export const FMLAB_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'right': {
-          'curve': 'lin',
-          'depth': 0.0
+          'curve': 'exp',
+          'depth': -3.012
         },
         'rateScaling': 1.0,
         'tremolo': 0.0
       },
       {
-        'ratio': 4.0,
-        'detune': 0.0,
-        'level': 0.0,
+        'ratio': 0.5,
+        'detune': 2.7,
+        'level': -5.25,
         'envelope': {
-          'attack': 0.001,
+          'attack': 0.316,
           'peak': 0.0,
-          'decay1': 0.3848,
-          'brk': -43.65,
-          'decay2': 0.714,
-          'sustain': -96.0,
-          'release': 0.2962
+          'decay1': 0.2123,
+          'brk': -1.51,
+          'decay2': 0.0,
+          'sustain': -1.51,
+          'release': 4.7393
         },
         'breakKey': 60,
         'left': {
@@ -5193,15 +5017,15 @@ export const FMLAB_VOICES: FactoryVoice[] = [
       {
         'ratio': 1.0,
         'detune': 0.0,
-        'level': null,
+        'level': -20.25,
         'envelope': {
-          'attack': 0.001,
-          'peak': 0.0,
-          'decay1': 0.0,
+          'attack': 0.4072,
+          'peak': -6.02,
+          'decay1': 0.2898,
           'brk': 0.0,
-          'decay2': 0.0,
-          'sustain': 0.0,
-          'release': 0.4937
+          'decay2': 0.2123,
+          'sustain': -1.51,
+          'release': 4.7393
         },
         'breakKey': 60,
         'left': {
@@ -5209,125 +5033,24 @@ export const FMLAB_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'right': {
-          'curve': 'lin',
-          'depth': 0.0
-        },
-        'rateScaling': 1.0,
-        'tremolo': 0.0
-      },
-      {
-        'ratio': 9.0,
-        'detune': 0.0,
-        'level': 0.0,
-        'envelope': {
-          'attack': 0.001,
-          'peak': 0.0,
-          'decay1': 0.0,
-          'brk': 0.0,
-          'decay2': 0.0,
-          'sustain': 0.0,
-          'release': 0.2962
-        },
-        'breakKey': 60,
-        'left': {
-          'curve': 'lin',
-          'depth': 0.0
-        },
-        'right': {
-          'curve': 'lin',
-          'depth': 0.0
-        },
-        'rateScaling': 1.0,
-        'tremolo': 0.0
-      },
-      {
-        'ratio': 9.0,
-        'detune': 0.0,
-        'level': 0.0,
-        'envelope': {
-          'attack': 0.001,
-          'peak': 0.0,
-          'decay1': 0.0,
-          'brk': 0.0,
-          'decay2': 0.0,
-          'sustain': 0.0,
-          'release': 0.2962
-        },
-        'breakKey': 60,
-        'left': {
-          'curve': 'lin',
-          'depth': 0.0
-        },
-        'right': {
-          'curve': 'lin',
-          'depth': 0.0
-        },
-        'rateScaling': 1.0,
-        'tremolo': 0.0
-      }
-    ],
-    'dxLfo': {
-      'wave': 'triangle',
-      'speed': 5.8065,
-      'delay': 0.0,
-      'vibrato': 0.0,
-      'tremolo': 0.0,
-      'sync': true
-    },
-    'dxPitchEnvelope': {
-      'start': 300.0,
-      'attack': 6478.87,
-      'peak': 0.0,
-      'decay1': 14366.2,
-      'brk': 0.0,
-      'decay2': 14366.2,
-      'sustain': 0.0,
-      'release': 14366.2
-    },
-    'missing': []
-  },
-  {
-    'name': 'LASER',
-    'algorithm': 16,
-    'dxFeedback': 0.0,
-    'dxOperators': [
-      {
-        'ratio': 1.0,
-        'detune': 0.0,
-        'level': 0.0,
-        'envelope': {
-          'attack': 0.001,
-          'peak': 0.0,
-          'decay1': 0.4412,
-          'brk': -28.6,
-          'decay2': 3.028,
-          'sustain': -96.0,
-          'release': 0.0529
-        },
-        'breakKey': 60,
-        'left': {
-          'curve': 'lin',
-          'depth': 0.0
-        },
-        'right': {
-          'curve': 'lin',
-          'depth': 0.0
+          'curve': 'exp',
+          'depth': -3.012
         },
         'rateScaling': 1.0,
         'tremolo': 0.0
       },
       {
         'ratio': 2.0,
-        'detune': 0.0,
-        'level': -11.25,
+        'detune': -3.6,
+        'level': -18.75,
         'envelope': {
-          'attack': 0.001,
+          'attack': 0.2074,
           'peak': 0.0,
-          'decay1': 0.3251,
-          'brk': -21.07,
-          'decay2': 2.8422,
-          'sustain': -96.0,
-          'release': 0.0529
+          'decay1': 0.4246,
+          'brk': -3.01,
+          'decay2': 0.0,
+          'sustain': -3.01,
+          'release': 4.7393
         },
         'breakKey': 60,
         'left': {
@@ -5344,15 +5067,66 @@ export const FMLAB_VOICES: FactoryVoice[] = [
       {
         'ratio': 1.0,
         'detune': 0.0,
-        'level': null,
+        'level': -26.25,
         'envelope': {
-          'attack': 0.001,
-          'peak': 0.0,
-          'decay1': 0.0,
+          'attack': 0.2834,
+          'peak': -6.02,
+          'decay1': 0.2475,
           'brk': 0.0,
+          'decay2': 0.4246,
+          'sustain': -3.01,
+          'release': 4.7393
+        },
+        'breakKey': 60,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'exp',
+          'depth': -3.012
+        },
+        'rateScaling': 1.0,
+        'tremolo': 0.0
+      }
+    ],
+    'dxLfo': {
+      'wave': 'sine',
+      'speed': 4.3226,
+      'delay': 0.4633,
+      'vibrato': 6.04,
+      'tremolo': 0.0,
+      'sync': false
+    },
+    'dxPitchEnvelope': {
+      'start': 0.0,
+      'attack': 14366.2,
+      'peak': 0.0,
+      'decay1': 14366.2,
+      'brk': 0.0,
+      'decay2': 14366.2,
+      'sustain': 0.0,
+      'release': 14366.2
+    },
+    'missing': []
+  },
+  {
+    'name': 'BRASS PAD',
+    'algorithm': 5,
+    'dxFeedback': 1.5707,
+    'dxOperators': [
+      {
+        'ratio': 1.0,
+        'detune': 0.0,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.1218,
+          'peak': 0.0,
+          'decay1': 0.2123,
+          'brk': -1.51,
           'decay2': 0.0,
-          'sustain': 0.0,
-          'release': 0.4937
+          'sustain': -1.51,
+          'release': 2.9621
         },
         'breakKey': 60,
         'left': {
@@ -5369,15 +5143,40 @@ export const FMLAB_VOICES: FactoryVoice[] = [
       {
         'ratio': 1.0,
         'detune': 0.0,
-        'level': null,
+        'level': -6.75,
         'envelope': {
-          'attack': 0.001,
+          'attack': 0.2215,
           'peak': 0.0,
-          'decay1': 0.0,
-          'brk': 0.0,
+          'decay1': 0.8917,
+          'brk': -9.03,
           'decay2': 0.0,
-          'sustain': 0.0,
-          'release': 0.4937
+          'sustain': -9.03,
+          'release': 2.9621
+        },
+        'breakKey': 60,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'exp',
+          'depth': -1.807
+        },
+        'rateScaling': 1.0,
+        'tremolo': 0.0
+      },
+      {
+        'ratio': 1.0,
+        'detune': 4.5,
+        'level': -8.25,
+        'envelope': {
+          'attack': 0.0829,
+          'peak': 0.0,
+          'decay1': 0.2123,
+          'brk': -1.51,
+          'decay2': 0.0,
+          'sustain': -1.51,
+          'release': 2.9621
         },
         'breakKey': 60,
         'left': {
@@ -5394,15 +5193,15 @@ export const FMLAB_VOICES: FactoryVoice[] = [
       {
         'ratio': 1.0,
         'detune': 0.0,
-        'level': null,
+        'level': -9.75,
         'envelope': {
-          'attack': 0.001,
+          'attack': 0.1939,
           'peak': 0.0,
-          'decay1': 0.0,
-          'brk': 0.0,
+          'decay1': 1.0403,
+          'brk': -10.54,
           'decay2': 0.0,
-          'sustain': 0.0,
-          'release': 0.4937
+          'sustain': -10.54,
+          'release': 2.9621
         },
         'breakKey': 60,
         'left': {
@@ -5410,8 +5209,33 @@ export const FMLAB_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'right': {
+          'curve': 'exp',
+          'depth': -1.807
+        },
+        'rateScaling': 1.0,
+        'tremolo': 0.0
+      },
+      {
+        'ratio': 2.0,
+        'detune': -2.7,
+        'level': -14.25,
+        'envelope': {
+          'attack': 0.0795,
+          'peak': 0.0,
+          'decay1': 0.4246,
+          'brk': -3.01,
+          'decay2': 0.0,
+          'sustain': -3.01,
+          'release': 2.9621
+        },
+        'breakKey': 60,
+        'left': {
           'curve': 'lin',
           'depth': 0.0
+        },
+        'right': {
+          'curve': 'exp',
+          'depth': -1.807
         },
         'rateScaling': 1.0,
         'tremolo': 0.0
@@ -5419,15 +5243,15 @@ export const FMLAB_VOICES: FactoryVoice[] = [
       {
         'ratio': 1.0,
         'detune': 0.0,
-        'level': null,
+        'level': -12.75,
         'envelope': {
-          'attack': 0.001,
+          'attack': 0.1699,
           'peak': 0.0,
-          'decay1': 0.0,
-          'brk': 0.0,
+          'decay1': 1.3375,
+          'brk': -13.55,
           'decay2': 0.0,
-          'sustain': 0.0,
-          'release': 0.4937
+          'sustain': -13.55,
+          'release': 2.9621
         },
         'breakKey': 60,
         'left': {
@@ -5435,8 +5259,8 @@ export const FMLAB_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'right': {
-          'curve': 'lin',
-          'depth': 0.0
+          'curve': 'exp',
+          'depth': -1.807
         },
         'rateScaling': 1.0,
         'tremolo': 0.0
@@ -5444,41 +5268,66 @@ export const FMLAB_VOICES: FactoryVoice[] = [
     ],
     'dxLfo': {
       'wave': 'triangle',
-      'speed': 5.8065,
-      'delay': 0.0,
-      'vibrato': 0.0,
+      'speed': 4.9677,
+      'delay': 0.3134,
+      'vibrato': 9.06,
       'tremolo': 0.0,
-      'sync': true
+      'sync': false
     },
     'dxPitchEnvelope': {
-      'start': 3450.0,
-      'attack': 3492.96,
-      'peak': -750.0,
+      'start': 0.0,
+      'attack': 14366.2,
+      'peak': 0.0,
       'decay1': 14366.2,
-      'brk': -750.0,
+      'brk': 0.0,
       'decay2': 14366.2,
-      'sustain': -750.0,
+      'sustain': 0.0,
       'release': 14366.2
     },
     'missing': []
   },
   {
-    'name': 'WIND',
-    'algorithm': 16,
-    'dxFeedback': 6.2831,
+    'name': 'SAW PAD',
+    'algorithm': 5,
+    'dxFeedback': 3.1415,
     'dxOperators': [
       {
         'ratio': 1.0,
         'detune': 0.0,
         'level': 0.0,
         'envelope': {
-          'attack': 1.3916,
+          'attack': 0.2435,
           'peak': 0.0,
-          'decay1': 0.8492,
-          'brk': -6.02,
+          'decay1': 0.2123,
+          'brk': -1.51,
+          'decay2': 0.0,
+          'sustain': -1.51,
+          'release': 3.9494
+        },
+        'breakKey': 60,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0,
+        'tremolo': 0.0
+      },
+      {
+        'ratio': 1.0,
+        'detune': 0.0,
+        'level': -6.75,
+        'envelope': {
+          'attack': 0.5438,
+          'peak': -6.02,
+          'decay1': 0.4715,
+          'brk': 0.0,
           'decay2': 0.4246,
-          'sustain': -9.03,
-          'release': 6.7705
+          'sustain': -3.01,
+          'release': 3.9494
         },
         'breakKey': 60,
         'left': {
@@ -5486,24 +5335,24 @@ export const FMLAB_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'right': {
-          'curve': 'lin',
-          'depth': 0.0
+          'curve': 'exp',
+          'depth': -1.807
         },
         'rateScaling': 1.0,
         'tremolo': 0.0
       },
       {
-        'ratio': 1.0,
-        'detune': 0.0,
-        'level': null,
+        'ratio': 2.0,
+        'detune': 5.4,
+        'level': -9.75,
         'envelope': {
-          'attack': 0.001,
+          'attack': 0.1551,
           'peak': 0.0,
-          'decay1': 0.0,
-          'brk': 0.0,
+          'decay1': 0.2123,
+          'brk': -1.51,
           'decay2': 0.0,
-          'sustain': 0.0,
-          'release': 0.4937
+          'sustain': -1.51,
+          'release': 3.9494
         },
         'breakKey': 60,
         'left': {
@@ -5520,65 +5369,40 @@ export const FMLAB_VOICES: FactoryVoice[] = [
       {
         'ratio': 1.0,
         'detune': 0.0,
-        'level': null,
+        'level': -11.25,
         'envelope': {
-          'attack': 0.001,
-          'peak': 0.0,
-          'decay1': 0.0,
+          'attack': 0.4445,
+          'peak': -6.02,
+          'decay1': 0.3899,
           'brk': 0.0,
-          'decay2': 0.0,
-          'sustain': 0.0,
-          'release': 0.4937
-        },
-        'breakKey': 60,
-        'left': {
-          'curve': 'lin',
-          'depth': 0.0
-        },
-        'right': {
-          'curve': 'lin',
-          'depth': 0.0
-        },
-        'rateScaling': 1.0,
-        'tremolo': 0.0
-      },
-      {
-        'ratio': 1.0,
-        'detune': 0.0,
-        'level': null,
-        'envelope': {
-          'attack': 0.001,
-          'peak': 0.0,
-          'decay1': 0.0,
-          'brk': 0.0,
-          'decay2': 0.0,
-          'sustain': 0.0,
-          'release': 0.4937
-        },
-        'breakKey': 60,
-        'left': {
-          'curve': 'lin',
-          'depth': 0.0
-        },
-        'right': {
-          'curve': 'lin',
-          'depth': 0.0
-        },
-        'rateScaling': 1.0,
-        'tremolo': 0.0
-      },
-      {
-        'ratio': 1.0,
-        'detune': 0.0,
-        'level': -14.25,
-        'envelope': {
-          'attack': 0.7269,
-          'peak': 0.0,
-          'decay1': 0.8492,
-          'brk': -6.02,
           'decay2': 0.4246,
-          'sustain': -9.03,
-          'release': 6.7705
+          'sustain': -3.01,
+          'release': 3.9494
+        },
+        'breakKey': 60,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'exp',
+          'depth': -1.807
+        },
+        'rateScaling': 1.0,
+        'tremolo': 0.0
+      },
+      {
+        'ratio': 1.0,
+        'detune': -3.6,
+        'level': -8.25,
+        'envelope': {
+          'attack': 0.1658,
+          'peak': 0.0,
+          'decay1': 0.2123,
+          'brk': -1.51,
+          'decay2': 0.0,
+          'sustain': -1.51,
+          'release': 3.9494
         },
         'breakKey': 60,
         'left': {
@@ -5593,17 +5417,17 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         'tremolo': 0.0
       },
       {
-        'ratio': 7.0,
+        'ratio': 1.0,
         'detune': 0.0,
-        'level': 0.0,
+        'level': -8.25,
         'envelope': {
-          'attack': 0.001,
-          'peak': 0.0,
-          'decay1': 0.0,
+          'attack': 0.5947,
+          'peak': -7.53,
+          'decay1': 0.5351,
           'brk': 0.0,
-          'decay2': 0.0,
-          'sustain': 0.0,
-          'release': 40.0
+          'decay2': 0.6369,
+          'sustain': -4.52,
+          'release': 3.9494
         },
         'breakKey': 60,
         'left': {
@@ -5611,18 +5435,194 @@ export const FMLAB_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'right': {
-          'curve': 'lin',
-          'depth': 0.0
+          'curve': 'exp',
+          'depth': -1.807
         },
         'rateScaling': 1.0,
         'tremolo': 0.0
       }
     ],
     'dxLfo': {
-      'wave': 'sampleHold',
-      'speed': 0.6452,
-      'delay': 0.0,
-      'vibrato': 103.73,
+      'wave': 'triangle',
+      'speed': 4.6452,
+      'delay': 0.1973,
+      'vibrato': 6.04,
+      'tremolo': 0.0,
+      'sync': false
+    },
+    'dxPitchEnvelope': {
+      'start': 0.0,
+      'attack': 14366.2,
+      'peak': 0.0,
+      'decay1': 14366.2,
+      'brk': 0.0,
+      'decay2': 14366.2,
+      'sustain': 0.0,
+      'release': 14366.2
+    },
+    'missing': []
+  },
+  {
+    'name': 'HOLLOW PAD',
+    'algorithm': 5,
+    'dxFeedback': 0.0,
+    'dxOperators': [
+      {
+        'ratio': 1.0,
+        'detune': 0.0,
+        'level': 0.0,
+        'envelope': {
+          'attack': 0.3044,
+          'peak': 0.0,
+          'decay1': 0.2123,
+          'brk': -1.51,
+          'decay2': 0.0,
+          'sustain': -1.51,
+          'release': 2.9621
+        },
+        'breakKey': 60,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0,
+        'tremolo': 0.0
+      },
+      {
+        'ratio': 2.0,
+        'detune': 0.0,
+        'level': -14.25,
+        'envelope': {
+          'attack': 0.2544,
+          'peak': 0.0,
+          'decay1': 0.8917,
+          'brk': -4.52,
+          'decay2': 0.2123,
+          'sustain': -6.02,
+          'release': 2.9621
+        },
+        'breakKey': 60,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'exp',
+          'depth': -1.807
+        },
+        'rateScaling': 1.0,
+        'tremolo': 0.0
+      },
+      {
+        'ratio': 1.0,
+        'detune': 3.6,
+        'level': -8.25,
+        'envelope': {
+          'attack': 0.2072,
+          'peak': 0.0,
+          'decay1': 0.2123,
+          'brk': -1.51,
+          'decay2': 0.0,
+          'sustain': -1.51,
+          'release': 2.9621
+        },
+        'breakKey': 60,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'rateScaling': 1.0,
+        'tremolo': 0.0
+      },
+      {
+        'ratio': 2.0,
+        'detune': 0.0,
+        'level': -17.25,
+        'envelope': {
+          'attack': 0.2222,
+          'peak': 0.0,
+          'decay1': 0.8917,
+          'brk': -4.52,
+          'decay2': 0.2123,
+          'sustain': -6.02,
+          'release': 2.9621
+        },
+        'breakKey': 60,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'exp',
+          'depth': -1.807
+        },
+        'rateScaling': 1.0,
+        'tremolo': 0.0
+      },
+      {
+        'ratio': 3.0,
+        'detune': -3.6,
+        'level': -17.25,
+        'envelope': {
+          'attack': 0.1389,
+          'peak': 0.0,
+          'decay1': 0.2123,
+          'brk': -1.51,
+          'decay2': 0.0,
+          'sustain': -1.51,
+          'release': 2.9621
+        },
+        'breakKey': 60,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'exp',
+          'depth': -3.012
+        },
+        'rateScaling': 1.0,
+        'tremolo': 0.0
+      },
+      {
+        'ratio': 2.0,
+        'detune': 0.0,
+        'level': -21.75,
+        'envelope': {
+          'attack': 0.1797,
+          'peak': 0.0,
+          'decay1': 1.1889,
+          'brk': -6.02,
+          'decay2': 0.2123,
+          'sustain': -7.53,
+          'release': 2.9621
+        },
+        'breakKey': 60,
+        'left': {
+          'curve': 'lin',
+          'depth': 0.0
+        },
+        'right': {
+          'curve': 'exp',
+          'depth': -1.807
+        },
+        'rateScaling': 1.0,
+        'tremolo': 0.0
+      }
+    ],
+    'dxLfo': {
+      'wave': 'sine',
+      'speed': 4.9677,
+      'delay': 0.3806,
+      'vibrato': 12.08,
       'tremolo': 0.0,
       'sync': false
     },

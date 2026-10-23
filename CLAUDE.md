@@ -177,7 +177,7 @@ figures subscribe to it. Nothing else passes values around.
   `SANDBOX_BANKS`, a `Preset`'s `bank` and the chapter's `presetBanks`):
   bank A all 32 of Yamaha's DX7 factory voices (ROM1A), numbered as on
   the DX7 after the bank's letter ("A11 E.PIANO 1", which it opens on),
-  and bank B fmlab's own 32 ("B1 TINE PIANO" to "B32 WIND",
+  and bank B fmlab's own 32 ("B1 TINE PIANO" to "B32 HOLLOW PAD",
   `fmlabVoices.ts`, `FMLAB_VOICES`; hint "fmlab's own TINE PIANO", no
   note, played whole). The masthead shows the voice's name, a button
   that opens the preset window (`presetMenu` in `chapterView.ts`,
