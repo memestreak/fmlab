@@ -13,7 +13,7 @@ import '@fontsource/figtree/latin-700-italic.css';
 import '@fontsource/ibm-plex-mono/latin-400.css';
 import '@fontsource/ibm-plex-mono/latin-500.css';
 import '@fontsource/ibm-plex-mono/latin-600.css';
-// The sandbox's Dymo tape labels.
+// The sandbox's printed labels: the knobs' names and the section plates.
 import '@fontsource/barlow-condensed/latin-400.css';
 import '@fontsource/barlow-condensed/latin-500.css';
 import '@fontsource/michroma/latin-400.css';
@@ -38,7 +38,6 @@ import { mountReverbView } from './ui/reverbView';
 import { mountFigures } from './ui/figures';
 import { mountAlgorithmSteps, mountFeedbackKnob } from './ui/instrument';
 import { mountOperators } from './ui/operators';
-import { tapeLabel } from './ui/dymo';
 import { createKeyBed } from './ui/keyBed';
 import { mountMidi } from './ui/midi';
 import { mountPiano } from './ui/piano';
@@ -126,17 +125,6 @@ if (piano) {
   const panel = mountPiano(piano, store, active, bed);
   // MIDI In, the sandbox's only (the keyboard is).
   mountMidi(panel, store, engine, bed, () => store.get().chapter === 'sandbox');
-}
-
-// The sandbox's Voice, Operators, Octave and Mod labels, on Dymo tape (the
-// tape's CSS is the sandbox's). Volume's is silkscreen (Jeremy, 2026-10-22).
-for (const selector of [
-  '.inst-section-title',
-  '#voice-heading',
-  '.piano-oct-label',
-  '.mod-wheel-label',
-]) {
-  tapeLabel(document.querySelector(selector));
 }
 
 const toggle = document.querySelector<HTMLButtonElement>('#controls-toggle');

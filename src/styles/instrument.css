@@ -376,78 +376,43 @@ body:not([data-view='instrument']) #inst-tools {
   --vfd-panel-edge: transparent;
 }
 
-/* Voice, Operators and Octave on black embossing tape, as a Dymo label
-   maker strikes them (Jeremy, 2026-10-21; ui/dymo.ts): white capitals
-   raised and stress-whitened on one baseline, the vinyl's grain under a
-   gloss, the ends cut square and lifting a little. A drawn object, the
-   same in either theme but its edge; its letters are not ink. */
-[data-view='instrument'] .dymo {
+/* Voice, Operators and the Settings window's title printed on the
+   chassis as a plate (Jeremy, 2026-10-23: the Dymo tape retired): a block
+   of the legend colour with the word knocked out of it, as Roland and
+   Yamaha mark their panel sections. Flat print: no gloss, grain, emboss,
+   shadow or edge. 20px tall with 2px either side, the tape's 24px, so
+   nothing round it moves. */
+[data-view='instrument'] .silk-plate {
   display: inline-flex;
   align-items: center;
   box-sizing: border-box;
   width: max-content;
-  height: 24px;
-  margin: 0;
-  padding: 0 0.55em 0 0.6em;
-  /* Cut square, as the machine's cutter leaves it. */
-  border-radius: 0;
-  background:
-    /* The gloss, kept faint (Jeremy, 2026-10-21). */
-    linear-gradient(
-      rgba(255, 255, 255, 0.09),
-      rgba(255, 255, 255, 0.025) 22%,
-      rgba(255, 255, 255, 0) 40%,
-      rgba(255, 255, 255, 0) 75%,
-      rgba(255, 255, 255, 0.03)
-    ),
-    /* Two faint streaks in the gloss. */
-    linear-gradient(
-      97deg,
-      rgba(255, 255, 255, 0) 12%,
-      rgba(255, 255, 255, 0.03) 22%,
-      rgba(255, 255, 255, 0) 32%,
-      rgba(255, 255, 255, 0) 56%,
-      rgba(255, 255, 255, 0.02) 66%,
-      rgba(255, 255, 255, 0) 76%
-    ),
-    /* The vinyl's grain, drawn out lengthwise. */
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='24'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012 1.1' numOctaves='2' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0.16 0 0 0 -0.05'/%3E%3C/filter%3E%3Crect width='160' height='24' filter='url(%23g)'/%3E%3C/svg%3E") 0 0 / 160px 24px repeat,
-    var(--dymo-tape);
-  /* The tape's thickness (a lit top edge, a dark bottom one, its side),
-     its shadow, and its ends lifting a little off the panel. */
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.09),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.7),
-    0 1px 0 #000,
-    var(--dymo-shadow),
-    0 2px 3px -0.5px rgba(0, 0, 0, 0.38),
-    3px 2.5px 3px -2px rgba(0, 0, 0, 0.35);
-  color: var(--dymo-letter);
-  font: 400 16px / 1 var(--font-tape);
-  letter-spacing: 0.13em;
+  height: 20px;
+  margin: 2px 0;
+  /* The extra on the left balances the tracking after the last letter. */
+  padding: 0 0.5em 0 0.7em;
+  border-radius: 1.5px;
+  background: var(--chassis-legend);
+  color: var(--chassis-legend-ink);
+  font: 500 14px / 1 var(--font-tape);
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  /* Raised: lit on top, shadowed under; and stress-whitened, the
-     stretched plastic's soft bloom. */
-  text-shadow:
-    0 -0.9px 0 rgba(255, 255, 255, 0.7),
-    0 1.2px 0.3px rgba(0, 0, 0, 1),
-    0 2px 1.4px rgba(0, 0, 0, 0.6),
-    0 0 1.8px rgba(255, 255, 255, 0.34),
-    0 0 3.5px rgba(255, 255, 255, 0.1);
   white-space: nowrap;
+  /* Off the line's baseline, so the line is the plate's 24px. */
+  vertical-align: top;
 }
 
-/* Each letter as the die struck it: a hair off the baseline, a hair
-   leaning, the same every load. Only where pixels are fine enough to
-   show it. */
-.dymo-letter {
-  display: inline-block;
+/* Voice and Operators a size up (Jeremy, 2026-10-23): the whole 24px
+   line, the letters 17px; the padding, in ems, grows with them. The
+   Settings window's title stays as it is. */
+[data-view='instrument'] .inst-section-title.silk-plate,
+[data-view='instrument'] .voice-panel .panel-title.silk-plate {
+  height: 24px;
+  font-size: 17px;
 }
 
-@media (min-resolution: 2dppx) {
-  [data-view='instrument'] .dymo-letter {
-    transform: translateY(var(--drop, 0)) rotate(var(--tilt, 0));
-  }
+[data-view='instrument'] .inst-section-title.silk-plate {
+  margin: 0;
 }
 
 /* Voice tops the left column, under the title bar's rule (no rule of
@@ -1096,7 +1061,7 @@ body:not([data-view='instrument']) #inst-tools {
 }
 
 /* Volume's name silkscreened on the chassis, a weight heavier, as the
-   operators' roles (Jeremy, 2026-10-22): no tape. */
+   operators' roles (Jeremy, 2026-10-22): no plate. */
 [data-view='instrument'] .inst-tools .slider-row > label {
   color: var(--chassis-legend);
   font: 500 0.9rem / 1 var(--font-tape);
@@ -1219,6 +1184,12 @@ body:not([data-view='instrument']) #inst-tools {
 
 .inst .voice-panel .panel-title {
   margin-bottom: 0.15rem;
+}
+
+/* Operators' plate, the whole 24px line: only the panel title's own
+   margin under it. */
+[data-view='instrument'] .voice-panel .panel-title.silk-plate {
+  margin: 0 0 0.15rem;
 }
 
 /* The DX7 voice's columns: ratio and level given the room, detune a box,
@@ -1774,9 +1745,10 @@ canvas.voice-keys {
   display: none;
 }
 
-/* The control panel: Octave and Mod on tape on the top line; under
-   them, 6px down, the octave chooser and the wheel, its foot 9px above
-   the chassis's (Jeremy, 2026-10-21: the chooser close to its tape);
+/* The control panel: Octave and Mod in silkscreen on the top line, set on
+   its foot, just over what they name; under them, 6px down, the octave
+   chooser and the wheel, its foot 9px above the chassis's (Jeremy,
+   2026-10-21: the chooser close to its label);
    and under the chooser, at its left and at the column's foot, its
    bottom level with the wheel's, the MIDI key (Jeremy, 2026-10-23). */
 .piano-panel {
@@ -1793,6 +1765,11 @@ canvas.voice-keys {
 
 .piano-panel .mod-wheel-label {
   grid-area: 1 / 2;
+  align-self: end;
+}
+
+.piano-oct-label {
+  align-self: flex-end;
 }
 
 .piano-oct-row {
@@ -1855,7 +1832,7 @@ canvas.voice-keys {
   box-shadow: var(--recess);
 }
 
-/* Z X, the computer keys that move the octave, beside its tape: grey, as
+/* Z X, the computer keys that move the octave, beside its label: grey, as
    the push keys' legends, and only while the pointer is over the
    keyboard or keyboard focus is in it, as the spectrum's title shows only
    under the pointer (Jeremy, 2026-10-20). Its place is kept, so nothing
@@ -2488,7 +2465,7 @@ canvas.voice-keys {
 
   /* The Voice tabs on a line of their own under the title, the keys
      sharing it, as the operator panel's are: four did not fit beside the
-     tape (Jeremy, 2026-10-22: Reverb the fourth). */
+     title (Jeremy, 2026-10-22: Reverb the fourth). */
   .inst-alg-head {
     flex-wrap: wrap;
     row-gap: 0.3rem;
@@ -2547,7 +2524,7 @@ canvas.voice-keys {
     flex-wrap: wrap;
   }
 
-  /* The tape, the name and ‹ › on one line. */
+  /* The name and ‹ › on one line. */
   [data-view='instrument'] .inst-presets,
   [data-view='instrument'] .inst-row .presets {
     flex-wrap: nowrap;
@@ -2787,7 +2764,7 @@ canvas.voice-keys {
     max-width: 40rem;
   }
 
-  /* The tapes are hidden here: the chooser, the wheel and the MIDI key
+  /* The labels are hidden here: the chooser, the wheel and the MIDI key
      side by side. */
   .piano-panel {
     grid-template-columns: auto auto auto;
@@ -3109,7 +3086,7 @@ body:not([data-view='instrument']) .inst-settings {
 /* The preset window (ui/presetPanel.ts; Jeremy, 2026-10-22): the
    Settings case, wider, its voices on the glass in four columns of eight,
    numbered down the columns. Every label in it is silkscreen on the
-   plastic, as the knobs' names: no Dymo tape. */
+   plastic, as the knobs' names: no plate. */
 :root:has(.preset-panel[open]) {
   overflow: hidden;
 }
@@ -3254,14 +3231,19 @@ body:not([data-view='instrument']) .inst-settings {
 /* The sandbox's control names printed as silkscreen capitals on the
    chassis (Jeremy, 2026-10-21): every knob's name, the curves' names
    under LIN | EXP, the operator table's column heads and, on a phone,
-   its cards' column names, in the tapes' condensed face. The text stays
+   its cards' column names, in the labels' condensed face. The text stays
    in its own case; units keep theirs ("LEVEL dB"). */
-[data-view='instrument'] .knob-label {
-  margin-top: 3px;
+/* The knobs' names, and Octave and Mod over the keyboard's chooser and
+   wheel (Jeremy, 2026-10-23): the standard silkscreen. */
+[data-view='instrument'] :is(.knob-label, .piano-oct-label, .mod-wheel-label) {
   color: var(--chassis-legend);
   font: 400 0.76rem / 1 var(--font-tape);
   letter-spacing: 0.1em;
   text-transform: uppercase;
+}
+
+[data-view='instrument'] .knob-label {
+  margin-top: 3px;
 }
 
 /* The LFO's six a little closer, so they keep apart at 1280 wide. */
