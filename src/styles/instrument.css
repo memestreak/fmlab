@@ -2923,14 +2923,15 @@ body:not([data-view='instrument']) .inst-settings {
   user-select: none;
 }
 
-.settings-glass:focus-visible {
-  outline: 2px solid var(--lamp-legend-hover);
-  outline-offset: 9px;
+/* Settings' glass a control row taller than its lines: each line is edited
+   in place, the room under them kept for the drop-down. */
+#settings-panel .settings-glass {
+  padding-bottom: calc(6px + 48px);
 }
 
-/* The Input line's drop-down: under the line, over the screen, its own
-   scroll; the option the keys are on lit behind, the one chosen with the
-   bar; a long name cut short. */
+/* A line's drop-down: under the line, over the screen, its own scroll;
+   the option the keys are on lit behind, the one chosen with the bar; a
+   long name cut short. */
 .settings-menu {
   position: absolute;
   z-index: 2;
@@ -2998,9 +2999,54 @@ body:not([data-view='instrument']) .inst-settings {
   padding: 3px 12px;
 }
 
-.settings-line[aria-selected='true'] {
+.settings-line {
+  cursor: default;
+}
+
+.settings-line.is-selected {
   background: color-mix(in srgb, var(--vfd-glow) 16%, transparent);
   box-shadow: inset 2px 0 0 var(--vfd-lit);
+}
+
+.settings-line:focus {
+  outline: none;
+}
+
+.settings-line:focus-visible {
+  outline: 2px solid var(--lamp-legend-hover);
+  outline-offset: -2px;
+}
+
+/* ‹ value ›, at the line's right: the arrows glow as the glass's text,
+   dimmer, dimmest at an end. */
+.settings-edit {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  min-width: 0;
+}
+
+.settings-arrow {
+  flex: none;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: 0;
+  text-shadow: inherit;
+  opacity: 0.6;
+  cursor: pointer;
+}
+
+.settings-arrow:hover {
+  opacity: 1;
+}
+
+.settings-arrow.is-end {
+  opacity: 0.2;
+  cursor: default;
 }
 
 .settings-group {
@@ -3008,6 +3054,7 @@ body:not([data-view='instrument']) .inst-settings {
 }
 
 .settings-value {
+  min-width: 0;
   overflow: hidden;
   text-align: right;
   text-overflow: ellipsis;
@@ -3015,8 +3062,7 @@ body:not([data-view='instrument']) .inst-settings {
   cursor: pointer;
 }
 
-/* Under the screen: ‹ › through the lines, the selected one's name
-   silkscreened grey, its choices as lamp keys. */
+/* Under the preset window's screen: ‹ › through its voices. */
 .settings-controls {
   display: flex;
   align-items: center;
@@ -3024,29 +3070,8 @@ body:not([data-view='instrument']) .inst-settings {
   margin-top: 12px;
 }
 
-/* Every ‹ › here, and Channel's readout, as tall as a lamp key: the
-   row under the glass is one height on either tab. */
-.settings-steps .chooser-key,
-.settings-choices .chooser-key,
-[data-view='instrument'] .settings-choices .op-vfd {
+.settings-steps .chooser-key {
   height: 1.65rem;
-}
-
-.settings-legend {
-  flex: 1 1 auto;
-  min-width: 0;
-  overflow: hidden;
-  color: var(--lamp-legend);
-  font: 700 0.72rem / 1 var(--font-sans);
-  font-variant: small-caps;
-  letter-spacing: 0.1em;
-  text-align: center;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.settings-choices {
-  flex: none;
 }
 
 /* On a phone the group goes under the name, and the tabs under the title
@@ -3062,6 +3087,11 @@ body:not([data-view='instrument']) .inst-settings {
     margin: 0;
   }
 
+  /* The control row was two lines here. */
+  #settings-panel .settings-glass {
+    padding-bottom: calc(6px + 72px);
+  }
+
   .settings-line {
     grid-template-columns: auto minmax(0, 1fr);
   }
@@ -3073,12 +3103,6 @@ body:not([data-view='instrument']) .inst-settings {
 
   .settings-controls {
     flex-wrap: wrap;
-  }
-
-  .settings-legend {
-    order: -1;
-    flex-basis: 100%;
-    text-align: left;
   }
 }
 

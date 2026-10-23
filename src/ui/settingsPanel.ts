@@ -2,25 +2,20 @@ import { type ChoiceSetting, SETTING_CHOICES, saveSettings, type Settings, setti
 import { tapeLabel } from './dymo';
 import { midiInputs } from './midi';
 import { glitchScreens } from './screenGlitch';
-import { createVfdReadout } from './vfdReadout';
 import { inSandbox } from './motion';
 
 // The sandbox's Settings (Jeremy, 2026-10-21, "a function panel, named
 // SETTINGS"): a push key in the masthead opens a modal console, its
 // settings on two tabs, General and MIDI (Jeremy, 2026-10-23), a VFD
-// screen listing the tab's, one line each, the selected one's
-// choices as lamp keys under it (or, for MIDI's lines, ‹ ›, round a VFD
-// readout for Channel). Changes apply as they are made and are
-// saved (model/settings.ts). No theme: the sandbox is dark only
-// (Jeremy, 2026-10-22).
+// screen listing the tab's, one line each, each edited in place (Jeremy,
+// 2026-10-23): ‹ value › on its line, its value opening a drop-down of
+// its choices. Changes apply as they are made and are saved
+// (model/settings.ts). No theme: the sandbox is dark only (Jeremy,
+// 2026-10-22).
 
 /**
  * One line of the panel: its group, its name, its choices (worked out
  * when shown: the MIDI inputs come and go) and how to read and set it.
- * With `stepper`, too many choices for lamp keys (or too long: an
- * interface's ports): under the glass, ‹ › instead, the choice read on
- * the glass; with `readout` too, round a two-place VFD readout of it
- * (MIDI Channel).
  */
 interface Line {
   group: string;
@@ -28,10 +23,6 @@ interface Line {
   choices: () => readonly { value: string; label: string }[];
   get: () => string;
   set: (value: string) => void;
-  stepper?: boolean;
-  readout?: (value: string) => string;
-  /** A list too long to step through (the MIDI inputs): its value, Enter or Space opens it as a drop-down. */
-  menu?: boolean;
 }
 
 const choice = (value: string, label: string) => ({ value, label });
@@ -51,11 +42,9 @@ function lines(): Line[] {
     name: string,
     key: K,
     labels: Record<Settings[K], string>,
-    stepper = false,
   ): Line => ({
     group,
     name,
-    stepper,
     choices: () => (Object.keys(labels) as `${Settings[K]}`[]).map(value => choice(value, labels[value as Settings[K]])),
     get: () => String(settings.get()[key]),
     // A choice of numbers (Bend range) is set as its number.
@@ -75,8 +64,6 @@ function lines(): Line[] {
     },
     get: () => settings.get().midiInput,
     set: value => settings.set({ midiInput: value }),
-    stepper: true,
-    menu: true,
   };
   const channel: Line = {
     group: 'MIDI',
@@ -84,8 +71,6 @@ function lines(): Line[] {
     choices: () => Array.from({ length: 17 }, (_, n) => choice(String(n), n === 0 ? 'All' : String(n))),
     get: () => String(settings.get().midiChannel),
     set: value => settings.set({ midiChannel: Number(value) }),
-    stepper: true,
-    readout: value => (value === '0' ? 'AL' : value),
   };
   return [
     setting('Screens', 'Screen glitch', 'screenGlitch', { on: 'On', off: 'Off' }),
@@ -104,12 +89,20 @@ function lines(): Line[] {
       5: '±5 st',
       7: '±7 st',
       12: '±12 st',
-    }, true),
+    }),
   ];
 }
 
 /** The index `steps` along from `at` among `count`, round the ends. */
 const round = (at: number, steps: number, count: number) => (((at + steps) % count) + count) % count;
+
+const button = (className: string, text: string) => {
+  const element = document.createElement('button');
+  element.type = 'button';
+  element.className = className;
+  element.textContent = text;
+  return element;
+};
 
 /** Sets the html element's data attributes the settings' CSS keys off. */
 export function applySettings(now: Settings): void {
@@ -227,38 +220,62 @@ export function mountSettings(): void {
   tabs.append(...tabKeys);
   head.append(title, tabs, closeBezel);
 
-  // The screen: a listbox of the lines.
+  // The screen: the open tab's lines, each one control: its group and
+  // name, then ‹ value ›. Up and Down move between them, Left and Right
+  // (or ‹ ›) step the value, held at the ends, and its value, Enter or
+  // Space open the drop-down of its choices.
   const screen = document.createElement('div');
   screen.className = 'screen-bezel settings-screen';
   const glass = document.createElement('div');
   glass.className = 'settings-glass';
-  glass.tabIndex = 0;
-  glass.setAttribute('role', 'listbox');
-  glass.setAttribute('aria-label', 'Settings');
   const rows = all.map((line, i) => {
     const row = document.createElement('div');
     row.className = 'settings-line';
     row.id = `settings-line-${i}`;
-    row.setAttribute('role', 'option');
+    row.tabIndex = -1;
+    row.setAttribute('role', 'spinbutton');
+    row.setAttribute('aria-label', `${line.group} ${line.name}`);
+    row.setAttribute('aria-haspopup', 'listbox');
+    row.setAttribute('aria-expanded', 'false');
+    row.setAttribute('aria-description', 'Left and Right change it; Enter opens its list');
     const group = document.createElement('span');
     group.className = 'settings-group';
     group.textContent = line.group;
+    group.setAttribute('aria-hidden', 'true');
     const name = document.createElement('span');
     name.className = 'settings-name';
     name.textContent = line.name;
+    name.setAttribute('aria-hidden', 'true');
+    const edit = document.createElement('span');
+    edit.className = 'settings-edit';
+    edit.setAttribute('aria-hidden', 'true');
+    const back = button('settings-arrow', '‹');
+    const on = button('settings-arrow', '›');
     const value = document.createElement('span');
     value.className = 'settings-value';
-    row.append(group, name, value);
-    // A click selects the line; on its value, it also turns it to its next choice.
+    for (const [arrow, by] of [
+      [back, -1],
+      [on, 1],
+    ] as const) {
+      arrow.tabIndex = -1;
+      // Worked on the press, as the chooser keys are; the line keeps focus.
+      arrow.addEventListener('pointerdown', event => {
+        if (event.button !== 0) return;
+        event.preventDefault();
+        select(i);
+        rows[i].row.focus({ preventScroll: true });
+        step(by);
+      });
+    }
+    edit.append(back, value, on);
+    row.append(group, name, edit);
     row.addEventListener('click', event => {
+      if (event.target instanceof Element && event.target.closest('.settings-arrow')) return;
       select(i);
-      glass.focus({ preventScroll: true });
-      if (event.target instanceof Element && event.target.closest('.settings-value')) {
-        if (all[i].menu) toggleMenu();
-        else cycle(1);
-      }
+      row.focus({ preventScroll: true });
+      if (event.target instanceof Element && event.target.closest('.settings-value')) toggleMenu();
     });
-    return { row, value };
+    return { row, value, back, on };
   });
   // One page of lines a tab, both in the glass's one cell, the closed one
   // unseen: the glass keeps the longer one's size whichever is open.
@@ -268,7 +285,8 @@ export function mountSettings(): void {
       element.className = 'settings-page';
       element.id = `settings-page-${page}`;
       element.dataset.page = page;
-      element.setAttribute('role', 'group');
+      element.setAttribute('role', 'tabpanel');
+      element.setAttribute('aria-labelledby', `settings-tab-${page}`);
       element.setAttribute('aria-label', name);
       element.append(...rows.filter((_, i) => pageOf(all[i]) === page).map(r => r.row));
       return [page, element];
@@ -277,24 +295,10 @@ export function mountSettings(): void {
   glass.append(...pages.values());
   screen.append(glass);
 
-  // Under the screen: ‹ › through the lines, the selected one's name, its choices.
-  const steps = document.createElement('span');
-  steps.className = 'chooser settings-steps';
-  const step = (label: string, glyph: string, by: number) => {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'chooser-key';
-    button.textContent = glyph;
-    button.setAttribute('aria-label', label);
-    button.addEventListener('pointerdown', event => {
-      if (event.button === 0) select(along(by));
-    });
-    button.addEventListener('click', event => {
-      if (event.detail === 0) select(along(by));
-    });
-    return button;
-  };
-  steps.append(step('Previous setting', '‹', -1), step('Next setting', '›', 1));
+  dialog.append(head, screen);
+  document.body.append(dialog);
+  tapeLabel(title);
+
   let page: Page = 'general';
   /** The lines of the open tab, by index. */
   const shown = () => all.flatMap((line, i) => (pageOf(line) === page ? [i] : []));
@@ -324,117 +328,72 @@ export function mountSettings(): void {
     select(shown()[0]);
     glitchScreens([glass]);
   }
-  const legend = document.createElement('span');
-  legend.className = 'settings-legend';
-  legend.setAttribute('aria-hidden', 'true');
-  const options = document.createElement('span');
-  options.className = 'lamp-keys settings-choices';
-  options.setAttribute('role', 'radiogroup');
-  const controls = document.createElement('div');
-  controls.className = 'settings-controls';
-  controls.append(steps, legend, options);
 
-  dialog.append(head, screen, controls);
-  document.body.append(dialog);
-  tapeLabel(title);
-
-  const labelOf = (line: Line) => line.choices().find(c => c.value === line.get())?.label ?? '';
-  /** Moves the line's value `by` choices on (Enter, Space, a click), round or held at the ends. */
-  const cycle = (by: number, wrap = true) => {
+  const at = (line: Line) => line.choices().findIndex(c => c.value === line.get());
+  const labelOf = (line: Line) => line.choices()[at(line)]?.label ?? '';
+  /** Moves the selected line's value `by` choices on, held at the ends. */
+  const step = (by: number) => {
     const line = all[selected];
     const choices = line.choices();
-    const at = choices.findIndex(c => c.value === line.get());
-    const to = wrap ? round(at, by, choices.length) : Math.min(choices.length - 1, Math.max(0, at + by));
-    if (to !== at) line.set(choices[to].value);
+    const from = at(line);
+    const to = Math.min(choices.length - 1, Math.max(0, from + by));
+    if (to !== from) line.set(choices[to].value);
   };
-  /** A stepper line: its VFD under the glass, if it has one, kept with its value. */
-  let readout: { update: () => void } | null = null;
-  const buildChoices = () => {
-    const line = all[selected];
-    options.setAttribute('aria-label', line.name);
-    readout = null;
-    if (line.stepper) {
-      // ‹ ›, round its readout if it has one, the octave chooser's: a step
-      // on the press, held at the ends, as Left and Right on the line.
-      const format = line.readout;
-      const vfd = format
-        ? createVfdReadout({ get: () => Number(line.get()), format: value => format(String(value)), places: 2 })
-        : null;
-      readout = vfd ?? { update: () => {} };
-      const key = (label: string, glyph: string, by: number) => {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'chooser-key';
-        button.textContent = glyph;
-        button.setAttribute('aria-label', `${label} ${line.name.toLowerCase()}`);
-        button.addEventListener('pointerdown', event => {
-          if (event.button === 0) cycle(by, false);
-        });
-        button.addEventListener('click', event => {
-          if (event.detail === 0) cycle(by, false);
-        });
-        return button;
-      };
-      options.className = `chooser settings-choices${vfd ? ' settings-readout' : ' settings-stepper'}`;
-      options.setAttribute('role', 'group');
-      options.replaceChildren(key('Previous', '‹', -1), ...(vfd ? [vfd.element] : []), key('Next', '›', 1));
-      return;
-    }
-    options.className = 'lamp-keys settings-choices';
-    options.setAttribute('role', 'radiogroup');
-    const choices = line.choices();
-    const keys = choices.map((c, i) => {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'lamp-key';
-      button.setAttribute('role', 'radio');
-      button.textContent = c.label;
-      const pick = () => line.set(c.value);
-      button.addEventListener('pointerdown', event => {
-        if (event.button === 0) pick();
-      });
-      button.addEventListener('click', pick);
-      button.addEventListener('keydown', event => {
-        const by = { ArrowLeft: -1, ArrowUp: -1, ArrowRight: 1, ArrowDown: 1 }[event.key];
-        if (by === undefined) return;
-        event.preventDefault();
-        event.stopPropagation();
-        const to = round(i, by, choices.length);
-        line.set(choices[to].value);
-        (options.children[to] as HTMLElement | undefined)?.focus();
-      });
-      return button;
-    });
-    options.replaceChildren(...keys);
-  };
+
   const show = () => {
-    rows.forEach(({ row, value }, i) => {
+    rows.forEach(({ row, value, back, on }, i) => {
       const line = all[i];
-      value.textContent = labelOf(line);
-      // The whole of a long one (an input's name), cut short on the glass.
-      value.title = labelOf(line);
-      row.setAttribute('aria-selected', String(i === selected));
-      row.setAttribute('aria-label', `${line.name}: ${labelOf(line)}`);
-    });
-    glass.setAttribute('aria-activedescendant', rows[selected].row.id);
-    legend.textContent = all[selected].name;
-    const line = all[selected];
-    if (readout) {
-      readout.update();
-      return;
-    }
-    const choices = line.choices();
-    [...options.children].forEach((button, i) => {
-      const on = choices[i]?.value === line.get();
-      button.setAttribute('aria-checked', String(on));
-      (button as HTMLElement).tabIndex = on ? 0 : -1;
+      const label = labelOf(line);
+      const index = at(line);
+      const count = line.choices().length;
+      value.textContent = label;
+      // The whole of a long one (an input's name), cut short on the line.
+      value.title = label;
+      row.classList.toggle('is-selected', i === selected);
+      row.tabIndex = i === selected ? 0 : -1;
+      row.setAttribute('aria-valuetext', label);
+      row.setAttribute('aria-valuenow', String(Math.max(0, index)));
+      row.setAttribute('aria-valuemin', '0');
+      row.setAttribute('aria-valuemax', String(count - 1));
+      back.classList.toggle('is-end', index <= 0);
+      on.classList.toggle('is-end', index >= count - 1);
     });
   };
+  const select = (i: number) => {
+    if (i !== selected) closeMenu(false);
+    selected = i;
+    show();
+    rows[selected].row.scrollIntoView({ block: 'nearest' });
+  };
+  const focusLine = () => rows[selected].row.focus({ preventScroll: true });
+
+  glass.addEventListener('keydown', event => {
+    if (event.altKey || event.ctrlKey || event.metaKey) return;
+    const handled: Record<string, () => void> = {
+      ArrowUp: () => select(along(-1)),
+      ArrowDown: () => select(along(1)),
+      ArrowLeft: () => step(-1),
+      ArrowRight: () => step(1),
+      Home: () => select(shown()[0]),
+      End: () => select(shown().at(-1) ?? selected),
+      Enter: () => openMenu(),
+      ' ': () => openMenu(),
+    };
+    const act = handled[event.key];
+    if (!act) return;
+    event.preventDefault();
+    // The panel's, not the page's: the space bar does not play here.
+    event.stopPropagation();
+    act();
+    if (!menuOpen()) focusLine();
+  });
+
   // The drop-down (Jeremy, 2026-10-23: "way too many MIDI devices" to
-  // step through): a list on VFD glass under the line, over the screen,
-  // scrolling inside itself, never past the case or the window. Up, Down,
-  // Home, End move; Enter, Space or a click choose and close it; Esc, Tab
-  // or a click elsewhere close it as it was. Focus goes back to the line.
+  // step through; then every line's): a list on VFD glass under the line,
+  // over the screen, scrolling inside itself, never past the case or the
+  // window. Up, Down, Home, End, Page Up and Down move; Enter, Space or a
+  // click choose and close it; Esc, Tab or a press elsewhere close it as
+  // it was. Focus goes back to the line; the note keys still play.
   const menu = document.createElement('div');
   menu.className = 'settings-menu';
   menu.id = 'settings-menu';
@@ -442,6 +401,7 @@ export function mountSettings(): void {
   menu.setAttribute('role', 'listbox');
   menu.hidden = true;
   dialog.append(menu);
+  for (const { row } of rows) row.setAttribute('aria-controls', menu.id);
   let menuAt = 0;
   const menuChoices = () => all[selected].choices();
   const menuOpen = () => !menu.hidden;
@@ -490,8 +450,9 @@ export function mountSettings(): void {
   function openMenu(): void {
     if (menuOpen()) return;
     fillMenu();
-    menuAt = Math.max(0, menuChoices().findIndex(c => c.value === all[selected].get()));
+    menuAt = Math.max(0, at(all[selected]));
     menu.hidden = false;
+    rows[selected].row.setAttribute('aria-expanded', 'true');
     placeMenu();
     markMenu();
     menu.focus({ preventScroll: true });
@@ -499,7 +460,8 @@ export function mountSettings(): void {
   function closeMenu(refocus = true): void {
     if (!menuOpen()) return;
     menu.hidden = true;
-    if (refocus && dialog.open) glass.focus({ preventScroll: true });
+    for (const { row } of rows) row.setAttribute('aria-expanded', 'false');
+    if (refocus && dialog.open) focusLine();
   }
   function toggleMenu(): void {
     if (menuOpen()) closeMenu();
@@ -513,16 +475,21 @@ export function mountSettings(): void {
   menu.addEventListener('keydown', event => {
     if (event.altKey || event.ctrlKey || event.metaKey) return;
     const count = menu.children.length;
-    const moves: Record<string, number> = { ArrowUp: menuAt - 1, ArrowDown: menuAt + 1, Home: 0, End: count - 1, PageUp: menuAt - 8, PageDown: menuAt + 8 };
+    const moves: Record<string, number> = {
+      ArrowUp: menuAt - 1,
+      ArrowDown: menuAt + 1,
+      Home: 0,
+      End: count - 1,
+      PageUp: menuAt - 8,
+      PageDown: menuAt + 8,
+    };
     if (event.key in moves) {
       menuAt = Math.max(0, Math.min(count - 1, moves[event.key]));
       markMenu();
     } else if (event.key === 'Enter' || event.key === ' ') {
       chooseFromMenu(menuAt);
-    } else if (event.key === 'Escape') {
+    } else if (event.key === 'Escape' || event.key === 'Tab') {
       // The list only, not the case round it.
-      closeMenu();
-    } else if (event.key === 'Tab') {
       closeMenu();
     } else {
       // The note keys still play.
@@ -537,43 +504,13 @@ export function mountSettings(): void {
     event => {
       if (!menuOpen() || !(event.target instanceof Node)) return;
       if (menu.contains(event.target)) return;
-      if (event.target instanceof Element && event.target.closest('.settings-line[aria-selected="true"] .settings-value')) return;
+      if (event.target instanceof Element && event.target.closest('.settings-line.is-selected .settings-value')) return;
       closeMenu(false);
     },
     { capture: true },
   );
   window.addEventListener('resize', () => {
     if (menuOpen()) placeMenu();
-  });
-
-  const select = (i: number) => {
-    if (i !== selected) closeMenu(false);
-    if (i !== selected) {
-      selected = i;
-      buildChoices();
-    }
-    show();
-    rows[selected].row.scrollIntoView({ block: 'nearest' });
-  };
-
-  glass.addEventListener('keydown', event => {
-    if (event.altKey || event.ctrlKey || event.metaKey) return;
-    const handled: Record<string, () => void> = {
-      ArrowUp: () => select(along(-1)),
-      ArrowDown: () => select(along(1)),
-      ArrowLeft: () => cycle(-1, false),
-      ArrowRight: () => cycle(1, false),
-      Home: () => select(shown()[0]),
-      End: () => select(shown().at(-1) ?? selected),
-      Enter: () => (all[selected].menu ? openMenu() : cycle(1)),
-      ' ': () => (all[selected].menu ? openMenu() : cycle(1)),
-    };
-    const act = handled[event.key];
-    if (!act) return;
-    event.preventDefault();
-    // The panel's, not the page's: the space bar does not play here.
-    event.stopPropagation();
-    act();
   });
 
   const isOpen = () => dialog.open;
@@ -586,7 +523,7 @@ export function mountSettings(): void {
     dialog.showModal();
     key.setAttribute('aria-pressed', 'true');
     key.setAttribute('aria-expanded', 'true');
-    glass.focus({ preventScroll: true });
+    focusLine();
   };
   const shut = () => {
     if (isOpen()) dialog.close();
@@ -620,8 +557,7 @@ export function mountSettings(): void {
     if (!inSandbox()) shut();
   }).observe(document.body, { attributes: true, attributeFilter: ['data-view'] });
 
-  // The Input line's choices come and go with the inputs, read on the
-  // glass; a line of lamp keys is made again when its count changes.
+  // The Input line's choices come and go with the inputs.
   const refresh = () => {
     if (!isOpen()) return;
     // The inputs came or went, or the choice changed: the open list follows.
@@ -629,13 +565,10 @@ export function mountSettings(): void {
       fillMenu();
       markMenu();
     }
-    const line = all[selected];
-    if (!line.stepper && options.children.length !== line.choices().length) buildChoices();
     show();
   };
   settings.subscribe(refresh);
   midiInputs.subscribe(refresh);
   showPage();
-  buildChoices();
   show();
 }

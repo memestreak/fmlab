@@ -812,16 +812,23 @@ General, the tab not kept; a change glitches the glass) and a Close key
 (a push key with no lamp: it has no state to show), a VFD screen in a
 molded bezel listing the open tab's settings one line each (both tabs'
 lines in the glass's one cell, the closed one unseen, so the glass is
-the longer list's size on either; group dim, but none on the MIDI tab,
-name, value, a long one cut short with an ellipsis, its whole in its
-tip;
-the selected line lit behind with a bar at its left; a listbox: Up and
-Down, Left and Right change the value, Enter and Space the next choice,
-a click on a value too), and under it ‹ › through the tab's lines, the
-selected one's name silkscreened grey and its choices as lamp keys, or,
-for MIDI's three (`stepper`), ‹ › held at the ends, the choice read on
-the glass (Channel's round a VFD readout too), every key the row's one
-height.
+the longer list's size on either, kept as tall as it was with the
+control row that used to be under it). Every line is edited in place
+(Jeremy, 2026-10-23): group dim (none on the MIDI tab), name, and at its
+right ‹ value ›, the arrows glowing dimmer, dimmest at an end, the value
+cut short with an ellipsis, its whole in its tip; the selected line lit
+behind with a bar at its left. Each line is one control (a
+`spinbutton`, named by group and setting, its value `aria-valuetext`,
+focus roving, a ring only from the keyboard): Up and Down, Home and End
+move between the tab's lines; Left and Right (or the arrows, on the
+press) step the value, held at the ends; its value, Enter or Space open
+its drop-down: a listbox on the same VFD glass under the line, over the
+screen, scrolling inside itself within the case and the window, the
+option the keys are on lit, the chosen one barred, a long name cut short
+with its whole in the tip; Up, Down, Home, End, Page Up and Down move,
+Enter, Space or a click choose and close it, Esc (the list first, then
+the case), Tab or a press elsewhere close it as it was, focus back on
+the line; the note keys still play.
 Changes apply and are saved as they are made; Esc, Close, the key or a
 click round the case closes it, focus going back to the key; the note
 keys and Z / X still play while it is open. The settings, General's: Screen glitch
@@ -832,16 +839,8 @@ Note names (C only, All: every white key, Off), Computer keys (Off, On:
 the computer key that plays each piano key, small at its foot), Wheel
 (Page, Reverse); MIDI's: Input (All inputs, then each connected input
 by name in the browser's order, `midiInputs`; a chosen input not
-connected stays, "(not connected)", until another is chosen; with too
-many to step through, its value, Enter or Space also opens a drop-down,
-`menu` (Jeremy, 2026-10-23): a listbox on the same VFD glass under the
-line, over the screen, scrolling inside itself within the case and the
-window, the option the keys are on lit, the chosen one barred, a long
-name cut short with its whole in the tip; Up, Down, Home, End, Page Up
-and Down move, Enter, Space or a click choose and close it, Esc (the list
-only, not the case), Tab or a press elsewhere close it as it was, focus
-back on the line; the note keys still play), Channel
-(a two-place VFD reading AL or 1 to 16) and Bend range (±1, ±2, ±3, ±5,
+connected stays, "(not connected)", until another is chosen), Channel
+(All, 1 to 16) and Bend range (±1, ±2, ±3, ±5,
 ±7, ±12 st) (the
 reverb's are on the Voice section's Reverb tab, Jeremy, 2026-10-22);
 `applySettings` sets them on `<html>` (`data-motion`, `data-tips`,

@@ -25,9 +25,6 @@ export const SEGMENTS: Readonly<Record<string, readonly Segment[]>> = {
   o: ['c', 'd', 'e', 'g'],
   F: ['a', 'e', 'f', 'g'],
   C: ['a', 'd', 'e', 'f'],
-  // MIDI Channel's All: "AL".
-  A: ['a', 'b', 'c', 'e', 'f', 'g'],
-  L: ['d', 'e', 'f'],
 };
 
 /** One place of the display: its character ('' for none) and whether its point is lit. */
