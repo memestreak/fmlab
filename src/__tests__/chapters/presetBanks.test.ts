@@ -43,9 +43,9 @@ describe('the sandbox\'s two banks', () => {
       'TINE PIANO', 'SUITCASE', 'REED PIANO', 'CLAVINET', 'HARPSICORD', 'DRAWBARS', 'PERC ORGAN', 'SOLID BASS',
       'SAW BASS', 'SLAP BASS', 'RUBBER BAS', 'SOFT BRASS', 'BRASS STAB', 'FLUTE', 'CLARINET', 'STRINGS',
       'WARM PAD', 'GLASS PAD', 'VOX PAD', 'SWEEP PAD', 'TUBE BELLS', 'CELESTA', 'MARIMBA', 'VIBES',
-      'GAMELAN', 'HARP', 'KOTO', 'SAW LEAD', 'LOG DRUM', 'SNARE', 'LASER', 'WIND',
+      'GAMELAN', 'HARP', 'KOTO', 'SAW LEAD', 'DARK PAD', 'BRASS PAD', 'SAW PAD', 'HOLLOW PAD',
     ]);
-    expect(presets[63].label).toBe('B32 WIND');
+    expect(presets[63].label).toBe('B32 HOLLOW PAD');
   });
 
   it('says bank B\'s voices are fmlab\'s own: no approximation, no note', () => {
