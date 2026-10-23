@@ -200,8 +200,8 @@ figures subscribe to it. Nothing else passes values around.
   by the same script from `scripts/fmlab-bank2.syx`, which is ours and
   committed (its header and `FMLAB_VOICES` set by hand after; it reuses
   `FactoryVoice`); `algorithms`
-  keeps `dx7Presets.ts`. Its link is `#/sandbox?c=&a=&f=&o=…&l=…`, `f` the DX7
-  feedback, `o` the six operators joined by "~", each fifteen fields
+  keeps `dx7Presets.ts`. Its link is `#/sandbox?a=&f=&o=…&l=…&p=…`, `a` the
+  algorithm, `f` the DX7 feedback, `o` the six operators joined by "~", each fifteen fields
   joined by "_" (`operatorsParam`: ratio, detune, level or "x" for off,
   the envelope's seven numbers, break key, left and right scaling as "l"
   or "e" and a depth, rate scaling, tremolo share as a percentage), and
@@ -212,7 +212,11 @@ figures subscribe to it. Nothing else passes values around.
   (`pitchParam`: start, attack, peak, decay 1, break, decay 2, sustain,
   release; levels in cents, speeds in cents a second), validated and clamped by
   `soundFromParams` (a share any percentage from 0 to 100, to 0.1 %); an older
-  link keeps only its pitch and algorithm.
+  link keeps only its pitch and algorithm. The pitch is not written (Jeremy,
+  2026-10-23): it is only the note struck last, so the address changed with
+  every note; a link's own `c` still sets it. The address is rewritten
+  (`replaceState`, no new history entry) 300 ms after the patch last
+  changes, and only then.
   `terms.ts` holds every defined term: its name, a one-sentence plain
   definition (for the glossary and the term's tip only), an optional
   formula, its English Wikipedia article and the chapter that defines it.

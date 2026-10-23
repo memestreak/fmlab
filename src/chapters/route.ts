@@ -281,14 +281,14 @@ export function pitchFromParam(raw: string | null): Dx7PitchEnvelope | null {
 }
 
 /**
- * The parameters that carry a sandbox sound: the base pitch, the
- * algorithm, the feedback, the six operators, the LFO and the pitch
- * envelope. Volume stays the
- * listener's own, and is left out.
+ * The parameters that carry a sandbox sound: the algorithm, the
+ * feedback, the six operators, the LFO and the pitch envelope. Volume
+ * stays the listener's own, and is left out; so does the pitch, which is
+ * only the note struck last (Jeremy, 2026-10-23: the address changed with
+ * every note played). A link's own `c` still sets it.
  */
 export function soundParams(state: LabState): string {
   return new URLSearchParams({
-    c: brief(state.carrierHz, 2),
     a: String(state.algorithm),
     f: brief(state.dxFeedback, 4),
     o: operatorsParam(state.dxOperators),
