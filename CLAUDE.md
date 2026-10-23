@@ -217,6 +217,7 @@ figures subscribe to it. Nothing else passes values around.
   `rel="noopener"`, marked ↗): the lesson text uses it only for proper
   nouns (John Chowning, the Yamaha DX7), maths panels where a formula
   appears, and the glossary gives each entry its article.
+  `docs/editing-chapters.md` is the guide to editing this text by hand.
   `index.ts` lists them (`CHAPTERS`, `neighbours`, and
   `sequenceNeighbours`, where Previous and Next go from any view, the
   bottom links and the masthead's arrows alike); `route.ts` reads and
