@@ -32,6 +32,17 @@ export function pressPlay(state: LabState, time: number): Partial<LabState> {
 }
 
 /**
+ * What the space bar does: the main button's press, but in the sandbox
+ * only Stop, every note silenced (Jeremy, 2026-10-23: "<space> causes a
+ * note to play"). The keys and MIDI play there; the space bar never
+ * strikes the Play-note note of the chapters.
+ */
+export function pressSpace(state: LabState, time: number): Partial<LabState> {
+  if (state.chapter === 'sandbox') return { stops: state.stops + 1, noteStartedAt: null };
+  return pressPlay(state, time);
+}
+
+/**
  * Whether the space bar may act as the main button when pressed on
  * `target`. Not where space already means something of its own: on a
  * button (it presses it, so the Play button still works), a link, a
@@ -61,7 +72,7 @@ export function labelTimeout(state: LabState, time: number): number | null {
   return Number.isFinite(left) ? left * 1000 + 50 : null;
 }
 
-/** The Play / Stop button, or Play note. Space does the same. */
+/** The Play / Stop button, or Play note. Space does the same (but in the sandbox, `pressSpace`). */
 export function mountPlayButton(button: HTMLButtonElement, store: LabStore): void {
   // Inside the click or key press, so the engine may start audio: see
   // createStore.
@@ -75,7 +86,7 @@ export function mountPlayButton(button: HTMLButtonElement, store: LabStore): voi
     if (store.get().chapter === GLOSSARY) return;
     // Or the page would scroll down a screen as well.
     event.preventDefault();
-    press();
+    store.set(pressSpace(store.get(), now()));
   });
 
   // A note ends by itself: the label goes back to Play when it does. A

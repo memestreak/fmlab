@@ -116,9 +116,10 @@ figures subscribe to it. Nothing else passes values around.
   `indexAtTime(state, t)` is the index at a moment of it. Six operators
   (`ops`: `algorithms` and the sandbox) play notes in the worklet's voice
   pool: `held` is the keys down on the keyboard, in the order struck, each
-  sounding until it is let go; `notes` still strikes one (Play note, the
-  space bar) held for `noteHold` and then let go; `stops` silences them
-  all. The figures follow the note struck last: `noteStartedAt`,
+  sounding until it is let go; `notes` still strikes one (Play note in
+  `algorithms`) held for `noteHold` and then let go; `stops` silences
+  them all (in the sandbox the space bar is only that, `pressSpace`;
+  Jeremy, 2026-10-23: it strikes no note there). The figures follow the note struck last: `noteStartedAt`,
   `noteHold` (Infinity while its key is down, then the time it was held)
   and `noteLength` (the hold plus `releaseSecondsOf`; `operatorLevelsAt`).
   Edits from the sandbox's controls reach the notes sounding (Jeremy,
@@ -785,8 +786,8 @@ across, it glitches as the top screens do, alongside theirs. Enter
 closes, keeping the voice; so do Close, Esc, a press and release both on
 the dimmed page, or the name again, and focus goes back to the name. It
 opens on the playing voice's bank, or the last chosen's once Edited
-(`openingBank`); the note keys, Z / X and the space bar play while it is
-open. The shown bank is in neither the link nor storage. On a phone it
+(`openingBank`); the note keys and Z / X play, and the space bar stops,
+while it is open. The shown bank is in neither the link nor storage. On a phone it
 is the window's width less 16px a side, two columns of 16 (left and
 right then move by 16), the bank keys under the title if they must wrap.
 
@@ -852,7 +853,8 @@ the settings. Their containers
 masthead's markup and shown on the sandbox only; `PLACES` moves the
 lab's nodes into them. The masthead keeps every page's height, with no
 rule under it (Jeremy, 2026-10-21): the top panel's edge is the line. No Play or Copy link: the keyboard
-and the space bar play, and the address bar keeps the sound. The page's
+plays, the space bar stops (it strikes no note here: `pressSpace`), and
+the address bar keeps the sound. The page's
 title, "Sandbox" (`#inst-title`), is for screen readers only. Then,
 in layout F (Jeremy, 2026-10-18), a top band: on the left, the
 title Voice at the top left, the band's first row, with
@@ -1153,7 +1155,8 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
   drag (`user-select: none` on its body), and a tap leaves no flash
   (Jeremy, 2026-10-21). The chapters' text stays selectable.
 - The space bar is Play / Stop on every page, including stopping a note
-  that is sounding. It is left alone on a button, link, checkbox, maths
+  that is sounding; in the sandbox, which has no Play button, it is Stop
+  only and never strikes a note (`pressSpace`; Jeremy, 2026-10-23). It is left alone on a button, link, checkbox, maths
   panel or anything typed into; on a slider, where space means nothing,
   it plays and stops. A "Space: play / stop" hint shows where there is a
   pointer that hovers.
