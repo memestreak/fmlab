@@ -55,15 +55,29 @@ import {
 
 const REPO_URL = 'https://github.com/memestreak/fmlab';
 
-/** The build's commit, linked to GitHub; plain "dev" without git. */
+/**
+ * The build's commit, its short hash a link to the commit on GitHub by its
+ * full hash (Jeremy, 2026-10-23), opening in a new tab and marked ↗ as the
+ * other outside links are; plain "dev" without git.
+ */
 function mountCommitHash(slot: HTMLElement): void {
-  if (__COMMIT_HASH__ === 'dev') {
+  if (__COMMIT_HASH__ === 'dev' || __COMMIT_FULL__ === 'dev') {
     slot.textContent = 'dev';
     return;
   }
   const link = document.createElement('a');
-  link.href = `${REPO_URL}/commit/${__COMMIT_HASH__}`;
-  link.textContent = __COMMIT_HASH__;
+  link.className = 'external';
+  link.href = `${REPO_URL}/commit/${__COMMIT_FULL__}`;
+  link.target = '_blank';
+  link.rel = 'noopener';
+  const mark = document.createElement('span');
+  mark.className = 'external-mark';
+  mark.setAttribute('aria-hidden', 'true');
+  mark.textContent = '↗';
+  const said = document.createElement('span');
+  said.className = 'visually-hidden';
+  said.textContent = ' (opens in a new tab)';
+  link.append(__COMMIT_HASH__, mark, said);
   slot.replaceChildren(link);
 }
 
