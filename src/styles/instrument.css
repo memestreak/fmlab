@@ -434,10 +434,35 @@ body:not([data-view='instrument']) #inst-tools {
 
 /* The Voice title at the left, its Algorithm | LFO switch at the right. */
 .inst-alg-head {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.6rem;
+}
+
+/* The Reverb key's light as a switch (ui/reverbLamp.ts; Jeremy,
+   2026-10-23): unseen, a 20px square laid over the light, so the key
+   looks as it did. A press on it turns the reverb on or off and opens no
+   tab. */
+.reverb-lamp {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+
+.reverb-lamp:focus {
+  outline: none;
+}
+
+.reverb-lamp:focus-visible {
+  outline: 2px solid var(--lamp-legend-hover);
+  outline-offset: -2px;
 }
 
 /* A switch between tabs, drawn as the lab's switches are (.switch): two
