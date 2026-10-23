@@ -1,5 +1,5 @@
 // How much of the audio thread's time the voice pool takes: VoicePool.render
-// for 0, 1, 4 and 8 held notes of A11 E.PIANO 1 and of the costliest
+// for 0, 1, 4, 8 and 16 held notes of A11 E.PIANO 1 and of the costliest
 // preset, at 48 kHz in 128-sample blocks, as the worklet renders. Not run
 // in CI; `npm run bench:voices`. Each block's time is a share of its
 // budget, 128 / 48000 s; the average and the worst 1% (99th percentile).
@@ -17,8 +17,8 @@ const BUDGET_MS = (BLOCK / SAMPLE_RATE) * 1000;
 // the plate's first blocks several times slower than it settles to.
 const WARM_SECONDS = 3;
 const MEASURE_SECONDS = 4;
-/** The keys held, C3 up in a C major spread. */
-const KEYS = [48, 52, 55, 60, 64, 67, 72, 76];
+/** The keys held, C3 up in a C major spread (C2 up for sixteen). */
+const KEYS = [48, 52, 55, 60, 64, 67, 72, 76, 36, 40, 43, 79, 84, 88, 91, 96];
 
 const sandbox = CHAPTERS.find(chapter => chapter.id === 'sandbox')!;
 
@@ -38,10 +38,11 @@ const hz = (key: number) => 440 * 2 ** ((key - 69) / 12);
 
 /**
  * Each block's render time as a share of its budget, `notes` keys held,
- * through the plate reverb (as the worklet runs it) when `reverb`.
+ * through the plate reverb (as the worklet runs it) when `reverb`; the pool
+ * as large as the notes need, VOICES at least.
  */
 function run(patch: Dx7Patch, notes: number, seconds = MEASURE_SECONDS, reverb = false): number[] {
-  const pool = new VoicePool(VOICES, SAMPLE_RATE, 0.05 * SAMPLE_RATE);
+  const pool = new VoicePool(Math.max(VOICES, notes), SAMPLE_RATE, 0.05 * SAMPLE_RATE);
   pool.setPatch(patch);
   for (const key of KEYS.slice(0, notes)) pool.noteOn(key, hz(key));
   const plate = new PlateReverb(SAMPLE_RATE);
@@ -82,15 +83,15 @@ it('benchmarks the voice pool', () => {
     `Block budget ${BUDGET_MS.toFixed(3)} ms (${BLOCK} samples at ${SAMPLE_RATE} Hz); costliest here: ${worst.label}`,
   ];
   for (const preset of shown) {
-    for (const notes of [0, 1, 4, 8]) {
+    for (const notes of [0, 1, 4, 8, 16]) {
       const { mean, p99 } = summary(run(patchOf(preset), notes));
       lines.push(`${preset.label.padEnd(16)} ${String(notes).padStart(2)} notes  mean ${pct(mean).padStart(6)}  p99 ${pct(p99).padStart(6)}`);
     }
   }
-  // The plate reverb: 8 notes of E.PIANO 1 with it off and on.
-  for (const reverb of [false, true]) {
-    const { mean, p99 } = summary(run(patchOf(named[0]), 8, MEASURE_SECONDS, reverb));
-    lines.push(`A11 E.PIANO 1     8 notes  reverb ${reverb ? 'on ' : 'off'}  mean ${pct(mean).padStart(6)}  p99 ${pct(p99).padStart(6)}`);
+  // The plate reverb: 8 and 16 notes of E.PIANO 1 with it off and on.
+  for (const [notes, reverb] of [[8, false], [8, true], [16, false], [16, true]] as const) {
+    const { mean, p99 } = summary(run(patchOf(named[0]), notes, MEASURE_SECONDS, reverb));
+    lines.push(`A11 E.PIANO 1    ${String(notes).padStart(2)} notes  reverb ${reverb ? 'on ' : 'off'}  mean ${pct(mean).padStart(6)}  p99 ${pct(p99).padStart(6)}`);
   }
   console.log(lines.join('\n'));
 }, 600_000);

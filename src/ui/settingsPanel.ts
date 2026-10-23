@@ -1,21 +1,30 @@
-import { type ChoiceSetting, saveSettings, type Settings, settings } from '../model/settings';
+import { type ChoiceSetting, SETTING_CHOICES, saveSettings, type Settings, settings } from '../model/settings';
 import { tapeLabel } from './dymo';
+import { midiInputs } from './midi';
+import { createVfdReadout } from './vfdReadout';
 import { inSandbox } from './motion';
 
 // The sandbox's Settings (Jeremy, 2026-10-21, "a function panel, named
 // SETTINGS"): a push key in the masthead opens a modal console, a VFD
 // screen listing every setting, one line each, the selected one's
-// choices as lamp keys under it. Changes apply as they are made and are
+// choices as lamp keys under it (or, for MIDI's Channel, ‹ › round a VFD
+// readout). Changes apply as they are made and are
 // saved (model/settings.ts). No theme: the sandbox is dark only
 // (Jeremy, 2026-10-22).
 
-/** One line of the panel: its group, its name, its choices and how to read and set it. */
+/**
+ * One line of the panel: its group, its name, its choices (worked out
+ * when shown: the MIDI inputs come and go) and how to read and set it.
+ * With `readout`, too many choices for lamp keys: under the glass, ‹ ›
+ * round a two-place VFD readout of the choice instead (MIDI Channel).
+ */
 interface Line {
   group: string;
   name: string;
-  choices: readonly { value: string; label: string }[];
+  choices: () => readonly { value: string; label: string }[];
   get: () => string;
   set: (value: string) => void;
+  readout?: (value: string) => string;
 }
 
 const choice = (value: string, label: string) => ({ value, label });
@@ -30,10 +39,34 @@ function lines(): Line[] {
   ): Line => ({
     group,
     name,
-    choices: (Object.keys(labels) as Settings[K][]).map(value => choice(value, labels[value])),
-    get: () => settings.get()[key],
-    set: value => settings.set({ [key]: value } as Partial<Settings>),
+    choices: () => (Object.keys(labels) as `${Settings[K]}`[]).map(value => choice(value, labels[value as Settings[K]])),
+    get: () => String(settings.get()[key]),
+    // A choice of numbers (Bend range) is set as its number.
+    set: value =>
+      settings.set({ [key]: (SETTING_CHOICES[key] as readonly unknown[]).find(c => String(c) === value) } as Partial<Settings>),
   });
+  // MIDI's (Jeremy, 2026-10-23): the input, by name, from those connected,
+  // and the one chosen even while it is not; the channel, all or 1 to 16.
+  const input: Line = {
+    group: 'MIDI',
+    name: 'Input',
+    choices: () => {
+      const names = [...new Set(midiInputs.get().names)];
+      const chosen = settings.get().midiInput;
+      const gone = chosen !== '' && !names.includes(chosen) ? [choice(chosen, `${chosen} (not connected)`)] : [];
+      return [choice('', 'All inputs'), ...names.map(name => choice(name, name)), ...gone];
+    },
+    get: () => settings.get().midiInput,
+    set: value => settings.set({ midiInput: value }),
+  };
+  const channel: Line = {
+    group: 'MIDI',
+    name: 'Channel',
+    choices: () => Array.from({ length: 17 }, (_, n) => choice(String(n), n === 0 ? 'All' : String(n))),
+    get: () => String(settings.get().midiChannel),
+    set: value => settings.set({ midiChannel: Number(value) }),
+    readout: value => (value === '0' ? 'AL' : value),
+  };
   return [
     setting('Screens', 'Screen glitch', 'screenGlitch', { on: 'On', off: 'Off' }),
     setting('Screens', 'Motion', 'motion', { system: 'System', still: 'Still' }),
@@ -42,6 +75,16 @@ function lines(): Line[] {
     setting('Keyboard', 'Note names', 'noteNames', { c: 'C only', all: 'All', off: 'Off' }),
     setting('Keyboard', 'Computer keys', 'computerKeys', { off: 'Off', on: 'On' }),
     setting('Controls', 'Wheel', 'wheel', { page: 'Page', reverse: 'Reverse' }),
+    input,
+    channel,
+    setting('MIDI', 'Bend range', 'bendRange', {
+      1: '±1 st',
+      2: '±2 st',
+      3: '±3 st',
+      5: '±5 st',
+      7: '±7 st',
+      12: '±12 st',
+    }),
   ];
 }
 
@@ -200,18 +243,50 @@ export function mountSettings(): void {
   document.body.append(dialog);
   tapeLabel(title);
 
-  const labelOf = (line: Line) => line.choices.find(c => c.value === line.get())?.label ?? '';
+  const labelOf = (line: Line) => line.choices().find(c => c.value === line.get())?.label ?? '';
   /** Moves the line's value `by` choices on (Enter, Space, a click), round or held at the ends. */
   const cycle = (by: number, wrap = true) => {
     const line = all[selected];
-    const at = line.choices.findIndex(c => c.value === line.get());
-    const to = wrap ? round(at, by, line.choices.length) : Math.min(line.choices.length - 1, Math.max(0, at + by));
-    if (to !== at) line.set(line.choices[to].value);
+    const choices = line.choices();
+    const at = choices.findIndex(c => c.value === line.get());
+    const to = wrap ? round(at, by, choices.length) : Math.min(choices.length - 1, Math.max(0, at + by));
+    if (to !== at) line.set(choices[to].value);
   };
+  /** A line with a readout: its VFD under the glass, kept with its value. */
+  let readout: { update: () => void } | null = null;
   const buildChoices = () => {
     const line = all[selected];
     options.setAttribute('aria-label', line.name);
-    const keys = line.choices.map((c, i) => {
+    readout = null;
+    if (line.readout) {
+      // ‹ › round its readout, the octave chooser's: a step on the press,
+      // held at the ends, as Left and Right on the line.
+      const format = line.readout;
+      const vfd = createVfdReadout({ get: () => Number(line.get()), format: value => format(String(value)), places: 2 });
+      readout = vfd;
+      const key = (label: string, glyph: string, by: number) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'chooser-key';
+        button.textContent = glyph;
+        button.setAttribute('aria-label', `${label} ${line.name.toLowerCase()}`);
+        button.addEventListener('pointerdown', event => {
+          if (event.button === 0) cycle(by, false);
+        });
+        button.addEventListener('click', event => {
+          if (event.detail === 0) cycle(by, false);
+        });
+        return button;
+      };
+      options.className = 'chooser settings-choices settings-readout';
+      options.setAttribute('role', 'group');
+      options.replaceChildren(key('Previous', '‹', -1), vfd.element, key('Next', '›', 1));
+      return;
+    }
+    options.className = 'lamp-keys settings-choices';
+    options.setAttribute('role', 'radiogroup');
+    const choices = line.choices();
+    const keys = choices.map((c, i) => {
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'lamp-key';
@@ -227,8 +302,8 @@ export function mountSettings(): void {
         if (by === undefined) return;
         event.preventDefault();
         event.stopPropagation();
-        const to = round(i, by, line.choices.length);
-        line.set(line.choices[to].value);
+        const to = round(i, by, choices.length);
+        line.set(choices[to].value);
         (options.children[to] as HTMLElement | undefined)?.focus();
       });
       return button;
@@ -245,8 +320,13 @@ export function mountSettings(): void {
     glass.setAttribute('aria-activedescendant', rows[selected].row.id);
     legend.textContent = all[selected].name;
     const line = all[selected];
+    if (readout) {
+      readout.update();
+      return;
+    }
+    const choices = line.choices();
     [...options.children].forEach((button, i) => {
-      const on = line.choices[i].value === line.get();
+      const on = choices[i]?.value === line.get();
       button.setAttribute('aria-checked', String(on));
       (button as HTMLElement).tabIndex = on ? 0 : -1;
     });
@@ -320,9 +400,16 @@ export function mountSettings(): void {
     if (!inSandbox()) shut();
   }).observe(document.body, { attributes: true, attributeFilter: ['data-view'] });
 
-  settings.subscribe(() => {
-    if (isOpen()) show();
-  });
+  // The Input line's choices come and go with the inputs: its keys are
+  // made again when their count changes.
+  const refresh = () => {
+    if (!isOpen()) return;
+    const line = all[selected];
+    if (!line.readout && options.children.length !== line.choices().length) buildChoices();
+    show();
+  };
+  settings.subscribe(refresh);
+  midiInputs.subscribe(refresh);
   buildChoices();
   show();
 }

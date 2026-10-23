@@ -11,7 +11,7 @@ import {
 import { envelopeAt } from '../../dsp/envelope';
 import { kernelLevels, type Operator, operatorEnvelope } from '../../dsp/operators';
 import { MAX_OPERATORS, PmKernel } from '../../dsp/pmKernel';
-import { type Dx7Patch, STEAL_SECONDS, VoicePool, type VoicePatch, WHEEL_GLIDE_SECONDS } from '../../dsp/voicePool';
+import { BEND_GLIDE_SECONDS, type Dx7Patch, STEAL_SECONDS, VoicePool, type VoicePatch, WHEEL_GLIDE_SECONDS } from '../../dsp/voicePool';
 
 const SAMPLE_RATE = 48000;
 const LOCK_SAMPLES = 0.05 * SAMPLE_RATE;
@@ -373,5 +373,59 @@ describe('the voice pool\'s pitch envelope', () => {
     render(voices, SAMPLE_RATE * 0.1);
     // 440 × 2^((700 - 1200) / 1200): about 329.6 Hz.
     expect(pitchOf(render(voices, SAMPLE_RATE))).toBeCloseTo(440 * 2 ** (-500 / 1200), -1);
+  });
+});
+
+describe('the voice pool\'s pitch bend', () => {
+  const sine: Dx7Patch = {
+    kind: 'dx7',
+    algorithm: 32,
+    feedback: 0,
+    operators: [heldOperator(1, 0), ...[2, 3, 4, 5, 6].map(r => heldOperator(r, null))],
+    lfo: HELD_LFO,
+    pitchEnvelope: FLAT_PITCH_ENVELOPE,
+  };
+  /** Rising zero crossings a second. */
+  const pitchOf = (samples: Float32Array) => {
+    let crossings = 0;
+    for (let i = 1; i < samples.length; i++) if (samples[i - 1] < 0 && samples[i] >= 0) crossings++;
+    return (crossings * SAMPLE_RATE) / samples.length;
+  };
+  const bent = (semitones: number, patch: VoicePatch = sine) => {
+    const voices = new VoicePool(1, SAMPLE_RATE, LOCK_SAMPLES);
+    voices.setPatch(patch);
+    voices.noteOn(69, 440);
+    voices.handle({ type: 'bend', semitones });
+    render(voices, SAMPLE_RATE * BEND_GLIDE_SECONDS * 4);
+    return voices;
+  };
+
+  it('multiplies every note\'s frequency by 2^(semitones/12), once glided', () => {
+    expect(pitchOf(render(bent(0), SAMPLE_RATE))).toBeCloseTo(440, -1);
+    expect(pitchOf(render(bent(2), SAMPLE_RATE))).toBeCloseTo(440 * 2 ** (2 / 12), -1);
+    expect(pitchOf(render(bent(-12), SAMPLE_RATE))).toBeCloseTo(220, -1);
+    // The simpler patches bend too.
+    const basic: VoicePatch = { algorithm: 32, feedback: 0, operators: [op(1, 1), ...[2, 3, 4, 5, 6].map(r => op(r, 0))] };
+    expect(pitchOf(render(bent(12, basic), SAMPLE_RATE))).toBeCloseTo(880, -1);
+  });
+
+  it('at 0 plays exactly as with no bend', () => {
+    const plain = new VoicePool(1, SAMPLE_RATE, LOCK_SAMPLES);
+    plain.setPatch(sine);
+    plain.noteOn(69, 440);
+    render(plain, SAMPLE_RATE * BEND_GLIDE_SECONDS * 4);
+    const a = render(plain, 4800);
+    const b = render(bent(0), 4800);
+    expect(Math.max(...a.map((v, i) => Math.abs(v - b[i])))).toBe(0);
+  });
+
+  it('glides to a new bend over 5 ms, not in one step', () => {
+    const voices = bent(0);
+    render(voices, 4800);
+    voices.handle({ type: 'bend', semitones: 12 });
+    const glide = render(voices, Math.round(SAMPLE_RATE * BEND_GLIDE_SECONDS));
+    // The glide's last stretch is faster than 440 but not yet at 880.
+    expect(steepest(glide)).toBeLessThan(0.5);
+    expect(pitchOf(render(voices, SAMPLE_RATE))).toBeCloseTo(880, -1);
   });
 });

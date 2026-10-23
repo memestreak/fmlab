@@ -81,9 +81,13 @@ figures subscribe to it. Nothing else passes values around.
   `settings.ts`, the sandbox's settings (its Settings panel, and the
   Voice section's Reverb tab), outside the lab's store, the link and the
   sound: `Settings` (Screen glitch, Motion, Tips on hover, Z X hint, Note
-  names, Computer keys, Wheel; and the plate reverb's Reverb, Decay, Mix,
+  names, Computer keys, Wheel; MIDI In's `midi` (off, on: set by the In key),
+  `midiInput` (an input's name, '' for all, at most `MAX_TEXT_SETTING`, 100,
+  characters, the one text setting), `midiChannel` (0 for all, or 1 to 16)
+  and `bendRange` (1, 2, 3, 5, 7 or 12 semitones); and the plate reverb's Reverb, Decay, Mix,
   Tone and Pre-delay, set on the Reverb tab), `DEFAULT_SETTINGS`
-  (today's behaviour; the reverb off, 1.5 s, 25 %, 70, 0 ms), the choice
+  (today's behaviour; the reverb off, 1.5 s, 25 %, 70, 0 ms; MIDI off,
+  every input and channel, the bend ±2), the choice
   settings' `SETTING_CHOICES` and the number settings' `SETTING_RANGES`
   (min, max, step; `inRange`), `parseSettings` (anything
   missing, unknown or unreadable its default; a number held in range
@@ -130,7 +134,11 @@ figures subscribe to it. Nothing else passes values around.
   `src/dsp/dx7.ts`. `selectedOp` is the operator the sandbox's operator
   panel shows; one always is, OP1 when it opens. `modWheel` is the sandbox's mod wheel, 0 to 1
   (opens at 0; the instrument's, not the voice's, so kept through voice
-  and preset changes, and in neither the link nor storage). `voiceTab` is that
+  and preset changes, and in neither the link nor storage). `pitchBend` is the pitch
+  wheel from MIDI In, -1 to 1 (kept as `modWheel` is, back to 0 when MIDI
+  is turned off or the sandbox left; times the Bend range it is the
+  semitones the voice pool bends every note by, and the sandbox's spectrum
+  stems move with it). `voiceTab` is that
   panel's tab, `envelope` (the default) or `keys`, and stays as it is
   when another operator is selected.
   `momentOf(state, time)` is what a figure should draw at a time on the
@@ -284,7 +292,8 @@ figures subscribe to it. Nothing else passes values around.
   peak, break and sustain, held; let go, from wherever it is back to
   start at the release speed, exactly as msfa. `FLAT_PITCH_ENVELOPE`,
   `pitchEnvelopeOn`. `voicePool.ts` (`VoicePool`:
-  `VOICES` notes of six operators at once, each a `PmKernel` whose levels
+  `VOICES` (16, the DX7's; 8 until MIDI In's pedal could hold more) notes
+  of six operators at once, each a `PmKernel` whose levels
   follow `operatorEnvelope` worked out per sample, summed (a `dx7`
   note's envelopes and pitch envelope every `CONTROL_SAMPLES`, 32, and
   followed between: an attack in a straight line in amplitude, a decay
@@ -316,7 +325,9 @@ figures subscribe to it. Nothing else passes values around.
   so a drag does not zipper (with each note's own pitch envelope, taken
   from the patch when it is struck and run from its own key:
   2^((pitchEnvelope + vibrato) / 1200)) and its tremolo every operator's level, after
-  its envelope, by 10^(−dB × share × amp / 20)) and `voices.ts` (`chooseVoice`: a key's own voice, else a
+  its envelope, by 10^(−dB × share × amp / 20)); the pitch wheel (`bend`,
+  in semitones) multiplies every note's frequency, either kind of patch, by
+  2^(bend / 12), glided over `BEND_GLIDE_SECONDS` (5 ms) and `voices.ts` (`chooseVoice`: a key's own voice, else a
   free one, else the one let go longest ago, else the oldest held; a
   voice taken is faded over `STEAL_SECONDS` first; and `midiToHz`).
   `plateReverb.ts` (`PlateReverb`: the sandbox's reverb, Dattorro's
@@ -366,7 +377,9 @@ figures subscribe to it. Nothing else passes values around.
   (1 is true FM; 2 the voice pool, told what to play by messages on its
   port, `VoiceMessage`: `patch`, `noteOn`, `noteOff`, `allOff`, and
   `wheel`, the mod wheel alone, lighter than the whole patch at every
-  step of a drag; the engine sends it on a change and with each note).
+  step of a drag; the engine sends it on a change and with each note;
+  `bend`, the pitch wheel in semitones; and `noteOn` carries a velocity,
+  not yet heard).
   Its first output is stereo: the sound in both channels and, in mode 2,
   the plate reverb's wet added (`ReverbMessage`, `reverb`: on, seconds,
   mix, tone; dsp/plateReverb.ts); its second, mono, the dry sound alone,
@@ -392,6 +405,15 @@ figures subscribe to it. Nothing else passes values around.
   reverb on, its tail rung out (`tailMs`). It sends the reverb on load,
   when its settings change and on a change of chapter: on only in the
   sandbox with Reverb on (Jeremy, 2026-10-22).
+  MIDI In (Jeremy, 2026-10-23) plays through its public `noteOn(note, hz,
+  velocity, marks)`: posted straight to the pool, before the store is
+  set, when the context runs and the pool has the voice (else struck as
+  any key, the patch, wheel and bend sent only when the pool lacks the
+  voice, never with every note), and marked so the `held` that follows
+  does not strike it again; false before the page's first gesture (the
+  note is dropped). With MIDI on in the sandbox the context is kept
+  running, never suspended for silence. The first MIDI note logs the
+  context's base and output latency to the console, once.
   An `AnalyserNode` taps the dry output before the volume (through
   `noteDry`, which every change to the note gain is made to too), and
   `measure()` hands its spectrum to the live view.
@@ -513,10 +535,18 @@ figures subscribe to it. Nothing else passes values around.
   algorithm's, which then takes neither them nor the space bar as the
   start of a name, its arrows still its own; and with the preset window
   or Settings open).
-  Every key held sounds: it writes
-  `held`, and the key struck last's pitch into `carrierHz` and its moment
-  into `noteStartedAt` / `noteLength`. Keys are let go on blur, a hidden
-  tab, a lost pointer capture and a change of chapter, so none sticks.
+  Every key held sounds. The keys held from every source are one key bed
+  (`keyBed.ts`: `KeyHolders`, pure, each pitch's holders, `key`, `pointer`
+  or `midi:<input id>`; `createKeyBed`, which keeps the store with it):
+  a pitch goes into `held` with its first holder and out with its last,
+  and the note struck last (any source; a MIDI strike always) sets
+  `carrierHz`, `noteStartedAt` and `noteLength`. MIDI's sustain pedal
+  keeps MIDI notes let go sounding until every input's pedal is up; it
+  never holds the computer's or the pointer's. The computer's and the
+  pointer's keys are let go on blur, a hidden tab, a lost pointer capture
+  and a change of chapter, so none sticks; MIDI's are not (an unplugged
+  input lets go its own notes and pedal; MIDI off or the sandbox left,
+  all of them, and the bend goes back to the middle, the mod wheel kept).
   Piano-shaped keys, every C named (the computer keys that play them are
   in their names, not drawn on them), drawn as real ones (Jeremy,
   2026-10-21): white keys with shaded tops, a lit left and shaded right
@@ -540,6 +570,24 @@ figures subscribe to it. Nothing else passes values around.
   press), scrolled (down for more, 1 % per 10 px), the arrows (1 %), Page
   Up / Down (10 %), Home, End, and a double click back to 0; no spring;
   the note keys, Z / X and space still play while it has focus.
+  The panel's third column is MIDI In (`ui/midi.ts`, `mountMidi`; Jeremy,
+  2026-10-23): MIDI on tape over one lamp key, In, worked on the press,
+  which turns the `midi` setting on and off; on, `requestMIDIAccess()`
+  (never sysex) is asked, and again on load with on saved. Its tip and
+  `data-state` (`midiTip`): "MIDI off"; "MIDI on: <names>" or "MIDI on: no
+  keyboard connected"; `waiting`, the lamp half lit, "Click anywhere to
+  wake the sound", until the page's first gesture (notes till then
+  dropped); `blocked`, "MIDI blocked: allow it in the site's settings" (a
+  press asks again); and `unsupported`, the key disabled, "This browser has
+  no MIDI: use Chrome, Edge, Brave or Firefox". It listens to every input
+  the Input setting names (hot-plugged ones too) on the Channel set, read
+  by `midiMessage.ts` (`parseMidi`, pure): note on and off (on at velocity
+  0 is off; A0 to C8 only), the sustain pedal (CC64, down from 64), the mod
+  wheel (CC1), all off (CC120, CC123, as Stop) and the pitch wheel (14
+  bits about 8192, to `pitchBend`); system messages, program change,
+  aftertouch and the rest are ignored. A note goes to the engine's
+  `noteOn` first, then into the key bed. On a phone the tapes are hidden
+  and In sits after the wheel on the chooser's line.
 It shows two octaves, from C1–B2 to C5–B6 (`STARTS`; Jeremy, 2026-10-21),
 starting at C3–B4, where a double click on the range brings it back;
 every key it can show plays (`playable`, C1 to B6). Every held
@@ -764,8 +812,11 @@ sandbox's native titles put away in `data-tip-off` and the terms' tips
 hidden, names and descriptions kept), Z X hint (Hover, Always, Off),
 Note names (C only, All: every white key, Off), Computer keys (Off, On:
 the computer key that plays each piano key, small at its foot), Wheel
-(Page, Reverse) (the reverb's are on the Voice section's Reverb tab,
-Jeremy, 2026-10-22);
+(Page, Reverse), then MIDI's three: Input (All inputs and each
+connected input by name, `midiInputs`; a chosen input not connected
+shown "(not connected)"), Channel (‹ › either side of a two-place VFD
+reading AL or 1 to 16) and Bend range (±1, ±2, ±3, ±5, ±7, ±12 st) (the
+reverb's are on the Voice section's Reverb tab, Jeremy, 2026-10-22);
 `applySettings` sets them on `<html>` (`data-motion`, `data-tips`,
 `data-zx`, `data-note-names`, `data-computer-keys`) for the CSS. On a
 phone the key has the line under Volume's (beside it the fader would

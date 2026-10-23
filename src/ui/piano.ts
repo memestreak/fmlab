@@ -1,5 +1,6 @@
 import { midiToHz } from '../dsp/voices';
-import { type LabStore, releaseSecondsOf } from '../model/lab';
+import type { LabStore } from '../model/lab';
+import type { Holder, KeyBed } from './keyBed';
 import { createModWheel } from './modWheel';
 import { createVfdReadout } from './vfdReadout';
 
@@ -8,9 +9,6 @@ import { createVfdReadout } from './vfdReadout';
 // pitch, for as long as it is held; letting go releases it.
 
 export { midiToHz };
-
-/** The page's clock in seconds, the one notes are timed on. */
-const now = () => performance.now() / 1000;
 
 const NAMES = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
 
@@ -110,11 +108,9 @@ export function mountPiano(
   container: HTMLElement,
   store: LabStore,
   active: () => boolean,
-): void {
+  bed: KeyBed,
+): HTMLElement {
   let start = FIRST_START;
-  const held: number[] = [];
-  /** The key struck last, which the figures follow; null once let go. */
-  let last: number | null = null;
   const keys = new Map<number, HTMLButtonElement>();
 
   const board = document.createElement('div');
@@ -171,49 +167,27 @@ export function mountPiano(
   row?.append(down, display, up);
   control.append(createModWheel(store));
 
-  /** Every key held is drawn down. */
+  /**
+   * Every key sounding is drawn down, from whatever holds it: the
+   * computer's keys, the pointer, MIDI (a key bed, ui/keyBed.ts).
+   */
   const update = () => {
     for (const [midi, key] of keys) {
-      key.setAttribute('aria-pressed', String(held.includes(midi)));
+      key.setAttribute('aria-pressed', String(bed.has(midi)));
     }
   };
+  bed.onChange(update);
 
-  const press = (midi: number) => {
-    if (!playable(midi) || held.includes(midi)) return;
-    held.push(midi);
-    last = midi;
-    // Inside the key press, so the engine may start audio. Held for as
-    // long as the key is: the note's length is not known yet.
-    store.set({
-      held: [...held],
-      carrierHz: midiToHz(midi),
-      noteStartedAt: now(),
-      noteLength: Infinity,
-      noteHold: Infinity,
-    });
-    update();
+  /** The screen's keys are the pointer's (and Enter's on one); the computer's keys their own. */
+  const press = (midi: number, holder: Holder = 'pointer') => {
+    if (playable(midi)) bed.press(midi, holder);
   };
-  const release = (midi: number) => {
-    const at = held.indexOf(midi);
-    if (at === -1) return;
-    held.splice(at, 1);
-    const { noteStartedAt } = store.get();
-    if (midi === last && noteStartedAt !== null) {
-      // The note the figures follow is let go: now its length is known.
-      last = null;
-      const hold = Math.max(0, now() - noteStartedAt);
-      store.set({
-        held: [...held],
-        noteHold: hold,
-        noteLength: hold + releaseSecondsOf(store.get()),
-      });
-    } else {
-      store.set({ held: [...held] });
-    }
-    update();
+  const release = (midi: number, holder: Holder = 'pointer') => {
+    bed.release(midi, holder);
   };
+  /** The computer's and the pointer's keys let go; MIDI's are not (it still plays with the window behind). */
   const releaseAll = () => {
-    for (const midi of [...held]) release(midi);
+    bed.releaseWhere(holder => holder === 'key' || holder === 'pointer');
   };
 
   const draw = () => {
@@ -321,11 +295,11 @@ export function mountPiano(
     const midi = noteForCode(event.code, start);
     if (midi === null) return;
     event.preventDefault();
-    press(midi);
+    press(midi, 'key');
   });
   document.addEventListener('keyup', event => {
     const midi = noteForCode(event.code, start);
-    if (midi !== null) release(midi);
+    if (midi !== null) release(midi, 'key');
   });
   // A key let go of in another window, or with the tab hidden, would
   // otherwise sound for ever.
@@ -335,12 +309,7 @@ export function mountPiano(
   });
   store.subscribe((state, previous) => {
     if (state.chapter !== previous.chapter) releaseAll();
-    // Stopped by the space bar: every voice is silenced, so no key is down.
-    if (state.stops !== previous.stops && held.length > 0) {
-      held.length = 0;
-      last = null;
-      store.set({ held: [] });
-      update();
-    }
   });
+  // The control panel, for MIDI's column (ui/midi.ts).
+  return control;
 }

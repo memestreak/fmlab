@@ -1774,15 +1774,55 @@ canvas.voice-keys {
   display: none;
 }
 
-/* The control panel: Octave and Mod on tape on the top line; under
-   them, 6px down, the octave chooser and the wheel, its foot 9px above
-   the chassis's (Jeremy, 2026-10-21: the chooser close to its tape). */
+/* The control panel: Octave, Mod and MIDI on tape on the top line;
+   under them, 6px down, the octave chooser, the wheel (its foot 9px
+   above the chassis's; Jeremy, 2026-10-21: the chooser close to its
+   tape) and MIDI's In key, on the chooser's line (Jeremy, 2026-10-23). */
 .piano-panel {
   display: grid;
-  grid-template-columns: auto auto;
+  grid-template-columns: auto auto auto;
   grid-template-rows: 24px minmax(0, 1fr);
   gap: 6px 14px;
   padding-bottom: 9px;
+}
+
+.piano-oct-head {
+  grid-area: 1 / 1;
+}
+
+.piano-panel .mod-wheel-label {
+  grid-area: 1 / 2;
+}
+
+.piano-oct-row {
+  grid-area: 2 / 1;
+}
+
+.piano-panel .mod-wheel {
+  grid-area: 2 / 2;
+}
+
+.midi-label {
+  grid-area: 1 / 3;
+  justify-self: start;
+}
+
+.midi-bezel {
+  grid-area: 2 / 3;
+  align-self: start;
+  justify-self: start;
+}
+
+/* In, waiting for the page's first gesture (MIDI on, the sound not yet
+   allowed to start): its lamp half lit. */
+[data-view='instrument'] .midi-in[data-state='waiting']::before {
+  opacity: 0.5;
+}
+
+/* No MIDI in this browser: In kept in its place, dimmed and dead. */
+[data-view='instrument'] .midi-in:disabled {
+  opacity: 0.45;
+  cursor: default;
 }
 
 .piano-oct-head {
@@ -2750,17 +2790,24 @@ canvas.voice-keys {
     max-width: 40rem;
   }
 
-  /* The tapes are hidden here: the chooser and the wheel side by side. */
+  /* The tapes are hidden here: the chooser, the wheel and In side by side. */
   .piano-panel {
-    grid-template-columns: auto auto;
+    grid-template-columns: auto auto auto;
     grid-template-rows: auto;
     justify-content: center;
     padding-bottom: 0;
   }
 
   .piano-oct-head,
-  .piano-panel .mod-wheel-label {
+  .piano-panel .mod-wheel-label,
+  .piano-panel .midi-label {
     display: none;
+  }
+
+  /* MIDI's In after the wheel, on the chooser's line. */
+  .midi-bezel {
+    grid-row: 1;
+    align-self: end;
   }
 
   .piano-oct-row {
@@ -2768,7 +2815,7 @@ canvas.voice-keys {
     align-self: end;
   }
 
-  .mod-wheel {
+  .piano-panel .mod-wheel {
     grid-row: 1;
     height: 2.75rem;
   }
