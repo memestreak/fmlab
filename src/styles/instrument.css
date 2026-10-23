@@ -402,6 +402,19 @@ body:not([data-view='instrument']) #inst-tools {
   vertical-align: top;
 }
 
+/* Voice and Operators a size up (Jeremy, 2026-10-23): the whole 24px
+   line, the letters 17px; the padding, in ems, grows with them. The
+   Settings window's title stays as it is. */
+[data-view='instrument'] .inst-section-title.silk-plate,
+[data-view='instrument'] .voice-panel .panel-title.silk-plate {
+  height: 24px;
+  font-size: 17px;
+}
+
+[data-view='instrument'] .inst-section-title.silk-plate {
+  margin: 0;
+}
+
 /* Voice tops the left column, under the title bar's rule (no rule of
    its own), level with the operator panel's head on the right. */
 .inst-alg-head {
@@ -1158,8 +1171,7 @@ body:not([data-view='instrument']) #inst-tools {
     position: absolute;
     top: 9px;
     left: 12px;
-    /* The plate centred on the column heads' 24px line. */
-    margin: 2px 0;
+    margin: 0;
   }
 
   [data-view='instrument'] .op-table thead th {
@@ -1174,9 +1186,10 @@ body:not([data-view='instrument']) #inst-tools {
   margin-bottom: 0.15rem;
 }
 
-/* Operators' plate: 2px either side, the tape's 24px. */
+/* Operators' plate, the whole 24px line: only the panel title's own
+   margin under it. */
 [data-view='instrument'] .voice-panel .panel-title.silk-plate {
-  margin: 2px 0 calc(0.15rem + 2px);
+  margin: 0 0 0.15rem;
 }
 
 /* The DX7 voice's columns: ratio and level given the room, detune a box,

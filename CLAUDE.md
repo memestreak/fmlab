@@ -939,8 +939,9 @@ title are printed on the chassis as a plate (`.silk-plate`; Jeremy,
 2026-10-23, the Dymo tape retired): a block of `--chassis-legend` with
 the word knocked out of it in `--chassis-legend-ink`, the chassis black,
 as Roland and Yamaha mark their panel sections; flat print, `--font-tape`
-500 capitals, 20px tall with 2px either side, so it takes the tape's
-24px line. The keyboard's Octave and Mod are the knobs' names' standard
+500 capitals; Voice and Operators fill the tape's 24px line with 17px
+letters (Jeremy, 2026-10-23: a size up), the Settings title 20px tall
+with 2px either side and 14px letters. The keyboard's Octave and Mod are the knobs' names' standard
 silkscreen. The text stays in its own case in the markup.
 On the right the operator
 panel (`#voice-envelope`) alone, the showing tab's curve filling it. Each
