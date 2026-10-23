@@ -70,7 +70,9 @@ figures subscribe to it. Nothing else passes values around.
   it imports the fonts and styles, makes the store and the engine, mounts
   the controls and figures, and fills in the footer's commit hash
   (`__COMMIT_HASH__`, set by `define` in `vite.config.ts` from
-  `git rev-parse --short HEAD`, `dev` without git).
+  `git rev-parse --short HEAD`, `dev` without git), a link to the commit
+  on GitHub by its full hash (`__COMMIT_FULL__`, `git rev-parse HEAD`),
+  opening in a new tab and marked ↗, plain text without git.
 - `src/model/` — state, no DOM except in `theme.ts`. `store.ts`
   (`createStore`: get, set, subscribe; listeners run synchronously inside
   `set` and get the previous state too), `lab.ts` (`LabState`; the ranges
