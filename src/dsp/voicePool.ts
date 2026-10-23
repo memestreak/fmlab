@@ -30,8 +30,11 @@ import { kernelLevels, type Operator, operatorEnvelope } from './operators';
 import { type Algorithm, MAX_OPERATORS, PmKernel } from './pmKernel';
 import { chooseVoice, type VoiceState } from './voices';
 
-/** How many notes sound at once. The DX7 has 16. */
-export const VOICES = 8;
+/**
+ * How many notes sound at once: 16, as the DX7 (8 until MIDI In, whose
+ * sustain pedal holds more). A voice costs only while it sounds.
+ */
+export const VOICES = 16;
 /** A voice taken for a new note is faded out over this long first: no click. */
 export const STEAL_SECONDS = 0.005;
 /** A voice is free once every carrier is below this, -90 dB. */
@@ -71,13 +74,19 @@ export type VoiceMessage =
    * link) only the notes struck next.
    */
   | { type: 'patch'; patch: VoicePatch; live?: boolean }
-  /** `hold`: seconds until the note lets itself go; Infinity until noteOff. */
-  | { type: 'noteOn'; note: number; hz: number; hold: number }
+  /**
+   * `hold`: seconds until the note lets itself go; Infinity until noteOff.
+   * `velocity`: a MIDI key's, 0 to 127, carried for the next version, not
+   * yet heard.
+   */
+  | { type: 'noteOn'; note: number; hz: number; hold: number; velocity?: number }
   | { type: 'noteOff'; note: number }
   /** Everything silenced at once, faded over STEAL_SECONDS. */
   | { type: 'allOff' }
   /** The mod wheel, 0 to 1: glided to over WHEEL_GLIDE_SECONDS. */
-  | { type: 'wheel'; amount: number };
+  | { type: 'wheel'; amount: number }
+  /** The pitch wheel, in semitones (its position times the Bend range): glided to over BEND_GLIDE_SECONDS. */
+  | { type: 'bend'; semitones: number };
 
 /**
  * A DX7 note's envelopes and pitch envelope are worked out every this many
@@ -88,6 +97,9 @@ export type VoiceMessage =
  * so the corners are where they belong.
  */
 export const CONTROL_SAMPLES = 32;
+
+/** How long the pool takes to follow the pitch wheel: short, as a bend that lags is heard. */
+export const BEND_GLIDE_SECONDS = 0.005;
 
 /** How long the pool takes to follow the mod wheel, so a drag does not zipper. */
 export const WHEEL_GLIDE_SECONDS = 0.03;
@@ -213,6 +225,11 @@ export class VoicePool {
   private trem1 = 1;
   private trem2 = 1;
   private trem3 = 1;
+  /** The pitch wheel as heard, in semitones, gliding to `bendTarget`, and its factor on every note's frequency. */
+  private bend = 0;
+  private bendTarget = 0;
+  private bendStep = 0;
+  private bendFactor = 1;
   /** The mod wheel as heard, gliding towards `wheelTarget`. */
   private wheel = 0;
   private wheelTarget = 0;
@@ -235,7 +252,14 @@ export class VoicePool {
     else if (message.type === 'noteOn') this.noteOn(message.note, message.hz, message.hold);
     else if (message.type === 'noteOff') this.noteOff(message.note);
     else if (message.type === 'wheel') this.setWheel(message.amount);
+    else if (message.type === 'bend') this.setBend(message.semitones);
     else this.allOff();
+  }
+
+  /** Moves the pitch wheel to `semitones`; every note's pitch glides there. */
+  setBend(semitones: number): void {
+    this.bendTarget = semitones;
+    this.bendStep = Math.abs(semitones - this.bend) / Math.max(1, BEND_GLIDE_SECONDS * this.sampleRate);
   }
 
   /** Moves the mod wheel to `amount`, 0 to 1; the sound glides there. */
@@ -381,6 +405,12 @@ export class VoicePool {
     if (lfoPatch) lfoDepths(lfoPatch, this.wheel, depths);
     else depths.vibrato = depths.tremolo = 0;
     for (let i = 0; i < out.length; i++) {
+      // The pitch wheel, glided, as one factor on every note's frequency.
+      if (this.bend !== this.bendTarget) {
+        const gap = this.bendTarget - this.bend;
+        this.bend = Math.abs(gap) <= this.bendStep ? this.bendTarget : this.bend + Math.sign(gap) * this.bendStep;
+        this.bendFactor = 2 ** (this.bend / 12);
+      }
       // The LFO once a sample, before the voices, which all share it.
       if (lfoPatch) {
         // The wheel's depth added on, glided so a drag does not zipper.
@@ -436,7 +466,7 @@ export class VoicePool {
         scaled[op] = level;
       }
       // The note's own pitch envelope, and the LFO's vibrato, in cents.
-      let freq = voice.baseFreq * this.pitch;
+      let freq = voice.baseFreq * this.pitch * this.bendFactor;
       if (voice.pitchEnvelope) {
         freq *= voice.pitchNow;
         voice.pitchNow *= voice.pitchTimes;
@@ -447,7 +477,7 @@ export class VoicePool {
         voice.heard[op] = voice.levels[op] * envelopeAt(voice.envelopes[op], time);
       }
       sample = voice.kernel.tick(
-        voice.baseFreq,
+        voice.baseFreq * this.bendFactor,
         voice.ratios,
         kernelLevels(voice.alg, voice.heard, voice.scaled),
         voice.feedback,

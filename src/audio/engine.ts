@@ -135,6 +135,25 @@ export class AudioEngine {
   private changingScene = false;
   /** Messages to the voice pool, in the order they were asked for. */
   private voiceQueue: Promise<void> = Promise.resolve();
+  /** How many of them are still on their way: a note sent at once must not pass one. */
+  private pending = 0;
+  /**
+   * Whether the pool has the current patch, the wheel and the bend: then a
+   * note needs only its noteOn, not the whole patch again (a chord would
+   * otherwise post four).
+   */
+  private poolCurrent = false;
+  /** Whether a note can sound at once: the six operators' mode set and the volume up since the last hush. */
+  private voiceReady = false;
+  /**
+   * Notes a MIDI key sent straight to the pool (`noteOn`): the store's
+   * `held` follows a moment later, and must not strike them again.
+   */
+  private readonly sent = new Set<number>();
+  /** Whether the page has had a click, tap or key press: until then no sound can start. */
+  private gestured = false;
+  /** Whether the audio latency has been logged, once, on the first MIDI note. */
+  private latencyLogged = false;
 
   constructor(private readonly store: LabStore) {
     if (store.get().chapter === 'sandbox') this.warm();
@@ -149,6 +168,9 @@ export class AudioEngine {
       ) {
         this.tell(this.reverbMessage());
       }
+      // A new Bend range re-sends the bend; MIDI off lets the context rest again.
+      if (now.bendRange !== before.bendRange) this.tell(this.bendMessage());
+      if (now.midi !== before.midi && now.midi === 'off') this.suspendSoon(SUSPEND_AFTER_MS);
     });
     store.subscribe((state, previous) => {
       if (state.chapter !== previous.chapter) this.tell(this.reverbMessage());
@@ -195,7 +217,10 @@ export class AudioEngine {
     }
     if (state.held !== previous.held) {
       for (const note of state.held) {
-        if (!previous.held.includes(note)) this.strike(note, midiToHz(note), Infinity);
+        if (previous.held.includes(note)) continue;
+        // A MIDI note has been sent already (`noteOn`): not struck twice.
+        if (this.sent.delete(note)) continue;
+        this.strike(note, midiToHz(note), Infinity);
       }
       for (const note of previous.held) {
         if (!state.held.includes(note)) this.tell({ type: 'noteOff', note });
@@ -240,16 +265,56 @@ export class AudioEngine {
     }
     // The wheel on its own, lighter than the whole patch at every step of a drag.
     if (state.modWheel !== previous.modWheel) this.tell({ type: 'wheel', amount: state.modWheel });
+    if (state.pitchBend !== previous.pitchBend) this.tell(this.bendMessage());
     if (state.volume !== previous.volume) this.tuneNote(state);
     return true;
   }
 
+  /** The pitch wheel as the pool takes it: semitones, its position times the Bend range. */
+  private bendMessage(): VoiceMessage {
+    return { type: 'bend', semitones: this.store.get().pitchBend * settings.get().bendRange };
+  }
+
+  /**
+   * A MIDI key down (ui/midi.ts; Jeremy, 2026-10-23): the sound first,
+   * before the store hears of it. Straight to the pool when it is running
+   * and has the patch; otherwise struck as a key is (waking the context).
+   * `marks`: the note goes into `held` next, which must not strike it
+   * again (a note played again while it sounds does not). False until the
+   * page's first gesture, when no sound can start: the note is dropped.
+   */
+  noteOn(note: number, hz: number, velocity: number, marks: boolean): boolean {
+    if (!this.gestured && !(navigator.userActivation?.hasBeenActive ?? false)) return false;
+    if (marks) this.sent.add(note);
+    const graph = this.graph;
+    if (graph && graph.context.state === 'running' && this.voiceReady && this.poolCurrent && this.pending === 0) {
+      graph.synth.port.postMessage({ type: 'noteOn', note, hz, hold: Infinity, velocity } satisfies VoiceMessage);
+    } else {
+      this.strike(note, hz, Infinity, undefined, velocity);
+    }
+    if (!this.latencyLogged && graph) {
+      this.latencyLogged = true;
+      const { baseLatency, outputLatency } = graph.context;
+      console.info(
+        `fmlab: audio latency ${(baseLatency * 1000).toFixed(1)} ms base, ${((outputLatency ?? 0) * 1000).toFixed(1)} ms output`,
+      );
+    }
+    return true;
+  }
+
+  /** Whether MIDI keeps the context running: on, in the sandbox. */
+  private midiOn(): boolean {
+    return settings.get().midi === 'on' && this.store.get().chapter === 'sandbox';
+  }
+
   /**
    * Strikes a note in the voice pool. Called inside the key press, so the
-   * engine may start audio; the patch goes with it, so the note has it.
+   * engine may start audio. The patch, the wheel and the bend go with it
+   * when the pool does not have them yet.
    */
-  private strike(note: number, hz: number, hold: number, started?: () => void): void {
+  private strike(note: number, hz: number, hold: number, started?: () => void, velocity?: number): void {
     const ready = this.wake();
+    this.pending++;
     this.voiceQueue = this.voiceQueue
       .then(async () => {
         const { context, synth, note: noteGain, noteDry, master } = await ready;
@@ -265,24 +330,32 @@ export class AudioEngine {
         // starts from silence, and a fade would soften its attack.
         master.gain.cancelScheduledValues(now);
         master.gain.setValueAtTime(state.volume, now);
-        synth.port.postMessage({ type: 'patch', patch: voicePatch(state) } satisfies VoiceMessage);
-        synth.port.postMessage({ type: 'wheel', amount: state.modWheel } satisfies VoiceMessage);
-        synth.port.postMessage({ type: 'noteOn', note, hz, hold } satisfies VoiceMessage);
+        if (!this.poolCurrent) {
+          synth.port.postMessage({ type: 'patch', patch: voicePatch(state) } satisfies VoiceMessage);
+          synth.port.postMessage({ type: 'wheel', amount: state.modWheel } satisfies VoiceMessage);
+          synth.port.postMessage(this.bendMessage());
+          this.poolCurrent = true;
+        }
+        synth.port.postMessage({ type: 'noteOn', note, hz, hold, velocity } satisfies VoiceMessage);
+        this.voiceReady = true;
         started?.();
       })
       .catch(error => {
         console.error('fmlab: audio failed to start', error);
         this.loading = null;
-      });
+      })
+      .finally(() => this.pending--);
   }
 
   /** Tells the worklet something (the voice pool, the reverb), once there is one; never starts audio. */
   private tell(message: VoiceMessage | ReverbMessage): void {
     const loading = this.loading;
     if (!loading) return;
+    this.pending++;
     this.voiceQueue = this.voiceQueue
       .then(async () => (await loading).synth.port.postMessage(message))
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => this.pending--);
   }
 
   /**
@@ -353,6 +426,7 @@ export class AudioEngine {
     if (this.listening) return;
     this.listening = true;
     const prime = () => {
+      this.gestured = true;
       if (this.store.get().chapter !== 'sandbox') return;
       const graph = this.graph;
       if (!graph || graph.context.state === 'running') return;
@@ -402,6 +476,8 @@ export class AudioEngine {
 
   /** Fades whatever is sounding to nothing. */
   private hush(): void {
+    // Faded out: the next note must set the volume again.
+    this.voiceReady = false;
     if (!this.graph) return;
     const { context, master } = this.graph;
     master.gain.cancelScheduledValues(context.currentTime);
@@ -416,6 +492,12 @@ export class AudioEngine {
   private suspendSoon(ms: number): void {
     const graph = this.graph;
     if (!graph) return;
+    // With MIDI on in the sandbox, never: resuming takes the better part
+    // of 100 ms, which would land on the first note after a pause.
+    if (this.midiOn()) {
+      window.clearTimeout(this.suspendTimer);
+      return;
+    }
     if (this.store.get().chapter === 'sandbox') ms = Math.max(ms, SANDBOX_IDLE_MS);
     window.clearTimeout(this.suspendTimer);
     this.suspendTimer = window.setTimeout(() => {
@@ -558,6 +640,8 @@ export class AudioEngine {
     });
     synth.connect(noteDry, 1).connect(analyser);
 
+    this.poolCurrent = false;
+    this.voiceReady = false;
     this.graph = {
       context,
       synth,

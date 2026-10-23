@@ -174,6 +174,12 @@ export interface LabState {
    */
   modWheel: number;
   /**
+   * The pitch wheel, -1 to 1 (Jeremy, 2026-10-23: MIDI In), the bend
+   * range (a Setting) at its ends. The instrument's, as the mod wheel:
+   * kept through presets, in neither the link nor storage.
+   */
+  pitchBend: number;
+  /**
    * `dx7`: the operator selected in the table, whose envelope view is
    * open. One always is: OP1 when the sandbox opens.
    */
@@ -275,6 +281,7 @@ export const DEFAULTS: LabState = {
   dxLfo: HELD_LFO,
   dxPitchEnvelope: FLAT_PITCH_ENVELOPE,
   modWheel: 0,
+  pitchBend: 0,
   selectedOp: 0,
   voiceTab: 'envelope',
   compare: false,

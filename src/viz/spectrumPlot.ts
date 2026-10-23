@@ -16,6 +16,7 @@ import {
   patchOf,
 } from '../model/lab';
 import { kernelSpectrum, operatorSpectrum } from '../dsp/operators';
+import { settings } from '../model/settings';
 import {
   ampToY,
   beginPlot,
@@ -567,8 +568,10 @@ export function drawLogSpectrum(
   plot.glow();
   const { x, y } = drawLogFrame(plot);
   const { ctx, token, bottom } = plot;
+  // The pitch wheel moves every line with the note (MIDI In).
+  const bent = state.carrierHz * 2 ** ((state.pitchBend * settings.get().bendRange) / 12);
   for (const { freq, amp } of lines) {
-    const hz = freq * state.carrierHz;
+    const hz = freq * bent;
     if (hz < LOG_HZ.min || hz > LOG_HZ.max) continue;
     const top = y(ampDb(amp));
     if (top === null || bottom - top < MIN_STEM) continue;

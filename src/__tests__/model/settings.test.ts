@@ -22,6 +22,11 @@ describe('the sandbox\'s settings', () => {
       reverbMix: 25,
       reverbTone: 70,
       reverbPreDelay: 0,
+      // MIDI In, off; every input, every channel, the wheel two semitones (Jeremy, 2026-10-23).
+      midi: 'off',
+      midiInput: '',
+      midiChannel: 0,
+      bendRange: 2,
     });
     expect(SETTINGS_KEY).toBe('fmlab.settings');
   });
@@ -76,5 +81,26 @@ describe('the sandbox\'s settings', () => {
     expect(loadSettings()).toEqual(DEFAULT_SETTINGS);
     expect(() => saveSettings(DEFAULT_SETTINGS)).not.toThrow();
     vi.unstubAllGlobals();
+  });
+
+  it('keep the MIDI choices: any input name up to 100 characters, a channel in range, a listed bend range', () => {
+    const parsed = (json: object) => parseSettings(JSON.stringify(json));
+    // An input not connected now is kept: it may be plugged in later.
+    expect(parsed({ midi: 'on', midiInput: 'KeyStep 37', midiChannel: 10, bendRange: 12 })).toEqual({
+      ...DEFAULT_SETTINGS,
+      midi: 'on',
+      midiInput: 'KeyStep 37',
+      midiChannel: 10,
+      bendRange: 12,
+    });
+    expect(parsed({ midiChannel: 40 }).midiChannel).toBe(16);
+    expect(parsed({ midiChannel: -3 }).midiChannel).toBe(0);
+    expect(parsed({ midiChannel: 2.6 }).midiChannel).toBe(3);
+    expect(parsed({ bendRange: 4 }).bendRange).toBe(2);
+    expect(parsed({ bendRange: '12' }).bendRange).toBe(2);
+    expect(parsed({ midi: 'yes' }).midi).toBe('off');
+    expect(parsed({ midiInput: 'x'.repeat(101) }).midiInput).toBe('');
+    expect(parsed({ midiInput: 'x'.repeat(100) }).midiInput).toBe('x'.repeat(100));
+    expect(parsed({ midiInput: 7 }).midiInput).toBe('');
   });
 });

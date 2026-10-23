@@ -35,11 +35,28 @@ export interface Settings {
   reverbTone: number;
   /** How long after the sound its tail starts, in ms (Jeremy, 2026-10-22). */
   reverbPreDelay: number;
+  /**
+   * MIDI In (ui/midi.ts; Jeremy, 2026-10-23): on or off, set by the
+   * keyboard panel's In key, not a Settings line. On, the page asks for
+   * MIDI again on load.
+   */
+  midi: 'off' | 'on';
+  /** The input it listens to, by name: '' for all of them. */
+  midiInput: string;
+  /** The channel it listens to: 0 for all (as a DX7 in Omni), or 1 to 16. */
+  midiChannel: number;
+  /** How far the pitch wheel bends, in semitones each way. */
+  bendRange: 1 | 2 | 3 | 5 | 7 | 12;
 }
 
 /** The settings that are numbers, each in a range; the rest are choices. */
-export type NumberSetting = 'reverbDecay' | 'reverbMix' | 'reverbTone' | 'reverbPreDelay';
-export type ChoiceSetting = Exclude<keyof Settings, NumberSetting>;
+export type NumberSetting = 'reverbDecay' | 'reverbMix' | 'reverbTone' | 'reverbPreDelay' | 'midiChannel';
+/** The settings that are free text. */
+export type TextSetting = 'midiInput';
+export type ChoiceSetting = Exclude<keyof Settings, NumberSetting | TextSetting>;
+
+/** A text setting's longest. */
+export const MAX_TEXT_SETTING = 100;
 
 /** Every number setting's range and step. */
 export const SETTING_RANGES: Record<NumberSetting, { min: number; max: number; step: number }> = {
@@ -47,6 +64,7 @@ export const SETTING_RANGES: Record<NumberSetting, { min: number; max: number; s
   reverbMix: { min: 0, max: 100, step: 1 },
   reverbTone: { min: 0, max: 100, step: 1 },
   reverbPreDelay: { min: 0, max: 500, step: 1 },
+  midiChannel: { min: 0, max: 16, step: 1 },
 };
 
 /** A number setting's value held in its range and rounded to its step. */
@@ -68,6 +86,8 @@ export const SETTING_CHOICES: { [K in ChoiceSetting]: readonly Settings[K][] } =
   computerKeys: ['off', 'on'],
   wheel: ['page', 'reverse'],
   reverb: ['off', 'on'],
+  midi: ['off', 'on'],
+  bendRange: [2, 1, 3, 5, 7, 12],
 };
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -83,6 +103,10 @@ export const DEFAULT_SETTINGS: Settings = {
   reverbMix: 25,
   reverbTone: 70,
   reverbPreDelay: 0,
+  midi: 'off',
+  midiInput: '',
+  midiChannel: 0,
+  bendRange: 2,
 };
 
 /** Where they are saved, as JSON. */
@@ -109,6 +133,9 @@ export function parseSettings(raw: string | null): Settings {
     const value = (saved as Record<string, unknown>)[key];
     if (typeof value === 'number' && Number.isFinite(value)) settings[key] = inRange(key, value);
   }
+  // A text: any string up to its longest; anything else the default.
+  const input = (saved as Record<string, unknown>).midiInput;
+  if (typeof input === 'string' && input.length <= MAX_TEXT_SETTING) settings.midiInput = input;
   return settings;
 }
 

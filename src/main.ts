@@ -39,6 +39,8 @@ import { mountFigures } from './ui/figures';
 import { mountAlgorithmSteps, mountFeedbackKnob } from './ui/instrument';
 import { mountOperators } from './ui/operators';
 import { tapeLabel } from './ui/dymo';
+import { createKeyBed } from './ui/keyBed';
+import { mountMidi } from './ui/midi';
 import { mountPiano } from './ui/piano';
 import { mountSliders } from './ui/sliders';
 import { mountSteps } from './ui/steps';
@@ -118,7 +120,12 @@ if (play) mountPlayButton(play, store);
 
 const piano = document.querySelector<HTMLElement>('#piano');
 if (piano) {
-  mountPiano(piano, store, () => chapterById(store.get().chapter)?.hasPiano === true);
+  // The keys held, from the computer, the screen and MIDI alike.
+  const bed = createKeyBed(store);
+  const active = () => chapterById(store.get().chapter)?.hasPiano === true;
+  const panel = mountPiano(piano, store, active, bed);
+  // MIDI In, the sandbox's only (the keyboard is).
+  mountMidi(panel, store, engine, bed, () => store.get().chapter === 'sandbox');
 }
 
 // The sandbox's Voice, Operators, Octave and Mod labels, on Dymo tape (the

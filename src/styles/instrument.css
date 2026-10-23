@@ -1776,13 +1776,50 @@ canvas.voice-keys {
 
 /* The control panel: Octave and Mod on tape on the top line; under
    them, 6px down, the octave chooser and the wheel, its foot 9px above
-   the chassis's (Jeremy, 2026-10-21: the chooser close to its tape). */
+   the chassis's (Jeremy, 2026-10-21: the chooser close to its tape);
+   and under the chooser, at its left and at the column's foot, its
+   bottom level with the wheel's, the MIDI key (Jeremy, 2026-10-23). */
 .piano-panel {
   display: grid;
   grid-template-columns: auto auto;
-  grid-template-rows: 24px minmax(0, 1fr);
+  grid-template-rows: 24px auto minmax(0, 1fr);
   gap: 6px 14px;
   padding-bottom: 9px;
+}
+
+.piano-oct-head {
+  grid-area: 1 / 1;
+}
+
+.piano-panel .mod-wheel-label {
+  grid-area: 1 / 2;
+}
+
+.piano-oct-row {
+  grid-area: 2 / 1;
+}
+
+.piano-panel .mod-wheel {
+  grid-area: 2 / 2 / 4 / 3;
+}
+
+.midi-bezel {
+  grid-area: 3 / 1;
+  align-self: end;
+  justify-self: start;
+}
+
+/* The MIDI key, waiting for the page's first gesture (MIDI on, the sound
+   not yet allowed to start) or for the browser's answer: its lamp half lit. */
+[data-view='instrument'] .midi-in[data-state='waiting']::before,
+[data-view='instrument'] .midi-in[data-state='asking']::before {
+  opacity: 0.5;
+}
+
+/* No MIDI in this browser: the key kept in its place, dimmed and dead. */
+[data-view='instrument'] .midi-in:disabled {
+  opacity: 0.45;
+  cursor: default;
 }
 
 .piano-oct-head {
@@ -2750,9 +2787,10 @@ canvas.voice-keys {
     max-width: 40rem;
   }
 
-  /* The tapes are hidden here: the chooser and the wheel side by side. */
+  /* The tapes are hidden here: the chooser, the wheel and the MIDI key
+     side by side. */
   .piano-panel {
-    grid-template-columns: auto auto;
+    grid-template-columns: auto auto auto;
     grid-template-rows: auto;
     justify-content: center;
     padding-bottom: 0;
@@ -2763,13 +2801,19 @@ canvas.voice-keys {
     display: none;
   }
 
+  /* The MIDI key after the wheel, on the chooser's line. */
+  .midi-bezel {
+    grid-area: 1 / 3;
+    align-self: end;
+  }
+
   .piano-oct-row {
     grid-row: 1;
     align-self: end;
   }
 
-  .mod-wheel {
-    grid-row: 1;
+  .piano-panel .mod-wheel {
+    grid-area: 1 / 2;
     height: 2.75rem;
   }
 
@@ -2848,14 +2892,21 @@ body:not([data-view='instrument']) .inst-settings {
   margin-bottom: 12px;
 }
 
+/* General | MIDI, between the title and Close. */
+.settings-tabs {
+  margin: 0 12px 0 auto;
+}
+
 .settings-screen {
   min-height: 0;
   padding: 7px;
 }
 
 /* The glass: one line a setting, its group dim, its name, its value at
-   the right, glowing; the selected one lit behind, a bar at its left. */
-.settings-glass {
+   the right, glowing; the selected one lit behind, a bar at its left.
+   The Input line's drop-down is the same glass. */
+.settings-glass,
+.settings-menu {
   display: grid;
   padding: 6px 0;
   border-radius: 3px;
@@ -2872,21 +2923,130 @@ body:not([data-view='instrument']) .inst-settings {
   user-select: none;
 }
 
-.settings-glass:focus-visible {
-  outline: 2px solid var(--lamp-legend-hover);
-  outline-offset: 9px;
+/* Settings' glass a control row taller than its lines: each line is edited
+   in place, the room under them kept for the drop-down. */
+#settings-panel .settings-glass {
+  padding-bottom: calc(6px + 48px);
+}
+
+/* A line's drop-down: under the line, over the screen, its own scroll;
+   the option the keys are on lit behind, the one chosen with the bar; a
+   long name cut short. */
+.settings-menu {
+  position: absolute;
+  z-index: 2;
+  box-sizing: border-box;
+  align-content: start;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  box-shadow:
+    0 0 0 1px #000,
+    0 6px 18px rgba(0, 0, 0, 0.7);
+}
+
+.settings-menu[hidden] {
+  display: none;
+}
+
+.settings-menu:focus {
+  outline: none;
+}
+
+.settings-menu-option {
+  overflow: hidden;
+  padding: 3px 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.settings-menu-option.is-active,
+.settings-menu-option:hover {
+  background: color-mix(in srgb, var(--vfd-glow) 16%, transparent);
+}
+
+.settings-menu-option[aria-selected='true'] {
+  box-shadow: inset 2px 0 0 var(--vfd-lit);
+}
+
+/* A tab's lines: both pages in the glass's one cell, the closed one
+   unseen, so the glass is the longer one's size whichever is open. */
+.settings-page {
+  display: grid;
+  grid-area: 1 / 1;
+  align-content: start;
+}
+
+.settings-page.is-closed {
+  visibility: hidden;
+}
+
+/* MIDI's tab: no group column, which would only say MIDI again. */
+.settings-page[data-page='midi'] .settings-group {
+  display: none;
+}
+
+.settings-page[data-page='midi'] .settings-line {
+  grid-template-columns: auto minmax(0, 1fr);
 }
 
 .settings-line {
   display: grid;
-  grid-template-columns: 7.5rem minmax(0, 1fr) auto;
+  /* The value takes the rest, so a long one (an input's name) is cut short
+     with an ellipsis rather than widening the case. */
+  grid-template-columns: 7.5rem auto minmax(0, 1fr);
   gap: 0 12px;
   padding: 3px 12px;
 }
 
-.settings-line[aria-selected='true'] {
+.settings-line {
+  cursor: default;
+}
+
+.settings-line.is-selected {
   background: color-mix(in srgb, var(--vfd-glow) 16%, transparent);
   box-shadow: inset 2px 0 0 var(--vfd-lit);
+}
+
+.settings-line:focus {
+  outline: none;
+}
+
+.settings-line:focus-visible {
+  outline: 2px solid var(--lamp-legend-hover);
+  outline-offset: -2px;
+}
+
+/* ‹ value ›, at the line's right: the arrows glow as the glass's text,
+   dimmer, dimmest at an end. */
+.settings-edit {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  min-width: 0;
+}
+
+.settings-arrow {
+  flex: none;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: 0;
+  text-shadow: inherit;
+  opacity: 0.6;
+  cursor: pointer;
+}
+
+.settings-arrow:hover {
+  opacity: 1;
+}
+
+.settings-arrow.is-end {
+  opacity: 0.2;
+  cursor: default;
 }
 
 .settings-group {
@@ -2894,12 +3054,15 @@ body:not([data-view='instrument']) .inst-settings {
 }
 
 .settings-value {
+  min-width: 0;
+  overflow: hidden;
   text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   cursor: pointer;
 }
 
-/* Under the screen: ‹ › through the lines, the selected one's name
-   silkscreened grey, its choices as lamp keys. */
+/* Under the preset window's screen: ‹ › through its voices. */
 .settings-controls {
   display: flex;
   align-items: center;
@@ -2911,27 +3074,26 @@ body:not([data-view='instrument']) .inst-settings {
   height: 1.65rem;
 }
 
-.settings-legend {
-  flex: 1 1 auto;
-  min-width: 0;
-  overflow: hidden;
-  color: var(--lamp-legend);
-  font: 700 0.72rem / 1 var(--font-sans);
-  font-variant: small-caps;
-  letter-spacing: 0.1em;
-  text-align: center;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.settings-choices {
-  flex: none;
-}
-
-/* On a phone the group goes under the name. */
+/* On a phone the group goes under the name, and the tabs under the title
+   and Close, on a line of their own. */
 @media (max-width: 30rem) {
+  .settings-head {
+    flex-wrap: wrap;
+    row-gap: 10px;
+  }
+
+  .settings-tabs {
+    order: 1;
+    margin: 0;
+  }
+
+  /* The control row was two lines here. */
+  #settings-panel .settings-glass {
+    padding-bottom: calc(6px + 72px);
+  }
+
   .settings-line {
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: auto minmax(0, 1fr);
   }
 
   .settings-group {
@@ -2941,12 +3103,6 @@ body:not([data-view='instrument']) .inst-settings {
 
   .settings-controls {
     flex-wrap: wrap;
-  }
-
-  .settings-legend {
-    order: -1;
-    flex-basis: 100%;
-    text-align: left;
   }
 }
 
