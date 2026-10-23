@@ -101,8 +101,8 @@ function mountSoundInUrl(store: LabStore): void {
   store.subscribe((state, previous) => {
     if (
       state.chapter === previous.chapter &&
-      (state.carrierHz !== previous.carrierHz ||
-        state.algorithm !== previous.algorithm ||
+      // Not the pitch: every note played sets it.
+      (state.algorithm !== previous.algorithm ||
         state.dxFeedback !== previous.dxFeedback ||
         state.dxOperators !== previous.dxOperators ||
         state.dxLfo !== previous.dxLfo ||

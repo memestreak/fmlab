@@ -87,7 +87,7 @@ describe('the sandbox in a link', () => {
 
   it('is readable, each operator in fifteen short fields, the LFO in eight', () => {
     const params = new URLSearchParams(soundParams(six));
-    expect(params.get('c')).toBe('146.83');
+    expect(params.has('c')).toBe(false);
     expect(params.get('a')).toBe('5');
     expect(params.get('f')).toBe('3.1415');
     const ops = params.get('o')!.split('~');
@@ -109,6 +109,12 @@ describe('the sandbox in a link', () => {
     expect(soundParams({ ...six, volume: 0.5 })).not.toContain('0.5');
   });
 
+  // Jeremy, 2026-10-23: "Why does the URL change every time I play a note?"
+  it('leaves the pitch out: a note played does not change the link', () => {
+    expect(soundParams({ ...six, carrierHz: 440 })).toBe(soundParams(six));
+    expect(soundParams({ ...six, carrierHz: 65.41 })).toBe(soundParams(six));
+  });
+
   it('brings back the same sound, playing notes', () => {
     const back = reopened(soundParams(six));
     expect(back.mode).toBe('ops');
@@ -118,7 +124,8 @@ describe('the sandbox in a link', () => {
     expect(back.dxFeedback).toBeCloseTo(Math.PI, 3);
     expect(back.dxOperators).toEqual(six.dxOperators);
     expect(back.dxPitchEnvelope).toEqual(six.dxPitchEnvelope);
-    expect(back.carrierHz).toBeCloseTo(146.83, 1);
+    // The pitch is the sandbox's own: the link does not carry it.
+    expect(back.carrierHz).toBe(sandbox.patch.carrierHz ?? DEFAULTS.carrierHz);
   });
 
   it('carries an operator that is off', () => {
