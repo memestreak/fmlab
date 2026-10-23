@@ -1814,8 +1814,9 @@ canvas.voice-keys {
 }
 
 /* In, waiting for the page's first gesture (MIDI on, the sound not yet
-   allowed to start): its lamp half lit. */
-[data-view='instrument'] .midi-in[data-state='waiting']::before {
+   allowed to start) or for the browser's answer: its lamp half lit. */
+[data-view='instrument'] .midi-in[data-state='waiting']::before,
+[data-view='instrument'] .midi-in[data-state='asking']::before {
   opacity: 0.5;
 }
 
@@ -2366,6 +2367,14 @@ canvas.voice-keys {
 
   [data-view='instrument'] .inst-lfo .lfo-wave {
     width: 1.6rem;
+  }
+}
+
+/* Under 1100px narrower still, so the keyboard panel's MIDI column
+   leaves the page no wider than the window. */
+@media (min-width: 62rem) and (max-width: 1099.98px) {
+  .piano {
+    --w: 2.7rem;
   }
 }
 

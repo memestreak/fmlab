@@ -18,13 +18,20 @@ import { tapeLabel } from './dymo';
 /** The inputs connected, by name, for the Settings panel's Input line. */
 export const midiInputs = createStore<{ names: string[] }>({ names: [] });
 
-/** What the In key shows: MIDI off, on, waiting for a gesture, blocked, or not in this browser. */
-export type MidiState = 'off' | 'on' | 'waiting' | 'blocked' | 'unsupported';
+/**
+ * What the In key shows: MIDI off, on, asking the browser (its permission
+ * prompt open, or the answer not back yet), waiting for a gesture,
+ * blocked, or not in this browser.
+ */
+export type MidiState = 'off' | 'on' | 'asking' | 'waiting' | 'blocked' | 'unsupported';
 
 /** The key's tip and description for a state, and the inputs' names. */
 export function midiTip(state: MidiState, names: readonly string[]): string {
   if (state === 'unsupported') return 'This browser has no MIDI: use Chrome, Edge, Brave or Firefox';
-  if (state === 'blocked') return "MIDI blocked: allow it in the site's settings";
+  if (state === 'blocked') {
+    return "MIDI blocked: allow it in the site's settings (in Brave: Settings, Site and Shields settings, MIDI devices)";
+  }
+  if (state === 'asking') return 'MIDI: asking the browser; allow it in the prompt by the address bar';
   if (state === 'waiting') return 'Click anywhere to wake the sound';
   if (state === 'off') return 'MIDI off';
   return names.length > 0 ? `MIDI on: ${names.join(', ')}` : 'MIDI on: no keyboard connected';
@@ -59,6 +66,10 @@ export function mountMidi(panel: HTMLElement, store: LabStore, sound: Sound, bed
   const supported = typeof navigator.requestMIDIAccess === 'function';
   let access: MIDIAccess | null = null;
   let blocked = false;
+  /** Whether a request is out, its answer not back. */
+  let asking = false;
+  /** Whether the first message has been logged. */
+  let heardAny = false;
   /** Whether the page has had a gesture: until then no sound can start. */
   let woken = navigator.userActivation?.hasBeenActive ?? false;
   /** The inputs listened to, by id. */
@@ -68,6 +79,7 @@ export function mountMidi(panel: HTMLElement, store: LabStore, sound: Sound, bed
     if (!supported) return 'unsupported';
     if (settings.get().midi !== 'on') return 'off';
     if (blocked) return 'blocked';
+    if (asking) return 'asking';
     if (!woken) return 'waiting';
     return 'on';
   };
@@ -79,7 +91,7 @@ export function mountMidi(panel: HTMLElement, store: LabStore, sound: Sound, bed
     const tip = midiTip(now, listened);
     key.title = tip;
     key.setAttribute('aria-description', tip);
-    key.setAttribute('aria-pressed', String(now === 'on' || now === 'waiting'));
+    key.setAttribute('aria-pressed', String(now === 'on' || now === 'waiting' || now === 'asking'));
     key.dataset.state = now;
     key.disabled = now === 'unsupported';
   };
@@ -107,6 +119,7 @@ export function mountMidi(panel: HTMLElement, store: LabStore, sound: Sound, bed
     for (const input of access.inputs.values()) {
       if (wanted(input) && !attached.has(input.id)) {
         attached.set(input.id, input);
+        console.info(`fmlab: MIDI listening to "${input.name ?? input.id}"`);
         input.onmidimessage = event => hear(input.id, event.data);
       }
     }
@@ -126,27 +139,42 @@ export function mountMidi(panel: HTMLElement, store: LabStore, sound: Sound, bed
     show();
   };
 
+  // Asked inside the press itself (a gesture), so no browser drops the
+  // prompt; on load too, with MIDI saved on.
   const request = () => {
-    if (!supported) return;
+    if (!supported || asking) return;
+    asking = true;
+    console.info('fmlab: MIDI requesting access');
     // No sysex: that brings a stronger prompt.
     navigator.requestMIDIAccess().then(
       granted => {
+        asking = false;
         access = granted;
         blocked = false;
+        const names = [...granted.inputs.values()].map(input => input.name ?? input.id);
+        console.info(`fmlab: MIDI granted, ${names.length} input(s)${names.length > 0 ? `: ${names.join(', ')}` : ''}`);
         granted.onstatechange = () => attach();
         attach();
       },
-      () => {
+      (error: unknown) => {
         // Refused: tried again on the next press, and the next visit.
+        asking = false;
         blocked = true;
+        const why = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+        console.warn(`fmlab: MIDI refused (${why})`);
         show();
       },
     );
+    show();
   };
 
   /** A message from input `id`. */
   const hear = (id: string, data: Uint8Array | null) => {
     if (!data || !active() || settings.get().midi !== 'on') return;
+    if (!heardAny) {
+      heardAny = true;
+      console.info(`fmlab: MIDI first message from "${attached.get(id)?.name ?? id}": ${[...data].join(' ')}`);
+    }
     const event = parseMidi(data, settings.get().midiChannel);
     if (!event) return;
     const holder = `midi:${id}` as const;
@@ -179,13 +207,16 @@ export function mountMidi(panel: HTMLElement, store: LabStore, sound: Sound, bed
   // In, worked on the press: on asks for MIDI (and, as a gesture, wakes
   // the sound); off lets it all go. Blocked, a press asks again.
   const press = () => {
+    console.info(`fmlab: MIDI In pressed (${state()})`);
     if (!supported) return;
     if (settings.get().midi === 'on' && !blocked) {
       settings.set({ midi: 'off' });
       return;
     }
     if (settings.get().midi !== 'on') settings.set({ midi: 'on' });
-    else request();
+    // Inside the press, not after it: the setting's subscriber asks too,
+    // but a press while blocked changes no setting.
+    if (!access) request();
   };
   key.addEventListener('pointerdown', event => {
     if (event.button === 0) press();
@@ -214,6 +245,7 @@ export function mountMidi(panel: HTMLElement, store: LabStore, sound: Sound, bed
       }
     }
     if (now.midiInput !== before.midiInput && now.midi === 'on') attach();
+    show();
   });
   // Leaving the sandbox lets MIDI's notes go; MIDI stays on, so coming back plays.
   store.subscribe((state, previous) => {

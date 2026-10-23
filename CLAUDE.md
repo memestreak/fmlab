@@ -577,9 +577,15 @@ figures subscribe to it. Nothing else passes values around.
   `data-state` (`midiTip`): "MIDI off"; "MIDI on: <names>" or "MIDI on: no
   keyboard connected"; `waiting`, the lamp half lit, "Click anywhere to
   wake the sound", until the page's first gesture (notes till then
-  dropped); `blocked`, "MIDI blocked: allow it in the site's settings" (a
-  press asks again); and `unsupported`, the key disabled, "This browser has
-  no MIDI: use Chrome, Edge, Brave or Firefox". It listens to every input
+  dropped); `asking`, the lamp half lit too, while the browser's answer
+  is out ("MIDI: asking the browser; allow it in the prompt by the
+  address bar"); `blocked`, "MIDI blocked: allow it in the site's settings
+  (in Brave: Settings, Site and Shields settings, MIDI devices)" (a
+  press asks again, inside the press); and `unsupported`, the key disabled, "This browser has
+  no MIDI: use Chrome, Edge, Brave or Firefox". Each press, request, answer
+  (with a refusal's error), input listened to and the first message are
+  logged to the console as "fmlab: MIDI ...", for debugging a real
+  keyboard. It listens to every input
   the Input setting names (hot-plugged ones too) on the Channel set, read
   by `midiMessage.ts` (`parseMidi`, pure): note on and off (on at velocity
   0 is off; A0 to C8 only), the sustain pedal (CC64, down from 64), the mod
