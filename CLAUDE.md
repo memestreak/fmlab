@@ -570,8 +570,8 @@ figures subscribe to it. Nothing else passes values around.
   press), scrolled (down for more, 1 % per 10 px), the arrows (1 %), Page
   Up / Down (10 %), Home, End, and a double click back to 0; no spring;
   the note keys, Z / X and space still play while it has focus.
-  Under the octave chooser, centred, MIDI In's one lamp key, MIDI (no
-  tape; named "MIDI in"; `ui/midi.ts`, `mountMidi`; Jeremy, 2026-10-23),
+  Under the octave chooser, at its left and at the column's foot, its
+  bottom level with the wheel's, MIDI In's one lamp key, MIDI (no tape; named "MIDI in"; `ui/midi.ts`, `mountMidi`; Jeremy, 2026-10-23),
   the wheel running down beside it; worked on the press, it turns the `midi` setting on and off; on, `requestMIDIAccess()`
   (never sysex) is asked, and again on load with on saved. Its tip and
   `data-state` (`midiTip`): "MIDI off"; "MIDI on: <names>" or "MIDI on: no

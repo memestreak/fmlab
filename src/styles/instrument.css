@@ -1777,7 +1777,8 @@ canvas.voice-keys {
 /* The control panel: Octave and Mod on tape on the top line; under
    them, 6px down, the octave chooser and the wheel, its foot 9px above
    the chassis's (Jeremy, 2026-10-21: the chooser close to its tape);
-   and under the chooser, centred, the MIDI key (Jeremy, 2026-10-23). */
+   and under the chooser, at its left and at the column's foot, its
+   bottom level with the wheel's, the MIDI key (Jeremy, 2026-10-23). */
 .piano-panel {
   display: grid;
   grid-template-columns: auto auto;
@@ -1804,8 +1805,8 @@ canvas.voice-keys {
 
 .midi-bezel {
   grid-area: 3 / 1;
-  align-self: start;
-  justify-self: center;
+  align-self: end;
+  justify-self: start;
 }
 
 /* The MIDI key, waiting for the page's first gesture (MIDI on, the sound
