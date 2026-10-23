@@ -34,6 +34,7 @@ import { mountEnvelopeView } from './ui/envelopeView';
 import { mountKeyScalingView } from './ui/keyScalingView';
 import { mountVoiceArea } from './ui/lfoView';
 import { mountPitchEgView } from './ui/pitchEgView';
+import { mountReverbLamp } from './ui/reverbLamp';
 import { mountReverbView } from './ui/reverbView';
 import { mountFigures } from './ui/figures';
 import { mountAlgorithmSteps, mountFeedbackKnob } from './ui/instrument';
@@ -108,6 +109,10 @@ mountKeyScalingView(store);
 mountVoiceArea(store);
 mountPitchEgView(store);
 mountReverbView();
+// The Reverb tab key's light, a switch of its own over it.
+const voiceHead = document.querySelector<HTMLElement>('.inst-alg-head');
+const reverbTab = document.getElementById('inst-tab-reverb');
+if (voiceHead && reverbTab) mountReverbLamp(voiceHead, reverbTab);
 mountAlgorithmSteps(store);
 mountFeedbackKnob(store);
 mountSteps(store);
