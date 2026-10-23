@@ -39,6 +39,17 @@ import { glitchScreens, topScreens } from './screenGlitch';
 /** How long the sound must rest before the address is brought up to date. */
 const URL_DELAY_MS = 300;
 
+/**
+ * Whether the sandbox keeps its sound in the address as it changes
+ * (Jeremy, 2026-10-23: "Let's not update the URL when the sound changes
+ * right now"). Off, the address stays #/sandbox: a link with a sound
+ * still opens it, and is then put back to #/sandbox, so a reload opens
+ * the sandbox as it starts rather than the link's old sound; Copy link
+ * still builds a link with the sound. On, the address follows the sound,
+ * as before.
+ */
+export const SOUND_IN_URL = false;
+
 const IDS = CHAPTERS.map(chapter => chapter.id);
 /** More sliders than this and they go in two columns on a wide screen. */
 const MANY_SLIDERS = 4;
@@ -71,14 +82,23 @@ export function chapterInUrl(): Chapter {
 export function openingFromUrl(chapter: Chapter): Partial<LabState> {
   const { hash, pathname, search } = window.location;
   const params = paramsFromHash(hash);
-  if (!chapter.sharesSound) {
-    // The glossary's parameter names an entry, not a sound: it stays.
-    if ([...params].length > 0 && chapter.id !== GLOSSARY) {
-      window.history.replaceState(null, '', pathname + search + hashFor(chapter.id));
-    }
-    return chapter.patch;
-  }
+  const address = addressAfterOpening(chapter, hash);
+  if (address !== null) window.history.replaceState(null, '', pathname + search + address);
+  if (!chapter.sharesSound) return chapter.patch;
   return { ...chapter.patch, ...soundFromParams(params) };
+}
+
+/**
+ * The hash the address is put back to once `chapter` has opened from
+ * `hash`, or null to leave it: parameters mean nothing to a chapter
+ * that keeps no sound (the glossary's names an entry, and stays), and
+ * with SOUND_IN_URL off the sandbox's sound, read, leaves the address.
+ */
+export function addressAfterOpening(chapter: Chapter, hash: string, soundInUrl = SOUND_IN_URL): string | null {
+  const params = paramsFromHash(hash);
+  if ([...params].length === 0 || chapter.id === GLOSSARY) return null;
+  if (chapter.sharesSound && soundInUrl) return null;
+  return hashFor(chapter.id);
 }
 
 /**
@@ -100,6 +120,7 @@ function mountSoundInUrl(store: LabStore): void {
   };
   store.subscribe((state, previous) => {
     if (
+      SOUND_IN_URL &&
       state.chapter === previous.chapter &&
       // Not the pitch: every note played sets it.
       (state.algorithm !== previous.algorithm ||
@@ -113,13 +134,19 @@ function mountSoundInUrl(store: LabStore): void {
     }
   });
 
-  // Copy link: the address as it is now, sound and all.
+  // Copy link: the address with the sound as it is now, built on demand
+  // (with SOUND_IN_URL off the address bar does not have it).
   const share = document.querySelector<HTMLButtonElement>('#share');
   if (!share) return;
   share.addEventListener('click', () => {
     window.clearTimeout(timer);
-    write();
-    const link = window.location.href;
+    if (SOUND_IN_URL) write();
+    const state = store.get();
+    const chapter = chapterById(state.chapter);
+    const { origin, pathname, search } = window.location;
+    const link = chapter?.sharesSound
+      ? origin + pathname + search + hashFor(chapter.id, soundParams(state))
+      : window.location.href;
     const done = (text: string) => {
       share.textContent = text;
       window.setTimeout(() => {

@@ -98,8 +98,10 @@ figures subscribe to it. Nothing else passes values around.
   the sandbox is dark only, and the chapters' theme keeps its own key and
   `theme.ts`.
   The URL holds
-  the section and, for one with `sharesSound` (the sandbox), its
-  sound (see `sandbox.ts` below). `state.chapter`
+  the section; for one with `sharesSound` (the sandbox), a link's sound
+  is read on opening (see `sandbox.ts` below), but with `SOUND_IN_URL`
+  off (chapterView.ts; Jeremy, 2026-10-23) the address is then put back
+  to the plain section and not written as the sound changes. `state.chapter`
   is a section's id, or `landing` or `glossary`.
   The patch is held two ways, by `mode`. `pm` (everywhere but `vibrato`):
   `ratio` and `index`. `fm` (`vibrato`): `modHz` and `deviationHz`.
@@ -214,9 +216,13 @@ figures subscribe to it. Nothing else passes values around.
   `soundFromParams` (a share any percentage from 0 to 100, to 0.1 %); an older
   link keeps only its pitch and algorithm. The pitch is not written (Jeremy,
   2026-10-23): it is only the note struck last, so the address changed with
-  every note; a link's own `c` still sets it. The address is rewritten
-  (`replaceState`, no new history entry) 300 ms after the patch last
-  changes, and only then.
+  every note; a link's own `c` still sets it. With `SOUND_IN_URL` on, the
+  address is rewritten (`replaceState`, no new history entry) 300 ms
+  after the patch last changes, and only then; it is off for now (Jeremy,
+  2026-10-23: "Let's not update the URL when the sound changes right
+  now"): a link still opens its sound, then the address goes back to
+  `#/sandbox` (`addressAfterOpening`), so a reload starts the sandbox
+  afresh, and Copy link builds the link with the sound on demand.
   `terms.ts` holds every defined term: its name, a one-sentence plain
   definition (for the glossary and the term's tip only), an optional
   formula, its English Wikipedia article and the chapter that defines it.
