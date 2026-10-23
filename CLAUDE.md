@@ -555,11 +555,12 @@ figures subscribe to it. Nothing else passes values around.
   grey grooves; a held key sinks, straight down and up, never animated.
   They are let into the foot's chassis, a strip of charcoal felt along
   their top where they run under the rail. On their left the control
-  panel: Octave and Mod on tape on one line, and 6px under them the octave
+  panel: Octave and Mod in silkscreen on one line (the knobs' names'
+  print, set on the line's foot), and 6px under them the octave
   control (‹ › black push keys either side of a two-place VFD readout of
   the keyboard's first C, C1 to C5, in one bezel as the algorithm
   chooser's; the range in words lies over the readout unseen, for its tip
-  and double click; beside the Octave tape the Z / X hint, grey, shown
+  and double click; beside the Octave label the Z / X hint, grey, shown
   only while the pointer is over the keyboard or keyboard focus is in it)
   and the mod wheel (`modWheel.ts`, `createModWheel`; Jeremy,
   2026-10-21): a ribbed rubber drum with a painted line riding from its
@@ -571,7 +572,7 @@ figures subscribe to it. Nothing else passes values around.
   Up / Down (10 %), Home, End, and a double click back to 0; no spring;
   the note keys, Z / X and space still play while it has focus.
   Under the octave chooser, at its left and at the column's foot, its
-  bottom level with the wheel's, MIDI In's one lamp key, MIDI (no tape; named "MIDI in"; `ui/midi.ts`, `mountMidi`; Jeremy, 2026-10-23),
+  bottom level with the wheel's, MIDI In's one lamp key, MIDI (no label; named "MIDI in"; `ui/midi.ts`, `mountMidi`; Jeremy, 2026-10-23),
   the wheel running down beside it; worked on the press, it turns the `midi` setting on and off; on, `requestMIDIAccess()`
   (never sysex) is asked, and again on load with on saved. Its tip and
   `data-state` (`midiTip`): "MIDI off"; "MIDI on: <names>" or "MIDI on: no
@@ -594,7 +595,7 @@ figures subscribe to it. Nothing else passes values around.
   aftertouch and the rest are ignored. A note goes to the engine's
   `noteOn` first, then into the key bed. Under 60rem high the key makes
   the panel 11px taller than the keys' bed (125 against 114). On a phone
-  the tapes are hidden and the key sits after the wheel on the chooser's
+  the labels are hidden and the key sits after the wheel on the chooser's
   line.
 It shows two octaves, from C1–B2 to C5–B6 (`STARTS`; Jeremy, 2026-10-21),
 starting at C3–B4, where a double click on the range brings it back;
@@ -737,7 +738,7 @@ hides with the crumb, the preset group, 40px after the wordmark, the
 free room right of it (Jeremy, 2026-10-22; it was centred between the
 wordmark and Volume), the name's box as wide as the widest name so
 nothing in it moves from voice to voice, with no label of its own
-(Jeremy, 2026-10-22: the Preset tape is gone; for screen readers the
+(Jeremy, 2026-10-22: the Preset label is gone; for screen readers the
 group is named Presets): the voice's name on a VFD (Jeremy,
 2026-10-21; `.preset-name`): glowing cyan capitals in Plex Mono on dark
 glass in a small bezel of the tab strips' plastic (seven segments
@@ -763,7 +764,7 @@ The preset window (`presetPanel.ts`, `mountPresetPanel`; Jeremy,
 window"): a modal dialog named Presets in the Settings case
 (`.settings-panel`, 760px wide or the window less 32px), every label in
 it silkscreen (`--font-tape` capitals in `--chassis-legend`, as the
-knobs' names; no Dymo tape). Its head: the title, then the bank keys A |
+knobs' names; no plate). Its head: the title, then the bank keys A |
 B with a "Bank" legend (a group named Bank, each key "Bank A: DX7 factory
 voices © Yamaha" or "Bank B: fmlab voices", lit for the bank shown), and
 Close at the right. Its glass, a listbox, shows the shown bank's 32 in
@@ -792,7 +793,7 @@ right then move by 16), the bank keys under the title if they must wrap.
 
 After the preset group, Volume, its name silkscreened on the chassis in
 the thicker weight (`--font-tape` 500 capitals in `--chassis-legend`, as
-the operators' roles; Jeremy, 2026-10-22: no tape), the Settings key; no glossary link (Jeremy, 2026-10-21: the chapters keep
+the operators' roles; Jeremy, 2026-10-22: no plate), the Settings key; no glossary link (Jeremy, 2026-10-21: the chapters keep
 theirs) and no theme switch: the sandbox is dark only (Jeremy,
 2026-10-22). Whatever is saved or the system says, `applyTheme(choice,
 sandbox)` sets `data-theme="dark"` while the sandbox shows (set where
@@ -805,7 +806,7 @@ function panel, named SETTINGS") is one lamp key in its own bezel, lit
 while its panel is open (`aria-pressed`, `aria-expanded`), worked on
 the press; the panel a modal `<dialog>` named Settings, a console of
 the chassis's black plastic the same in either theme over a page dimmed
-35 %: "Settings" on Dymo tape, two tabs, General and MIDI (Jeremy,
+35 %: "Settings" on a silkscreen plate, two tabs, General and MIDI (Jeremy,
 2026-10-23; `.pill-tabs`, the Voice tabs' keys, the arrows between them,
 on a line of their own under the title on a phone; always opening on
 General, the tab not kept; a change glitches the glass) and a Close key
@@ -933,12 +934,14 @@ the knobs at the right).
 `formatPitchBend` writes a bend in cents under a semitone, else in
 semitones; `formatGlideSpeed` a speed in st/s. Where a row's values on
 the screen would touch (the LFO's six at 1280 wide), `drawValueStrip`
-sets them a size smaller. Voice, Operators, the keyboard's Octave and
-Mod, four labels, are on Dymo tape
-(`tapeLabel`: each letter a span in the word's own case, the tape's CSS
-setting it in capitals, with the die's fixed tiny drop and tilt from
-the word, `strike`, shown at 2x pixels and finer; the word once more for
-screen readers).
+sets them a size smaller. Voice, Operators and the Settings window's
+title are printed on the chassis as a plate (`.silk-plate`; Jeremy,
+2026-10-23, the Dymo tape retired): a block of `--chassis-legend` with
+the word knocked out of it in `--chassis-legend-ink`, the chassis black,
+as Roland and Yamaha mark their panel sections; flat print, `--font-tape`
+500 capitals, 20px tall with 2px either side, so it takes the tape's
+24px line. The keyboard's Octave and Mod are the knobs' names' standard
+silkscreen. The text stays in its own case in the markup.
 On the right the operator
 panel (`#voice-envelope`) alone, the showing tab's curve filling it. Each
 screen keeps its box, and its glass, the canvas, sits 7px inside a
@@ -963,7 +966,7 @@ were, the room given to the top band's screens) with no rules
 between them or under the title bar, and only a black edge (no light
 one, which read as a white line): the top band (Voice and the operator panel, padded 9px
 12px, all four corners rounded), the operator table's panel (its
-Operators tape on the column heads' line, over the tags and roles,
+Operators plate on the column heads' line, over the tags and roles,
 whose heads are for screen readers only, so the table starts a line
 higher) and the keyboard's foot. The top two are `.chassis-ink`: they
 take the dark theme's tokens in either theme (tokens.css), their text
@@ -1013,7 +1016,7 @@ wraps, the wordmark and the theme, then the presets (the name's VFD and
 its up and down keys on one line), then Volume on a line of its own, then Settings; the keyboard
 and the spectrum over it docked to the screen's foot in the chassis, the
 full width and square (the spectrum, then the octave control and the
-wheel without their tapes, then the keys), the operator panel
+wheel without their labels, then the keys), the operator panel
 first (its tabs on a line of their own), the controls scrolling under it, and the
 operator table as cards, each with its drawings.
 
@@ -1072,10 +1075,11 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
   and the spectrum let into it; the felt under its rail is charcoal, not
   red, because red is reserved for negative phase. The mod wheel's drum
   is black rubber, its index line painted white, and its bar a VFD.
-  The sandbox's Voice, Operators, Octave and Mod labels are on
-  black Dymo embossing tape (`ui/dymo.ts`, `--dymo-*`; Jeremy,
-  2026-10-21): a drawn object, the same in either theme but its edge,
-  its white letters not `--ink`.
+  The sandbox's Voice, Operators and Settings labels are silkscreen
+  plates (`.silk-plate`: `--chassis-legend` with the word knocked out in
+  `--chassis-legend-ink`, the same in either theme), and every other
+  label printed on its chassis, Octave and Mod among them, is the knobs'
+  names' silkscreen.
 - Red means negative phase and nothing else: controls and the focus ring
   are ink. Never let phase rest on colour alone; a negative stem also gets
   a hollow marker. In the sandbox's VFD spectrum, a negative stem is
@@ -1104,8 +1108,9 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
   `--font-sans` (Figtree 400 to 700, italic for figure captions:
   everything else), `--font-mono` (IBM Plex Mono: numbers, with tabular
   figures; `.num`), `--font-tape` (Barlow Condensed 400: the sandbox's
-  Dymo tape labels, its knob names, its operator table's heads, and at
-  500 the operators' roles and Volume's name), `--font-logo` (Michroma 400: the logo only). A
+  printed labels, its knob names, Octave and Mod, its operator table's
+  heads, and at 500 its section plates, the operators' roles and
+  Volume's name), `--font-logo` (Michroma 400: the logo only). A
   weight that is not imported there is not available.
 - A canvas has no CSS: draw code reads the tokens with `getComputedStyle`
   and whoever mounts it must redraw on resize, theme change and

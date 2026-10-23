@@ -1,5 +1,4 @@
 import { type ChoiceSetting, SETTING_CHOICES, saveSettings, type Settings, settings } from '../model/settings';
-import { tapeLabel } from './dymo';
 import { midiInputs } from './midi';
 import { glitchScreens } from './screenGlitch';
 import { inSandbox } from './motion';
@@ -179,7 +178,7 @@ export function mountSettings(): void {
   const head = document.createElement('div');
   head.className = 'settings-head';
   const title = document.createElement('span');
-  title.className = 'settings-title';
+  title.className = 'settings-title silk-plate';
   title.textContent = 'Settings';
   title.setAttribute('aria-hidden', 'true');
   const closeBezel = document.createElement('span');
@@ -297,7 +296,6 @@ export function mountSettings(): void {
 
   dialog.append(head, screen);
   document.body.append(dialog);
-  tapeLabel(title);
 
   let page: Page = 'general';
   /** The lines of the open tab, by index. */
