@@ -90,7 +90,13 @@ function lines(): Line[] {
       7: '±7 st',
       12: '±12 st',
     }),
-    setting('MIDI', 'Velocity curve', 'velocityCurve', { light: 'Light', normal: 'Normal', heavy: 'Heavy' }),
+    setting('MIDI', 'Velocity curve', 'velocityCurve', {
+      lightest: 'Lightest',
+      light: 'Light',
+      normal: 'Normal',
+      heavy: 'Heavy',
+      heaviest: 'Heaviest',
+    }),
   ];
 }
 

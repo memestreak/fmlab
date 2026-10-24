@@ -886,9 +886,10 @@ at; Jeremy, 2026-10-24), Wheel (Page, Reverse); MIDI's: Input (All inputs, then 
 by name in the browser's order, `midiInputs`; a chosen input not
 connected stays, "(not connected)", until another is chosen), Channel
 (All, 1 to 16), Bend range (±1, ±2, ±3, ±5,
-±7, ±12 st) and Velocity curve (Light, Normal, Heavy: a MIDI key's
-velocity raised to 0.6, 1 or 1.6 across 1 to 127, `curveVelocity`, which
-keeps 1 and 127) (the
+±7, ±12 st) and Velocity curve (Lightest, Light, Normal, Heavy,
+Heaviest: a MIDI key's velocity raised to 0.4, 0.6, 1, 1.6 or 2.5 across
+1 to 127, `curveVelocity`, which keeps 1 and 127; Jeremy, 2026-10-24:
+five, so the softest touch can be soft enough) (the
 reverb's are on the Voice section's Reverb tab, Jeremy, 2026-10-22);
 `applySettings` sets them on `<html>` (`data-motion`, `data-tips`,
 `data-zx`, `data-note-names`, `data-computer-keys`) for the CSS. On a

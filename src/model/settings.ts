@@ -54,9 +54,10 @@ export interface Settings {
   bendRange: 1 | 2 | 3 | 5 | 7 | 12;
   /**
    * How a MIDI key's velocity is mapped before the voice hears it
-   * (`curveVelocity`): Light is easier to play loud, Heavy harder.
+   * (`curveVelocity`): Lightest and Light are easier to play loud, Heavy
+   * and Heaviest harder.
    */
-  velocityCurve: 'light' | 'normal' | 'heavy';
+  velocityCurve: 'lightest' | 'light' | 'normal' | 'heavy' | 'heaviest';
 }
 
 /** The settings that are numbers, each in a range; the rest are choices. */
@@ -99,7 +100,7 @@ export const SETTING_CHOICES: { [K in ChoiceSetting]: readonly Settings[K][] } =
   reverb: ['off', 'on'],
   midi: ['off', 'on'],
   bendRange: [2, 1, 3, 5, 7, 12],
-  velocityCurve: ['normal', 'light', 'heavy'],
+  velocityCurve: ['normal', 'lightest', 'light', 'heavy', 'heaviest'],
 };
 
 export const DEFAULT_SETTINGS: Settings = {

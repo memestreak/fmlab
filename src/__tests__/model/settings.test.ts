@@ -118,6 +118,8 @@ describe('the sandbox\'s settings', () => {
     expect(parsed({ keyVelocity: 90 }).keyVelocity).toBe(100);
     expect(parsed({ keyVelocity: '127' }).keyVelocity).toBe(100);
     expect(parsed({ velocityCurve: 'light' }).velocityCurve).toBe('light');
+    expect(parsed({ velocityCurve: 'heaviest' }).velocityCurve).toBe('heaviest');
+    expect(parsed({ velocityCurve: 'lightest' }).velocityCurve).toBe('lightest');
     expect(parsed({ velocityCurve: 'soft' }).velocityCurve).toBe('normal');
   });
 });
