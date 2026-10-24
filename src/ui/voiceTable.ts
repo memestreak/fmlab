@@ -2,7 +2,8 @@
 // full width of the page. Each row has the operator's tag and role, its
 // ratio (a slider and a VFD readout), detune in cents (a number reel),
 // level in dB (a slider and a VFD readout), its share of the LFO's
-// tremolo (a number reel, off to 100 % by tenths),
+// tremolo (a number reel, off to 100 % by tenths), its velocity (a
+// number reel through the DX7's eight steps, in dB on the softest note),
 // and two small drawings, to compare at a glance: its envelope and its
 // key scaling (its level across the keyboard). A row clicked or focused
 // is the selected one, marked by an ink bar down its left edge, and the
@@ -10,7 +11,15 @@
 // drawing's tab there, where it is edited.
 
 import { algorithm, operatorsUsed } from '../dsp/algorithms';
-import { DETUNE_CENTS, DX7_RATIO, type Dx7Envelope, type Dx7Operator, LEVEL_DB } from '../dsp/dx7';
+import {
+  DETUNE_CENTS,
+  DX7_RATIO,
+  type Dx7Envelope,
+  type Dx7Operator,
+  LEVEL_DB,
+  VELOCITY_DB,
+  VELOCITY_STOPS,
+} from '../dsp/dx7';
 import type { LabState, LabStore, VoiceTab } from '../model/lab';
 import { describeKeyScaling, drawKeyScaling } from '../viz/keyScalingPlot';
 import { drawVoiceEnvelope } from '../viz/voiceEnvelopePlot';
@@ -81,6 +90,19 @@ export const DETUNE_STOPS: readonly number[] = Array.from(
 
 /** Tremolo's reel stops: off to 100 % in tenths. */
 export const TREMOLO_STOPS: readonly number[] = Array.from({ length: 11 }, (_, i) => i / 10);
+
+/** A velocity as its reel shows it: "off", or how far the softest note falls, "-33". */
+export function formatVelocity(db: number): string {
+  return db === 0 ? 'off' : String(Math.round(db));
+}
+
+/** What a screen reader hears a velocity as. */
+export function sayVelocity(db: number): string {
+  return db === 0 ? 'no velocity' : `${Math.round(-db)} dB quieter on the softest note`;
+}
+
+/** Velocity's reel stops: the DX7's eight, ascending, the deepest first and off last. */
+export const VELOCITY_REEL_STOPS: readonly number[] = [...VELOCITY_STOPS].reverse();
 
 /** Level's reel stops: off, then whole dB from -72 to 0. */
 export const LEVEL_STOPS: readonly number[] = [
@@ -205,6 +227,19 @@ export function mountVoiceTable(store: LabStore): void {
       say: value => (value === 0 ? 'none of the tremolo' : `${formatShare(value)} of the tremolo`),
     });
 
+    // Its velocity (Jeremy, 2026-10-24): how far its level falls on the
+    // softest note, through the DX7's eight steps on a number reel. A
+    // value between them (from a link) is kept until it is turned.
+    const velocity = createReel({
+      name: `${name} velocity`,
+      stops: VELOCITY_REEL_STOPS,
+      page: 2,
+      get: () => get().velocity,
+      set: value => setDxOperator(store, op, { velocity: within(value, VELOCITY_DB) }),
+      format: formatVelocity,
+      say: sayVelocity,
+    });
+
     // The two drawings, small and read only: a click on one (or Enter or
     // Space on it) selects the row and opens that tab of the panel.
     const drawing = (className: string, tab: VoiceTab) => {
@@ -228,6 +263,7 @@ export function mountVoiceTable(store: LabStore): void {
       cell('voice-detune', 'Detune ¢', detune.element),
       cell('voice-level', 'Level dB', pair(levelSlider.element, levelVfd.element)),
       cell('voice-tremolo', 'Tremolo', tremolo.element),
+      cell('voice-velocity', 'Velocity dB', velocity.element),
       cell('voice-env', 'Envelope', envelope.button),
       cell('voice-scaling', 'Key scaling', keys.button),
     );
@@ -278,6 +314,7 @@ export function mountVoiceTable(store: LabStore): void {
       levelSlider.update();
       levelVfd.update();
       tremolo.update();
+      velocity.update();
       drawVoiceEnvelope(envelope.canvas, o.envelope, penOf(r), false);
       envelope.button.setAttribute('aria-label', `${name} envelope: edit it above`);
       drawKeyScaling(keys.canvas, o, penOf(r));

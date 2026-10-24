@@ -28,6 +28,14 @@ then give the result fmlabVoices.ts's own header (fmlab's voices, not
 Yamaha's), import `FactoryVoice` from `./dx7Factory` in place of the
 interface, and name the list `FMLAB_VOICES`.
 
+Bank B's key velocity sensitivities (KVS) are set by kind, in the .syx
+itself, by `bank2_velocity.py`; change its table and run it, then
+regenerate fmlabVoices.ts as above:
+
+```sh
+scripts/bank2_velocity.py scripts/fmlab-bank2.syx
+```
+
 Standard library only. Its tests use pytest:
 
 ```sh

@@ -1,5 +1,6 @@
 import { midiToHz } from '../dsp/voices';
 import type { LabStore } from '../model/lab';
+import { settings } from '../model/settings';
 import type { Holder, KeyBed } from './keyBed';
 import { createModWheel } from './modWheel';
 import { createVfdReadout } from './vfdReadout';
@@ -180,7 +181,8 @@ export function mountPiano(
 
   /** The screen's keys are the pointer's (and Enter's on one); the computer's keys their own. */
   const press = (midi: number, holder: Holder = 'pointer') => {
-    if (playable(midi)) bed.press(midi, holder);
+    // At the Key velocity setting: these keys have no velocity of their own.
+    if (playable(midi)) bed.press(midi, holder, settings.get().keyVelocity);
   };
   const release = (midi: number, holder: Holder = 'pointer') => {
     bed.release(midi, holder);

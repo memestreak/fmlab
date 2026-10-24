@@ -19,6 +19,11 @@ export interface Settings {
   noteNames: 'c' | 'all' | 'off';
   /** The computer key that plays each piano key, drawn at its foot. */
   computerKeys: 'off' | 'on';
+  /**
+   * The velocity the computer's and the screen's keys strike at (Jeremy,
+   * 2026-10-24): 100, as written, by default.
+   */
+  keyVelocity: 64 | 100 | 127;
   /** A wheel's direction: as the page scrolls (positive deltaY the value below), or reversed. */
   wheel: 'page' | 'reverse';
   /**
@@ -47,6 +52,11 @@ export interface Settings {
   midiChannel: number;
   /** How far the pitch wheel bends, in semitones each way. */
   bendRange: 1 | 2 | 3 | 5 | 7 | 12;
+  /**
+   * How a MIDI key's velocity is mapped before the voice hears it
+   * (`curveVelocity`): Light is easier to play loud, Heavy harder.
+   */
+  velocityCurve: 'light' | 'normal' | 'heavy';
 }
 
 /** The settings that are numbers, each in a range; the rest are choices. */
@@ -84,10 +94,12 @@ export const SETTING_CHOICES: { [K in ChoiceSetting]: readonly Settings[K][] } =
   zxHint: ['hover', 'always', 'off'],
   noteNames: ['c', 'all', 'off'],
   computerKeys: ['off', 'on'],
+  keyVelocity: [100, 64, 127],
   wheel: ['page', 'reverse'],
   reverb: ['off', 'on'],
   midi: ['off', 'on'],
   bendRange: [2, 1, 3, 5, 7, 12],
+  velocityCurve: ['normal', 'light', 'heavy'],
 };
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -97,6 +109,7 @@ export const DEFAULT_SETTINGS: Settings = {
   zxHint: 'hover',
   noteNames: 'c',
   computerKeys: 'off',
+  keyVelocity: 100,
   wheel: 'page',
   reverb: 'off',
   reverbDecay: 1.5,
@@ -107,6 +120,7 @@ export const DEFAULT_SETTINGS: Settings = {
   midiInput: '',
   midiChannel: 0,
   bendRange: 2,
+  velocityCurve: 'normal',
 };
 
 /** Where they are saved, as JSON. */

@@ -64,6 +64,7 @@ const DRAWN: (keyof LabState)[] = [
   'noteStartedAt',
   'noteLength',
   'noteHold',
+  'noteVelocity',
   // The sideband order picked out in the linked figures.
   'hover',
   'pinned',

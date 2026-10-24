@@ -75,6 +75,10 @@ PITCH_RATES = (
 # Dexed's amplitude modulation sensitivities, AMS 0 to 3, over 2^24
 # (dx7note.cc, ampmodsenstab): 0, 66, 109 and 255 of 255.
 AMS_SHARES = (0.0, 4342338 / 2**24, 7171437 / 2**24, 1.0)
+# Key velocity sensitivity 0 to 7 as how far an operator's level falls on
+# the softest note, in dB: msfa's ScaleVelocity at velocity 1 for each
+# step, to a tenth (src/dsp/dx7.ts, VELOCITY_STOPS).
+VELOCITY_STOPS = (0.0, -10.9, -22.1, -33.4, -44.6, -55.9, -67.1, -78.4)
 
 
 @dataclass(frozen=True)
@@ -374,6 +378,7 @@ def convert_operator(op: RawOperator) -> dict[str, object]:
         "right": scaling_side(op.right_depth, op.right_curve),
         "rateScaling": round(2 ** (op.rate_scaling / 8), 4),
         "tremolo": AMS_SHARES[op.amp_sensitivity],
+        "velocity": VELOCITY_STOPS[op.velocity],
     }
 
 
@@ -532,7 +537,6 @@ def missing(voice: RawVoice) -> list[str]:
     """
     lost: list[str] = []
     checks = (
-        (any(op.velocity > 0 for op in voice.operators), "velocity"),
         (any(op.fixed for op in voice.operators),
          "fixed frequency (played as a ratio from middle C)"),
         (any(op.levels[3] > 0 for op in voice.operators),

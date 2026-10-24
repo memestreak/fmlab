@@ -8,6 +8,7 @@ import pytest
 from dx7_voices import (
     BANK_BYTES,
     HEADER,
+    VELOCITY_STOPS,
     VOICE_BYTES,
     RawOperator,
     convert_lfo,
@@ -145,6 +146,25 @@ def test_an_operators_tremolo_share_from_its_ams() -> None:
     assert shares[1] == pytest.approx(66 / 255, abs=0.001)
     assert shares[2] == pytest.approx(109 / 255, abs=0.001)
     assert shares[3] == 1
+
+
+def test_an_operators_velocity_from_its_kvs() -> None:
+    # Act
+    stops = [convert_operator(operator(velocity=kvs))["velocity"]
+             for kvs in range(8)]
+    # Assert: off, then the DX7's steps as dB on the softest note.
+    assert stops == list(VELOCITY_STOPS)
+    assert stops == [0.0, -10.9, -22.1, -33.4, -44.6, -55.9, -67.1, -78.4]
+
+
+def test_velocity_is_no_longer_missing() -> None:
+    data = bytearray(VOICE_BYTES)
+    # OP6's byte 13: velocity sensitivity 4.
+    data[13] = 4 << 2
+    voice = unpack_voice(bytes(data))
+    # Stored OP6 first: OP6 is the last once unpacked.
+    assert voice.operators[5].velocity == 4
+    assert "velocity" not in missing(voice)
 
 
 def test_refuses_what_is_not_a_bank() -> None:

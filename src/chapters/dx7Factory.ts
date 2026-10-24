@@ -44,7 +44,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.843
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 0.5,
@@ -69,7 +70,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -0.422
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 1.0,
@@ -94,7 +96,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -22.1
       },
       {
         'ratio': 1.0,
@@ -119,7 +122,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -22.1
       },
       {
         'ratio': 1.0,
@@ -144,7 +148,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -22.1
       },
       {
         'ratio': 1.0,
@@ -169,7 +174,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -3.012
         },
         'rateScaling': 1.4142,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -22.1
       }
     ],
     'dxLfo': {
@@ -190,9 +196,7 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'sustain': 0.0,
       'release': 3267.61
     },
-    'missing': [
-      'velocity'
-    ]
+    'missing': []
   },
   {
     'name': 'BRASS 2',
@@ -222,7 +226,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 2.289
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 0.5,
@@ -247,7 +252,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 2.289
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 0.5,
@@ -272,7 +278,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 0.5,
@@ -297,7 +304,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 0.5,
@@ -322,7 +330,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 0.5,
@@ -347,7 +356,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       }
     ],
     'dxLfo': {
@@ -398,7 +408,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.1892,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -22.1
       },
       {
         'ratio': 1.0,
@@ -423,7 +434,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.1892,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -10.9
       },
       {
         'ratio': 1.0,
@@ -448,7 +460,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0905,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -10.9
       },
       {
         'ratio': 1.0,
@@ -473,7 +486,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 3.18,
@@ -498,7 +512,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 8.47,
@@ -523,7 +538,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.834,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       }
     ],
     'dxLfo': {
@@ -545,7 +561,6 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'release': 3267.61
     },
     'missing': [
-      'velocity',
       'transpose'
     ]
   },
@@ -577,7 +592,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.1892,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -33.4
       },
       {
         'ratio': 1.0,
@@ -602,7 +618,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0905,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 1.0,
@@ -627,7 +644,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -5.843
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -78.4
       },
       {
         'ratio': 1.0,
@@ -652,7 +670,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.1892,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -22.1
       },
       {
         'ratio': 3.0,
@@ -677,7 +696,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.1892,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -22.1
       },
       {
         'ratio': 14.0,
@@ -702,7 +722,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.1892,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -22.1
       }
     ],
     'dxLfo': {
@@ -723,9 +744,7 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'sustain': 0.0,
       'release': 3267.61
     },
-    'missing': [
-      'velocity'
-    ]
+    'missing': []
   },
   {
     'name': 'STRINGS 2',
@@ -755,7 +774,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 2.0,
@@ -780,7 +800,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 2.0,
@@ -805,7 +826,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 2.0,
@@ -830,7 +852,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 2.0,
@@ -855,7 +878,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 8.0,
@@ -880,7 +904,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       }
     ],
     'dxLfo': {
@@ -933,7 +958,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.1892,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -10.9
       },
       {
         'ratio': 1.0,
@@ -958,7 +984,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0905,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 1.0,
@@ -983,7 +1010,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -3.615
         },
         'rateScaling': 1.1892,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -10.9
       },
       {
         'ratio': 1.0,
@@ -1008,7 +1036,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.1892,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -22.1
       },
       {
         'ratio': 3.0,
@@ -1033,7 +1062,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.1892,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -10.9
       },
       {
         'ratio': 14.0,
@@ -1058,7 +1088,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.1892,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -22.1
       }
     ],
     'dxLfo': {
@@ -1080,7 +1111,6 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'release': 3267.61
     },
     'missing': [
-      'velocity',
       'transpose'
     ]
   },
@@ -1112,7 +1142,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 1.0,
@@ -1137,7 +1168,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 2.0,
@@ -1162,7 +1194,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 2.0,
@@ -1187,7 +1220,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 2.0,
@@ -1212,7 +1246,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 2.0,
@@ -1237,7 +1272,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       }
     ],
     'dxLfo': {
@@ -1290,7 +1326,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.4142,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -22.1
       },
       {
         'ratio': 1.0,
@@ -1315,7 +1352,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -0.783
         },
         'rateScaling': 1.5422,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 3.0,
@@ -1340,7 +1378,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -4.458
         },
         'rateScaling': 1.5422,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 1.0,
@@ -1365,7 +1404,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.5422,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -22.1
       },
       {
         'ratio': 1.58,
@@ -1390,7 +1430,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -3.976
         },
         'rateScaling': 1.5422,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -10.9
       },
       {
         'ratio': 1.0,
@@ -1415,7 +1456,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -0.602
         },
         'rateScaling': 1.5422,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       }
     ],
     'dxLfo': {
@@ -1436,9 +1478,7 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'sustain': 0.0,
       'release': 3267.61
     },
-    'missing': [
-      'velocity'
-    ]
+    'missing': []
   },
   {
     'name': 'PIANO 2',
@@ -1468,7 +1508,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -22.1
       },
       {
         'ratio': 1.0,
@@ -1493,7 +1534,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -0.602
         },
         'rateScaling': 1.1892,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -10.9
       },
       {
         'ratio': 5.0,
@@ -1518,7 +1560,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -1.627
         },
         'rateScaling': 1.5422,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -10.9
       },
       {
         'ratio': 1.0,
@@ -1543,7 +1586,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -10.9
       },
       {
         'ratio': 0.5,
@@ -1568,7 +1612,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -1.566
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -10.9
       },
       {
         'ratio': 0.5,
@@ -1593,7 +1638,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -5.904
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -10.9
       }
     ],
     'dxLfo': {
@@ -1615,7 +1661,6 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'release': 3267.61
     },
     'missing': [
-      'velocity',
       'transpose'
     ]
   },
@@ -1647,7 +1692,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -33.4
       },
       {
         'ratio': 1.0,
@@ -1672,7 +1718,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -3.012
         },
         'rateScaling': 1.1892,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 7.0,
@@ -1697,7 +1744,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -1.205
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -33.4
       },
       {
         'ratio': 1.0,
@@ -1722,7 +1770,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -22.1
       },
       {
         'ratio': 1.0,
@@ -1747,7 +1796,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -1.627
         },
         'rateScaling': 1.1892,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -10.9
       },
       {
         'ratio': 0.5,
@@ -1772,7 +1822,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -55.9
       }
     ],
     'dxLfo': {
@@ -1793,9 +1844,7 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'sustain': 0.0,
       'release': 56.34
     },
-    'missing': [
-      'velocity'
-    ]
+    'missing': []
   },
   {
     'name': 'E.PIANO 1',
@@ -1825,7 +1874,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -22.1
       },
       {
         'ratio': 14.0,
@@ -1850,7 +1900,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -78.4
       },
       {
         'ratio': 1.0,
@@ -1875,7 +1926,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -22.1
       },
       {
         'ratio': 1.0,
@@ -1900,7 +1952,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -67.1
       },
       {
         'ratio': 1.0,
@@ -1925,7 +1978,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 1.0,
@@ -1950,7 +2004,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -1.145
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -67.1
       }
     ],
     'dxLfo': {
@@ -1971,9 +2026,7 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'sustain': 0.0,
       'release': 3267.61
     },
-    'missing': [
-      'velocity'
-    ]
+    'missing': []
   },
   {
     'name': 'GUITAR 1',
@@ -2003,7 +2056,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.4142,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -55.9
       },
       {
         'ratio': 3.0,
@@ -2028,7 +2082,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -3.916
         },
         'rateScaling': 1.1892,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -78.4
       },
       {
         'ratio': 1.0,
@@ -2053,7 +2108,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -78.4
       },
       {
         'ratio': 3.0,
@@ -2078,7 +2134,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -0.843
         },
         'rateScaling': 1.4142,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -44.6
       },
       {
         'ratio': 3.0,
@@ -2103,7 +2160,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -0.904
         },
         'rateScaling': 1.4142,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -78.4
       },
       {
         'ratio': 12.0,
@@ -2128,7 +2186,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -1.205
         },
         'rateScaling': 1.0,
-        'tremolo': 1.0
+        'tremolo': 1.0,
+        'velocity': -67.1
       }
     ],
     'dxLfo': {
@@ -2149,9 +2208,7 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'sustain': 0.0,
       'release': 3267.61
     },
-    'missing': [
-      'velocity'
-    ]
+    'missing': []
   },
   {
     'name': 'GUITAR 2',
@@ -2181,7 +2238,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -22.1
       },
       {
         'ratio': 1.0,
@@ -2206,7 +2264,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0905,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -78.4
       },
       {
         'ratio': 1.5,
@@ -2231,7 +2290,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -2.41
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -78.4
       },
       {
         'ratio': 0.5,
@@ -2256,7 +2316,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 0.5,
@@ -2281,7 +2342,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -78.4
       },
       {
         'ratio': 3.0,
@@ -2306,7 +2368,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -2.771
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -22.1
       }
     ],
     'dxLfo': {
@@ -2328,7 +2391,6 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'release': 3267.61
     },
     'missing': [
-      'velocity',
       'an envelope ending above silence'
     ]
   },
@@ -2360,7 +2422,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0905,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 1.0,
@@ -2385,7 +2448,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 1.0,
@@ -2410,7 +2474,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -1.265
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 2.0,
@@ -2435,7 +2500,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -3.615
         },
         'rateScaling': 1.6818,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 3.0,
@@ -2460,7 +2526,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0905,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 17.0,
@@ -2485,7 +2552,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -1.265
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       }
     ],
     'dxLfo': {
@@ -2538,7 +2606,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -0.843
         },
         'rateScaling': 1.834,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 0.5,
@@ -2563,7 +2632,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.834,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 0.5,
@@ -2588,7 +2658,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.6818,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -33.4
       },
       {
         'ratio': 5.0,
@@ -2613,7 +2684,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.5422,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -55.9
       },
       {
         'ratio': 0.5,
@@ -2638,7 +2710,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.834,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -33.4
       },
       {
         'ratio': 9.0,
@@ -2663,7 +2736,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0905,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -78.4
       }
     ],
     'dxLfo': {
@@ -2685,7 +2759,6 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'release': 3267.61
     },
     'missing': [
-      'velocity',
       'transpose'
     ]
   },
@@ -2717,7 +2790,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -1.928
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -22.1
       },
       {
         'ratio': 0.515,
@@ -2742,7 +2816,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -2.108
         },
         'rateScaling': 1.0905,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -22.1
       },
       {
         'ratio': 1.0,
@@ -2767,7 +2842,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -33.4
       },
       {
         'ratio': 0.5,
@@ -2792,7 +2868,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -22.1
       },
       {
         'ratio': 1.01,
@@ -2817,7 +2894,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -1.928
         },
         'rateScaling': 1.4142,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -22.1
       },
       {
         'ratio': 0.5,
@@ -2842,7 +2920,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -78.4
       }
     ],
     'dxLfo': {
@@ -2864,7 +2943,6 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'release': 3267.61
     },
     'missing': [
-      'velocity',
       'transpose'
     ]
   },
@@ -2896,7 +2974,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 1.01,
@@ -2921,7 +3000,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -0.602
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 1.5,
@@ -2946,7 +3026,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 0.5,
@@ -2971,7 +3052,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 1.0,
@@ -2996,7 +3078,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 3.0,
@@ -3021,7 +3104,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       }
     ],
     'dxLfo': {
@@ -3072,7 +3156,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -3.012
         },
         'rateScaling': 1.5422,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 0.5,
@@ -3097,7 +3182,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.4142,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 1.0,
@@ -3122,7 +3208,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -2.41
         },
         'rateScaling': 1.5422,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 4.0,
@@ -3147,7 +3234,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -0.602
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 2.0,
@@ -3172,7 +3260,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 10.0,
@@ -3197,7 +3286,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.06
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -22.1
       }
     ],
     'dxLfo': {
@@ -3219,7 +3309,6 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'release': 3267.61
     },
     'missing': [
-      'velocity',
       'transpose'
     ]
   },
@@ -3251,7 +3340,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -22.1
       },
       {
         'ratio': 0.5,
@@ -3276,7 +3366,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0905,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 1.0,
@@ -3301,7 +3392,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -22.1
       },
       {
         'ratio': 3.0,
@@ -3326,7 +3418,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -2.771
         },
         'rateScaling': 1.0905,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 4.0,
@@ -3351,7 +3444,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -33.4
       },
       {
         'ratio': 6.0,
@@ -3376,7 +3470,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -3.313
         },
         'rateScaling': 1.0905,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       }
     ],
     'dxLfo': {
@@ -3398,7 +3493,6 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'release': 56.34
     },
     'missing': [
-      'velocity',
       'an envelope ending above silence'
     ]
   },
@@ -3430,7 +3524,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -33.4
       },
       {
         'ratio': 0.5,
@@ -3455,7 +3550,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -10.9
       },
       {
         'ratio': 6.0,
@@ -3480,7 +3576,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -1.265
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -10.9
       },
       {
         'ratio': 2.0,
@@ -3505,7 +3602,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -22.1
       },
       {
         'ratio': 0.5,
@@ -3530,7 +3628,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -67.1
       },
       {
         'ratio': 8.0,
@@ -3555,7 +3654,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -1.265
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -78.4
       }
     ],
     'dxLfo': {
@@ -3576,9 +3676,7 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'sustain': 0.0,
       'release': 56.34
     },
-    'missing': [
-      'velocity'
-    ]
+    'missing': []
   },
   {
     'name': 'VIBE 1',
@@ -3608,7 +3706,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.723
         },
         'rateScaling': 1.1892,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -78.4
       },
       {
         'ratio': 1.0,
@@ -3633,7 +3732,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.723
         },
         'rateScaling': 1.1892,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -10.9
       },
       {
         'ratio': 3.0,
@@ -3658,7 +3758,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.723
         },
         'rateScaling': 1.4142,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -44.6
       },
       {
         'ratio': 1.0,
@@ -3683,7 +3784,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -10.9
       },
       {
         'ratio': 1.0,
@@ -3708,7 +3810,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -55.9
       },
       {
         'ratio': 14.0,
@@ -3733,7 +3836,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.723
         },
         'rateScaling': 1.5422,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -78.4
       }
     ],
     'dxLfo': {
@@ -3754,9 +3858,7 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'sustain': 0.0,
       'release': 3267.61
     },
-    'missing': [
-      'velocity'
-    ]
+    'missing': []
   },
   {
     'name': 'MARIMBA',
@@ -3786,7 +3888,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 3.0,
@@ -3811,7 +3914,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -2.771
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -22.1
       },
       {
         'ratio': 0.5,
@@ -3836,7 +3940,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -10.9
       },
       {
         'ratio': 5.0,
@@ -3861,7 +3966,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -2.771
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -22.1
       },
       {
         'ratio': 0.75,
@@ -3886,7 +3992,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -2.771
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -22.1
       },
       {
         'ratio': 4.52,
@@ -3911,7 +4018,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -22.1
       }
     ],
     'dxLfo': {
@@ -3932,9 +4040,7 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'sustain': 0.0,
       'release': 3267.61
     },
-    'missing': [
-      'velocity'
-    ]
+    'missing': []
   },
   {
     'name': 'KOTO',
@@ -3964,7 +4070,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.6818,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -33.4
       },
       {
         'ratio': 4.0,
@@ -3989,7 +4096,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -0.602
         },
         'rateScaling': 1.6818,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 1.0,
@@ -4014,7 +4122,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.5422,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -33.4
       },
       {
         'ratio': 1.0,
@@ -4039,7 +4148,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -1.024
         },
         'rateScaling': 1.6818,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -10.9
       },
       {
         'ratio': 4.0,
@@ -4064,7 +4174,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -0.301
         },
         'rateScaling': 1.6818,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -10.9
       },
       {
         'ratio': 3.0,
@@ -4089,7 +4200,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -0.301
         },
         'rateScaling': 1.6818,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -10.9
       }
     ],
     'dxLfo': {
@@ -4110,9 +4222,7 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'sustain': 0.0,
       'release': 56.34
     },
-    'missing': [
-      'velocity'
-    ]
+    'missing': []
   },
   {
     'name': 'FLUTE 1',
@@ -4142,7 +4252,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -22.1
       },
       {
         'ratio': 1.0,
@@ -4167,7 +4278,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.4142,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -22.1
       },
       {
         'ratio': 1.0,
@@ -4192,7 +4304,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.2588235139846802
+        'tremolo': 0.2588235139846802,
+        'velocity': 0.0
       },
       {
         'ratio': 2.0,
@@ -4217,7 +4330,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -0.602
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 2.0,
@@ -4242,7 +4356,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -2.59
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 1.53,
@@ -4267,7 +4382,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -22.1
       }
     ],
     'dxLfo': {
@@ -4288,9 +4404,7 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'sustain': 0.0,
       'release': 3267.61
     },
-    'missing': [
-      'velocity'
-    ]
+    'missing': []
   },
   {
     'name': 'ORCH-CHIME',
@@ -4320,7 +4434,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 0.5,
@@ -4345,7 +4460,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.834,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 0.5,
@@ -4370,7 +4486,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -22.1
       },
       {
         'ratio': 3.14,
@@ -4395,7 +4512,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -33.4
       },
       {
         'ratio': 1.0,
@@ -4420,7 +4538,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 1.0,
@@ -4445,7 +4564,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.834,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       }
     ],
     'dxLfo': {
@@ -4466,9 +4586,7 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'sustain': 0.0,
       'release': 14366.2
     },
-    'missing': [
-      'velocity'
-    ]
+    'missing': []
   },
   {
     'name': 'TUB BELLS',
@@ -4498,7 +4616,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.1892,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 3.5,
@@ -4523,7 +4642,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.1892,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 1.0,
@@ -4548,7 +4668,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.1892,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 3.5,
@@ -4573,7 +4694,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.1892,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 1.2369,
@@ -4598,7 +4720,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.1892,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -55.9
       },
       {
         'ratio': 2.0,
@@ -4623,7 +4746,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.1892,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       }
     ],
     'dxLfo': {
@@ -4645,7 +4769,6 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'release': 3267.61
     },
     'missing': [
-      'velocity',
       'fixed frequency (played as a ratio from middle C)'
     ]
   },
@@ -4677,7 +4800,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.4142,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 1.7,
@@ -4702,7 +4826,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -4.277
         },
         'rateScaling': 1.1892,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -22.1
       },
       {
         'ratio': 1.0,
@@ -4727,7 +4852,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -33.4
       },
       {
         'ratio': 2.0,
@@ -4752,7 +4878,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -10.9
       },
       {
         'ratio': 5.32,
@@ -4777,7 +4904,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 1.5217,
@@ -4802,7 +4930,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       }
     ],
     'dxLfo': {
@@ -4824,7 +4953,6 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'release': 2309.86
     },
     'missing': [
-      'velocity',
       'fixed frequency (played as a ratio from middle C)'
     ]
   },
@@ -4856,7 +4984,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -10.9
       },
       {
         'ratio': 0.5,
@@ -4881,7 +5010,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0905,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -10.9
       },
       {
         'ratio': 0.68,
@@ -4906,7 +5036,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 0.875,
@@ -4931,7 +5062,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.834,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -78.4
       },
       {
         'ratio': 0.5,
@@ -4956,7 +5088,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -10.9
       },
       {
         'ratio': 0.78,
@@ -4981,7 +5114,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -10.9
       }
     ],
     'dxLfo': {
@@ -5002,9 +5136,7 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'sustain': 0.0,
       'release': 3267.61
     },
-    'missing': [
-      'velocity'
-    ]
+    'missing': []
   },
   {
     'name': 'REFS WHISL',
@@ -5034,7 +5166,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.4142,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -10.9
       },
       {
         'ratio': 0.5,
@@ -5059,7 +5192,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.4142,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 0.5,
@@ -5084,7 +5218,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.4142,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 25.2534,
@@ -5109,7 +5244,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0905,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 0.5,
@@ -5134,7 +5270,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 0.5,
@@ -5159,7 +5296,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0905,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       }
     ],
     'dxLfo': {
@@ -5181,7 +5319,6 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'release': 3267.61
     },
     'missing': [
-      'velocity',
       'fixed frequency (played as a ratio from middle C)'
     ]
   },
@@ -5213,7 +5350,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 1.0,
@@ -5238,7 +5376,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.427450954914093
+        'tremolo': 0.427450954914093,
+        'velocity': -22.1
       },
       {
         'ratio': 1.0,
@@ -5263,7 +5402,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -33.4
       },
       {
         'ratio': 1.02,
@@ -5288,7 +5428,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -10.9
       },
       {
         'ratio': 1.01,
@@ -5313,7 +5454,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': -10.9
       },
       {
         'ratio': 5.1,
@@ -5338,7 +5480,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       }
     ],
     'dxLfo': {
@@ -5360,7 +5503,6 @@ export const FACTORY_VOICES: FactoryVoice[] = [
       'release': 3267.61
     },
     'missing': [
-      'velocity',
       'an envelope ending above silence'
     ]
   },
@@ -5392,7 +5534,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': -5.904
         },
         'rateScaling': 1.2968,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 3.03,
@@ -5417,7 +5560,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.5422,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 1.4201,
@@ -5442,7 +5586,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 3.7353,
@@ -5467,7 +5612,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 9.0,
@@ -5492,7 +5638,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 1.0
+        'tremolo': 1.0,
+        'velocity': 0.0
       },
       {
         'ratio': 5.0,
@@ -5517,7 +5664,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       }
     ],
     'dxLfo': {
@@ -5571,7 +5719,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 1.0,
@@ -5596,7 +5745,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 6.06,
@@ -5621,7 +5771,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 0.5,
@@ -5646,7 +5797,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 2.02,
@@ -5671,7 +5823,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       },
       {
         'ratio': 0.5,
@@ -5696,7 +5849,8 @@ export const FACTORY_VOICES: FactoryVoice[] = [
           'depth': 0.0
         },
         'rateScaling': 1.0,
-        'tremolo': 0.0
+        'tremolo': 0.0,
+        'velocity': 0.0
       }
     ],
     'dxLfo': {

@@ -78,6 +78,7 @@ function lines(): Line[] {
     setting('Help', 'Z X hint', 'zxHint', { hover: 'Hover', always: 'Always', off: 'Off' }),
     setting('Keyboard', 'Note names', 'noteNames', { c: 'C only', all: 'All', off: 'Off' }),
     setting('Keyboard', 'Computer keys', 'computerKeys', { off: 'Off', on: 'On' }),
+    setting('Keyboard', 'Key velocity', 'keyVelocity', { 64: '64', 100: '100', 127: '127' }),
     setting('Controls', 'Wheel', 'wheel', { page: 'Page', reverse: 'Reverse' }),
     input,
     channel,
@@ -89,6 +90,7 @@ function lines(): Line[] {
       7: '±7 st',
       12: '±12 st',
     }),
+    setting('MIDI', 'Velocity curve', 'velocityCurve', { light: 'Light', normal: 'Normal', heavy: 'Heavy' }),
   ];
 }
 

@@ -28,6 +28,7 @@ import {
   SCALING_DEPTH,
   type ScalingSide,
   SILENCE_DB,
+  VELOCITY_DB,
   WHEEL_DEPTHS,
 } from '../dsp/dx7';
 import { AMS_SHARES } from '../dsp/lfo';
@@ -115,9 +116,10 @@ function brief(value: number, places: number): string {
  * The six operators of a DX7 voice in a link, short: each as its ratio,
  * detune, level ("x" for off), its envelope (attack, peak, decay 1, break,
  * decay 2, sustain, release), its break point, left and right scaling
- * (curve "l" or "e" then depth), rate scaling and its share of the
- * LFO's tremolo as a percentage, joined by "_", and the six joined by
- * "~". Characters a URL keeps as they are.
+ * (curve "l" or "e" then depth), rate scaling, its share of the
+ * LFO's tremolo as a percentage and its velocity (dB on the softest note,
+ * "0" for off), joined by "_", and the six joined by "~". Characters a URL
+ * keeps as they are.
  */
 export function operatorsParam(operators: readonly Dx7Operator[]): string {
   const side = ({ curve, depth }: ScalingSide) => `${curve === 'lin' ? 'l' : 'e'}${brief(depth, 3)}`;
@@ -140,12 +142,14 @@ export function operatorsParam(operators: readonly Dx7Operator[]): string {
         side(op.right),
         brief(op.rateScaling, 4),
         brief(op.tremolo * 100, 1),
+        brief(op.velocity, 1),
       ].join('_');
     })
     .join('~');
 }
 
-const FIELDS = 15;
+/** An operator's fields in a link: sixteen, or fifteen from before velocity (read as off). */
+const FIELDS = 16;
 const STAGE = { min: 0, max: MAX_STAGE_SECONDS };
 const ENV_LEVEL = { min: SILENCE_DB, max: 0 };
 /** The DX7's break points: A-1 to C8 (MIDI 21 to 120). */
@@ -153,9 +157,9 @@ const KEYS = { min: 21, max: 120 };
 
 /**
  * The six operators a link's "o" describes, each value held inside its
- * range; null unless it is exactly six operators of fifteen fields each,
- * all readable, so a damaged or old link keeps the voice the sandbox
- * starts with.
+ * range; null unless it is exactly six operators of sixteen fields each
+ * (or fifteen, velocity off), all readable, so a damaged or old link
+ * keeps the voice the sandbox starts with.
  */
 export function operatorsFromParam(raw: string | null): Dx7Operator[] | null {
   if (raw === null) return null;
@@ -171,7 +175,9 @@ export function operatorsFromParam(raw: string | null): Dx7Operator[] | null {
   const operators: Dx7Operator[] = [];
   for (const row of rows) {
     const f = row.split('_');
-    if (f.length !== FIELDS) return null;
+    if (f.length !== FIELDS && f.length !== FIELDS - 1) return null;
+    const velocity = f.length === FIELDS ? number(f[15]) : 0;
+    if (!Number.isFinite(velocity)) return null;
     const values = [0, 1, ...[3, 4, 5, 6, 7, 8, 9, 10, 13, 14]].map(i => number(f[i]));
     if (!values.every(Number.isFinite)) return null;
     const level = f[2] === 'x' ? null : number(f[2]);
@@ -198,6 +204,7 @@ export function operatorsFromParam(raw: string | null): Dx7Operator[] | null {
       right,
       rateScaling: clamp(rate, RATE_SCALING),
       tremolo: shareFromPercent(share),
+      velocity: clamp(velocity, VELOCITY_DB),
     });
   }
   return operators;

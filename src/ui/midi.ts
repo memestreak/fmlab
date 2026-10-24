@@ -12,7 +12,7 @@ import type { LabStore } from '../model/lab';
 import { settings } from '../model/settings';
 import { createStore } from '../model/store';
 import type { KeyBed } from './keyBed';
-import { parseMidi } from './midiMessage';
+import { curveVelocity, parseMidi } from './midiMessage';
 
 /** The inputs connected, by name, for the Settings panel's Input line. */
 export const midiInputs = createStore<{ names: string[] }>({ names: [] });
@@ -175,8 +175,10 @@ export function mountMidi(panel: HTMLElement, store: LabStore, sound: Sound, bed
       case 'noteOn': {
         // The sound first, then the store; dropped before the first gesture.
         const entering = !bed.has(event.note);
-        if (!sound.noteOn(event.note, midiToHz(event.note), event.velocity, entering)) return;
-        bed.press(event.note, holder);
+        // Through the Velocity curve, before the voice and the figures see it.
+        const velocity = curveVelocity(event.velocity, settings.get().velocityCurve);
+        if (!sound.noteOn(event.note, midiToHz(event.note), velocity, entering)) return;
+        bed.press(event.note, holder, velocity);
         break;
       }
       case 'noteOff':

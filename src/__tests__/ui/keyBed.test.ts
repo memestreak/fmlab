@@ -106,11 +106,13 @@ describe('the key bed', () => {
   it('keeps the store\'s held and the figures\' note with the holders', () => {
     const store = createLabStore();
     const bed = createKeyBed(store);
-    bed.press(69, 'midi:a');
+    bed.press(69, 'midi:a', 37);
     expect(store.get().held).toEqual([69]);
     expect(store.get().carrierHz).toBeCloseTo(440, 6);
     expect(store.get().noteLength).toBe(Infinity);
-    bed.press(69, 'key');
+    // The note's velocity, for the figures (Jeremy, 2026-10-24).
+    expect(store.get().noteVelocity).toBe(37);
+    bed.press(69, 'key', 100);
     bed.release(69, 'midi:a');
     expect(store.get().held).toEqual([69]);
     bed.release(69, 'key');
@@ -122,9 +124,9 @@ describe('the key bed', () => {
     const store = createLabStore();
     const bed = createKeyBed(store);
     bed.pedal('a', true);
-    bed.press(60, 'midi:a');
+    bed.press(60, 'midi:a', 100);
     bed.release(60, 'midi:a');
-    bed.press(62, 'key');
+    bed.press(62, 'key', 100);
     store.set({ stops: store.get().stops + 1 });
     expect(store.get().held).toEqual([]);
     expect(bed.has(60)).toBe(false);
@@ -135,7 +137,7 @@ describe('the key bed', () => {
     const bed = createKeyBed(store);
     let calls = 0;
     bed.onChange(() => calls++);
-    bed.press(60, 'pointer');
+    bed.press(60, 'pointer', 100);
     bed.release(60, 'pointer');
     expect(calls).toBe(2);
   });

@@ -85,7 +85,7 @@ describe('the sandbox in a link', () => {
     ...soundFromParams(paramsFromHash(`#/sandbox?${params}`)),
   });
 
-  it('is readable, each operator in fifteen short fields, the LFO in eight', () => {
+  it('is readable, each operator in sixteen short fields, the LFO in eight', () => {
     const params = new URLSearchParams(soundParams(six));
     expect(params.has('c')).toBe(false);
     expect(params.get('a')).toBe('5');
@@ -95,8 +95,8 @@ describe('the sandbox in a link', () => {
     // E.PIANO 1's OP2: ratio 14, no detune, -30.75 dB; attack 1 ms to
     // 0 dB, 279 ms to the break at -18.06 dB, 3.37 s to silence; break
     // point A-1, no level scaling, 1.3 times faster an octave up; none of
-    // the tremolo.
-    expect(ops[1]).toBe('14_0_-30.75_0.001_0_0.2786_-18.06_3.3747_-96_0.0741_21_l0_l0_1.2968_0');
+    // the tremolo; 78.4 dB quieter on the softest note (KVS 7).
+    expect(ops[1]).toBe('14_0_-30.75_0.001_0_0.2786_-18.06_3.3747_-96_0.0741_21_l0_l0_1.2968_0_-78.4');
     // Its LFO: a sine at 5.61 Hz, 0.15 s late, no vibrato or tremolo.
     // The wheel's vibrato and tremolo last: every voice opens on 50 ¢ and 0 dB.
     expect(params.get('l')).toBe('sine_5.613_0.148_0_0_0_50_0');
@@ -126,6 +126,20 @@ describe('the sandbox in a link', () => {
     expect(back.dxPitchEnvelope).toEqual(six.dxPitchEnvelope);
     // The pitch is the sandbox's own: the link does not carry it.
     expect(back.carrierHz).toBe(sandbox.patch.carrierHz ?? DEFAULTS.carrierHz);
+  });
+
+  it('carries each operator\'s velocity, the sixteenth field, held in range', () => {
+    const felt = { ...six, dxOperators: six.dxOperators.map((o, i) => ({ ...o, velocity: [0, -10.9, -33.4, -44.6, -67.1, -78.4][i] })) };
+    expect(reopened(soundParams(felt)).dxOperators?.map(o => o.velocity)).toEqual([0, -10.9, -33.4, -44.6, -67.1, -78.4]);
+    // A value between the DX7's steps is kept; one out of range is held in it.
+    const ops = new URLSearchParams(soundParams(felt)).get('o')!.split('~');
+    const between = ops.map(o => o.replace(/_[^_]*$/, '_-30')).join('~');
+    expect(operatorsFromParam(between)?.map(o => o.velocity)).toEqual([-30, -30, -30, -30, -30, -30]);
+    const beyond = ops.map(o => o.replace(/_[^_]*$/, '_-200')).join('~');
+    expect(operatorsFromParam(beyond)?.[0].velocity).toBe(-78.4);
+    // Fifteen fields, from before velocity: read as off.
+    const older = ops.map(o => o.replace(/_[^_]*$/, '')).join('~');
+    expect(operatorsFromParam(older)?.map(o => o.velocity)).toEqual([0, 0, 0, 0, 0, 0]);
   });
 
   it('carries an operator that is off', () => {

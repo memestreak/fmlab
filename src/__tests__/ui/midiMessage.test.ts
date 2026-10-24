@@ -1,4 +1,4 @@
-import { parseMidi } from '../../ui/midiMessage';
+import { curveVelocity, parseMidi } from '../../ui/midiMessage';
 
 describe('a MIDI message', () => {
   it('is a note on with its velocity, or off at velocity 0 or as 0x80', () => {
@@ -58,5 +58,34 @@ describe('a MIDI message', () => {
     expect(parseMidi([0xa0, 60, 30], 0)).toBeNull();
     expect(parseMidi([0x3c, 90], 0)).toBeNull();
     expect(parseMidi([], 0)).toBeNull();
+  });
+});
+
+describe('the Velocity curve', () => {
+  it('is the velocity as sent on Normal', () => {
+    for (let v = 1; v <= 127; v++) expect(curveVelocity(v, 'normal')).toBe(v);
+  });
+
+  it('keeps 1 and 127 on every curve; Light plays 64 louder, Heavy softer', () => {
+    for (const curve of ['light', 'normal', 'heavy'] as const) {
+      expect(curveVelocity(1, curve)).toBe(1);
+      expect(curveVelocity(127, curve)).toBe(127);
+    }
+    expect(curveVelocity(64, 'light')).toBeGreaterThan(64);
+    expect(curveVelocity(64, 'heavy')).toBeLessThan(64);
+    // 1 + 126 × (63 / 126) ^ 0.6 and ^ 1.6.
+    expect(curveVelocity(64, 'light')).toBe(84);
+    expect(curveVelocity(64, 'heavy')).toBe(43);
+  });
+
+  it('never falls below 1, and rises with the velocity', () => {
+    for (const curve of ['light', 'heavy'] as const) {
+      let last = 0;
+      for (let v = 1; v <= 127; v++) {
+        const out = curveVelocity(v, curve);
+        expect(out).toBeGreaterThanOrEqual(Math.max(1, last));
+        last = out;
+      }
+    }
   });
 });
