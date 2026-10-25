@@ -40,7 +40,7 @@ describe('the sandbox\'s two banks', () => {
     expect(presets[0].label).toBe('A1 BRASS 1');
     expect(presets[31].label).toBe('A32 TAKE OFF');
     expect(presets.slice(32).map(preset => preset.label.replace(/^B\d+ /, ''))).toEqual([
-      'TINE PIANO', 'SUITCASE', 'REED PIANO', 'CLAVINET', 'HARPSICORD', 'DRAWBARS', 'PERC ORGAN', 'SOLID BASS',
+      'TINE PIANO', 'SUITCASE', 'REED PIANO', 'ROSEWOOD', 'SOLO CELLO', 'DRAWBARS', 'PERC ORGAN', 'SOLID BASS',
       'SAW BASS', 'SLAP BASS', 'RUBBER BAS', 'SOFT BRASS', 'BRASS STAB', 'FLUTE', 'CLARINET', 'STRINGS',
       'WARM PAD', 'GLASS PAD', 'VOX PAD', 'SWEEP PAD', 'TUBE BELLS', 'CELESTA', 'MARIMBA', 'VIBES',
       'GAMELAN', 'HARP', 'KOTO', 'SAW LEAD', 'DARK PAD', 'BRASS PAD', 'SAW PAD', 'HOLLOW PAD',
