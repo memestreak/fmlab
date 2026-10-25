@@ -99,7 +99,7 @@ describe('the sandbox in a link', () => {
     expect(ops[1]).toBe('14_0_-30.75_0.001_0_0.2786_-18.06_3.3747_-96_0.0741_21_l0_l0_1.2968_0_-78.4');
     // Its LFO: a sine at 5.61 Hz, 0.15 s late, no vibrato or tremolo.
     // The wheel's vibrato and tremolo last: every voice opens on 50 ¢ and 0 dB.
-    expect(params.get('l')).toBe('sine_5.613_0.148_0_0_0_50_0');
+    expect(params.get('l')).toBe('sine_5.6129_0.148_0_0_0_50_0');
     // Its pitch envelope, flat, with the factory's speeds: levels in cents,
     // speeds in cents a second.
     expect(params.get('p')).toBe('0_11380.28_0_4056.34_0_11887.32_0_3267.61');

@@ -30,7 +30,7 @@ import {
 import type { Preset, PresetBank } from '../chapters';
 import { applyTheme } from '../model/theme';
 import { FACTORY_CREDIT } from '../chapters/dx7Voices';
-import type { LabState, LabStore } from '../model/lab';
+import { DEFAULTS, type LabState, type LabStore } from '../model/lab';
 import { mountInstrument } from './instrument';
 import { mountPresetPanel } from './presetPanel';
 import { stepPreset } from './presetGrid';
@@ -85,7 +85,41 @@ export function openingFromUrl(chapter: Chapter): Partial<LabState> {
   const address = addressAfterOpening(chapter, hash);
   if (address !== null) window.history.replaceState(null, '', pathname + search + address);
   if (!chapter.sharesSound) return chapter.patch;
-  return { ...chapter.patch, ...soundFromParams(params) };
+  const sound = soundFromParams(params);
+  // A shared sound, remembered so the name's glass can say so.
+  if (Object.keys(sound).length > 0) linkSound = soundParams({ ...DEFAULTS, ...chapter.patch, ...sound } as LabState);
+  return { ...chapter.patch, ...sound };
+}
+
+/** The sound a link opened, as its parameters; null when none did. */
+let linkSound: string | null = null;
+
+/**
+ * The link to a sandbox sound, built when asked for (Jeremy, 2026-10-25:
+ * the address never follows the sound, but a sound can be shared):
+ * this page's address with the sound's parameters. It carries the voice
+ * (algorithm, feedback, the six operators with their velocity, the LFO
+ * and the pitch envelope), not the reverb, the settings, the octave or
+ * the volume.
+ */
+export function soundLink(state: LabState, { origin, pathname, search }: Pick<Location, 'origin' | 'pathname' | 'search'>): string {
+  return origin + pathname + search + hashFor('sandbox', soundParams(state));
+}
+
+/**
+ * What the preset name's glass shows for `state`: the preset's name when
+ * the sound is one exactly; SHARED for the sound a link opened, until it
+ * is changed; otherwise a dimmer EDITED.
+ */
+export function nameOnGlass(
+  presets: readonly Preset[],
+  state: LabState,
+  opened: string | null,
+): { text: string; edited: boolean; preset: number } {
+  const at = presetOf(presets, state);
+  if (at >= 0) return { text: presets[at].label, edited: false, preset: at };
+  if (opened !== null && soundParams(state) === opened) return { text: 'Shared', edited: false, preset: -1 };
+  return { text: 'Edited', edited: true, preset: -1 };
 }
 
 /**
@@ -143,10 +177,7 @@ function mountSoundInUrl(store: LabStore): void {
     if (SOUND_IN_URL) write();
     const state = store.get();
     const chapter = chapterById(state.chapter);
-    const { origin, pathname, search } = window.location;
-    const link = chapter?.sharesSound
-      ? origin + pathname + search + hashFor(chapter.id, soundParams(state))
-      : window.location.href;
+    const link = chapter?.sharesSound ? soundLink(state, window.location) : window.location.href;
     const done = (text: string) => {
       share.textContent = text;
       window.setTimeout(() => {
@@ -620,9 +651,11 @@ function presetMenu(presets: readonly Preset[], banks: readonly PresetBank[], st
     // one plays without; fmlab's own say only whose they are.
     const bank = banks.find(b => b.id === presets[at >= 0 ? at : last]?.bank);
     pick.title = bank && bank.id !== banks[0]?.id ? bank.name : `${FACTORY_CREDIT} · ${note.textContent}`;
-    // On the glass: the voice, or a dimmer EDITED once the sound is changed.
-    name.textContent = preset ? preset.label : 'Edited';
-    name.classList.toggle('is-edited', at < 0);
+    // On the glass: the voice, SHARED for a link's sound, or a dimmer
+    // EDITED once the sound is changed.
+    const glass = nameOnGlass(presets, state, linkSound);
+    name.textContent = glass.text;
+    name.classList.toggle('is-edited', glass.edited);
     pick.setAttribute('aria-label', `Preset: ${name.textContent}`);
     panel.show();
   };
@@ -644,7 +677,43 @@ function presetMenu(presets: readonly Preset[], banks: readonly PresetBank[], st
   // Up and down, right of the name (Jeremy, 2026-10-21): up on, down back
   // (Jeremy, 2026-10-23: the other way was "wired in reverse").
   steps.append(...PRESET_STEP_KEYS.map(({ label, glyph, steps: by }) => step(label, glyph, by)));
+  // Share, after them (Jeremy, 2026-10-25): a plain push key that copies
+  // a link to the sound as it is now, the name's glass saying so. Where
+  // the clipboard is refused, the link in a field to copy by hand.
+  const shareBezel = document.createElement('span');
+  shareBezel.className = 'lamp-keys preset-share';
+  const share = document.createElement('button');
+  share.type = 'button';
+  share.className = 'lamp-key preset-share-key';
+  share.textContent = 'Share';
+  share.setAttribute('aria-label', 'Copy a link to this sound');
+  share.title = 'Copy a link to this sound';
+  shareBezel.append(share);
+  let saying = 0;
+  const say = (text: string) => {
+    window.clearTimeout(saying);
+    name.textContent = text;
+    name.classList.remove('is-edited');
+    glitchScreens([name]);
+    saying = window.setTimeout(() => show(store.get()), 1500);
+  };
+  const copy = () => {
+    const link = soundLink(store.get(), window.location);
+    const byHand = () => window.prompt('Copy this link to the sound:', link);
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(link).then(() => say('Link copied'), byHand);
+    } else {
+      byHand();
+    }
+  };
+  // On the press, as every key here; Enter and Space through the click.
+  share.addEventListener('pointerdown', event => {
+    if (event.button === 0) copy();
+  });
+  share.addEventListener('click', event => {
+    if (event.detail === 0) copy();
+  });
   // No label of its own (Jeremy, 2026-10-22): the name on the glass says
   // what it is; for screen readers the group is named Presets.
-  return [pick, steps, note];
+  return [pick, steps, shareBezel, note];
 }

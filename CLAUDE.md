@@ -101,7 +101,10 @@ figures subscribe to it. Nothing else passes values around.
   the section; for one with `sharesSound` (the sandbox), a link's sound
   is read on opening (see `sandbox.ts` below), but with `SOUND_IN_URL`
   off (chapterView.ts; Jeremy, 2026-10-23) the address is then put back
-  to the plain section and not written as the sound changes. `state.chapter`
+  to the plain section and not written as the sound changes. The
+  masthead's Share key copies `soundLink` (built when pressed); the name's
+  glass then says `nameOnGlass`: a preset's name, SHARED for the link's
+  sound until it changes, else EDITED. `state.chapter`
   is a section's id, or `landing` or `glossary`.
   The patch is held two ways, by `mode`. `pm` (everywhere but `vibrato`):
   `ratio` and `index`. `fm` (`vibrato`): `modHz` and `deviationHz`.
