@@ -58,6 +58,12 @@ export interface Settings {
    * and Heaviest harder.
    */
   velocityCurve: 'lightest' | 'light' | 'normal' | 'heavy' | 'heaviest';
+  /**
+   * The velocity a MIDI keyboard's softest press sends (Jeremy,
+   * 2026-10-25), 1 for off: at or below it a key plays as 1, the rest
+   * stretched to 127 (`stretchVelocity`), before the curve.
+   */
+  softestPress: 1 | 10 | 20 | 30 | 40 | 50 | 60;
 }
 
 /** The settings that are numbers, each in a range; the rest are choices. */
@@ -101,6 +107,7 @@ export const SETTING_CHOICES: { [K in ChoiceSetting]: readonly Settings[K][] } =
   midi: ['off', 'on'],
   bendRange: [2, 1, 3, 5, 7, 12],
   velocityCurve: ['normal', 'lightest', 'light', 'heavy', 'heaviest'],
+  softestPress: [1, 10, 20, 30, 40, 50, 60],
 };
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -122,6 +129,7 @@ export const DEFAULT_SETTINGS: Settings = {
   midiChannel: 0,
   bendRange: 2,
   velocityCurve: 'normal',
+  softestPress: 1,
 };
 
 /** Where they are saved, as JSON. */

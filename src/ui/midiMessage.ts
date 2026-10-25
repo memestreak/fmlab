@@ -36,6 +36,20 @@ export function curveVelocity(v: number, curve: VelocityCurve): number {
   return 1 + Math.round(126 * ((clamped - 1) / 126) ** CURVE_GAMMA[curve]);
 }
 
+/**
+ * A MIDI key's velocity with the Softest press setting (Jeremy,
+ * 2026-10-25: the minimum should reach the softest playable velocity):
+ * at or below `softest` it plays as 1, the voice's quietest, and the
+ * range from there to 127 is stretched to 1 to 127. At 1 (off) it is the
+ * velocity as sent. Applied before the Velocity curve.
+ */
+export function stretchVelocity(v: number, softest: number): number {
+  const clamped = Math.min(127, Math.max(1, v));
+  if (softest <= 1) return clamped;
+  if (clamped <= softest) return 1;
+  return 1 + Math.round((126 * (clamped - softest)) / (127 - softest));
+}
+
 /** The keys the sandbox plays: A0 to C8, a piano's. */
 export const MIDI_NOTES = { min: 21, max: 108 };
 

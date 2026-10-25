@@ -1,5 +1,5 @@
 import { type ChoiceSetting, SETTING_CHOICES, saveSettings, type Settings, settings } from '../model/settings';
-import { midiInputs } from './midi';
+import { formatLastVelocity, midiInputs, midiLast } from './midi';
 import { glitchScreens } from './screenGlitch';
 import { inSandbox } from './motion';
 
@@ -22,6 +22,8 @@ interface Line {
   choices: () => readonly { value: string; label: string }[];
   get: () => string;
   set: (value: string) => void;
+  /** A line only read, not set (MIDI's Last velocity): its value. Up and Down pass it by. */
+  readout?: () => string;
 }
 
 const choice = (value: string, label: string) => ({ value, label });
@@ -97,6 +99,16 @@ function lines(): Line[] {
       heavy: 'Heavy',
       heaviest: 'Heaviest',
     }),
+    // Jeremy, 2026-10-25: the minimum reaches the softest playable velocity.
+    setting('MIDI', 'Softest press', 'softestPress', { 1: 'Off', 10: '10', 20: '20', 30: '30', 40: '40', 50: '50', 60: '60' }),
+    {
+      group: 'MIDI',
+      name: 'Last velocity',
+      choices: () => [],
+      get: () => '',
+      set: () => {},
+      readout: () => formatLastVelocity(midiLast.get()),
+    },
   ];
 }
 
@@ -240,11 +252,16 @@ export function mountSettings(): void {
     row.className = 'settings-line';
     row.id = `settings-line-${i}`;
     row.tabIndex = -1;
-    row.setAttribute('role', 'spinbutton');
-    row.setAttribute('aria-label', `${line.group} ${line.name}`);
-    row.setAttribute('aria-haspopup', 'listbox');
-    row.setAttribute('aria-expanded', 'false');
-    row.setAttribute('aria-description', 'Left and Right change it; Enter opens its list');
+    if (line.readout) {
+      // Read only: no control, its value in its name for a screen reader.
+      row.classList.add('is-readout');
+    } else {
+      row.setAttribute('role', 'spinbutton');
+      row.setAttribute('aria-label', `${line.group} ${line.name}`);
+      row.setAttribute('aria-haspopup', 'listbox');
+      row.setAttribute('aria-expanded', 'false');
+      row.setAttribute('aria-description', 'Left and Right change it; Enter opens its list');
+    }
     const group = document.createElement('span');
     group.className = 'settings-group';
     group.textContent = line.group;
@@ -277,6 +294,7 @@ export function mountSettings(): void {
     edit.append(back, value, on);
     row.append(group, name, edit);
     row.addEventListener('click', event => {
+      if (line.readout) return;
       if (event.target instanceof Element && event.target.closest('.settings-arrow')) return;
       select(i);
       row.focus({ preventScroll: true });
@@ -306,8 +324,8 @@ export function mountSettings(): void {
   document.body.append(dialog);
 
   let page: Page = 'general';
-  /** The lines of the open tab, by index. */
-  const shown = () => all.flatMap((line, i) => (pageOf(line) === page ? [i] : []));
+  /** The lines of the open tab that can be set, by index. */
+  const shown = () => all.flatMap((line, i) => (pageOf(line) === page && !line.readout ? [i] : []));
   /** The line `by` along from the selected one in the open tab, round its ends. */
   const along = (by: number) => {
     const lines = shown();
@@ -349,6 +367,12 @@ export function mountSettings(): void {
   const show = () => {
     rows.forEach(({ row, value, back, on }, i) => {
       const line = all[i];
+      if (line.readout) {
+        const text = line.readout();
+        value.textContent = text;
+        row.setAttribute('aria-label', `${line.group} ${line.name}: ${text}`);
+        return;
+      }
       const label = labelOf(line);
       const index = at(line);
       const count = line.choices().length;
@@ -575,6 +599,7 @@ export function mountSettings(): void {
   };
   settings.subscribe(refresh);
   midiInputs.subscribe(refresh);
+  midiLast.subscribe(refresh);
   showPage();
   show();
 }

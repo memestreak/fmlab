@@ -12,10 +12,22 @@ import type { LabStore } from '../model/lab';
 import { settings } from '../model/settings';
 import { createStore } from '../model/store';
 import type { KeyBed } from './keyBed';
-import { curveVelocity, parseMidi } from './midiMessage';
+import { curveVelocity, parseMidi, stretchVelocity } from './midiMessage';
 
 /** The inputs connected, by name, for the Settings panel's Input line. */
 export const midiInputs = createStore<{ names: string[] }>({ names: [] });
+
+/**
+ * The last MIDI note's velocity as sent and as played (after Softest
+ * press and the Velocity curve), for the Settings panel's Last velocity
+ * line and the MIDI key's tip; null before the first.
+ */
+export const midiLast = createStore<{ sent: number | null; played: number | null }>({ sent: null, played: null });
+
+/** A last velocity in words: "38 → 9", or "none yet". */
+export function formatLastVelocity({ sent, played }: { sent: number | null; played: number | null }): string {
+  return sent === null || played === null ? 'none yet' : `${sent} → ${played}`;
+}
 
 /**
  * What the MIDI key shows: MIDI off, on, asking the browser (its permission
@@ -82,7 +94,9 @@ export function mountMidi(panel: HTMLElement, store: LabStore, sound: Sound, bed
     const names = access ? [...access.inputs.values()].filter(input => input.state === 'connected').map(input => input.name ?? '') : [];
     midiInputs.set({ names });
     const listened = [...attached.values()].map(input => input.name ?? '');
-    const tip = midiTip(now, listened);
+    const last = midiLast.get();
+    // The last note's velocity too, so the Softest press can be found by playing.
+    const tip = midiTip(now, listened) + (now === 'on' && last.sent !== null ? ` · last velocity ${formatLastVelocity(last)}` : '');
     key.title = tip;
     key.setAttribute('aria-description', tip);
     key.setAttribute('aria-pressed', String(now === 'on' || now === 'waiting' || now === 'asking'));
@@ -175,8 +189,12 @@ export function mountMidi(panel: HTMLElement, store: LabStore, sound: Sound, bed
       case 'noteOn': {
         // The sound first, then the store; dropped before the first gesture.
         const entering = !bed.has(event.note);
-        // Through the Velocity curve, before the voice and the figures see it.
-        const velocity = curveVelocity(event.velocity, settings.get().velocityCurve);
+        // Through Softest press and the Velocity curve, before the voice
+        // and the figures see it.
+        const { softestPress, velocityCurve } = settings.get();
+        const velocity = curveVelocity(stretchVelocity(event.velocity, softestPress), velocityCurve);
+        midiLast.set({ sent: event.velocity, played: velocity });
+        show();
         if (!sound.noteOn(event.note, midiToHz(event.note), velocity, entering)) return;
         bed.press(event.note, holder, velocity);
         break;

@@ -30,6 +30,7 @@ describe('the sandbox\'s settings', () => {
       midiChannel: 0,
       bendRange: 2,
       velocityCurve: 'normal',
+      softestPress: 1,
     });
     expect(SETTINGS_KEY).toBe('fmlab.settings');
   });
@@ -121,5 +122,8 @@ describe('the sandbox\'s settings', () => {
     expect(parsed({ velocityCurve: 'heaviest' }).velocityCurve).toBe('heaviest');
     expect(parsed({ velocityCurve: 'lightest' }).velocityCurve).toBe('lightest');
     expect(parsed({ velocityCurve: 'soft' }).velocityCurve).toBe('normal');
+    expect(parsed({ softestPress: 40 }).softestPress).toBe(40);
+    expect(parsed({ softestPress: 35 }).softestPress).toBe(1);
+    expect(parsed({ softestPress: '40' }).softestPress).toBe(1);
   });
 });

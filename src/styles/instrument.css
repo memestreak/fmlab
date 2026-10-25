@@ -3049,6 +3049,16 @@ body:not([data-view='instrument']) .inst-settings {
   opacity: 1;
 }
 
+/* A line only read (MIDI's Last velocity): no arrows, its value dimmer. */
+.settings-line.is-readout .settings-arrow {
+  visibility: hidden;
+}
+
+.settings-line.is-readout .settings-value {
+  opacity: 0.75;
+  cursor: default;
+}
+
 .settings-arrow.is-end {
   opacity: 0.2;
   cursor: default;
