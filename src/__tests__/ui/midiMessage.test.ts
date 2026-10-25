@@ -1,4 +1,4 @@
-import { CURVE_GAMMA, curveVelocity, parseMidi, stretchVelocity } from '../../ui/midiMessage';
+import { CURVE_GAMMA, curveVelocity, parseMidi } from '../../ui/midiMessage';
 
 describe('a MIDI message', () => {
   it('is a note on with its velocity, or off at velocity 0 or as 0x80', () => {
@@ -93,35 +93,5 @@ describe('the Velocity curve', () => {
         last = out;
       }
     }
-  });
-});
-
-// Jeremy, 2026-10-25: "make sure that our minimums extend to the softest playable velocity".
-describe('the Softest press', () => {
-  it('is the velocity as sent when off', () => {
-    for (let v = 1; v <= 127; v++) expect(stretchVelocity(v, 1)).toBe(v);
-  });
-
-  it('plays the softest press and below as 1, keeps 127, and stretches the rest', () => {
-    for (const softest of [10, 20, 30, 40, 50, 60]) {
-      expect(stretchVelocity(softest, softest)).toBe(1);
-      expect(stretchVelocity(softest - 5, softest)).toBe(1);
-      expect(stretchVelocity(127, softest)).toBe(127);
-      let last = 1;
-      for (let v = softest; v <= 127; v++) {
-        expect(stretchVelocity(v, softest)).toBeGreaterThanOrEqual(last);
-        last = stretchVelocity(v, softest);
-      }
-    }
-    // Halfway from 40 to 127 lands halfway from 1 to 127.
-    expect(stretchVelocity(84, 40)).toBe(65);
-  });
-
-  it('comes before the curve: a softest press of 40 plays as 1 on every curve', () => {
-    for (const curve of ['lightest', 'light', 'normal', 'heavy', 'heaviest'] as const) {
-      expect(curveVelocity(stretchVelocity(40, 40), curve)).toBe(1);
-    }
-    expect(curveVelocity(stretchVelocity(60, 40), 'normal')).toBe(30);
-    expect(curveVelocity(stretchVelocity(60, 40), 'heaviest')).toBe(4);
   });
 });

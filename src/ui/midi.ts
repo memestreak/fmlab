@@ -12,15 +12,15 @@ import type { LabStore } from '../model/lab';
 import { settings } from '../model/settings';
 import { createStore } from '../model/store';
 import type { KeyBed } from './keyBed';
-import { curveVelocity, parseMidi, stretchVelocity } from './midiMessage';
+import { curveVelocity, parseMidi } from './midiMessage';
 
 /** The inputs connected, by name, for the Settings panel's Input line. */
 export const midiInputs = createStore<{ names: string[] }>({ names: [] });
 
 /**
- * The last MIDI note's velocity as sent and as played (after Softest
- * press and the Velocity curve), for the Settings panel's Last velocity
- * line and the MIDI key's tip; null before the first.
+ * The last MIDI note's velocity as sent and as played (after the
+ * Velocity curve), for the Settings panel's Last velocity line and the
+ * MIDI key's tip; null before the first.
  */
 export const midiLast = createStore<{ sent: number | null; played: number | null }>({ sent: null, played: null });
 
@@ -95,7 +95,7 @@ export function mountMidi(panel: HTMLElement, store: LabStore, sound: Sound, bed
     midiInputs.set({ names });
     const listened = [...attached.values()].map(input => input.name ?? '');
     const last = midiLast.get();
-    // The last note's velocity too, so the Softest press can be found by playing.
+    // The last note's velocity too: what the keyboard sends, and what it plays as.
     const tip = midiTip(now, listened) + (now === 'on' && last.sent !== null ? ` · last velocity ${formatLastVelocity(last)}` : '');
     key.title = tip;
     key.setAttribute('aria-description', tip);
@@ -189,10 +189,8 @@ export function mountMidi(panel: HTMLElement, store: LabStore, sound: Sound, bed
       case 'noteOn': {
         // The sound first, then the store; dropped before the first gesture.
         const entering = !bed.has(event.note);
-        // Through Softest press and the Velocity curve, before the voice
-        // and the figures see it.
-        const { softestPress, velocityCurve } = settings.get();
-        const velocity = curveVelocity(stretchVelocity(event.velocity, softestPress), velocityCurve);
+        // Through the Velocity curve, before the voice and the figures see it.
+        const velocity = curveVelocity(event.velocity, settings.get().velocityCurve);
         midiLast.set({ sent: event.velocity, played: velocity });
         show();
         if (!sound.noteOn(event.note, midiToHz(event.note), velocity, entering)) return;

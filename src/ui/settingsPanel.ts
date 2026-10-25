@@ -99,8 +99,6 @@ function lines(): Line[] {
       heavy: 'Heavy',
       heaviest: 'Heaviest',
     }),
-    // Jeremy, 2026-10-25: the minimum reaches the softest playable velocity.
-    setting('MIDI', 'Softest press', 'softestPress', { 1: 'Off', 10: '10', 20: '20', 30: '30', 40: '40', 50: '50', 60: '60' }),
     {
       group: 'MIDI',
       name: 'Last velocity',
