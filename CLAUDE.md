@@ -889,7 +889,13 @@ connected stays, "(not connected)", until another is chosen), Channel
 ±7, ±12 st) and Velocity curve (Lightest, Light, Normal, Heavy,
 Heaviest: a MIDI key's velocity raised to 0.4, 0.6, 1, 1.6 or 2.5 across
 1 to 127, `curveVelocity`, which keeps 1 and 127; Jeremy, 2026-10-24:
-five, so the softest touch can be soft enough) (the
+five, so the softest touch can be soft enough), Softest press (Off, 10,
+20 … 60: the velocity a keyboard's softest press sends; at or below it a
+key plays as 1, the voice's quietest, the rest stretched to 127 before the
+curve, `stretchVelocity`; Jeremy, 2026-10-25: "our minimums extend to the
+softest playable velocity") and Last velocity, a line only read
+(`readout`, passed by Up and Down): the last MIDI note's velocity as sent
+and as played, "38 → 9" (`midiLast`), also in the MIDI key's tip (the
 reverb's are on the Voice section's Reverb tab, Jeremy, 2026-10-22);
 `applySettings` sets them on `<html>` (`data-motion`, `data-tips`,
 `data-zx`, `data-note-names`, `data-computer-keys`) for the CSS. On a
