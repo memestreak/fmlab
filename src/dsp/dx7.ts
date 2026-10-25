@@ -347,6 +347,53 @@ export interface Dx7Operator {
    * steps (`AMS_SHARES`), none, about a quarter, about two fifths, all.
    */
   tremolo: number;
+  /**
+   * Its velocity sensitivity: how far its level falls on the softest
+   * note, in dB, 0 (off) or negative; the DX7's eight steps are
+   * VELOCITY_STOPS (Jeremy, 2026-10-24). On a modulator it changes the
+   * brightness as well as the loudness.
+   */
+  velocity: number;
+}
+
+/**
+ * msfa's velocity table (dx7note.cc, velocity_data): the DX7's curve
+ * for a key's velocity, by velocity / 2, 0 to 254. A note's level moves
+ * by (table - 239) × sensitivity × 3/64 dB, so at velocity 100 (240)
+ * every operator is within half a dB of its written level.
+ */
+export const VELOCITY_DATA: readonly number[] = [
+  0, 70, 86, 97, 106, 114, 121, 126, 132, 138, 142, 148, 152, 156, 160, 163,
+  166, 170, 173, 174, 178, 181, 184, 186, 189, 190, 194, 196, 198, 200, 202,
+  205, 206, 209, 211, 214, 216, 218, 220, 222, 224, 225, 227, 229, 230, 232,
+  233, 235, 237, 238, 240, 241, 242, 243, 244, 246, 246, 248, 249, 250, 251,
+  252, 253, 254,
+];
+
+/**
+ * The DX7's eight velocity sensitivities, 0 to 7, as how far an
+ * operator's level falls on the softest note (velocity 1), in dB: msfa's
+ * ScaleVelocity at velocity 1 for each step, to a tenth.
+ */
+export const VELOCITY_STOPS: readonly number[] = [0, -10.9, -22.1, -33.4, -44.6, -55.9, -67.1, -78.4];
+
+/** An operator's velocity, from the deepest step to off. */
+export const VELOCITY_DB = { min: -78.4, max: 0 };
+
+/** The velocity of a note with none of its own (a key on the screen, Play note). */
+export const DEFAULT_VELOCITY = 100;
+
+/**
+ * How far velocity `v` (1 to 127) moves the level of an operator whose
+ * level falls `softest` dB (0 or negative) on the softest note: msfa's
+ * curve, without its rounding to a quarter of an output level step.
+ * Above about 100 it is a little over its written level, as on the DX7
+ * (+4.9 dB at the deepest step and velocity 127).
+ */
+export function velocityDb(v: number, softest: number): number {
+  if (softest === 0) return 0;
+  const at = VELOCITY_DATA[Math.min(63, Math.max(0, Math.round(v) >> 1))];
+  return (softest * (at - 239)) / -239;
 }
 
 /** A level in dB as an amplitude, 0 to 1; silence is 0. */
@@ -604,6 +651,19 @@ export function levelAtKey(op: Dx7Operator, key: number): number | null {
   return Math.min(0, op.level + levelScalingDb(op, key));
 }
 
+/**
+ * An operator's level at `key` struck at `velocity`, in dB: its level at
+ * the key, then its velocity's change, added after the clamp to full as
+ * msfa adds it (so a hard note may be a little over 0 dB); null for an
+ * operator that is off. A null velocity (no note: the figures between
+ * notes) leaves the level as written.
+ */
+export function levelAtNote(op: Dx7Operator, key: number, velocity: number | null): number | null {
+  const db = levelAtKey(op, key);
+  if (db === null) return null;
+  return velocity === null ? db : db + velocityDb(velocity, op.velocity);
+}
+
 /** A frequency as the key it is nearest, as a MIDI number (A4 is 69). */
 export function keyOf(hz: number): number {
   return 69 + 12 * Math.log2(hz / 440);
@@ -628,12 +688,17 @@ export interface Dx7Note {
   tremolo: Float64Array;
 }
 
-/** A note of `operators` at `key`, through algorithm `number`. */
+/**
+ * A note of `operators` at `key` and `velocity`, through algorithm
+ * `number`; a null velocity, the levels as written (the figures between
+ * notes).
+ */
 export function dx7Note(
   number: number,
   operators: readonly Dx7Operator[],
   feedback: number,
   key: number,
+  velocity: number | null = DEFAULT_VELOCITY,
 ): Dx7Note {
   const alg = algorithm(number);
   const ratios = new Float64Array(MAX_OPERATORS);
@@ -651,7 +716,7 @@ export function dx7Note(
     }
     ratios[op] = detuned(o.ratio, o.detune);
     tremolo[op] = o.tremolo;
-    const db = levelAtKey(o, key);
+    const db = levelAtNote(o, key, velocity);
     gains[op] = db === null ? 0 : unit(op) * dbToAmp(db);
     envelopes.push(fasterEnvelope(o.envelope, rateScalingFactor(o.rateScaling, key)));
   }
@@ -712,5 +777,6 @@ export function heldOperator(ratio: number, level: number | null): Dx7Operator {
     right: { curve: 'lin', depth: 0 },
     rateScaling: 1,
     tremolo: 0,
+    velocity: 0,
   };
 }

@@ -1217,8 +1217,9 @@ body:not([data-view='instrument']) #inst-tools {
   margin: 0 0 0.15rem;
 }
 
-/* The DX7 voice's columns: ratio and level given the room, detune a box,
-   the envelope and the keyboard as small drawings. */
+/* The DX7 voice's columns: ratio and level given the room, detune,
+   tremolo and velocity a reel each, the envelope and the keyboard as
+   small drawings. */
 .voice-table {
   width: 100%;
   table-layout: auto;
@@ -1232,7 +1233,8 @@ body:not([data-view='instrument']) #inst-tools {
 
 .voice-table .voice-ratio,
 .voice-table .voice-level {
-  width: 22%;
+  /* A little less since velocity's column (Jeremy, 2026-10-24). */
+  width: 19%;
 }
 
 .voice-table .voice-env {
@@ -1270,8 +1272,9 @@ canvas.voice-keys {
   outline-offset: 2px;
 }
 
-/* The tremolo share: a reel alone, narrow. */
-.voice-table .voice-tremolo {
+/* The tremolo share and the velocity: a reel each, alone, narrow. */
+.voice-table .voice-tremolo,
+.voice-table .voice-velocity {
   width: 4.5rem;
 }
 
@@ -3044,6 +3047,16 @@ body:not([data-view='instrument']) .inst-settings {
 
 .settings-arrow:hover {
   opacity: 1;
+}
+
+/* A line only read (MIDI's Last velocity): no arrows, its value dimmer. */
+.settings-line.is-readout .settings-arrow {
+  visibility: hidden;
+}
+
+.settings-line.is-readout .settings-value {
+  opacity: 0.75;
+  cursor: default;
 }
 
 .settings-arrow.is-end {

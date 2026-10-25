@@ -15,6 +15,8 @@ describe('the sandbox\'s settings', () => {
       zxHint: 'hover',
       noteNames: 'c',
       computerKeys: 'off',
+      // The computer's and the screen's keys at velocity 100 (Jeremy, 2026-10-24).
+      keyVelocity: 100,
       wheel: 'page',
       // The plate reverb, off (Jeremy, 2026-10-22).
       reverb: 'off',
@@ -27,6 +29,7 @@ describe('the sandbox\'s settings', () => {
       midiInput: '',
       midiChannel: 0,
       bendRange: 2,
+      velocityCurve: 'normal',
     });
     expect(SETTINGS_KEY).toBe('fmlab.settings');
   });
@@ -102,5 +105,21 @@ describe('the sandbox\'s settings', () => {
     expect(parsed({ midiInput: 'x'.repeat(101) }).midiInput).toBe('');
     expect(parsed({ midiInput: 'x'.repeat(100) }).midiInput).toBe('x'.repeat(100));
     expect(parsed({ midiInput: 7 }).midiInput).toBe('');
+  });
+
+  it('keep Key velocity and the Velocity curve to their choices', () => {
+    const parsed = (json: object) => parseSettings(JSON.stringify(json));
+    expect(parsed({ keyVelocity: 127, velocityCurve: 'heavy' })).toEqual({
+      ...DEFAULT_SETTINGS,
+      keyVelocity: 127,
+      velocityCurve: 'heavy',
+    });
+    expect(parsed({ keyVelocity: 64 }).keyVelocity).toBe(64);
+    expect(parsed({ keyVelocity: 90 }).keyVelocity).toBe(100);
+    expect(parsed({ keyVelocity: '127' }).keyVelocity).toBe(100);
+    expect(parsed({ velocityCurve: 'light' }).velocityCurve).toBe('light');
+    expect(parsed({ velocityCurve: 'heaviest' }).velocityCurve).toBe('heaviest');
+    expect(parsed({ velocityCurve: 'lightest' }).velocityCurve).toBe('lightest');
+    expect(parsed({ velocityCurve: 'soft' }).velocityCurve).toBe('normal');
   });
 });

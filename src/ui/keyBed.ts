@@ -150,7 +150,7 @@ const now = () => performance.now() / 1000;
 /** The key bed the piano and MIDI share: the holders, and the store kept with them. */
 export interface KeyBed {
   /** `holder` holds `midi`. Returns what that did. */
-  press(midi: number, holder: Holder): Change;
+  press(midi: number, holder: Holder, velocity: number): Change;
   /** `holder` lets `midi` go. */
   release(midi: number, holder: Holder): Change;
   /** `input`'s pedal; returns the pitches let go by its lifting. */
@@ -200,7 +200,7 @@ export function createKeyBed(store: LabStore): KeyBed {
   });
 
   return {
-    press(midi, holder) {
+    press(midi, holder, velocity) {
       const change = holders.press(midi, holder);
       // A new strike from MIDI (a note played again, sustained or held by
       // another source) is the figures' new note too.
@@ -214,6 +214,7 @@ export function createKeyBed(store: LabStore): KeyBed {
           noteStartedAt: now(),
           noteLength: Infinity,
           noteHold: Infinity,
+          noteVelocity: velocity,
         });
         for (const listener of listeners) listener();
       }

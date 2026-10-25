@@ -15,6 +15,27 @@ export type MidiEvent =
   /** The pitch wheel, -1 to 1. */
   | { type: 'bend'; amount: number };
 
+/** How hard a MIDI key must be struck for each loudness: the Velocity curve setting. */
+export type VelocityCurve = 'lightest' | 'light' | 'normal' | 'heavy' | 'heaviest';
+
+/**
+ * Each curve's exponent: below 1 a key sounds louder for its velocity,
+ * above 1 softer (Jeremy, 2026-10-24: Heaviest for a softest touch that
+ * is soft enough).
+ */
+export const CURVE_GAMMA: Record<VelocityCurve, number> = { lightest: 0.4, light: 0.6, normal: 1, heavy: 1.6, heaviest: 2.5 };
+
+/**
+ * A MIDI key's velocity (1 to 127) through the Velocity curve (Jeremy,
+ * 2026-10-24): the span 1 to 127 raised to γ, 1 + 126 × ((v − 1) / 126) ^ γ,
+ * rounded. Normal is the velocity as sent; Light and Lightest are easier
+ * to play loud, Heavy and Heaviest harder; all keep 1 and 127.
+ */
+export function curveVelocity(v: number, curve: VelocityCurve): number {
+  const clamped = Math.min(127, Math.max(1, v));
+  return 1 + Math.round(126 * ((clamped - 1) / 126) ** CURVE_GAMMA[curve]);
+}
+
 /** The keys the sandbox plays: A0 to C8, a piano's. */
 export const MIDI_NOTES = { min: 21, max: 108 };
 

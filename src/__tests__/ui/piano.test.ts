@@ -131,8 +131,11 @@ describe('the sandbox', () => {
       expect(preset.hint).toMatch(/^the DX7's factory .*, a close approximation/);
       expect(preset.note).toMatch(/^approximate/);
     }
-    expect(sandbox.presets[10].hint).toContain('without its velocity');
-    expect(sandbox.presets[10].note).toBe('approximate · no velocity');
+    // Velocity is played now (Jeremy, 2026-10-24): E.PIANO 1 has its
+    // KVS, OP2 the deepest, and nothing else it plays without.
+    expect(sandbox.presets[10].hint).not.toContain('velocity');
+    expect(sandbox.presets[10].note).toBe('approximate');
+    expect(sandbox.presets[10].patch.dxOperators?.map(op => op.velocity)).toEqual([-22.1, -78.4, -22.1, -67.1, 0, -67.1]);
     // The LFO is played now: STRINGS 2's vibrato, a delay of 1.18 s.
     expect(sandbox.presets[4].hint).not.toContain('vibrato');
     expect(sandbox.presets[4].patch.dxLfo).toMatchObject({ wave: 'sine', delay: 1.184 });

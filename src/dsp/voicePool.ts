@@ -2,6 +2,7 @@ import { algorithm } from './algorithms';
 import {
   anchorAt,
   atKey,
+  DEFAULT_VELOCITY,
   type Dx7Envelope,
   type Dx7EnvelopeAnchor,
   dx7EnvelopeAt,
@@ -76,8 +77,8 @@ export type VoiceMessage =
   | { type: 'patch'; patch: VoicePatch; live?: boolean }
   /**
    * `hold`: seconds until the note lets itself go; Infinity until noteOff.
-   * `velocity`: a MIDI key's, 0 to 127, carried for the next version, not
-   * yet heard.
+   * `velocity`: the key's, 1 to 127 (DEFAULT_VELOCITY, 100, when none):
+   * each operator's level moves by its velocity sensitivity.
    */
   | { type: 'noteOn'; note: number; hz: number; hold: number; velocity?: number }
   | { type: 'noteOff'; note: number }
@@ -109,6 +110,7 @@ interface Waiting {
   hz: number;
   hold: number;
   patch: VoicePatch;
+  velocity: number;
 }
 
 /** One note's worth of synth: a kernel and each operator's envelope. */
@@ -135,6 +137,8 @@ class Voice implements VoiceState {
   /** A DX7 note's algorithm and key: an edit keeps both. */
   algorithm = 1;
   key = 60;
+  /** The note's velocity, 1 to 127: an edit works the note out again with it. */
+  velocity = DEFAULT_VELOCITY;
   /**
    * A DX7 note's levels as the kernel takes them and its tremolo shares,
    * as heard (gliding after an edit); its ratios are `ratios`, its
@@ -249,7 +253,7 @@ export class VoicePool {
 
   handle(message: VoiceMessage): void {
     if (message.type === 'patch') this.setPatch(message.patch, message.live === true);
-    else if (message.type === 'noteOn') this.noteOn(message.note, message.hz, message.hold);
+    else if (message.type === 'noteOn') this.noteOn(message.note, message.hz, message.hold, message.velocity);
     else if (message.type === 'noteOff') this.noteOff(message.note);
     else if (message.type === 'wheel') this.setWheel(message.amount);
     else if (message.type === 'bend') this.setBend(message.semitones);
@@ -289,7 +293,7 @@ export class VoicePool {
    */
   private edit(voice: Voice, patch: Dx7Patch): void {
     const time = voice.age / this.sampleRate;
-    const note = dx7Note(voice.algorithm, patch.operators, patch.feedback, voice.key);
+    const note = dx7Note(voice.algorithm, patch.operators, patch.feedback, voice.key, voice.velocity);
     for (let op = 0; op < MAX_OPERATORS; op++) {
       anchorAt(voice.envelopes7[op], voice.anchors[op], time, voice.hold, voice.anchors[op]);
     }
@@ -329,15 +333,15 @@ export class VoicePool {
     voice.feedback = voice.feedbackFrom + (voice.feedbackTo - voice.feedbackFrom) * f;
   }
 
-  /** Strikes `note` at `hz`; it lets itself go after `hold` seconds. */
-  noteOn(note: number, hz: number, hold = Infinity): void {
+  /** Strikes `note` at `hz` and `velocity`; it lets itself go after `hold` seconds. */
+  noteOn(note: number, hz: number, hold = Infinity, velocity = DEFAULT_VELOCITY): void {
     // Every key restarts the LFO's delay, for the notes already held too.
     this.lfo.keyDown();
     const voice = this.voices[chooseVoice(this.voices, note)];
     voice.note = note;
     voice.struckAt = this.now;
     voice.releasedAt = null;
-    const waiting = { hz, hold, patch: this.patch };
+    const waiting = { hz, hold, patch: this.patch, velocity: Math.min(127, Math.max(1, velocity)) };
     if (voice.sounding) {
       // Faded out first, then started.
       voice.waiting = waiting;
@@ -583,7 +587,7 @@ export class VoicePool {
     }
   }
 
-  private start(voice: Voice, { hz, hold, patch }: Waiting): void {
+  private start(voice: Voice, { hz, hold, patch, velocity }: Waiting): void {
     voice.waiting = null;
     voice.alg = algorithm(patch.algorithm);
     voice.kernel.setAlgorithm(voice.alg);
@@ -593,7 +597,8 @@ export class VoicePool {
     if (patch.kind === 'dx7') {
       voice.algorithm = patch.algorithm;
       voice.key = keyOf(hz);
-      const note = dx7Note(patch.algorithm, patch.operators, patch.feedback, voice.key);
+      voice.velocity = velocity;
+      const note = dx7Note(patch.algorithm, patch.operators, patch.feedback, voice.key, velocity);
       voice.dx7 = note;
       voice.gains.set(note.gains);
       voice.ratios.set(note.ratios);

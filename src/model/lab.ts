@@ -3,6 +3,7 @@ import { type Envelope, envelopeAt } from '../dsp/envelope';
 import {
   anchorAt,
   dbToAmp,
+  DEFAULT_VELOCITY,
   type Dx7Envelope,
   type Dx7EnvelopeAnchor,
   dx7EnvelopeAt,
@@ -18,7 +19,7 @@ import {
   heldOperator,
   keyAnchor,
   keyOf,
-  levelAtKey,
+  levelAtNote,
 } from '../dsp/dx7';
 import { noteHold, type Operator, OPERATOR_RELEASE, operatorEnvelope } from '../dsp/operators';
 import { createStore, type Store } from './store';
@@ -119,6 +120,13 @@ export interface LabState {
    * them, are let go then.
    */
   noteHold: number;
+  /**
+   * `dx7`: the last note's velocity, 1 to 127 (Jeremy, 2026-10-24): MIDI's
+   * after the Velocity curve, Key velocity for the computer's and the
+   * screen's keys, DEFAULT_VELOCITY for Play note. While it sounds, the
+   * figures draw each operator's level at it, as it is heard.
+   */
+  noteVelocity: number;
   /**
    * Counts the voices loaded whole: a preset or a link. Notes already
    * sounding keep the voice they were struck with; any other change to the
@@ -253,6 +261,7 @@ export const DEFAULTS: LabState = {
   noteStartedAt: null,
   noteLength: 0,
   noteHold: Infinity,
+  noteVelocity: DEFAULT_VELOCITY,
   voiceLoads: 0,
   noteAnchors: null,
   hover: null,
@@ -364,11 +373,13 @@ export function envelopeOf(state: LabState): Envelope {
 export function operatorLevelsAt(state: LabState, time: number | undefined): number[] {
   const into = noteProgress(state, time);
   if (state.voiceModel === 'dx7') {
-    // How loud each is, 0 to 1: its level at the key, by its envelope.
+    // How loud each is, 0 to 1: its level at the key and the note's
+    // velocity (as written when none sounds), by its envelope.
     const key = keyOf(state.carrierHz);
+    const velocity = into === null ? null : state.noteVelocity;
     const { envelopes } = dx7NoteOf(state);
     return state.dxOperators.map((op, i) => {
-      const db = levelAtKey(op, key);
+      const db = levelAtNote(op, key, velocity);
       if (db === null) return 0;
       return dbToAmp(db) * (into === null ? 1 : noteEnvelopeAt(state, envelopes, i, into));
     });
@@ -377,9 +388,9 @@ export function operatorLevelsAt(state: LabState, time: number | undefined): num
   return state.operators.map(op => op.level * envelopeAt(operatorEnvelope(op, state.noteHold), into));
 }
 
-/** `dx7`: a note of the voice as set, at the carrier's pitch. */
-export function dx7NoteOf(state: LabState): Dx7Note {
-  return dx7Note(state.algorithm, state.dxOperators, state.dxFeedback, keyOf(state.carrierHz));
+/** `dx7`: a note of the voice as set, at the carrier's pitch and `velocity` (null: as written). */
+export function dx7NoteOf(state: LabState, velocity: number | null = null): Dx7Note {
+  return dx7Note(state.algorithm, state.dxOperators, state.dxFeedback, keyOf(state.carrierHz), velocity);
 }
 
 /**
@@ -388,7 +399,7 @@ export function dx7NoteOf(state: LabState): Dx7Note {
  */
 export function dx7KernelLevelsAt(state: LabState, time: number | undefined): number[] {
   const into = noteProgress(state, time);
-  const note = dx7NoteOf(state);
+  const note = dx7NoteOf(state, into === null ? null : state.noteVelocity);
   return Array.from(note.gains, (gain, op) =>
     into === null ? gain : gain * noteEnvelopeAt(state, note.envelopes, op, into),
   );

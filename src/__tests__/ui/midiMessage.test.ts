@@ -1,4 +1,4 @@
-import { parseMidi } from '../../ui/midiMessage';
+import { CURVE_GAMMA, curveVelocity, parseMidi } from '../../ui/midiMessage';
 
 describe('a MIDI message', () => {
   it('is a note on with its velocity, or off at velocity 0 or as 0x80', () => {
@@ -58,5 +58,40 @@ describe('a MIDI message', () => {
     expect(parseMidi([0xa0, 60, 30], 0)).toBeNull();
     expect(parseMidi([0x3c, 90], 0)).toBeNull();
     expect(parseMidi([], 0)).toBeNull();
+  });
+});
+
+describe('the Velocity curve', () => {
+  it('is the velocity as sent on Normal', () => {
+    for (let v = 1; v <= 127; v++) expect(curveVelocity(v, 'normal')).toBe(v);
+  });
+
+  it('keeps 1 and 127 on every curve; Light plays 64 louder, Heavy softer', () => {
+    for (const curve of ['lightest', 'light', 'normal', 'heavy', 'heaviest'] as const) {
+      expect(curveVelocity(1, curve)).toBe(1);
+      expect(curveVelocity(127, curve)).toBe(127);
+    }
+    // Five, from the lightest touch to the heaviest (Jeremy, 2026-10-24).
+    expect(CURVE_GAMMA).toEqual({ lightest: 0.4, light: 0.6, normal: 1, heavy: 1.6, heaviest: 2.5 });
+    // Each heavier curve plays a soft key softer.
+    const soft = (['lightest', 'light', 'normal', 'heavy', 'heaviest'] as const).map(c => curveVelocity(30, c));
+    expect(soft).toEqual([...soft].sort((a, b) => b - a));
+    expect(new Set(soft).size).toBe(5);
+    expect(curveVelocity(64, 'light')).toBeGreaterThan(64);
+    expect(curveVelocity(64, 'heavy')).toBeLessThan(64);
+    // 1 + 126 × (63 / 126) ^ 0.6 and ^ 1.6.
+    expect(curveVelocity(64, 'light')).toBe(84);
+    expect(curveVelocity(64, 'heavy')).toBe(43);
+  });
+
+  it('never falls below 1, and rises with the velocity', () => {
+    for (const curve of ['lightest', 'light', 'heavy', 'heaviest'] as const) {
+      let last = 0;
+      for (let v = 1; v <= 127; v++) {
+        const out = curveVelocity(v, curve);
+        expect(out).toBeGreaterThanOrEqual(Math.max(1, last));
+        last = out;
+      }
+    }
   });
 });

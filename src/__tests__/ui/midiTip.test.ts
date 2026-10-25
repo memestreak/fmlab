@@ -1,4 +1,4 @@
-import { midiTip } from '../../ui/midi';
+import { formatLastVelocity, midiTip } from '../../ui/midi';
 
 describe('the In key\'s tip', () => {
   it('names the keyboards heard, or says why none is', () => {
@@ -11,5 +11,12 @@ describe('the In key\'s tip', () => {
       "MIDI blocked: allow it in the site's settings (in Brave: Settings, Site and Shields settings, MIDI devices)",
     );
     expect(midiTip('unsupported', [])).toBe('This browser has no MIDI: use Chrome, Edge, Brave or Firefox');
+  });
+});
+
+describe('the last velocity', () => {
+  it('says what was sent and what was played, or none yet', () => {
+    expect(formatLastVelocity({ sent: 38, played: 9 })).toBe('38 → 9');
+    expect(formatLastVelocity({ sent: null, played: null })).toBe('none yet');
   });
 });

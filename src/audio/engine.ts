@@ -1,5 +1,5 @@
 import { type Envelope, noteSeconds, TIME_CONSTANTS } from '../dsp/envelope';
-import { dx7NoteHold } from '../dsp/dx7';
+import { DEFAULT_VELOCITY, dx7NoteHold } from '../dsp/dx7';
 import { noteHold } from '../dsp/operators';
 import type { VoiceMessage, VoicePatch } from '../dsp/voicePool';
 import { midiToHz } from '../dsp/voices';
@@ -220,7 +220,8 @@ export class AudioEngine {
         if (previous.held.includes(note)) continue;
         // A MIDI note has been sent already (`noteOn`): not struck twice.
         if (this.sent.delete(note)) continue;
-        this.strike(note, midiToHz(note), Infinity);
+        // A key's velocity: the key bed set it with `held` (Key velocity).
+        this.strike(note, midiToHz(note), Infinity, undefined, state.noteVelocity);
       }
       for (const note of previous.held) {
         if (!state.held.includes(note)) this.tell({ type: 'noteOff', note });
@@ -238,6 +239,7 @@ export class AudioEngine {
           noteStartedAt: performance.now() / 1000,
           noteLength: seconds,
           noteHold: hold,
+          noteVelocity: DEFAULT_VELOCITY,
         });
         this.suspendSoon((seconds + 1) * 1000 + this.tailMs());
       });
