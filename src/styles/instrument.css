@@ -2881,12 +2881,13 @@ body:not([data-view='instrument']) .inst-settings {
   background: rgba(0, 0, 0, 0.35);
 }
 
-/* Close has no state to show, so no lamp: a plain push key. */
-[data-view='instrument'] .settings-close {
+/* Close has no state to show, so no lamp: a plain push key; and the
+   preset's Share, beside its steps. */
+[data-view='instrument'] :is(.settings-close, .preset-share-key) {
   padding: 0 0.75rem;
 }
 
-[data-view='instrument'] .settings-close::before {
+[data-view='instrument'] :is(.settings-close, .preset-share-key)::before {
   display: none;
 }
 

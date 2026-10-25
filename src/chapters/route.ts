@@ -228,10 +228,12 @@ export function shareFromPercent(percent: number): number {
 export function lfoParam(lfo: Dx7Lfo): string {
   return [
     lfo.wave,
-    brief(lfo.speed, 3),
-    brief(lfo.delay, 3),
-    brief(lfo.vibrato, 1),
-    brief(lfo.tremolo, 1),
+    // To the voices' own places (scripts/dx7_voices.py), so a preset's
+    // link brings back the preset exactly (Jeremy, 2026-10-25: sharing).
+    brief(lfo.speed, 4),
+    brief(lfo.delay, 4),
+    brief(lfo.vibrato, 2),
+    brief(lfo.tremolo, 2),
     lfo.sync ? '1' : '0',
     brief(lfo.wheelVibrato, 1),
     brief(lfo.wheelTremolo, 1),
@@ -252,10 +254,10 @@ export function lfoFromParam(raw: string | null): Dx7Lfo | null {
   const [speed, delay, vibrato, tremolo, wheelVibrato, wheelTremolo] = numbers;
   return {
     wave: f[0] as LfoWave,
-    speed: clamp(speed, LFO_SPEED),
-    delay: clamp(delay, LFO_DELAY),
-    vibrato: clamp(vibrato, LFO_VIBRATO),
-    tremolo: clamp(tremolo, LFO_TREMOLO),
+    speed: clampRounded(speed, LFO_SPEED, 4),
+    delay: clampRounded(delay, LFO_DELAY, 4),
+    vibrato: clampRounded(vibrato, LFO_VIBRATO, 2),
+    tremolo: clampRounded(tremolo, LFO_TREMOLO, 2),
     sync: f[5] === '1',
     wheelVibrato: wheelVibrato === undefined ? WHEEL_DEPTHS.wheelVibrato : clamp(wheelVibrato, LFO_VIBRATO),
     wheelTremolo: wheelTremolo === undefined ? WHEEL_DEPTHS.wheelTremolo : clamp(wheelTremolo, LFO_TREMOLO),
@@ -265,6 +267,19 @@ export function lfoFromParam(raw: string | null): Dx7Lfo | null {
 /** The pitch envelope's fields in a link, in this order. */
 const PITCH_FIELDS = ['start', 'attack', 'peak', 'decay1', 'brk', 'decay2', 'sustain', 'release'] as const;
 const PITCH_SPEEDS = new Set<string>(['attack', 'decay1', 'decay2', 'release']);
+/**
+ * A value held to its range, but one past an end by no more than the
+ * rounding of the voices' `places` decimals kept as it is: the fastest
+ * pitch envelope speed is written 14366.2, a hair over 14366.197…, and
+ * the deepest LFO tremolo 91.71 (Jeremy, 2026-10-25: a preset's link
+ * brings back the preset exactly).
+ */
+function clampRounded(value: number, range: { min: number; max: number }, places: number): number {
+  const slack = 0.5 * 10 ** -places + 1e-9;
+  if (value > range.max && value - range.max <= slack) return value;
+  if (value < range.min && range.min - value <= slack) return value;
+  return clamp(value, range);
+}
 
 /**
  * The pitch envelope in a link: start, attack, peak, decay 1, break,
@@ -282,7 +297,7 @@ export function pitchFromParam(raw: string | null): Dx7PitchEnvelope | null {
   if (f.length !== PITCH_FIELDS.length || !f.every(Number.isFinite)) return null;
   const env = {} as Dx7PitchEnvelope;
   PITCH_FIELDS.forEach((key, i) => {
-    env[key] = clamp(f[i], PITCH_SPEEDS.has(key) ? PITCH_EG_SPEED : PITCH_ENVELOPE_CENTS);
+    env[key] = PITCH_SPEEDS.has(key) ? clampRounded(f[i], PITCH_EG_SPEED, 2) : clamp(f[i], PITCH_ENVELOPE_CENTS);
   });
   return env;
 }
