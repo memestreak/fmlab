@@ -24,19 +24,18 @@ KVS_BYTE = 13
 SENSITIVITY: dict[str, tuple[int, int]] = {
     # Every carrier with velocity two steps deeper than the first starting
     # points (Jeremy, 2026-10-25: the softest note was still too loud).
-    # Pianos, Rhodes-type and clavinet: carriers 4, bright modulators 4 to 6.
+    # Pianos and Rhodes-type: carriers 4, bright modulators 4 to 6.
     "TINE PIANO": (4, 5),
     "SUITCASE": (4, 5),
     "REED PIANO": (4, 4),
-    "CLAVINET": (4, 4),
     # Plucks: modulators 3, carriers 3.
-    "HARPSICORD": (3, 3),
     "HARP": (3, 3),
     "KOTO": (3, 3),
     # Mallets: modulators 4, carriers 4.
     "TUBE BELLS": (4, 4),
     "CELESTA": (4, 4),
     "MARIMBA": (4, 4),
+    "ROSEWOOD": (4, 4),
     "VIBES": (4, 4),
     "GAMELAN": (4, 4),
     # Basses: modulators 3, carriers 3.
@@ -58,6 +57,8 @@ SENSITIVITY: dict[str, tuple[int, int]] = {
     "SAW PAD": (0, 0),
     "HOLLOW PAD": (0, 0),
     "STRINGS": (3, 0),
+    # A solo bowed string: a firmer key, a little brighter bow.
+    "SOLO CELLO": (3, 2),
     "FLUTE": (3, 0),
     "CLARINET": (3, 0),
     "SAW LEAD": (3, 0),
