@@ -35,7 +35,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.1892,
         'tremolo': 0.0,
-        'velocity': -22.1
+        'velocity': -44.6
       },
       {
         'ratio': 1.0,
@@ -87,7 +87,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.1892,
         'tremolo': 0.0,
-        'velocity': -22.1
+        'velocity': -44.6
       },
       {
         'ratio': 14.0,
@@ -139,7 +139,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.1892,
         'tremolo': 0.0,
-        'velocity': -22.1
+        'velocity': -44.6
       },
       {
         'ratio': 1.0,
@@ -217,7 +217,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.1892,
         'tremolo': 1.0,
-        'velocity': -22.1
+        'velocity': -44.6
       },
       {
         'ratio': 1.0,
@@ -269,7 +269,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.1892,
         'tremolo': 1.0,
-        'velocity': -22.1
+        'velocity': -44.6
       },
       {
         'ratio': 14.0,
@@ -321,7 +321,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.1892,
         'tremolo': 0.427450954914093,
-        'velocity': -22.1
+        'velocity': -44.6
       },
       {
         'ratio': 1.0,
@@ -399,7 +399,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.1892,
         'tremolo': 0.0,
-        'velocity': -22.1
+        'velocity': -44.6
       },
       {
         'ratio': 1.0,
@@ -451,7 +451,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.1892,
         'tremolo': 0.0,
-        'velocity': -22.1
+        'velocity': -44.6
       },
       {
         'ratio': 1.0,
@@ -503,7 +503,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.1892,
         'tremolo': 0.0,
-        'velocity': -22.1
+        'velocity': -44.6
       },
       {
         'ratio': 3.0,
@@ -581,7 +581,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.2968,
         'tremolo': 0.0,
-        'velocity': -22.1
+        'velocity': -44.6
       },
       {
         'ratio': 3.0,
@@ -659,7 +659,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.2968,
         'tremolo': 0.0,
-        'velocity': -22.1
+        'velocity': -44.6
       },
       {
         'ratio': 5.0,
@@ -763,7 +763,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.1892,
         'tremolo': 0.0,
-        'velocity': -10.9
+        'velocity': -33.4
       },
       {
         'ratio': 3.0,
@@ -815,7 +815,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.1892,
         'tremolo': 0.0,
-        'velocity': -10.9
+        'velocity': -33.4
       },
       {
         'ratio': 5.0,
@@ -867,7 +867,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.1892,
         'tremolo': 0.0,
-        'velocity': -10.9
+        'velocity': -33.4
       },
       {
         'ratio': 1.0,
@@ -1309,7 +1309,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.1892,
         'tremolo': 0.0,
-        'velocity': -10.9
+        'velocity': -33.4
       },
       {
         'ratio': 0.5,
@@ -1491,7 +1491,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.0905,
         'tremolo': 0.0,
-        'velocity': -10.9
+        'velocity': -33.4
       },
       {
         'ratio': 1.0,
@@ -1543,7 +1543,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.0905,
         'tremolo': 0.0,
-        'velocity': -10.9
+        'velocity': -33.4
       },
       {
         'ratio': 0.5,
@@ -1673,7 +1673,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.1892,
         'tremolo': 0.0,
-        'velocity': -10.9
+        'velocity': -33.4
       },
       {
         'ratio': 1.0,
@@ -1725,7 +1725,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.1892,
         'tremolo': 0.0,
-        'velocity': -10.9
+        'velocity': -33.4
       },
       {
         'ratio': 0.5,
@@ -1777,7 +1777,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.1892,
         'tremolo': 0.0,
-        'velocity': -10.9
+        'velocity': -33.4
       },
       {
         'ratio': 4.0,
@@ -1855,7 +1855,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.0905,
         'tremolo': 0.0,
-        'velocity': -10.9
+        'velocity': -33.4
       },
       {
         'ratio': 0.5,
@@ -1907,7 +1907,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.0905,
         'tremolo': 0.0,
-        'velocity': -10.9
+        'velocity': -33.4
       },
       {
         'ratio': 1.0,
@@ -2037,7 +2037,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.0,
         'tremolo': 0.0,
-        'velocity': -10.9
+        'velocity': -33.4
       },
       {
         'ratio': 1.0,
@@ -2089,7 +2089,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.0,
         'tremolo': 0.0,
-        'velocity': -10.9
+        'velocity': -33.4
       },
       {
         'ratio': 1.0,
@@ -2115,7 +2115,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.0,
         'tremolo': 0.0,
-        'velocity': -10.9
+        'velocity': -33.4
       },
       {
         'ratio': 0.5,
@@ -2141,7 +2141,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.0,
         'tremolo': 0.0,
-        'velocity': -10.9
+        'velocity': -33.4
       },
       {
         'ratio': 1.0,
@@ -2219,7 +2219,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.0,
         'tremolo': 0.0,
-        'velocity': -10.9
+        'velocity': -33.4
       },
       {
         'ratio': 1.0,
@@ -2271,7 +2271,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.0,
         'tremolo': 0.0,
-        'velocity': -10.9
+        'velocity': -33.4
       },
       {
         'ratio': 2.0,
@@ -2297,7 +2297,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.0,
         'tremolo': 0.0,
-        'velocity': -10.9
+        'velocity': -33.4
       },
       {
         'ratio': 0.5,
@@ -2323,7 +2323,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.0,
         'tremolo': 0.0,
-        'velocity': -10.9
+        'velocity': -33.4
       },
       {
         'ratio': 1.0,
@@ -2401,7 +2401,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.0,
         'tremolo': 0.0,
-        'velocity': -10.9
+        'velocity': -33.4
       },
       {
         'ratio': 1.0,
@@ -2453,7 +2453,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.0,
         'tremolo': 0.0,
-        'velocity': -10.9
+        'velocity': -33.4
       },
       {
         'ratio': 2.0,
@@ -2583,7 +2583,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.0,
         'tremolo': 0.0,
-        'velocity': -10.9
+        'velocity': -33.4
       },
       {
         'ratio': 2.0,
@@ -2635,7 +2635,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.0,
         'tremolo': 0.0,
-        'velocity': -10.9
+        'velocity': -33.4
       },
       {
         'ratio': 1.0,
@@ -2765,7 +2765,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.0,
         'tremolo': 0.2588235139846802,
-        'velocity': -10.9
+        'velocity': -33.4
       },
       {
         'ratio': 1.0,
@@ -2817,7 +2817,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.0,
         'tremolo': 0.2588235139846802,
-        'velocity': -10.9
+        'velocity': -33.4
       },
       {
         'ratio': 1.0,
@@ -3675,7 +3675,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.0905,
         'tremolo': 0.0,
-        'velocity': -22.1
+        'velocity': -44.6
       },
       {
         'ratio': 3.5,
@@ -3727,7 +3727,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.0905,
         'tremolo': 0.0,
-        'velocity': -22.1
+        'velocity': -44.6
       },
       {
         'ratio': 3.5,
@@ -3779,7 +3779,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.0905,
         'tremolo': 0.0,
-        'velocity': -22.1
+        'velocity': -44.6
       },
       {
         'ratio': 1.41,
@@ -3857,7 +3857,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.1892,
         'tremolo': 0.0,
-        'velocity': -22.1
+        'velocity': -44.6
       },
       {
         'ratio': 4.0,
@@ -3909,7 +3909,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.1892,
         'tremolo': 0.0,
-        'velocity': -22.1
+        'velocity': -44.6
       },
       {
         'ratio': 1.0,
@@ -3961,7 +3961,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.1892,
         'tremolo': 0.0,
-        'velocity': -22.1
+        'velocity': -44.6
       },
       {
         'ratio': 1.0,
@@ -4039,7 +4039,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.2968,
         'tremolo': 0.0,
-        'velocity': -22.1
+        'velocity': -44.6
       },
       {
         'ratio': 3.92,
@@ -4091,7 +4091,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.2968,
         'tremolo': 0.0,
-        'velocity': -22.1
+        'velocity': -44.6
       },
       {
         'ratio': 1.0,
@@ -4143,7 +4143,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.2968,
         'tremolo': 0.0,
-        'velocity': -22.1
+        'velocity': -44.6
       },
       {
         'ratio': 1.0,
@@ -4221,7 +4221,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.1892,
         'tremolo': 1.0,
-        'velocity': -22.1
+        'velocity': -44.6
       },
       {
         'ratio': 1.0,
@@ -4273,7 +4273,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.1892,
         'tremolo': 1.0,
-        'velocity': -22.1
+        'velocity': -44.6
       },
       {
         'ratio': 1.0,
@@ -4325,7 +4325,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.1892,
         'tremolo': 0.0,
-        'velocity': -22.1
+        'velocity': -44.6
       },
       {
         'ratio': 1.0,
@@ -4403,7 +4403,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.1892,
         'tremolo': 0.0,
-        'velocity': -22.1
+        'velocity': -44.6
       },
       {
         'ratio': 1.41,
@@ -4455,7 +4455,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.1892,
         'tremolo': 0.0,
-        'velocity': -22.1
+        'velocity': -44.6
       },
       {
         'ratio': 1.41,
@@ -4507,7 +4507,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.1892,
         'tremolo': 0.0,
-        'velocity': -22.1
+        'velocity': -44.6
       },
       {
         'ratio': 5.19,
@@ -4585,7 +4585,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.1892,
         'tremolo': 0.0,
-        'velocity': -10.9
+        'velocity': -33.4
       },
       {
         'ratio': 1.0,
@@ -4637,7 +4637,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.1892,
         'tremolo': 0.0,
-        'velocity': -10.9
+        'velocity': -33.4
       },
       {
         'ratio': 1.0,
@@ -4689,7 +4689,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.1892,
         'tremolo': 0.0,
-        'velocity': -10.9
+        'velocity': -33.4
       },
       {
         'ratio': 3.0,
@@ -4767,7 +4767,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.2968,
         'tremolo': 0.0,
-        'velocity': -10.9
+        'velocity': -33.4
       },
       {
         'ratio': 3.0,
@@ -4819,7 +4819,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.2968,
         'tremolo': 0.0,
-        'velocity': -10.9
+        'velocity': -33.4
       },
       {
         'ratio': 5.0,
@@ -4871,7 +4871,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.2968,
         'tremolo': 0.0,
-        'velocity': -10.9
+        'velocity': -33.4
       },
       {
         'ratio': 1.0,
@@ -4949,7 +4949,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.0,
         'tremolo': 0.0,
-        'velocity': -10.9
+        'velocity': -33.4
       },
       {
         'ratio': 1.0,
@@ -5001,7 +5001,7 @@ export const FMLAB_VOICES: FactoryVoice[] = [
         },
         'rateScaling': 1.0,
         'tremolo': 0.0,
-        'velocity': -10.9
+        'velocity': -33.4
       },
       {
         'ratio': 1.0,

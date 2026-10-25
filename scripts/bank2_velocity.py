@@ -22,29 +22,31 @@ KVS_BYTE = 13
 
 # Voice name to (carriers' KVS, modulators' KVS).
 SENSITIVITY: dict[str, tuple[int, int]] = {
-    # Pianos, Rhodes-type and clavinet: carriers 2, bright modulators 4 to 6.
-    "TINE PIANO": (2, 5),
-    "SUITCASE": (2, 5),
-    "REED PIANO": (2, 4),
-    "CLAVINET": (2, 4),
-    # Plucks: modulators 3, carriers 1.
-    "HARPSICORD": (1, 3),
-    "HARP": (1, 3),
-    "KOTO": (1, 3),
-    # Mallets: modulators 4, carriers 2.
-    "TUBE BELLS": (2, 4),
-    "CELESTA": (2, 4),
-    "MARIMBA": (2, 4),
-    "VIBES": (2, 4),
-    "GAMELAN": (2, 4),
-    # Basses: modulators 3, carriers 1.
-    "SOLID BASS": (1, 3),
-    "SLAP BASS": (1, 3),
-    "RUBBER BAS": (1, 3),
+    # Every carrier with velocity two steps deeper than the first starting
+    # points (Jeremy, 2026-10-25: the softest note was still too loud).
+    # Pianos, Rhodes-type and clavinet: carriers 4, bright modulators 4 to 6.
+    "TINE PIANO": (4, 5),
+    "SUITCASE": (4, 5),
+    "REED PIANO": (4, 4),
+    "CLAVINET": (4, 4),
+    # Plucks: modulators 3, carriers 3.
+    "HARPSICORD": (3, 3),
+    "HARP": (3, 3),
+    "KOTO": (3, 3),
+    # Mallets: modulators 4, carriers 4.
+    "TUBE BELLS": (4, 4),
+    "CELESTA": (4, 4),
+    "MARIMBA": (4, 4),
+    "VIBES": (4, 4),
+    "GAMELAN": (4, 4),
+    # Basses: modulators 3, carriers 3.
+    "SOLID BASS": (3, 3),
+    "SLAP BASS": (3, 3),
+    "RUBBER BAS": (3, 3),
     # Brass: brighter when harder.
-    "SOFT BRASS": (1, 3),
-    "BRASS STAB": (1, 4),
-    # Organs and pads: none. Strings, winds and saws: carriers 1 at most.
+    "SOFT BRASS": (3, 3),
+    "BRASS STAB": (3, 4),
+    # Organs and pads: none. Strings, winds and saws: carriers 3, no brightness.
     "DRAWBARS": (0, 0),
     "PERC ORGAN": (0, 0),
     "WARM PAD": (0, 0),
@@ -55,11 +57,11 @@ SENSITIVITY: dict[str, tuple[int, int]] = {
     "BRASS PAD": (0, 0),
     "SAW PAD": (0, 0),
     "HOLLOW PAD": (0, 0),
-    "STRINGS": (1, 0),
-    "FLUTE": (1, 0),
-    "CLARINET": (1, 0),
-    "SAW LEAD": (1, 0),
-    "SAW BASS": (1, 0),
+    "STRINGS": (3, 0),
+    "FLUTE": (3, 0),
+    "CLARINET": (3, 0),
+    "SAW LEAD": (3, 0),
+    "SAW BASS": (3, 0),
 }
 
 
