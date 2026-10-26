@@ -5,7 +5,7 @@ import {
   LANDING,
   neighbours,
 } from '../../chapters';
-import { viewFromHash, isStrayHash } from '../../chapters/route';
+import { hashFor, isStrayHash, viewFromHash } from '../../chapters/route';
 import { envelopeAt, noteSeconds } from '../../dsp/envelope';
 import {
   DEFAULTS,
@@ -34,21 +34,21 @@ const opened: LabState = { ...DEFAULTS, chapter: LANDING, ...landing.patch };
 const sounding: LabState = started({ ...opened, notes: 1 }, 100);
 
 describe('where the site opens', () => {
-  it('is the landing view when the address names no section, or "#/"', () => {
-    expect(viewFromHash('', IDS, LANDING)).toBe(LANDING);
-    expect(viewFromHash('#', IDS, LANDING)).toBe(LANDING);
-    expect(viewFromHash('#/', IDS, 'x')).toBe(LANDING);
+  it('is the synth at "#/", and the landing view at "#/learn"', () => {
+    expect(viewFromHash('#/', IDS, 'x')).toBe('sandbox');
+    expect(viewFromHash('#/learn', IDS, 'x')).toBe(LANDING);
+    expect(hashFor(LANDING)).toBe('#/learn');
   });
 
   it('is still a section when the address names one', () => {
     for (const id of IDS) {
-      expect(viewFromHash(`#/${id}`, IDS, LANDING)).toBe(id);
+      expect(viewFromHash(hashFor(id), IDS, LANDING)).toBe(id);
     }
   });
 
-  it('is the landing view for an address with no section', () => {
-    expect(viewFromHash('#/nowhere', IDS, LANDING)).toBe(LANDING);
-    expect(viewFromHash('#/landing', IDS, LANDING)).toBe(LANDING);
+  it('is the fallback for an address with no view', () => {
+    expect(viewFromHash('#/nowhere', IDS, 'sandbox')).toBe('sandbox');
+    expect(viewFromHash('#/landing', IDS, 'sandbox')).toBe('sandbox');
   });
 
   it('takes out of the address bar a hash that names nothing', () => {
@@ -59,6 +59,8 @@ describe('where the site opens', () => {
 
   it('leaves a section\'s hash, the landing view\'s, and no hash, alone', () => {
     expect(isStrayHash('#/index', IDS)).toBe(false);
+    expect(isStrayHash('#/learn', IDS)).toBe(false);
+    expect(isStrayHash('#/sandbox', IDS)).toBe(true);
     expect(isStrayHash('#/', IDS)).toBe(false);
     expect(isStrayHash('', IDS)).toBe(false);
     expect(isStrayHash('#', IDS)).toBe(false);

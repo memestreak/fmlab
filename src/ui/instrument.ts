@@ -128,3 +128,16 @@ export function mountFeedbackKnob(store: LabStore): void {
     if (state.dxFeedback !== previous.dxFeedback) knob.update();
   });
 }
+
+/**
+ * The synth's Learn key (index.html): a link to the guide, "#/learn",
+ * that goes on the press as the other push keys work (Jeremy,
+ * 2026-10-25). Enter follows the link as any link does.
+ */
+export function mountLearnKey(): void {
+  const learn = document.querySelector<HTMLAnchorElement>('#learn');
+  learn?.addEventListener('pointerdown', event => {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    window.location.hash = learn.hash;
+  });
+}

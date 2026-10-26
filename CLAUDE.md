@@ -1,7 +1,9 @@
 # fmlab
 
-An interactive guide to FM synthesis: a single page of short chapters, each
-built around a figure you can play with and hear. Design spec:
+A DX7-style FM synth with an interactive guide to FM synthesis beside it:
+the site opens on the synth (the sandbox, at `#/`; Jeremy, 2026-10-25,
+synth first), and its Learn key leads to the guide, a single page of
+short chapters, each built around a figure you can play with and hear. Design spec:
 `docs/specs/2026-10-13-fmlab-design.md`. The app has no users yet: don't
 keep old URLs, storage keys or saved state working after a change.
 
@@ -17,17 +19,21 @@ sine `#/sine`, Vibrato becomes tone `#/vibrato`), Two operators (The
 modulation index `#/index`, Sidebands and Bessel functions `#/sidebands`,
 Carrier and modulator ratio `#/ratio`, Sounds that change over time
 `#/envelopes`), The DX7 (Operators and algorithms `#/algorithms`, FM
-versus PM `#/fm-vs-pm`) and Play (the Sandbox `#/sandbox`, last). `#/`
-(or no hash) is the landing view, "Hearing FM" under the kicker
+versus PM `#/fm-vs-pm`) and Play (the Sandbox, last, whose address is
+`#/`, or no hash: the synth is the front page; `#/sandbox` names
+nothing). `#/learn` is the landing view, "Hearing FM" under the kicker
 Introduction: laid out exactly as a section (its lab a Play button whose
 note the two figures move with), its text the pitch, a button to the
 sandbox and the guide's contents (no button to the first section: its
 Next link is the way on), its Next the first section and that section's
-Previous it; `#/glossary` is the
+Previous it (the guide's way in: the synth's Learn key goes there);
+`#/glossary` is the
 glossary, outside the sequence. The header's Contents button opens a panel
 of every group and section (`ui/contents.ts`); each section ends with
 Previous and Next by name, except the sandbox, an instrument page with no
-text (its way back is the Contents panel). The masthead's crumb (`#where`,
+text (its way back is the Contents panel). The sandbox's links (the
+Contents panel, the last section's Next, the landing view's button) and
+the wordmark on every page go to `#/`. The masthead's crumb (`#where`,
 "Two operators · The modulation index") has the same two ways side by side
 just left of it, ‹ then › (`#where-prev`, `#where-next`, `whereSteps` in
 `ui/contents.ts`; Jeremy, 2026-10-20, moved together 2026-10-22): small
@@ -174,7 +180,8 @@ figures subscribe to it. Nothing else passes values around.
   `landing.ts` is the landing view, written as a chapter with the id
   `LANDING` so that everything following the store's chapter needs no
   special case. It is not in `CHAPTERS` (Previous and Next reach it
-  through `sequenceNeighbours`), is at `#/` and plays one long note. `glossary.ts` is the glossary, the same way: `GLOSSARY`, at
+  through `sequenceNeighbours`), is at `#/learn` (`addressOf` and `LEARN`
+in `outline.ts`; the synth, `SYNTH`, is at `#/`) and plays one long note. `glossary.ts` is the glossary, the same way: `GLOSSARY`, at
   `#/glossary` (an entry: `#/glossary?t=index`), drawn from the terms,
   with no lab and nothing to play. `route.ts` reads and writes addresses,
   and `upgradeHash` turns a link from before the sections had names
@@ -219,7 +226,7 @@ figures subscribe to it. Nothing else passes values around.
   by the same script from `scripts/fmlab-bank2.syx`, which is ours and
   committed (its header and `FMLAB_VOICES` set by hand after; it reuses
   `FactoryVoice`); `algorithms`
-  keeps `dx7Presets.ts`. Its link is `#/sandbox?a=&f=&o=…&l=…&p=…`, `a` the
+  keeps `dx7Presets.ts`. Its link is `#/?a=&f=&o=…&l=…&p=…`, `a` the
   algorithm, `f` the DX7 feedback, `o` the six operators joined by "~", each sixteen fields
   joined by "_" (`operatorsParam`: ratio, detune, level or "x" for off,
   the envelope's seven numbers, break key, left and right scaling as "l"
@@ -240,8 +247,15 @@ figures subscribe to it. Nothing else passes values around.
   after the patch last changes, and only then; it is off for now (Jeremy,
   2026-10-23: "Let's not update the URL when the sound changes right
   now"): a link still opens its sound, then the address goes back to
-  `#/sandbox` (`addressAfterOpening`), so a reload starts the sandbox
+  `#/` (`addressAfterOpening`), so a reload starts the sandbox
   afresh, and Copy link builds the link with the sound on demand.
+  Left for a chapter and come back to within a visit, the synth is as it
+  was left (Jeremy, 2026-10-25; `synthAsLeft` in `chapterView.ts`, memory
+  only): its whole patch (the voice and its edits, so the name says the
+  preset or EDITED), the operator selected and the panel's tab, the Voice
+  tab (`lfoView.ts` keeps it), the voice last chosen that the steps go on
+  from (`lastChosen`), the octave and the mod wheel; a reload starts it
+  afresh on A11, and a link's sound wins.
   `terms.ts` holds every defined term: its name, a one-sentence plain
   definition (for the glossary and the term's tip only), an optional
   formula, its English Wikipedia article and the chapter that defines it.
@@ -839,13 +853,19 @@ right then move by 16), the bank keys under the title if they must wrap.
 
 After the preset group, Volume, its name silkscreened on the chassis in
 the thicker weight (`--font-tape` 500 capitals in `--chassis-legend`, as
-the operators' roles; Jeremy, 2026-10-22: no plate), the Settings key; no glossary link (Jeremy, 2026-10-21: the chapters keep
+the operators' roles; Jeremy, 2026-10-22: no plate), the Settings key,
+then at the bar's right end the Learn key (Jeremy, 2026-10-25;
+`#learn` in `index.html`, `mountLearnKey` in `ui/instrument.ts`): a
+link to `#/learn` drawn as Settings' push key in a bezel of its own,
+with no lamp, going on the press (Enter follows the link); on a phone
+after Settings on its line; no glossary link (Jeremy, 2026-10-21: the chapters keep
 theirs) and no theme switch: the sandbox is dark only (Jeremy,
 2026-10-22). Whatever is saved or the system says, `applyTheme(choice,
 sandbox)` sets `data-theme="dark"` while the sandbox shows (set where
 `chapterView` sets the view, before anything redraws) and puts the saved
 choice back on leaving it; the boot script in `index.html` does the same
-for an address of `#/sandbox`, so the first paint is dark. The light
+for an address of `#/` or none (with or without a link's sound), so the
+first paint is dark. The light
 sandbox rules still in the CSS are unused. The Settings key
 (`ui/settingsPanel.ts`, `mountSettings`; Jeremy, 2026-10-21, "the
 function panel, named SETTINGS") is one lamp key in its own bezel, lit

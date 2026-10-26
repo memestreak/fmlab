@@ -5,11 +5,10 @@ import {
   type ControlId,
   type FigureId,
   GLOSSARY,
-  landing,
   LANDING,
   sequenceNeighbours,
 } from '../chapters';
-import { groupOf, OUTLINE, type SectionId, titleOf } from '../chapters/outline';
+import { groupOf, OUTLINE, type SectionId, SYNTH, titleOf } from '../chapters/outline';
 import {
   hashFor,
   isStrayHash,
@@ -42,9 +41,9 @@ const URL_DELAY_MS = 300;
 /**
  * Whether the sandbox keeps its sound in the address as it changes
  * (Jeremy, 2026-10-23: "Let's not update the URL when the sound changes
- * right now"). Off, the address stays #/sandbox: a link with a sound
- * still opens it, and is then put back to #/sandbox, so a reload opens
- * the sandbox as it starts rather than the link's old sound; Copy link
+ * right now"). Off, the synth's address stays #/: a link with a sound
+ * still opens it, and is then put back to #/, so a reload opens
+ * the synth as it starts rather than the link's old sound; Copy link
  * still builds a link with the sound. On, the address follows the sound,
  * as before.
  */
@@ -55,8 +54,7 @@ const IDS = CHAPTERS.map(chapter => chapter.id);
 const MANY_SLIDERS = 4;
 
 /**
- * The chapter the URL asks for, or the landing view when it asks for
- * none.
+ * The chapter the URL asks for, or the synth when it asks for none.
  */
 export function chapterInUrl(): Chapter {
   const { pathname, search } = window.location;
@@ -64,13 +62,13 @@ export function chapterInUrl(): Chapter {
   const upgraded = upgradeHash(window.location.hash);
   if (upgraded) window.history.replaceState(null, '', pathname + search + upgraded);
   const { hash } = window.location;
-  const id = viewFromHash(hash, IDS, LANDING);
+  const id = viewFromHash(hash, IDS, SYNTH);
   // A hash that names nothing is taken out, so the address bar does not
   // claim a section the page is not showing.
   if (isStrayHash(hash, IDS)) {
     window.history.replaceState(null, '', pathname + search);
   }
-  return chapterById(id) ?? landing;
+  return chapterById(id) ?? chapterById(SYNTH)!;
 }
 
 /**
@@ -86,9 +84,29 @@ export function openingFromUrl(chapter: Chapter): Partial<LabState> {
   if (address !== null) window.history.replaceState(null, '', pathname + search + address);
   if (!chapter.sharesSound) return chapter.patch;
   const sound = soundFromParams(params);
+  // Back within the session, and no sound in the link: as it was left.
+  if (Object.keys(sound).length === 0 && synthAsLeft) return synthAsLeft.patch;
   // A shared sound, remembered so the name's glass can say so.
   if (Object.keys(sound).length > 0) linkSound = soundParams({ ...DEFAULTS, ...chapter.patch, ...sound } as LabState);
   return { ...chapter.patch, ...sound };
+}
+
+/**
+ * The synth as it was last left, kept for this visit only (Jeremy,
+ * 2026-10-25): its whole patch (the voice and its edits) and the operator
+ * and tab selected. A reload starts it fresh; a link's sound wins.
+ */
+let synthAsLeft: { patch: Partial<LabState>; selectedOp: number; voiceTab: LabState['voiceTab'] } | null = null;
+
+/** Keeps the synth as `state` has it, as it is left. */
+function leaveSynth(state: LabState): void {
+  const synth = chapterById(SYNTH);
+  if (!synth) return;
+  const patch: Partial<LabState> = {};
+  for (const key of Object.keys(synth.patch) as (keyof LabState)[]) {
+    (patch as Record<string, unknown>)[key] = state[key];
+  }
+  synthAsLeft = { patch, selectedOp: state.selectedOp, voiceTab: state.voiceTab };
 }
 
 /** The sound a link opened, as its parameters; null when none did. */
@@ -335,10 +353,10 @@ export function mountChapters(store: LabStore): void {
   const instrument = mountInstrument();
 
   const show = (chapter: Chapter) => {
-    const isLanding = chapter.id === LANDING;
     // An instrument page has no text column.
     if (narrative) narrative.innerHTML = chapter.instrument ? '' : narrativeHtml(chapter);
-    document.title = isLanding ? 'fmlab' : `${chapter.title} · fmlab`;
+    // The synth is the site's front page.
+    document.title = chapter.id === SYNTH ? 'fmlab' : `${chapter.title} · fmlab`;
     // For the stylesheet: the glossary is one centred column with no lab;
     // the sandbox is an instrument page; the landing view is laid out as a
     // section, so going on to the first one changes what is on the page
@@ -462,20 +480,26 @@ export function mountChapters(store: LabStore): void {
   });
 
   window.addEventListener('hashchange', () => {
+    const before = store.get();
+    if (before.chapter === SYNTH) leaveSynth(before);
     const chapter = chapterInUrl();
+    const opening = openingFromUrl(chapter);
+    // The synth comes back as it was left, unless a link brings a sound.
+    const restored = chapter.id === SYNTH && synthAsLeft && opening === synthAsLeft.patch ? synthAsLeft : null;
     // Nothing stays picked out from the chapter before, nor its last
     // note's playhead. A chapter that plays notes has no steady sound to
     // carry on with, so that stops.
     store.set({
       chapter: chapter.id,
-      ...openingFromUrl(chapter),
+      ...opening,
       // A link's sound is a new voice, not an edit.
       voiceLoads: store.get().voiceLoads + 1,
       hover: null,
       hoverOp: null,
-      // The sandbox opens on OP1 selected, its envelope showing.
-      selectedOp: 0,
-      voiceTab: 'envelope',
+      // The synth opens on OP1 selected, its envelope showing, unless it
+      // comes back as it was left.
+      selectedOp: restored?.selectedOp ?? 0,
+      voiceTab: restored?.voiceTab ?? 'envelope',
       pinned: null,
       noteStartedAt: null,
       // The glossary has no lab to stop a sound from.
@@ -505,7 +529,7 @@ export function mountChapters(store: LabStore): void {
  */
 function showTermInUrl(): void {
   const { hash } = window.location;
-  if (viewFromHash(hash, IDS, LANDING) !== GLOSSARY) return;
+  if (viewFromHash(hash, IDS, SYNTH) !== GLOSSARY) return;
   const id = paramsFromHash(hash).get('t');
   for (const entry of document.querySelectorAll('.glossary-entry.is-current')) {
     entry.classList.remove('is-current');
@@ -546,6 +570,9 @@ export const PRESET_ARROW_STEPS: Readonly<Record<string, number>> = {
   ArrowRight: 1,
 };
 
+/** The synth's voice last chosen, for this visit; null until one is. */
+let lastChosen: number | null = null;
+
 /**
  * The sandbox's presets: the voice's name on VFD glass, a button opening
  * the preset window (ui/presetPanel.ts), where the bank keys are (Jeremy,
@@ -559,12 +586,16 @@ function presetMenu(presets: readonly Preset[], banks: readonly PresetBank[], st
   note.className = 'preset-note';
   note.id = 'preset-note';
 
-  /** The voice last chosen, which the steps go on from. */
-  let last = banks[0]?.start ?? -1;
+  /**
+   * The voice last chosen, which the steps go on from; kept as the synth
+   * is left, for when it comes back.
+   */
+  let last = lastChosen ?? banks[0]?.start ?? -1;
   const choose = (at: number, glitch: readonly HTMLElement[] = []) => {
     const preset = presets[at];
     if (!preset) return;
     last = at;
+    lastChosen = at;
     // A new voice, not an edit: notes already sounding keep theirs.
     store.set({ ...preset.patch, voiceLoads: store.get().voiceLoads + 1 });
     // Both top screens glitch together as the voice changes, each its own

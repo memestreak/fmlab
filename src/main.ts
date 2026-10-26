@@ -37,7 +37,7 @@ import { mountPitchEgView } from './ui/pitchEgView';
 import { mountReverbLamp } from './ui/reverbLamp';
 import { mountReverbView } from './ui/reverbView';
 import { mountFigures } from './ui/figures';
-import { mountAlgorithmSteps, mountFeedbackKnob } from './ui/instrument';
+import { mountAlgorithmSteps, mountFeedbackKnob, mountLearnKey } from './ui/instrument';
 import { mountOperators } from './ui/operators';
 import { createKeyBed } from './ui/keyBed';
 import { mountMidi } from './ui/midi';
@@ -141,8 +141,10 @@ if (follows) mountIndexFollowsToggle(follows, store);
 const theme = document.querySelector<HTMLButtonElement>('#theme');
 if (theme) mountThemeSwitch(theme, store);
 
-// The sandbox's Settings key and panel, and what the settings govern.
+// The sandbox's Settings key and panel, and what the settings govern,
+// and the Learn key beside it.
 mountSettings();
+mountLearnKey();
 
 // Focus rings only for focus the keyboard moved.
 trackFocusSource();
