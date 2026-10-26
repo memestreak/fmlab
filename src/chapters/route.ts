@@ -1,9 +1,8 @@
 // The section is in the URL's hash as an address, "#/index", so it can be
-// linked to and survives a reload. "#/" (or no hash) is the landing view,
-// "#/glossary" the glossary and "#/glossary?t=index" one of its entries.
-// The sandbox also keeps its sound there,
-// "#/sandbox?c=220&a=5&f=3.142&o=1_0_-0.9_0.002_0_1.2_-12_4_-48_0.4_60_l0_l0_1.3~…",
-// so a sound can be shared by its link. Addresses from before the sections
+// linked to and survives a reload. "#/" (or no hash) is the synth (the
+// sandbox), "#/learn" the landing view, "#/glossary" the glossary and
+// "#/glossary?t=index" one of its entries. A synth sound can be shared
+// by its link, "#/?a=5&f=3.142&o=1_0_-0.9_0.002_0_1.2_-12_4_-48_0.4_60_l0_l0_1.3~…". Addresses from before the sections
 // had names ("#3", "#7?c=…", "#glossary") are upgraded by `upgradeHash`.
 
 import { DX7_COUNT } from '../dsp/algorithms';
@@ -33,14 +32,15 @@ import {
 } from '../dsp/dx7';
 import { AMS_SHARES } from '../dsp/lfo';
 import { CARRIER_HZ, clamp, hzToSemitones, type LabState, semitonesToHz } from '../model/lab';
-import { GLOSSARY, LANDING, type SectionId } from './outline';
+import { addressOf, GLOSSARY, LANDING, LEARN, type SectionId, SYNTH } from './outline';
 
 /** The hash's parts: the address after "#/", and anything after a "?". */
 const HASH = /^#\/([a-z0-9-]*)(?:\?(.*))?$/;
 
 /**
- * What a hash shows: a section in `ids`, the glossary, or the landing
- * view for "#/"; `fallback` when it names none of them.
+ * What a hash shows: a section in `ids`, the glossary, the synth for
+ * "#/" or the landing view for "#/learn"; `fallback` when it names none
+ * of them ("#/sandbox" among them: the synth's address is "#/").
  *
  * @param ids the sections that exist
  */
@@ -52,9 +52,10 @@ export function viewFromHash(
   const match = HASH.exec(hash);
   if (!match) return fallback;
   const [, address] = match;
-  if (address === '') return LANDING;
+  if (address === '') return SYNTH;
+  if (address === LEARN) return LANDING;
   if (address === GLOSSARY) return GLOSSARY;
-  return ids.includes(address) ? address : fallback;
+  return ids.includes(address) && address !== SYNTH ? address : fallback;
 }
 
 /** What follows the "?" in a hash, as parameters; empty if nothing does. */
@@ -62,15 +63,15 @@ export function paramsFromHash(hash: string): URLSearchParams {
   return new URLSearchParams(HASH.exec(hash)?.[2] ?? '');
 }
 
-/** The hash for a section, the landing view or the glossary. */
+/** The hash for a section, the synth, the landing view or the glossary. */
 export function hashFor(id: string, params?: string): string {
-  const address = id === LANDING ? '#/' : `#/${id}`;
+  const address = `#/${addressOf(id)}`;
   return params ? `${address}?${params}` : address;
 }
 
 /**
  * Whether a hash is one the page should take out of the address bar: it
- * is there, but names nothing, so the page is showing the landing view
+ * is there, but names nothing, so the page is showing the synth
  * under an address that claims otherwise.
  */
 export function isStrayHash(hash: string, ids: readonly string[]): boolean {
@@ -95,7 +96,7 @@ const OLD_HASH = /^#(\d+|glossary)(?:\?(.*))?$/;
 
 /**
  * The address an old link meant ("#4" is now "#/sidebands", "#7?c=220…"
- * "#/sandbox?c=220…", "#glossary?t=index" "#/glossary?t=index"), with its
+ * "#/?c=220…", "#glossary?t=index" "#/glossary?t=index"), with its
  * parameters kept; null for anything else, including a number that never
  * had a section.
  */

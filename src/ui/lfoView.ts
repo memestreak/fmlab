@@ -1,8 +1,9 @@
 // The sandbox's Voice section: four tabs, Algorithm (the chooser, the
 // diagram and Feedback), LFO, Pitch EG (ui/pitchEgView.ts) and Reverb
 // (ui/reverbView.ts; Jeremy, 2026-10-22). The
-// sandbox always opens on Algorithm; which tab is open is the page's
-// alone, in neither the link nor storage. While the LFO, the Pitch EG or
+// sandbox opens on Algorithm, and comes back within a visit on the tab it
+// was left on; which tab is open is the page's alone, in neither the link
+// nor storage. While the LFO, the Pitch EG or
 // the Reverb tab is closed its pill shows a dot when that feature is on. The LFO tab: the wave, six buttons each drawing its shape, with
 // a drawing of the LFO under them (viz/lfoPlot.ts); Speed, Delay,
 // Vibrato and Tremolo, and what the mod wheel adds to those two at full,
@@ -289,8 +290,8 @@ export function mountVoiceArea(store: LabStore): void {
   };
 
   store.subscribe((state, previous) => {
-    // Every visit to the sandbox opens on the Algorithm tab.
-    if (state.chapter !== previous.chapter) open = 'algorithm';
+    // The tab stays as it was left (Jeremy, 2026-10-25): the synth comes
+    // back as it was within a visit; a reload opens on Algorithm.
     if (state.chapter !== previous.chapter || state.dxLfo !== previous.dxLfo) show();
     else if (state.dxPitchEnvelope !== previous.dxPitchEnvelope || state.modWheel !== previous.modWheel) showTabs();
     else if (state.theme !== previous.theme && open === 'lfo') drawPlot();

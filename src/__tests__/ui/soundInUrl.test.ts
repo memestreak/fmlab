@@ -12,11 +12,11 @@ describe('the sound in the address', () => {
     expect(SOUND_IN_URL).toBe(false);
   });
 
-  it('is read from a link, then the address is put back to #/sandbox', () => {
-    expect(link.startsWith('#/sandbox?')).toBe(true);
-    expect(addressAfterOpening(sandbox, link)).toBe('#/sandbox');
+  it('is read from a link, then the address is put back to #/', () => {
+    expect(link.startsWith('#/?')).toBe(true);
+    expect(addressAfterOpening(sandbox, link)).toBe('#/');
     // Nothing to put back on a plain address.
-    expect(addressAfterOpening(sandbox, '#/sandbox')).toBeNull();
+    expect(addressAfterOpening(sandbox, '#/')).toBeNull();
   });
 
   it('stays in the address with the switch on, as before', () => {

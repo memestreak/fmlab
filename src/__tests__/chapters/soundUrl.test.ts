@@ -16,21 +16,22 @@ import { DEFAULTS, hzToSemitones, type LabState } from '../../model/lab';
 const IDS = CHAPTERS.map(chapter => chapter.id);
 describe('a hash with a sound in it', () => {
   it('still names its section', () => {
-    expect(viewFromHash('#/sandbox?c=220&r=1&i=2', IDS, 'landing')).toBe('sandbox');
-    expect(isStrayHash('#/sandbox?c=220&r=1&i=2', IDS)).toBe(false);
+    expect(viewFromHash('#/?c=220&r=1&i=2', IDS, 'landing')).toBe('sandbox');
+    expect(isStrayHash('#/?c=220&r=1&i=2', IDS)).toBe(false);
     expect(isStrayHash('#/nowhere?c=220', IDS)).toBe(true);
   });
 
   it('gives up its parameters', () => {
-    expect(paramsFromHash('#/sandbox?c=220&r=1.41&i=5').get('r')).toBe('1.41');
-    expect([...paramsFromHash('#/sandbox')]).toEqual([]);
+    expect(paramsFromHash('#/?c=220&r=1.41&i=5').get('r')).toBe('1.41');
+    expect([...paramsFromHash('#/')]).toEqual([]);
     expect([...paramsFromHash('')]).toEqual([]);
   });
 
   it('is written with the parameters after a "?"', () => {
-    expect(hashFor('sandbox', 'c=220')).toBe('#/sandbox?c=220');
-    expect(hashFor('sandbox')).toBe('#/sandbox');
-    expect(hashFor('sandbox', '')).toBe('#/sandbox');
+    expect(hashFor('sandbox', 'c=220')).toBe('#/?c=220');
+    expect(hashFor('sandbox')).toBe('#/');
+    expect(hashFor('sandbox', '')).toBe('#/');
+    expect(hashFor('sine', 'c=220')).toBe('#/sine?c=220');
   });
 
   it('from before the sections had names still opens in the sandbox', () => {
@@ -82,7 +83,7 @@ describe('the sandbox in a link', () => {
   const reopened = (params: string) => ({
     ...DEFAULTS,
     ...sandbox.patch,
-    ...soundFromParams(paramsFromHash(`#/sandbox?${params}`)),
+    ...soundFromParams(paramsFromHash(`#/?${params}`)),
   });
 
   it('is readable, each operator in sixteen short fields, the LFO in eight', () => {

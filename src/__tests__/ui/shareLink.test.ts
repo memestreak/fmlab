@@ -16,7 +16,7 @@ describe('a shared sound', () => {
   it('is this page\'s address with the sound, the voice only', () => {
     const state = stateOf(presets[10].patch);
     const link = soundLink(state, location);
-    expect(link).toBe(`https://fmlab.pages.dev/#/sandbox?${soundParams(state)}`);
+    expect(link).toBe(`https://fmlab.pages.dev/#/?${soundParams(state)}`);
     // Not the volume, the reverb or the octave: they are the listener's.
     expect(soundLink({ ...state, volume: 0.123 }, location)).toBe(link);
   });

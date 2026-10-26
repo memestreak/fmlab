@@ -186,7 +186,8 @@ export function mountSettings(): void {
   key.setAttribute('aria-expanded', 'false');
   key.setAttribute('aria-pressed', 'false');
   bezel.append(key);
-  glossary.before(bezel);
+  // Left of the Learn key, at the title bar's right end.
+  (document.querySelector('.inst-learn') ?? glossary).before(bezel);
 
   // The panel: a modal console.
   const dialog = document.createElement('dialog');

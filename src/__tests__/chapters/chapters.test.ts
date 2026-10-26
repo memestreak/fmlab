@@ -241,11 +241,16 @@ describe('viewFromHash', () => {
   it('reads a section\'s address', () => {
     expect(viewFromHash('#/sine', IDS, 'landing')).toBe('sine');
     expect(viewFromHash('#/fm-vs-pm', IDS, 'landing')).toBe('fm-vs-pm');
-    expect(viewFromHash('#/sandbox?c=220', IDS, 'landing')).toBe('sandbox');
+    expect(viewFromHash('#/?a=5', IDS, 'landing')).toBe('sandbox');
   });
 
-  it('is the landing view at "#/", and the glossary at its own', () => {
-    expect(viewFromHash('#/', IDS, 'x')).toBe('landing');
+  it('has no address for the sandbox but the front page\'s', () => {
+    expect(viewFromHash('#/sandbox', IDS, 'fallback')).toBe('fallback');
+  });
+
+  it('is the synth at "#/", the landing view at "#/learn", and the glossary at its own', () => {
+    expect(viewFromHash('#/', IDS, 'x')).toBe('sandbox');
+    expect(viewFromHash('#/learn', IDS, 'x')).toBe('landing');
     expect(viewFromHash('#/glossary?t=index', IDS, 'x')).toBe('glossary');
   });
 
@@ -259,8 +264,10 @@ describe('viewFromHash', () => {
     for (const id of IDS) {
       expect(viewFromHash(hashFor(id), IDS, 'x')).toBe(id);
     }
-    expect(hashFor('landing')).toBe('#/');
-    expect(hashFor('sandbox', 'c=220')).toBe('#/sandbox?c=220');
+    expect(viewFromHash(hashFor('landing'), IDS, 'x')).toBe('landing');
+    expect(hashFor('landing')).toBe('#/learn');
+    expect(hashFor('sandbox')).toBe('#/');
+    expect(hashFor('sandbox', 'a=5')).toBe('#/?a=5');
   });
 });
 
@@ -271,11 +278,11 @@ describe('old links', () => {
     expect(upgradeHash('#6')).toBe('#/envelopes');
     expect(upgradeHash('#8')).toBe('#/algorithms');
     expect(upgradeHash('#9')).toBe('#/fm-vs-pm');
-    expect(upgradeHash('#7?c=220&r=1.41&i=5')).toBe('#/sandbox?c=220&r=1.41&i=5');
-    expect(upgradeHash('#7?m=6&a=5')).toBe('#/sandbox?m=6&a=5');
+    expect(upgradeHash('#7?c=220&r=1.41&i=5')).toBe('#/?c=220&r=1.41&i=5');
+    expect(upgradeHash('#7?m=6&a=5')).toBe('#/?m=6&a=5');
     expect(upgradeHash('#glossary')).toBe('#/glossary');
     expect(upgradeHash('#glossary?t=index')).toBe('#/glossary?t=index');
-    expect(upgradeHash('#0')).toBe('#/');
+    expect(upgradeHash('#0')).toBe('#/learn');
   });
 
   it('leave everything else alone', () => {

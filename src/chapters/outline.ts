@@ -35,7 +35,7 @@ export const OUTLINE = [
   },
 ] as const;
 
-/** A section of the guide, by its address. */
+/** A section of the guide, by its id. */
 export type SectionId = (typeof OUTLINE)[number]['sections'][number]['id'];
 
 /** The sections in reading order. */
@@ -43,8 +43,17 @@ export const SECTION_IDS: readonly SectionId[] = OUTLINE.flatMap(g =>
   g.sections.map(s => s.id),
 );
 
-/** The landing view's id: not a section, at "#/". */
+/** The landing view's id: not a section, at "#/learn". */
 export const LANDING = 'landing';
+
+/**
+ * The synth, the site's front page at "#/" (Jeremy, 2026-10-25: synth
+ * first): the sandbox, still the guide's last section.
+ */
+export const SYNTH = 'sandbox';
+
+/** The landing view's address, "#/learn". */
+export const LEARN = 'learn';
 
 /** The glossary's id: not in the sequence, at "#/glossary". */
 export const GLOSSARY = 'glossary';
@@ -75,7 +84,17 @@ export function orderOf(id: SectionId): number {
   return SECTION_IDS.indexOf(id);
 }
 
+/**
+ * What follows "#/" for a view: nothing for the synth, "learn" for the
+ * landing view, otherwise its id.
+ */
+export function addressOf(id: string): string {
+  if (id === SYNTH) return '';
+  if (id === LANDING) return LEARN;
+  return id;
+}
+
 /** A link to a section from the text, by its title unless `text` is given. */
 export function sectionLink(id: SectionId, text: string = titleOf(id)): string {
-  return `<a href="#/${id}">${text}</a>`;
+  return `<a href="#/${addressOf(id)}">${text}</a>`;
 }

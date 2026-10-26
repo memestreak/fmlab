@@ -2850,12 +2850,20 @@ canvas.voice-keys {
    push key in the title bar, between Volume and the glossary, lit while
    its panel is open; the panel a modal console of the chassis's black
    plastic, the same in either theme, its settings on a VFD screen. */
-body:not([data-view='instrument']) .inst-settings {
+body:not([data-view='instrument']) :is(.inst-settings, .inst-learn) {
   display: none;
 }
 
-.inst-settings {
+.inst-settings,
+.inst-learn {
   flex: none;
+}
+
+/* The Learn key (Jeremy, 2026-10-25): a link to the guide, a push key
+   in its own bezel right of Settings. */
+.learn-key {
+  color: inherit;
+  text-decoration: none;
 }
 
 :root:has(.settings-panel[open]) {
@@ -2883,11 +2891,11 @@ body:not([data-view='instrument']) .inst-settings {
 
 /* Close has no state to show, so no lamp: a plain push key; and the
    preset's Share, beside its steps. */
-[data-view='instrument'] :is(.settings-close, .preset-share-key) {
+[data-view='instrument'] :is(.settings-close, .preset-share-key, .learn-key) {
   padding: 0 0.75rem;
 }
 
-[data-view='instrument'] :is(.settings-close, .preset-share-key)::before {
+[data-view='instrument'] :is(.settings-close, .preset-share-key, .learn-key)::before {
   display: none;
 }
 
