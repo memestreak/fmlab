@@ -38,8 +38,8 @@ in Settings.
 | Key velocity | Preference | How the player's keys strike |
 | MIDI on, Input, Channel, Bend range, Velocity curve | Preference | The player's controller |
 | Theme (chapters) | Preference | |
-| Reverb on, Decay, Mix, Tone, Pre-delay | **Open question** | Changes the sound for everyone, so by the rule it is the work, but it was deliberately kept out of the voice and the link (2026-10-22) |
-| Volume | **Open question** | A preference by the rule; today it is not saved at all |
+| Reverb on, Decay, Mix, Tone, Pre-delay | The work | Part of the sound (Jeremy, 2026-10-29): moves into the voice, its presets and the share link |
+| Volume | Instrument state | Neither a preference nor part of the sound (Jeremy, 2026-10-29): stays unsaved and out of Settings |
 | Octave, mod wheel, pitch bend | Instrument state | Not saved; stays out of Settings |
 | Algorithm, operators, LFO, pitch EG, feedback | The work | Already in the voice and the link |
 
@@ -51,11 +51,9 @@ General
 
 Synth
 - Display: Screen glitch, Z X hint, Note names, Computer keys
-- Keyboard: Key velocity, Wheel, Volume (if saved)
+- Keyboard: Key velocity, Wheel
 - MIDI: MIDI in, Input, Channel, Bend range, Velocity curve, Last
   velocity (read only)
-- Reverb: On, Pre-delay, Decay, Mix, Tone (only if Reverb stays a
-  preference)
 
 Learn
 - No section yet (Theme is app-wide), so the group is not shown until it
@@ -63,11 +61,23 @@ Learn
 
 ## Work to do
 
+### Reverb becomes part of the sound
+- [ ] Take Reverb, Decay, Mix, Tone and Pre-delay out of `Settings` and
+      into the voice (the lab's patch), so a voice edit, a preset and a
+      link all carry them. The Reverb tab stays where it is, editing the
+      voice instead of a setting.
+- [ ] Give every preset a reverb (bank A off, as the DX7 had none; bank B
+      chosen by ear per voice, or off to start) and decide whether a
+      reverb edit marks the name EDITED (it should, as part of the sound).
+- [ ] Add the reverb to the share link (a new parameter, validated and
+      clamped in `soundFromParams`; a link without it is reverb off).
+- [ ] Decide whether reverb edits reach held notes at once (as live
+      edits) or only the next note (as a preset does).
+
 ### Model and storage
 - [ ] Split `fmlab.settings` into one key per section:
       `fmlab.general.appearance`, `fmlab.synth.display`,
-      `fmlab.synth.keyboard`, `fmlab.synth.midi` (and
-      `fmlab.synth.reverb` if kept).
+      `fmlab.synth.keyboard`, `fmlab.synth.midi`.
 - [ ] Move the theme into `fmlab.general.appearance`; update the boot
       script in `index.html` to read it there.
 - [ ] One parser per section, every field checked, defaults on anything
@@ -108,8 +118,7 @@ Learn
       click. No reset-all button.
 
 ### Shortcuts write the same value
-- [ ] The MIDI key, the Reverb tab (if kept a preference) and the
-      chapters' theme switch read and write the same saved values the
+- [ ] The MIDI key and the chapters' theme switch read and write the same saved values the
       dialog shows; no second copy.
 
 ### Entry points
@@ -126,13 +135,13 @@ Learn
 
 ## Open questions for Jeremy
 
-1. **Reverb**: the work (into the voice, its presets and the share link)
-   or a preference (into Settings › Synth › Reverb, with the Reverb tab
-   as its shortcut)?
-2. **Volume**: save it as a preference (Synth › Keyboard), or keep it
-   per visit and out of Settings?
-3. **Learn key**: move it left of Settings so the gear is last?
-4. **Chapters' gear**: add one, given the chapters have only Theme,
+Answered 2026-10-29: Reverb is part of the sound; Volume is neither a
+preference nor part of the sound.
+
+1. **Learn key**: move it left of Settings so the gear is last?
+2. **Chapters' gear**: add one, given the chapters have only Theme,
    Motion and Tips to set?
-5. **Motion and Tips**: app-wide (General › Appearance), as proposed, or
+3. **Motion and Tips**: app-wide (General › Appearance), as proposed, or
    synth only? Today they act only in the sandbox.
+4. **Bank B reverbs**: give each fmlab voice its own reverb, or start
+   them all off?
