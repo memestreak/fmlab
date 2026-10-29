@@ -66,8 +66,8 @@ Learn
       into the voice (the lab's patch), so a voice edit, a preset and a
       link all carry them. The Reverb tab stays where it is, editing the
       voice instead of a setting.
-- [ ] Give every preset a reverb (bank A off, as the DX7 had none; bank B
-      chosen by ear per voice, or off to start) and decide whether a
+- [ ] Give every preset a reverb, off in both banks to start (Jeremy,
+      2026-10-29) and decide whether a
       reverb edit marks the name EDITED (it should, as part of the sound).
 - [ ] Add the reverb to the share link (a new parameter, validated and
       clamped in `soundFromParams`; a link without it is reverb off).
@@ -136,12 +136,10 @@ Learn
 ## Open questions for Jeremy
 
 Answered 2026-10-29: Reverb is part of the sound; Volume is neither a
-preference nor part of the sound.
+preference nor part of the sound; every preset starts with reverb off.
 
 1. **Learn key**: move it left of Settings so the gear is last?
 2. **Chapters' gear**: add one, given the chapters have only Theme,
    Motion and Tips to set?
 3. **Motion and Tips**: app-wide (General › Appearance), as proposed, or
    synth only? Today they act only in the sandbox.
-4. **Bank B reverbs**: give each fmlab voice its own reverb, or start
-   them all off?
