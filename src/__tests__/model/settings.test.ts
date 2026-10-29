@@ -18,12 +18,6 @@ describe('the sandbox\'s settings', () => {
       // The computer's and the screen's keys at velocity 100 (Jeremy, 2026-10-24).
       keyVelocity: 100,
       wheel: 'page',
-      // The plate reverb, off (Jeremy, 2026-10-22).
-      reverb: 'off',
-      reverbDecay: 1.5,
-      reverbMix: 25,
-      reverbTone: 70,
-      reverbPreDelay: 0,
       // MIDI In, off; every input, every channel, the wheel two semitones (Jeremy, 2026-10-23).
       midi: 'off',
       midiInput: '',
@@ -34,22 +28,18 @@ describe('the sandbox\'s settings', () => {
     expect(SETTINGS_KEY).toBe('fmlab.settings');
   });
 
-  it('hold the reverb\'s numbers in range and to their steps; anything else is the default', () => {
+  it('hold a number in range and to its step; anything else is the default', () => {
     const parsed = (json: object) => parseSettings(JSON.stringify(json));
-    expect(parsed({ reverb: 'on', reverbMix: 25.4, reverbTone: 300, reverbDecay: 3.04 })).toEqual({
-      ...DEFAULT_SETTINGS,
-      reverb: 'on',
-      reverbMix: 25,
-      reverbTone: 100,
-      reverbDecay: 3,
-    });
-    expect(parsed({ reverb: 'loud', reverbMix: 'x', reverbTone: null, reverbDecay: -5 })).toEqual({
-      ...DEFAULT_SETTINGS,
-      reverbDecay: 0.2,
-    });
-    expect(parseSettings('{"reverbDecay":1e999}')).toEqual(DEFAULT_SETTINGS);
+    expect(parsed({ midiChannel: 3.4 })).toEqual({ ...DEFAULT_SETTINGS, midiChannel: 3 });
+    expect(parsed({ midiChannel: 40 })).toEqual({ ...DEFAULT_SETTINGS, midiChannel: 16 });
+    expect(parsed({ midiChannel: 'x' })).toEqual(DEFAULT_SETTINGS);
+    expect(parseSettings('{"midiChannel":1e999}')).toEqual(DEFAULT_SETTINGS);
   });
 
+  it('no longer hold the reverb, which is the voice\'s (Jeremy, 2026-10-29)', () => {
+    expect(parseSettings('{"reverb":"on","reverbDecay":3}')).toEqual(DEFAULT_SETTINGS);
+    expect(Object.keys(DEFAULT_SETTINGS).some(key => key.startsWith('reverb'))).toBe(false);
+  });
 
   it('fall back to the defaults on bad or partial JSON, field by field', () => {
     expect(parseSettings(null)).toEqual(DEFAULT_SETTINGS);

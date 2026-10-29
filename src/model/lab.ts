@@ -22,6 +22,7 @@ import {
   levelAtNote,
 } from '../dsp/dx7';
 import { noteHold, type Operator, OPERATOR_RELEASE, operatorEnvelope } from '../dsp/operators';
+import { DEFAULT_REVERB, type VoiceReverb } from '../dsp/plateReverb';
 import { createStore, type Store } from './store';
 import type { ThemeChoice } from './theme';
 
@@ -175,6 +176,13 @@ export interface LabState {
   /** `dx7`: the voice's pitch envelope, which each note runs (dsp/dx7.ts). */
   dxPitchEnvelope: Dx7PitchEnvelope;
   /**
+   * `dx7`: the voice's plate reverb (Jeremy, 2026-10-29: part of the
+   * sound, so presets and links carry it). One plate for the whole
+   * instrument, so a change is heard at once, tails and all; heard only
+   * in the sandbox.
+   */
+  dxReverb: VoiceReverb;
+  /**
    * `dx7`: the mod wheel, 0 to 1, adding the LFO's wheel depths
    * (`lfoDepths`). The instrument's, not the voice's: it stays where it
    * is left through voice and preset changes, and is in neither the link
@@ -289,6 +297,7 @@ export const DEFAULTS: LabState = {
   dxFeedback: 0,
   dxLfo: HELD_LFO,
   dxPitchEnvelope: FLAT_PITCH_ENVELOPE,
+  dxReverb: DEFAULT_REVERB,
   modWheel: 0,
   pitchBend: 0,
   selectedOp: 0,

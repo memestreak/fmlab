@@ -1,4 +1,5 @@
 import { WHEEL_DEPTHS } from '../dsp/dx7';
+import { DEFAULT_REVERB } from '../dsp/plateReverb';
 import { FACTORY_VOICES, type FactoryVoice } from './dx7Factory';
 import { FMLAB_VOICES } from './fmlabVoices';
 import type { ChapterPatch, Preset, PresetBank } from './types';
@@ -20,6 +21,8 @@ function patchOf(voice: FactoryVoice): Partial<ChapterPatch> {
     // The wheel's depths are not in a DX7 voice: every voice opens on the same.
     dxLfo: { ...voice.dxLfo, ...WHEEL_DEPTHS },
     dxPitchEnvelope: voice.dxPitchEnvelope,
+    // Every voice starts dry (Jeremy, 2026-10-29); a DX7 voice has no reverb.
+    dxReverb: DEFAULT_REVERB,
   };
 }
 

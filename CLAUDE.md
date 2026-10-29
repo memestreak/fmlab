@@ -84,15 +84,13 @@ figures subscribe to it. Nothing else passes values around.
   `set` and get the previous state too), `lab.ts` (`LabState`; the ranges
   and defaults; the log scales of the carrier and modulator sliders),
   `theme.ts` (the choice, its storage key, `applyTheme`) and
-  `settings.ts`, the sandbox's settings (its Settings panel, and the
-  Voice section's Reverb tab), outside the lab's store, the link and the
-  sound: `Settings` (Screen glitch, Motion, Tips on hover, Z X hint, Note
+  `settings.ts`, the sandbox's settings (its Settings panel), outside
+  the lab's store, the link and the sound: `Settings` (Screen glitch, Motion, Tips on hover, Z X hint, Note
   names, Computer keys, Wheel; MIDI In's `midi` (off, on: set by the MIDI key),
   `midiInput` (an input's name, '' for all, at most `MAX_TEXT_SETTING`, 100,
   characters, the one text setting), `midiChannel` (0 for all, or 1 to 16)
-  and `bendRange` (1, 2, 3, 5, 7 or 12 semitones); and the plate reverb's Reverb, Decay, Mix,
-  Tone and Pre-delay, set on the Reverb tab), `DEFAULT_SETTINGS`
-  (today's behaviour; the reverb off, 1.5 s, 25 %, 70, 0 ms; MIDI off,
+  and `bendRange` (1, 2, 3, 5, 7 or 12 semitones)), `DEFAULT_SETTINGS`
+  (today's behaviour; MIDI off,
   every input and channel, the bend ±2), the choice
   settings' `SETTING_CHOICES` and the number settings' `SETTING_RANGES`
   (min, max, step; `inRange`), `parseSettings` (anything
@@ -150,8 +148,14 @@ figures subscribe to it. Nothing else passes values around.
   by `createLabStore`), so the figures draw what is heard.
   `voiceModel` says which operators six-operator chapters play: `basic`
   (`operators`, `feedback`: ratio, level 0 to 1, one decay; `algorithms`)
-  or `dx7` (`dxOperators`, `dxFeedback`, `dxLfo`, `dxPitchEnvelope`; the sandbox), the DX7 voice of
-  `src/dsp/dx7.ts`. `selectedOp` is the operator the sandbox's operator
+  or `dx7` (`dxOperators`, `dxFeedback`, `dxLfo`, `dxPitchEnvelope`, `dxReverb`; the sandbox), the DX7 voice of
+  `src/dsp/dx7.ts`. `dxReverb` (Jeremy, 2026-10-29: part of the sound)
+  is the voice's plate reverb, a `VoiceReverb` (`dsp/plateReverb.ts`: on,
+  decay in s, mix, tone, pre-delay in ms; `REVERB_RANGES`,
+  `reverbInRange`, `DEFAULT_REVERB` off, 1.5 s, 25 %, 70, 0 ms): every
+  preset starts with it off, an edit makes the name EDITED, a link
+  carries it, and there being one plate for every note, a change from an
+  edit or a preset is heard at once, tails and all. `selectedOp` is the operator the sandbox's operator
   panel shows; one always is, OP1 when it opens. `modWheel` is the sandbox's mod wheel, 0 to 1
   (opens at 0; the instrument's, not the voice's, so kept through voice
   and preset changes, and in neither the link nor storage). `pitchBend` is the pitch
@@ -238,7 +242,9 @@ in `outline.ts`; the synth, `SYNTH`, is at `#/`) and plays one long note. `gloss
   wheel tremolo in dB, as `sine_5.81_0.31_12_0_1_50_0`; a link with only
   the first six gets the wheel's defaults, 50 and 0), and `p` the pitch envelope
   (`pitchParam`: start, attack, peak, decay 1, break, decay 2, sustain,
-  release; levels in cents, speeds in cents a second), validated and clamped by
+  release; levels in cents, speeds in cents a second), and `r` the reverb
+  (`reverbParam`: on 1 or 0, decay, mix, tone, pre-delay, as
+  `1_2.4_30_60_20`; a link without it opens with the reverb off), validated and clamped by
   `soundFromParams` (a share any percentage from 0 to 100, to 0.1 %); an older
   link keeps only its pitch and algorithm. The pitch is not written (Jeremy,
   2026-10-23): it is only the note struck last, so the address changed with
@@ -457,8 +463,8 @@ in `outline.ts`; the synth, `SYNTH`, is at `#/`) and plays one long note. `gloss
   Play note, and sends `allOff` for Stop and a change of chapter; the
   context is suspended once nothing is held or sounding, and, with the
   reverb on, its tail rung out (`tailMs`). It sends the reverb on load,
-  when its settings change and on a change of chapter: on only in the
-  sandbox with Reverb on (Jeremy, 2026-10-22).
+  when the voice's `dxReverb` changes and on a change of chapter: on only
+  in the sandbox with the voice's reverb on (Jeremy, 2026-10-22).
   MIDI In (Jeremy, 2026-10-23) plays through its public `noteOn(note, hz,
   velocity, marks)`: posted straight to the pool, before the store is
   set, when the context runs and the pool has the voice (else struck as
@@ -945,7 +951,7 @@ neither the link nor storage; while closed, the LFO's key shows a dot
 (amber in the sandbox), "LFO, on", when vibrato or tremolo, the mod
 wheel's share counted, is above 0, the Pitch EG's,
 "Pitch EG, on", when the pitch envelope is not flat; and the Reverb's,
-"Reverb, on", whenever the reverb is on, a setting, its tab open or not;
+"Reverb, on", whenever the voice's reverb is on, its tab open or not;
 the Reverb key's light is always there, unlit while it is off, so the
 key keeps its width). Each tab is laid
 out as the operator panel is (Jeremy, 2026-10-20; `.inst-voice-tab`):
@@ -983,9 +989,8 @@ ends, labelled as the readouts are; a dot at Start and at each part's
 end dragging up and down only), and eight knobs in a row: Start,
 Attack, Peak, Decay 1, Break, Decay 2, Sustain, Release (pitches two-sided, ±48 st; speeds log in st/s).
 The Reverb tab (`reverbView.ts`; Jeremy, 2026-10-22, mock B): the plate
-reverb's controls, settings of the instrument (`settings.ts`, saved per
-browser; not the voice, the link or a preset), moved there from the
-Settings panel. Its screen (`viz/reverbPlot.ts`) is the plate's response
+reverb's controls, the voice's `dxReverb` (Jeremy, 2026-10-29: part of
+the sound, so presets and links carry it; it was a setting before). Its screen (`viz/reverbPlot.ts`) is the plate's response
 to a click as two decay curves, LOWS under about 500 Hz lit full and
 HIGHS over about 4 kHz at half (`bandEnvelopes`, energy in windows of
 50 ms or a column), each set against its own start (`fromStart`) and

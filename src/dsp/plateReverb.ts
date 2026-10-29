@@ -143,6 +143,44 @@ export interface ReverbSettings {
   preDelay: number;
 }
 
+/**
+ * The reverb as a voice holds it (Jeremy, 2026-10-29: part of the sound,
+ * so presets and links carry it): heard or not, its -60 dB time in
+ * seconds, its mix and tone 0 to 100, and its pre-delay in ms. The Reverb
+ * tab (ui/reverbView.ts) edits it.
+ */
+export interface VoiceReverb {
+  on: boolean;
+  decay: number;
+  mix: number;
+  tone: number;
+  /** In ms. */
+  preDelay: number;
+}
+
+/** A voice reverb's number that has a range. */
+export type ReverbField = Exclude<keyof VoiceReverb, 'on'>;
+
+/** Each of a voice reverb's numbers: its range and step. */
+export const REVERB_RANGES: Record<ReverbField, { min: number; max: number; step: number }> = {
+  decay: { min: 0.2, max: 20, step: 0.1 },
+  mix: { min: 0, max: 100, step: 1 },
+  tone: { min: 0, max: 100, step: 1 },
+  preDelay: { min: 0, max: MAX_PRE_DELAY_SECONDS * 1000, step: 1 },
+};
+
+/** Every preset's reverb (Jeremy, 2026-10-29: all start with it off), and a voice's with none set. */
+export const DEFAULT_REVERB: VoiceReverb = { on: false, decay: 1.5, mix: 25, tone: 70, preDelay: 0 };
+
+/** A reverb number held in its range and rounded to its step. */
+export function reverbInRange(field: ReverbField, value: number): number {
+  const { min, max, step } = REVERB_RANGES[field];
+  const steps = Math.round((Math.min(max, Math.max(min, value)) - min) / step);
+  // To the step's own decimals, so 0.1 steps do not drift (1.5000000000000002).
+  const decimals = Math.max(0, -Math.floor(Math.log10(step)));
+  return Number((min + steps * step).toFixed(decimals));
+}
+
 /** The paper's decay coefficient for a -60 dB time of `seconds`, at `rate`, round a loop of `loop` samples. */
 export function decayFor(seconds: number, rate: number, loop: number): number {
   // Round the figure eight the signal is multiplied by the decay four

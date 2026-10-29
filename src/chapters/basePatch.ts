@@ -33,5 +33,6 @@ export const BASE_PATCH: ChapterPatch = {
   dxFeedback: 0,
   dxLfo: DEFAULTS.dxLfo,
   dxPitchEnvelope: DEFAULTS.dxPitchEnvelope,
+  dxReverb: DEFAULTS.dxReverb,
   compare: false,
 };

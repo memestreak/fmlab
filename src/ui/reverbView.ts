@@ -1,12 +1,13 @@
 // The Voice section's Reverb tab (Jeremy, 2026-10-22): the plate reverb's
 // screen (viz/reverbPlot.ts), four knobs under it, Pre-delay, Decay, Mix
-// and Tone, and its On key at the row's right end. They set the Settings
-// (model/settings.ts): the reverb belongs to the instrument, per browser,
-// not to the voice, the link or a preset; the engine follows them.
+// and Tone, and its On key at the row's right end. They edit the voice's
+// reverb (`dxReverb`; Jeremy, 2026-10-29: part of the sound, so presets
+// and links carry it); the engine follows it.
 
 import type { BandEnvelopes, ResponseRequest } from '../dsp/reverbResponse';
 import ResponseWorker from '../dsp/reverbResponse.worker?worker';
-import { inRange, SETTING_RANGES, settings } from '../model/settings';
+import { REVERB_RANGES, type ReverbField, reverbInRange, type VoiceReverb } from '../dsp/plateReverb';
+import type { LabStore } from '../model/lab';
 import { describeReverb, drawReverb, type ReverbCurves, type ReverbView } from '../viz/reverbPlot';
 import { createKnob } from './knob';
 import { knobValues, redrawOnLayout } from './screenValues';
@@ -21,65 +22,66 @@ export const formatMix = (mix: number) => `${Math.round(mix)} %`;
 /** How many worked-out responses are kept, for stepping back and forth. */
 const CACHE = 8;
 
-/** The view of the settings the screen and the engine take: Pre-delay in seconds. */
-function viewOf(): ReverbView {
-  const now = settings.get();
+/** The view of a voice's reverb the screen takes: Pre-delay in seconds. */
+function viewOf(reverb: VoiceReverb): ReverbView {
   return {
-    on: now.reverb === 'on',
-    seconds: now.reverbDecay,
-    mix: now.reverbMix,
-    tone: now.reverbTone,
-    preDelay: now.reverbPreDelay / 1000,
+    on: reverb.on,
+    seconds: reverb.decay,
+    mix: reverb.mix,
+    tone: reverb.tone,
+    preDelay: reverb.preDelay / 1000,
   };
 }
 
-/** Builds the Reverb tab and keeps it showing the settings. */
-export function mountReverbView(): void {
+/** Builds the Reverb tab and keeps it showing the voice's reverb. */
+export function mountReverbView(store: LabStore): void {
   const canvas = document.querySelector<HTMLCanvasElement>('#inst-reverb-plot');
   const knobs = document.getElementById('inst-reverb-knobs');
   const key = document.querySelector<HTMLButtonElement>('#inst-reverb-on');
   if (!canvas || !knobs || !key) return;
 
-  const now = () => settings.get();
+  const now = () => store.get().dxReverb;
+  const set = (field: ReverbField, value: number) =>
+    store.set({ dxReverb: { ...now(), [field]: reverbInRange(field, value) } });
   const built = [
     createKnob({
       label: 'Pre-delay',
       name: 'Reverb pre-delay',
       min: 1,
-      max: SETTING_RANGES.reverbPreDelay.max,
+      max: REVERB_RANGES.preDelay.max,
       log: true,
       // Turned all the way down it is none: the tail starts with the sound.
       zero: true,
-      get: () => now().reverbPreDelay,
-      set: value => settings.set({ reverbPreDelay: inRange('reverbPreDelay', value) }),
+      get: () => now().preDelay,
+      set: value => set('preDelay', value),
       format: formatPreDelay,
     }),
     createKnob({
       label: 'Decay',
       name: 'Reverb decay',
-      min: SETTING_RANGES.reverbDecay.min,
-      max: SETTING_RANGES.reverbDecay.max,
+      min: REVERB_RANGES.decay.min,
+      max: REVERB_RANGES.decay.max,
       log: true,
-      get: () => now().reverbDecay,
-      set: value => settings.set({ reverbDecay: inRange('reverbDecay', value) }),
+      get: () => now().decay,
+      set: value => set('decay', value),
       format: formatDecay,
     }),
     createKnob({
       label: 'Mix',
       name: 'Reverb mix',
-      min: SETTING_RANGES.reverbMix.min,
-      max: SETTING_RANGES.reverbMix.max,
-      get: () => now().reverbMix,
-      set: value => settings.set({ reverbMix: inRange('reverbMix', value) }),
+      min: REVERB_RANGES.mix.min,
+      max: REVERB_RANGES.mix.max,
+      get: () => now().mix,
+      set: value => set('mix', value),
       format: formatMix,
     }),
     createKnob({
       label: 'Tone',
       name: 'Reverb tone',
-      min: SETTING_RANGES.reverbTone.min,
-      max: SETTING_RANGES.reverbTone.max,
-      get: () => now().reverbTone,
-      set: value => settings.set({ reverbTone: inRange('reverbTone', value) }),
+      min: REVERB_RANGES.tone.min,
+      max: REVERB_RANGES.tone.max,
+      get: () => now().tone,
+      set: value => set('tone', value),
       format: value => String(Math.round(value)),
     }),
   ];
@@ -87,7 +89,7 @@ export function mountReverbView(): void {
 
   // On, a push key: it goes down or up on the press, as Key sync. Enter and
   // Space work it through the click.
-  const flip = () => settings.set({ reverb: now().reverb === 'on' ? 'off' : 'on' });
+  const flip = () => store.set({ dxReverb: { ...now(), on: !now().on } });
   key.addEventListener('pointerdown', event => {
     if (event.button === 0) flip();
   });
@@ -156,7 +158,7 @@ export function mountReverbView(): void {
   const draw = () => {
     const box = canvas.getBoundingClientRect();
     if (box.width === 0) return;
-    const view = viewOf();
+    const view = viewOf(now());
     // A column a pixel of the time the curves cover.
     const columns = Math.max(16, Math.round(box.width * ((1.25 * view.seconds) / (1.25 * view.seconds + view.preDelay))));
     // Decay and Tone need a new run; Mix and Pre-delay only move the
@@ -169,19 +171,11 @@ export function mountReverbView(): void {
 
   const show = () => {
     built.forEach(knob => knob.update());
-    key.setAttribute('aria-pressed', String(now().reverb === 'on'));
+    key.setAttribute('aria-pressed', String(now().on));
     draw();
   };
-  settings.subscribe((state, before) => {
-    if (
-      state.reverb !== before.reverb ||
-      state.reverbDecay !== before.reverbDecay ||
-      state.reverbMix !== before.reverbMix ||
-      state.reverbTone !== before.reverbTone ||
-      state.reverbPreDelay !== before.reverbPreDelay
-    ) {
-      show();
-    }
+  store.subscribe((state, before) => {
+    if (state.dxReverb !== before.dxReverb) show();
   });
   // Drawn when shown (0 to a size), resized, or its knobs laid out anew;
   // never while hidden.
@@ -189,5 +183,5 @@ export function mountReverbView(): void {
   redrawOnLayout(knobs, draw);
   void document.fonts.ready.then(draw);
   built.forEach(knob => knob.update());
-  key.setAttribute('aria-pressed', String(now().reverb === 'on'));
+  key.setAttribute('aria-pressed', String(now().on));
 }

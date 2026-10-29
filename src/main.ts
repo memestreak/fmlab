@@ -108,11 +108,11 @@ mountEnvelopeView(store);
 mountKeyScalingView(store);
 mountVoiceArea(store);
 mountPitchEgView(store);
-mountReverbView();
+mountReverbView(store);
 // The Reverb tab key's light, a switch of its own over it.
 const voiceHead = document.querySelector<HTMLElement>('.inst-alg-head');
 const reverbTab = document.getElementById('inst-tab-reverb');
-if (voiceHead && reverbTab) mountReverbLamp(voiceHead, reverbTab);
+if (voiceHead && reverbTab) mountReverbLamp(store, voiceHead, reverbTab);
 mountAlgorithmSteps(store);
 mountFeedbackKnob(store);
 mountSteps(store);
