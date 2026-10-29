@@ -56,8 +56,8 @@ Synth
   velocity (read only)
 
 Learn
-- No section yet (Theme is app-wide), so the group is not shown until it
-  has one. A chapter's gear opens General instead.
+- No section yet (Theme, Motion and Tips are app-wide), so the group is
+  not shown until it has one. A chapter's gear opens General.
 
 ## Work to do
 
@@ -124,22 +124,25 @@ Learn
 ### Entry points
 - [ ] Synth: the Settings key opens the dialog at Synth, expanded, first
       section selected; other groups collapsed.
-- [ ] The gear is the last page-level action. Today the Learn key sits
-      right of Settings: move it left of Settings (open question).
+- [ ] The gear is the last page-level action: move the Learn key left of
+      Settings.
 - [ ] Chapters: add a gear to the masthead that opens the dialog at
       General.
+- [ ] Make Motion and Tips on hover act on the chapters as well as the
+      synth (`motionReduced()`, the terms' tips).
 
 ### Docs
 - [ ] Update `CLAUDE.md` (settings.ts, the Settings panel, storage keys)
       and the design spec.
 
-## Open questions for Jeremy
+## Decisions (Jeremy, 2026-10-29)
 
-Answered 2026-10-29: Reverb is part of the sound; Volume is neither a
-preference nor part of the sound; every preset starts with reverb off.
-
-1. **Learn key**: move it left of Settings so the gear is last?
-2. **Chapters' gear**: add one, given the chapters have only Theme,
-   Motion and Tips to set?
-3. **Motion and Tips**: app-wide (General › Appearance), as proposed, or
-   synth only? Today they act only in the sandbox.
+- Reverb is part of the sound: the voice, its presets and the share link.
+  Every preset starts with it off.
+- Volume is neither a preference nor part of the sound: unsaved, out of
+  Settings.
+- The Learn key moves left of Settings, so the gear is the last
+  page-level action.
+- The chapters get a gear that opens the dialog at General.
+- Motion and Tips on hover are app-wide (General › Appearance): the
+  chapters' animations and term tips follow them too.
