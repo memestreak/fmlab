@@ -3,10 +3,10 @@ import { currentStep, isLastStep } from '../chapters/steps';
 import type { Chapter } from '../chapters/types';
 import { algorithm } from '../dsp/algorithms';
 import type { LabState, LabStore } from '../model/lab';
+import { motionReduced } from './motion';
 
 /** Where the text has its own scrolling column beside the lab. */
 const PINNED = '(min-width: 62rem)';
-const REDUCED_MOTION = '(prefers-reduced-motion: reduce)';
 
 /**
  * A chapter built up in steps (chapter 8): a row of step buttons in the
@@ -40,7 +40,7 @@ export function mountSteps(store: LabStore): void {
         ?.querySelector(`[data-step-section="${index}"]`)
         ?.scrollIntoView({
           block: 'start',
-          behavior: window.matchMedia(REDUCED_MOTION).matches ? 'auto' : 'smooth',
+          behavior: motionReduced() ? 'auto' : 'smooth',
         });
     }
   };

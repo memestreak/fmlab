@@ -2846,10 +2846,13 @@ canvas.voice-keys {
   }
 }
 
-/* The sandbox's Settings (ui/settingsPanel.ts; Jeremy, 2026-10-21): a
-   push key in the title bar, between Volume and the glossary, lit while
-   its panel is open; the panel a modal console of the chassis's black
-   plastic, the same in either theme, its settings on a VFD screen. */
+/* Settings (ui/settingsPanel.ts; Jeremy, 2026-10-21, and the settings
+   philosophy, 2026-10-29): on the synth a push key at the title bar's
+   right end, after Learn, lit while open; on the chapters a gear after
+   the theme switch. The dialog is a modal console of the chassis's black
+   plastic, the same on every page and in either theme: a tree of groups
+   and sections at the left, the section's settings on a VFD screen at
+   the right, OK, Apply and Cancel under them. */
 body:not([data-view='instrument']) :is(.inst-settings, .inst-learn) {
   display: none;
 }
@@ -2860,7 +2863,7 @@ body:not([data-view='instrument']) :is(.inst-settings, .inst-learn) {
 }
 
 /* The Learn key (Jeremy, 2026-10-25): a link to the guide, a push key
-   in its own bezel right of Settings. */
+   in its own bezel left of Settings (2026-10-29: the gear is the last). */
 .learn-key {
   color: inherit;
   text-decoration: none;
@@ -2872,7 +2875,7 @@ body:not([data-view='instrument']) :is(.inst-settings, .inst-learn) {
 
 .settings-panel {
   box-sizing: border-box;
-  width: min(600px, calc(100vw - 32px));
+  width: min(680px, calc(100vw - 32px));
   max-width: none;
   padding: 14px 16px 16px;
   border: 1px solid #000;
@@ -2889,13 +2892,25 @@ body:not([data-view='instrument']) :is(.inst-settings, .inst-learn) {
   background: rgba(0, 0, 0, 0.35);
 }
 
-/* Close has no state to show, so no lamp: a plain push key; and the
-   preset's Share, beside its steps. */
-[data-view='instrument'] :is(.settings-close, .preset-share-key, .learn-key) {
+/* Close, OK, Apply and Cancel have no state to show, so no lamp: plain
+   push keys; and the preset's Share, beside its steps. */
+[data-view='instrument'] :is(.settings-close, .settings-actions .lamp-key, .preset-share-key, .learn-key) {
   padding: 0 0.75rem;
 }
 
-[data-view='instrument'] :is(.settings-close, .preset-share-key, .learn-key)::before {
+[data-view='instrument'] :is(.settings-close, .settings-actions .lamp-key, .preset-share-key, .learn-key)::before {
+  display: none;
+}
+
+/* Apply, with nothing staged: dead, its legend dark. */
+[data-view='instrument'] .settings-actions .lamp-key:disabled {
+  color: var(--lamp-legend-dead);
+  cursor: default;
+}
+
+/* The chapters' gear: the theme switch's square; none on the synth, which
+   has its key. */
+[data-view='instrument'] .masthead .settings-gear {
   display: none;
 }
 
@@ -2906,9 +2921,110 @@ body:not([data-view='instrument']) :is(.inst-settings, .inst-learn) {
   margin-bottom: 12px;
 }
 
-/* General | MIDI, between the title and Close. */
-.settings-tabs {
-  margin: 0 12px 0 auto;
+/* The tree at the left, the pane at the right. */
+.settings-body {
+  display: grid;
+  grid-template-columns: 9rem minmax(0, 1fr);
+  gap: 0 14px;
+  align-items: start;
+}
+
+/* The tree: silkscreen on the plastic. A group's head (▸ closed, ▾ open),
+   its sections under it, the one shown filled, a plate. */
+.settings-tree {
+  display: grid;
+  gap: 2px;
+  padding-top: 2px;
+  font: 500 0.95rem / 1.2 var(--font-tape);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.settings-tree button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 4px 6px;
+  border: 0;
+  border-radius: 2px;
+  background: none;
+  color: var(--chassis-legend);
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: left;
+  text-transform: inherit;
+  cursor: pointer;
+}
+
+.settings-tree-mark {
+  width: 0.8em;
+  font-size: 0.8em;
+}
+
+.settings-tree-sections {
+  display: grid;
+  gap: 2px;
+  padding-left: calc(0.8em + 6px);
+}
+
+.settings-tree-sections[hidden] {
+  display: none;
+}
+
+.settings-tree .settings-tree-section {
+  font-weight: 400;
+}
+
+.settings-tree button:hover {
+  color: var(--lamp-legend-hover);
+}
+
+.settings-tree .settings-tree-section.is-current {
+  background: var(--chassis-legend);
+  color: var(--chassis-legend-ink);
+}
+
+.settings-tree button:focus {
+  outline: none;
+}
+
+.settings-tree button:focus-visible {
+  outline: 2px solid var(--lamp-legend-hover);
+  outline-offset: 1px;
+}
+
+/* The phone's group picker and section strip: shown only there. */
+.settings-narrow {
+  display: none;
+}
+
+/* The pane's heading, "Synth › MIDI", silkscreen over its screen. */
+.settings-pane-heading {
+  margin: 0 0 8px;
+  color: var(--chassis-legend);
+  font: 500 0.95rem / 1.2 var(--font-tape);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* The foot: a failed save, said quietly, then OK, Apply and Cancel at the right. */
+.settings-foot {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.settings-notice {
+  margin: 0;
+  color: var(--chassis-legend);
+  font: 400 0.85rem / 1.3 var(--font-tape);
+  letter-spacing: 0.04em;
+}
+
+.settings-actions {
+  margin-left: auto;
 }
 
 .settings-screen {
@@ -2983,8 +3099,8 @@ body:not([data-view='instrument']) :is(.inst-settings, .inst-learn) {
   box-shadow: inset 2px 0 0 var(--vfd-lit);
 }
 
-/* A tab's lines: both pages in the glass's one cell, the closed one
-   unseen, so the glass is the longer one's size whichever is open. */
+/* A section's lines: every page in the glass's one cell, the others
+   unseen, so the glass is the longest one's size whichever is shown. */
 .settings-page {
   display: grid;
   grid-area: 1 / 1;
@@ -2995,20 +3111,11 @@ body:not([data-view='instrument']) :is(.inst-settings, .inst-learn) {
   visibility: hidden;
 }
 
-/* MIDI's tab: no group column, which would only say MIDI again. */
-.settings-page[data-page='midi'] .settings-group {
-  display: none;
-}
-
-.settings-page[data-page='midi'] .settings-line {
-  grid-template-columns: auto minmax(0, 1fr);
-}
-
 .settings-line {
   display: grid;
   /* The value takes the rest, so a long one (an input's name) is cut short
      with an ellipsis rather than widening the case. */
-  grid-template-columns: 7.5rem auto minmax(0, 1fr);
+  grid-template-columns: auto minmax(0, 1fr);
   gap: 0 12px;
   padding: 3px 12px;
 }
@@ -3073,8 +3180,15 @@ body:not([data-view='instrument']) :is(.inst-settings, .inst-learn) {
   cursor: default;
 }
 
-.settings-group {
-  opacity: 0.45;
+/* A name resets its setting on a double click (its tip says so). */
+.settings-name.is-resettable {
+  cursor: pointer;
+}
+
+/* Changed and not yet saved: a dot after the name. */
+.settings-line.is-staged .settings-name::after {
+  content: ' •';
+  opacity: 0.7;
 }
 
 .settings-value {
@@ -3098,31 +3212,61 @@ body:not([data-view='instrument']) :is(.inst-settings, .inst-learn) {
   height: 1.65rem;
 }
 
-/* On a phone the group goes under the name, and the tabs under the title
-   and Close, on a line of their own. */
+/* On a phone the tree is two rows over the pane: the group picker, then
+   that group's sections in a strip that scrolls sideways. */
 @media (max-width: 30rem) {
-  .settings-head {
+  .settings-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .settings-tree {
+    display: none;
+  }
+
+  .settings-narrow {
+    display: grid;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .settings-group-picker {
+    justify-self: start;
+    padding: 4px 8px;
+    border: 1px solid #000;
+    border-radius: 3px;
+    background: linear-gradient(var(--lamp-key-1), var(--lamp-key-3));
+    color: var(--chassis-legend);
+    font: 500 0.95rem / 1.2 var(--font-tape);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .settings-strip {
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .settings-strip-section {
+    flex: none;
+    padding: 4px 8px;
+    border: 0;
+    border-radius: 2px;
+    background: none;
+    color: var(--chassis-legend);
+    font: 400 0.95rem / 1.2 var(--font-tape);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .settings-strip-section.is-current {
+    background: var(--chassis-legend);
+    color: var(--chassis-legend-ink);
+  }
+
+  .settings-foot {
     flex-wrap: wrap;
-    row-gap: 10px;
-  }
-
-  .settings-tabs {
-    order: 1;
-    margin: 0;
-  }
-
-  /* The control row was two lines here. */
-  #settings-panel .settings-glass {
-    padding-bottom: calc(6px + 72px);
-  }
-
-  .settings-line {
-    grid-template-columns: auto minmax(0, 1fr);
-  }
-
-  .settings-group {
-    grid-column: 1 / -1;
-    font-size: 0.68rem;
   }
 
   .settings-controls {
@@ -3267,11 +3411,13 @@ body:not([data-view='instrument']) :is(.inst-settings, .inst-learn) {
   visibility: hidden;
 }
 
-:root[data-tips='off'] body[data-view='instrument'] .term-tip {
+/* Tips on hover and Motion are app-wide (Jeremy, 2026-10-29): the
+   chapters' term tips and transitions follow them too. */
+:root[data-tips='off'] .term-tip {
   display: none;
 }
 
-:root[data-motion='still'] body[data-view='instrument'] * {
+:root[data-motion='still'] * {
   transition: none !important;
 }
 

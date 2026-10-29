@@ -1,8 +1,8 @@
 import { settings } from '../model/settings';
 
-// Whether to hold still: the device asks for reduced motion, or, in the
-// sandbox, its Motion setting is Still (Jeremy, 2026-10-21). Everything
-// that moves asks here.
+// Whether to hold still: the device asks for reduced motion, or the
+// Motion setting is Still (Jeremy, 2026-10-21; app-wide since
+// 2026-10-29). Everything that moves asks here.
 
 const REDUCED_MOTION = '(prefers-reduced-motion: reduce)';
 
@@ -13,7 +13,7 @@ export function inSandbox(): boolean {
 
 /** Whether motion is unwelcome now. */
 export function motionReduced(): boolean {
-  return window.matchMedia(REDUCED_MOTION).matches || (settings.get().motion === 'still' && inSandbox());
+  return window.matchMedia(REDUCED_MOTION).matches || settings.get().motion === 'still';
 }
 
 /** Calls `then` when the answer may have changed: the device's choice, or the setting. */
