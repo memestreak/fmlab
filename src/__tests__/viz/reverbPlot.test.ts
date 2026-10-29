@@ -1,5 +1,4 @@
 import { bandEnvelopes, fromStart, reverbResponse } from '../../dsp/reverbResponse';
-import { DEFAULT_SETTINGS, parseSettings } from '../../model/settings';
 import { describeReverb, formatGain, type ReverbCurves, timeAt, timeStep, wetDb } from '../../viz/reverbPlot';
 
 // The Reverb tab's screen (Jeremy, 2026-10-22): the plate's lows and highs
@@ -97,19 +96,3 @@ describe('the reverb screen in words', () => {
   });
 });
 
-describe('the reverb\'s settings, set on its tab', () => {
-  it('still load as saved, Pre-delay among them, held in range', () => {
-    const saved = parseSettings(
-      JSON.stringify({ reverb: 'on', reverbDecay: 3.04, reverbMix: 40, reverbTone: 20, reverbPreDelay: 900 }),
-    );
-    expect(saved).toEqual({
-      ...DEFAULT_SETTINGS,
-      reverb: 'on',
-      reverbDecay: 3,
-      reverbMix: 40,
-      reverbTone: 20,
-      reverbPreDelay: 500,
-    });
-    expect(DEFAULT_SETTINGS.reverbPreDelay).toBe(0);
-  });
-});

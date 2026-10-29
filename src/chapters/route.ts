@@ -6,6 +6,7 @@
 // had names ("#3", "#7?c=…", "#glossary") are upgraded by `upgradeHash`.
 
 import { DX7_COUNT } from '../dsp/algorithms';
+import { type ReverbField, reverbInRange, type VoiceReverb } from '../dsp/plateReverb';
 import {
   DETUNE_CENTS,
   DX7_FEEDBACK,
@@ -303,9 +304,33 @@ export function pitchFromParam(raw: string | null): Dx7PitchEnvelope | null {
   return env;
 }
 
+/** The reverb's fields in a link, in order after on (1 or 0). */
+const REVERB_FIELDS: readonly ReverbField[] = ['decay', 'mix', 'tone', 'preDelay'];
+
+/**
+ * The reverb in a link: on (1 or 0), decay in seconds, mix, tone and
+ * pre-delay in ms, joined by "_", as `1_2.4_30_60_20`.
+ */
+export function reverbParam(reverb: VoiceReverb): string {
+  return [reverb.on ? '1' : '0', ...REVERB_FIELDS.map(key => brief(reverb[key], 1))].join('_');
+}
+
+/** The reverb a link's "r" describes, each number held in its range and to its step; null if it is not one. */
+export function reverbFromParam(raw: string | null): VoiceReverb | null {
+  if (raw === null) return null;
+  const f = raw.split('_').map(text => (text.trim() === '' ? NaN : Number(text)));
+  if (f.length !== REVERB_FIELDS.length + 1 || !f.every(Number.isFinite) || (f[0] !== 0 && f[0] !== 1)) return null;
+  const reverb = { on: f[0] === 1 } as VoiceReverb;
+  REVERB_FIELDS.forEach((key, i) => {
+    reverb[key] = reverbInRange(key, f[i + 1]);
+  });
+  return reverb;
+}
+
 /**
  * The parameters that carry a sandbox sound: the algorithm, the
- * feedback, the six operators, the LFO and the pitch envelope. Volume
+ * feedback, the six operators, the LFO, the pitch envelope and the
+ * reverb (Jeremy, 2026-10-29: part of the sound). Volume
  * stays the listener's own, and is left out; so does the pitch, which is
  * only the note struck last (Jeremy, 2026-10-23: the address changed with
  * every note played). A link's own `c` still sets it.
@@ -317,6 +342,7 @@ export function soundParams(state: LabState): string {
     o: operatorsParam(state.dxOperators),
     l: lfoParam(state.dxLfo),
     p: pitchParam(state.dxPitchEnvelope),
+    r: reverbParam(state.dxReverb),
   }).toString();
 }
 
@@ -355,5 +381,8 @@ export function soundFromParams(params: URLSearchParams): Partial<LabState> {
   if (lfo) patch.dxLfo = lfo;
   const pitch = pitchFromParam(params.get('p'));
   if (pitch) patch.dxPitchEnvelope = pitch;
+  // None in the link: the voice's own, off.
+  const reverb = reverbFromParam(params.get('r'));
+  if (reverb) patch.dxReverb = reverb;
   return patch;
 }

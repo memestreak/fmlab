@@ -116,8 +116,8 @@ let linkSound: string | null = null;
  * The link to a sandbox sound, built when asked for (Jeremy, 2026-10-25:
  * the address never follows the sound, but a sound can be shared):
  * this page's address with the sound's parameters. It carries the voice
- * (algorithm, feedback, the six operators with their velocity, the LFO
- * and the pitch envelope), not the reverb, the settings, the octave or
+ * (algorithm, feedback, the six operators with their velocity, the LFO,
+ * the pitch envelope and the reverb), not the settings, the octave or
  * the volume.
  */
 export function soundLink(state: LabState, { origin, pathname, search }: Pick<Location, 'origin' | 'pathname' | 'search'>): string {
@@ -179,7 +179,8 @@ function mountSoundInUrl(store: LabStore): void {
         state.dxFeedback !== previous.dxFeedback ||
         state.dxOperators !== previous.dxOperators ||
         state.dxLfo !== previous.dxLfo ||
-        state.dxPitchEnvelope !== previous.dxPitchEnvelope)
+        state.dxPitchEnvelope !== previous.dxPitchEnvelope ||
+        state.dxReverb !== previous.dxReverb)
     ) {
       window.clearTimeout(timer);
       timer = window.setTimeout(write, URL_DELAY_MS);
@@ -545,7 +546,7 @@ function showTermInUrl(): void {
 /** The voice a state is, of `presets`: the one whose sound it is exactly. */
 export function presetOf(presets: readonly Preset[], state: LabState): number {
   const sound = (s: Partial<LabState>) =>
-    JSON.stringify([s.algorithm, s.dxFeedback, s.dxOperators, s.dxLfo, s.dxPitchEnvelope]);
+    JSON.stringify([s.algorithm, s.dxFeedback, s.dxOperators, s.dxLfo, s.dxPitchEnvelope, s.dxReverb]);
   const now = sound(state);
   return presets.findIndex(preset => sound(preset.patch) === now);
 }
@@ -697,7 +698,8 @@ function presetMenu(presets: readonly Preset[], banks: readonly PresetBank[], st
       state.algorithm !== previous.algorithm ||
       state.dxFeedback !== previous.dxFeedback ||
       state.dxLfo !== previous.dxLfo ||
-      state.dxPitchEnvelope !== previous.dxPitchEnvelope
+      state.dxPitchEnvelope !== previous.dxPitchEnvelope ||
+      state.dxReverb !== previous.dxReverb
     ) {
       show(state);
     }

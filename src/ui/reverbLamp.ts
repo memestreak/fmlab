@@ -4,9 +4,9 @@
 // A button cannot sit inside the tab's button, so the light's switch is
 // a sibling, unseen, laid over the light: a 20px square round it, so it
 // is not fiddly to hit. It is the On key in the Reverb tab by another
-// way in: both are the `reverb` setting.
+// way in: both are the voice's reverb.
 
-import { settings } from '../model/settings';
+import type { LabStore } from '../model/lab';
 
 /** The switch's square, in CSS pixels, centred on the light. */
 export const LAMP_HIT = 20;
@@ -21,14 +21,11 @@ export function lampPlace(holder: Box, light: Box): { left: number; top: number 
   };
 }
 
-/** The reverb after a press on the switch. */
-export const flipped = (reverb: 'on' | 'off'): 'on' | 'off' => (reverb === 'on' ? 'off' : 'on');
-
 /**
  * Lays a switch over `tab`'s light (its `.pill-mark`), a child of
  * `holder`, which it is placed in. Returns the switch.
  */
-export function mountReverbLamp(holder: HTMLElement, tab: HTMLElement): HTMLButtonElement | null {
+export function mountReverbLamp(store: LabStore, holder: HTMLElement, tab: HTMLElement): HTMLButtonElement | null {
   const mark = tab.querySelector<HTMLElement>('.pill-mark');
   if (!mark) return null;
   const lamp = document.createElement('button');
@@ -39,7 +36,7 @@ export function mountReverbLamp(holder: HTMLElement, tab: HTMLElement): HTMLButt
   holder.append(lamp);
 
   const show = () => {
-    const on = settings.get().reverb === 'on';
+    const on = store.get().dxReverb.on;
     lamp.setAttribute('aria-pressed', String(on));
     lamp.title = on ? 'Reverb on' : 'Reverb off';
   };
@@ -50,7 +47,10 @@ export function mountReverbLamp(holder: HTMLElement, tab: HTMLElement): HTMLButt
     lamp.style.top = `${top}px`;
   };
 
-  const flip = () => settings.set({ reverb: flipped(settings.get().reverb) });
+  const flip = () => {
+    const reverb = store.get().dxReverb;
+    store.set({ dxReverb: { ...reverb, on: !reverb.on } });
+  };
   // On the press, as every key here; not the press's own focusing, so a
   // click leaves no ring. Enter and Space work it through the click.
   lamp.addEventListener('pointerdown', event => {
@@ -62,8 +62,8 @@ export function mountReverbLamp(holder: HTMLElement, tab: HTMLElement): HTMLButt
     if (event.detail === 0) flip();
   });
 
-  settings.subscribe((now, before) => {
-    if (now.reverb !== before.reverb) show();
+  store.subscribe((now, before) => {
+    if (now.dxReverb.on !== before.dxReverb.on) show();
   });
   if (typeof ResizeObserver === 'function') {
     const watch = new ResizeObserver(place);

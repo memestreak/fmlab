@@ -1,4 +1,4 @@
-import { flipped, LAMP_HIT, lampPlace } from '../../ui/reverbLamp';
+import { LAMP_HIT, lampPlace } from '../../ui/reverbLamp';
 
 describe('the Reverb tab key\'s light', () => {
   it('is a 20px switch centred on the light, wherever the key is', () => {
@@ -8,10 +8,5 @@ describe('the Reverb tab key\'s light', () => {
     expect(lampPlace(holder, { left: 400, top: 70, width: 5, height: 5 })).toEqual({ left: 292.5, top: 12.5 });
     // The key on a line of its own, lower and further left.
     expect(lampPlace(holder, { left: 150, top: 95, width: 5, height: 5 })).toEqual({ left: 42.5, top: 37.5 });
-  });
-
-  it('turns the reverb on and off', () => {
-    expect(flipped('off')).toBe('on');
-    expect(flipped('on')).toBe('off');
   });
 });

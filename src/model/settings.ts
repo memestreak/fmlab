@@ -2,7 +2,8 @@ import { createStore, type Store } from './store';
 
 // The sandbox's settings (its Settings panel, ui/settingsPanel.ts): per
 // browser, saved together under one key, outside the lab's store, the
-// link and the sound. No DOM. The theme is a line of the panel too but
+// link and the sound (the reverb is the voice's: dsp/plateReverb.ts's
+// VoiceReverb). No DOM. The theme is a line of the panel too but
 // keeps its own key and model (theme.ts), which the boot script reads
 // before the first paint.
 
@@ -27,20 +28,6 @@ export interface Settings {
   /** A wheel's direction: as the page scrolls (positive deltaY the value below), or reversed. */
   wheel: 'page' | 'reverse';
   /**
-   * The plate reverb (dsp/plateReverb.ts; Jeremy, 2026-10-22): heard or
-   * not. It and the four below are set on the Voice section's Reverb tab
-   * (ui/reverbView.ts), not in the Settings panel.
-   */
-  reverb: 'off' | 'on';
-  /** Its -60 dB time, in seconds. */
-  reverbDecay: number;
-  /** Its dry and wet balance, 0 (dry only) to 100 (wet only). */
-  reverbMix: number;
-  /** Its tail's brightness, 0 (darkest) to 100 (brightest). */
-  reverbTone: number;
-  /** How long after the sound its tail starts, in ms (Jeremy, 2026-10-22). */
-  reverbPreDelay: number;
-  /**
    * MIDI In (ui/midi.ts; Jeremy, 2026-10-23): on or off, set by the
    * keyboard panel's In key, not a Settings line. On, the page asks for
    * MIDI again on load.
@@ -61,7 +48,7 @@ export interface Settings {
 }
 
 /** The settings that are numbers, each in a range; the rest are choices. */
-export type NumberSetting = 'reverbDecay' | 'reverbMix' | 'reverbTone' | 'reverbPreDelay' | 'midiChannel';
+export type NumberSetting = 'midiChannel';
 /** The settings that are free text. */
 export type TextSetting = 'midiInput';
 export type ChoiceSetting = Exclude<keyof Settings, NumberSetting | TextSetting>;
@@ -71,10 +58,6 @@ export const MAX_TEXT_SETTING = 100;
 
 /** Every number setting's range and step. */
 export const SETTING_RANGES: Record<NumberSetting, { min: number; max: number; step: number }> = {
-  reverbDecay: { min: 0.2, max: 20, step: 0.1 },
-  reverbMix: { min: 0, max: 100, step: 1 },
-  reverbTone: { min: 0, max: 100, step: 1 },
-  reverbPreDelay: { min: 0, max: 500, step: 1 },
   midiChannel: { min: 0, max: 16, step: 1 },
 };
 
@@ -97,7 +80,6 @@ export const SETTING_CHOICES: { [K in ChoiceSetting]: readonly Settings[K][] } =
   computerKeys: ['off', 'on'],
   keyVelocity: [100, 64, 127],
   wheel: ['page', 'reverse'],
-  reverb: ['off', 'on'],
   midi: ['off', 'on'],
   bendRange: [2, 1, 3, 5, 7, 12],
   velocityCurve: ['normal', 'lightest', 'light', 'heavy', 'heaviest'],
@@ -112,11 +94,6 @@ export const DEFAULT_SETTINGS: Settings = {
   computerKeys: 'off',
   keyVelocity: 100,
   wheel: 'page',
-  reverb: 'off',
-  reverbDecay: 1.5,
-  reverbMix: 25,
-  reverbTone: 70,
-  reverbPreDelay: 0,
   midi: 'off',
   midiInput: '',
   midiChannel: 0,

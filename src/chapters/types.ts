@@ -59,6 +59,7 @@ export type ChapterPatch = Pick<
   | 'dxFeedback'
   | 'dxLfo'
   | 'dxPitchEnvelope'
+  | 'dxReverb'
   | 'compare'
 >;
 

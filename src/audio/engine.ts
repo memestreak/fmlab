@@ -102,8 +102,8 @@ const FFT_SIZE = 8192;
  *   worklet (the synth, stereo) -> note gain -> master gain -> limiter -> speakers
  *   worklet (its dry output) -> note gain (the same) -> analyser (the live spectrum)
  *
- * The first output carries the sandbox's plate reverb when it is on (a
- * Setting; dsp/plateReverb.ts), the second the dry sound alone, so the
+ * The first output carries the sandbox's plate reverb when it is on (the
+ * voice's; dsp/plateReverb.ts), the second the dry sound alone, so the
  * spectrum is the notes, never the tail.
  *
  * There are three ways of playing. Most chapters hold one steady sound
@@ -157,23 +157,15 @@ export class AudioEngine {
 
   constructor(private readonly store: LabStore) {
     if (store.get().chapter === 'sandbox') this.warm();
-    // The reverb follows its settings, and is off outside the sandbox.
     settings.subscribe((now, before) => {
-      if (
-        now.reverb !== before.reverb ||
-        now.reverbDecay !== before.reverbDecay ||
-        now.reverbMix !== before.reverbMix ||
-        now.reverbTone !== before.reverbTone ||
-        now.reverbPreDelay !== before.reverbPreDelay
-      ) {
-        this.tell(this.reverbMessage());
-      }
       // A new Bend range re-sends the bend; MIDI off lets the context rest again.
       if (now.bendRange !== before.bendRange) this.tell(this.bendMessage());
       if (now.midi !== before.midi && now.midi === 'off') this.suspendSoon(SUSPEND_AFTER_MS);
     });
     store.subscribe((state, previous) => {
-      if (state.chapter !== previous.chapter) this.tell(this.reverbMessage());
+      // The reverb follows the voice, edited or loaded, at once (one plate
+      // for every note), and is off outside the sandbox.
+      if (state.chapter !== previous.chapter || state.dxReverb !== previous.dxReverb) this.tell(this.reverbMessage());
       if (state.chapter === 'sandbox' && previous.chapter !== 'sandbox') this.warm();
       if (state.mode === 'ops' && this.followVoices(state, previous)) return;
       // Out of six operators: whatever they were playing stops.
@@ -653,26 +645,26 @@ export class AudioEngine {
       analyser,
       bins: new Float32Array(analyser.frequencyBinCount),
     };
-    // The reverb as the settings and the page say, from the start.
+    // The reverb as the voice and the page say, from the start.
     synth.port.postMessage(this.reverbMessage());
     return this.graph;
   }
 
   /**
    * The plate reverb as the worklet should have it: on only in the sandbox
-   * with the Reverb setting on (Jeremy, 2026-10-22), and its Pre-delay,
+   * with the voice's reverb on (Jeremy, 2026-10-22), and its Pre-delay,
    * Decay, Mix and Tone as set, which the worklet turns into the plate's
    * coefficients.
    */
   private reverbMessage(): ReverbMessage {
-    const now = settings.get();
+    const { chapter, dxReverb: reverb } = this.store.get();
     return {
       type: 'reverb',
-      on: now.reverb === 'on' && this.store.get().chapter === 'sandbox',
-      seconds: now.reverbDecay,
-      mix: now.reverbMix,
-      tone: now.reverbTone,
-      preDelay: now.reverbPreDelay / 1000,
+      on: reverb.on && chapter === 'sandbox',
+      seconds: reverb.decay,
+      mix: reverb.mix,
+      tone: reverb.tone,
+      preDelay: reverb.preDelay / 1000,
     };
   }
 

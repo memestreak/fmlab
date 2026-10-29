@@ -23,7 +23,6 @@ import {
 } from '../dsp/dx7';
 import { dx7LfoDelay, dx7TremoloDb, dx7VibratoCents } from '../dsp/lfo';
 import type { LabStore } from '../model/lab';
-import { settings } from '../model/settings';
 import { knobValues, redrawOnLayout } from './screenValues';
 import { describeLfo, drawLfo } from '../viz/lfoPlot';
 import { createKnob } from './knob';
@@ -109,7 +108,7 @@ export function mountVoiceArea(store: LabStore): void {
       tab: tabs.find(tab => tab.dataset.tab === 'reverb'),
       area: 'reverb',
       name: 'Reverb',
-      on: () => settings.get().reverb === 'on',
+      on: () => store.get().dxReverb.on,
       whileOpen: true,
     },
   ];
@@ -293,12 +292,14 @@ export function mountVoiceArea(store: LabStore): void {
     // The tab stays as it was left (Jeremy, 2026-10-25): the synth comes
     // back as it was within a visit; a reload opens on Algorithm.
     if (state.chapter !== previous.chapter || state.dxLfo !== previous.dxLfo) show();
-    else if (state.dxPitchEnvelope !== previous.dxPitchEnvelope || state.modWheel !== previous.modWheel) showTabs();
+    else if (
+      state.dxPitchEnvelope !== previous.dxPitchEnvelope ||
+      state.modWheel !== previous.modWheel ||
+      state.dxReverb.on !== previous.dxReverb.on
+    ) {
+      showTabs();
+    }
     else if (state.theme !== previous.theme && open === 'lfo') drawPlot();
-  });
-  // The Reverb tab's dot follows its On key, a setting.
-  settings.subscribe((state, before) => {
-    if (state.reverb !== before.reverb) showTabs();
   });
   new ResizeObserver(() => {
     if (open === 'lfo') drawPlot();
