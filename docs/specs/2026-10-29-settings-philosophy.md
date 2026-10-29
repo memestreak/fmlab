@@ -62,17 +62,16 @@ Learn
 ## Work to do
 
 ### Reverb becomes part of the sound
-- [ ] Take Reverb, Decay, Mix, Tone and Pre-delay out of `Settings` and
+- [x] Take Reverb, Decay, Mix, Tone and Pre-delay out of `Settings` and
       into the voice (the lab's patch), so a voice edit, a preset and a
       link all carry them. The Reverb tab stays where it is, editing the
       voice instead of a setting.
-- [ ] Give every preset a reverb, off in both banks to start (Jeremy,
-      2026-10-29) and decide whether a
-      reverb edit marks the name EDITED (it should, as part of the sound).
-- [ ] Add the reverb to the share link (a new parameter, validated and
+- [x] Give every preset a reverb, off in both banks to start (Jeremy,
+      2026-10-29); a reverb edit marks the name EDITED.
+- [x] Add the reverb to the share link (a new parameter, validated and
       clamped in `soundFromParams`; a link without it is reverb off).
-- [ ] Decide whether reverb edits reach held notes at once (as live
-      edits) or only the next note (as a preset does).
+- [x] Reverb changes, an edit's or a preset's, are heard at once, tails
+      and all: there is one plate for every note.
 
 ### Model and storage
 - [ ] Split `fmlab.settings` into one key per section:
