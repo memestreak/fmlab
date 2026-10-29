@@ -7,9 +7,73 @@
    ui/instrument.ts, so the lab's rules scoped to [data-view='chapter'] do
    not reach them. */
 
-[data-view='instrument'] .chapter,
-[data-view='instrument'] .footer {
+[data-view='instrument'] .chapter {
   display: none;
+}
+
+/* Under the panels, the source's link in the middle and the build's
+   commit at the right (Jeremy, 2026-10-29), printed as the chassis's
+   other labels are; no glossary link, as in the title bar. */
+.footer-built {
+  display: none;
+}
+
+[data-view='instrument'] .footer {
+  display: grid;
+  flex: none;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: baseline;
+  margin-top: 0.35rem;
+  font-family: var(--font-tape);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--chassis-legend);
+}
+
+[data-view='instrument'] .footer-links {
+  grid-column: 2;
+}
+
+[data-view='instrument'] .footer-links a {
+  text-decoration: none;
+}
+
+[data-view='instrument'] .footer-links a:hover {
+  text-decoration: underline;
+}
+
+[data-view='instrument'] .footer-glossary {
+  display: none;
+}
+
+[data-view='instrument'] .footer-commit {
+  grid-column: 3;
+  justify-self: end;
+}
+
+[data-view='instrument'] .footer-built {
+  display: inline;
+}
+
+[data-view='instrument'] .footer-commit .num {
+  font-family: inherit;
+}
+
+[data-view='instrument'] .footer-commit a {
+  text-decoration-style: dotted;
+}
+
+/* On a phone the two are centred, one over the other. */
+@media (max-width: 61.99rem) {
+  [data-view='instrument'] .footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    margin-top: 1rem;
+    white-space: nowrap;
+  }
 }
 
 .inst[hidden] {

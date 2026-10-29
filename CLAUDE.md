@@ -78,7 +78,11 @@ figures subscribe to it. Nothing else passes values around.
   (`__COMMIT_HASH__`, set by `define` in `vite.config.ts` from
   `git rev-parse --short HEAD`, `dev` without git), a link to the commit
   on GitHub by its full hash (`__COMMIT_FULL__`, `git rev-parse HEAD`),
-  opening in a new tab and marked ↗, plain text without git.
+  opening in a new tab and marked ↗, plain text without git. On the
+  synth the footer is under its panels in the chassis's silkscreen
+  (Jeremy, 2026-10-29): Source code in the middle, "Built at commit"
+  and the hash at the right, no glossary link; on a phone the two
+  centred, one over the other.
 - `src/model/` — state, no DOM except in `theme.ts`. `store.ts`
   (`createStore`: get, set, subscribe; listeners run synchronously inside
   `set` and get the previous state too), `lab.ts` (`LabState`; the ranges
