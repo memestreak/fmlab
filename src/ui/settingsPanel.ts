@@ -1,4 +1,4 @@
-import { type ChoiceSetting, SETTING_CHOICES, saveSettings, type Settings, settings } from '../model/settings';
+import { type ChoiceSetting, SETTING_CHOICES, type Settings, settings } from '../model/settings';
 import { formatLastVelocity, midiInputs, midiLast } from './midi';
 import { glitchScreens } from './screenGlitch';
 import { inSandbox } from './motion';
@@ -165,10 +165,8 @@ export function mountSettings(): void {
   const glossary = document.querySelector('.guide-link');
   if (!glossary) return;
   applySettings(settings.get());
-  settings.subscribe(now => {
-    applySettings(now);
-    saveSettings(now);
-  });
+  // Saved by the settings themselves (model/settings.ts).
+  settings.subscribe(applySettings);
   governTips();
 
   const all = lines();

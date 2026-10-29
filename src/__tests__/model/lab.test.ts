@@ -18,7 +18,8 @@ import {
   operatorLevelsAt,
   noteSounding,
 } from '../../model/lab';
-import { nextTheme, parseTheme } from '../../model/theme';
+import { parseSection } from '../../model/settings';
+import { nextTheme } from '../../model/theme';
 
 describe('the lab store', () => {
   it('starts on the default patch, silent', () => {
@@ -159,11 +160,12 @@ describe('the carrier slider scale', () => {
 
 describe('theme', () => {
   it('reads a saved choice and treats anything else as auto', () => {
-    expect(parseTheme('light')).toBe('light');
-    expect(parseTheme('dark')).toBe('dark');
-    expect(parseTheme('auto')).toBe('auto');
-    expect(parseTheme(null)).toBe('auto');
-    expect(parseTheme('sepia')).toBe('auto');
+    const theme = (saved: unknown) => parseSection('fmlab.general.appearance', JSON.stringify({ theme: saved })).theme;
+    expect(theme('light')).toBe('light');
+    expect(theme('dark')).toBe('dark');
+    expect(theme('auto')).toBe('auto');
+    expect(theme(null)).toBe('auto');
+    expect(theme('sepia')).toBe('auto');
   });
 
   it('cycles auto, light, dark and round again', () => {

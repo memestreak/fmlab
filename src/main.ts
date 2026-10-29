@@ -24,7 +24,7 @@ import './styles/instrument.css';
 import { AudioEngine } from './audio/engine';
 import { chapterById } from './chapters';
 import { createLabStore } from './model/lab';
-import { loadTheme } from './model/theme';
+import { settings } from './model/settings';
 import { mountBesselControls } from './ui/besselControls';
 import { chapterInUrl, mountChapters, openingFromUrl } from './ui/chapterView';
 import { mountCompare } from './ui/compare';
@@ -88,7 +88,7 @@ function mountCommitHash(slot: HTMLElement): void {
 // in index.html has already applied the saved theme.
 const opening = chapterInUrl();
 const store = createLabStore({
-  theme: loadTheme(),
+  theme: settings.get().theme,
   chapter: opening.id,
   // The chapter's patch, and in the sandbox the sound a link carries.
   ...openingFromUrl(opening),

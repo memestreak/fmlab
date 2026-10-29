@@ -95,7 +95,7 @@ Rules:
 - Red always means negative phase, so control fills and the focus ring use ink, not red.
 - Negative sidebands also get a hollow marker, so the meaning survives for colour-blind viewers.
 - Figures sit between two ink rules, with an italic caption, like a journal figure.
-- Theme switch Auto / Light / Dark, as in frets, saved under `localStorage["fmlab.theme"]`.
+- Theme switch Auto / Light / Dark, as in frets, saved in the Appearance section's `localStorage["fmlab.general.appearance"]` (`theme`).
 
 ## Code layout
 

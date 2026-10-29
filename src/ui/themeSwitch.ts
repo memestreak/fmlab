@@ -1,5 +1,6 @@
 import type { LabStore } from '../model/lab';
-import { applyTheme, nextTheme, saveTheme, type ThemeChoice } from '../model/theme';
+import { settings } from '../model/settings';
+import { applyTheme, nextTheme, type ThemeChoice } from '../model/theme';
 
 const LABELS: Record<ThemeChoice, string> = {
   auto: 'Auto',
@@ -48,9 +49,10 @@ export function themeButton(choice: ThemeChoice): {
 }
 
 /**
- * One small icon button that cycles Auto, Light, Dark. The choice lives
- * in the store; a change is applied to <html> and saved for the boot
- * script in index.html to find on the next visit.
+ * One small icon button that cycles Auto, Light, Dark. It sets the theme
+ * setting (saved in General's Appearance, which the boot script in
+ * index.html reads on the next visit); the store follows it, and a
+ * change is applied to <html>.
  */
 export function mountThemeSwitch(button: HTMLButtonElement, store: LabStore): void {
   const show = (theme: ThemeChoice) => {
@@ -61,12 +63,16 @@ export function mountThemeSwitch(button: HTMLButtonElement, store: LabStore): vo
   };
 
   button.addEventListener('click', () => {
-    store.set({ theme: nextTheme(store.get().theme) });
+    settings.set({ theme: nextTheme(settings.get().theme) });
+  });
+  // The setting is the one saved value (the dialog shows it too); the
+  // store keeps a copy for the drawings that redraw on a theme change.
+  settings.subscribe((now, before) => {
+    if (now.theme !== before.theme) store.set({ theme: now.theme });
   });
   store.subscribe((state, previous) => {
     if (state.theme === previous.theme) return;
     applyTheme(state.theme, document.body.dataset.view === 'instrument');
-    saveTheme(state.theme);
     show(state.theme);
   });
   show(store.get().theme);
