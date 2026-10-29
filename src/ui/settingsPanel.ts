@@ -1,124 +1,89 @@
-import { type ChoiceSetting, SETTING_CHOICES, type Settings, settings } from '../model/settings';
+import { type ChoiceSetting, SETTING_CHOICES, type Settings, settings, settingsSaveFailed } from '../model/settings';
+import {
+  draftDiffers,
+  paneHeading,
+  resetField,
+  shownTree,
+  type TreeGroup,
+  type TreeSection,
+} from '../model/settingsTree';
 import { formatLastVelocity, midiInputs, midiLast } from './midi';
-import { glitchScreens } from './screenGlitch';
 import { inSandbox } from './motion';
+import { glitchScreens } from './screenGlitch';
 
-// The sandbox's Settings (Jeremy, 2026-10-21, "a function panel, named
-// SETTINGS"): a push key in the masthead opens a modal console, its
-// settings on two tabs, General and MIDI (Jeremy, 2026-10-23), a VFD
-// screen listing the tab's, one line each, each edited in place (Jeremy,
-// 2026-10-23): ‹ value › on its line, its value opening a drop-down of
-// its choices. Changes apply as they are made and are saved
-// (model/settings.ts). No theme: the sandbox is dark only (Jeremy,
-// 2026-10-22).
+// Settings (the settings philosophy; Jeremy, 2026-10-29): one modal
+// dialog holding every preference, shaped like REAPER's Preferences. A
+// tree on the left, General (Appearance) and Synth (Display, Keyboard,
+// MIDI), each group opening and closing under its ▸/▾ head; on the right
+// the selected section's fields under its `Group › Section` heading, on
+// the console's VFD glass, one line each: its name, then ‹ value ›, its
+// value opening a drop-down of its choices (Jeremy, 2026-10-23). Changes
+// are staged: OK saves and closes, Apply saves and stays, Cancel (Esc,
+// Close) throws them away. A double click on a name, or a long press,
+// puts it back to its default, staged too. The synth's Settings key opens
+// it at Synth; the chapters' gear at General.
 
-/**
- * One line of the panel: its group, its name, its choices (worked out
- * when shown: the MIDI inputs come and go) and how to read and set it.
- */
+/** One line of the pane: a setting, or a readout (MIDI's Last velocity). */
 interface Line {
-  group: string;
+  section: TreeSection;
   name: string;
+  /** The setting it shows; none for a readout. */
+  key?: keyof Settings;
+  /** Its choices, worked out when shown: the MIDI inputs come and go. */
   choices: () => readonly { value: string; label: string }[];
   get: () => string;
   set: (value: string) => void;
-  /** A line only read, not set (MIDI's Last velocity): its value. Up and Down pass it by. */
+  /** A line only read, not set: its value. Up and Down pass it by. */
   readout?: () => string;
+  /** Said to a screen reader after its name. */
+  description?: string;
 }
 
 const choice = (value: string, label: string) => ({ value, label });
 
-/** The panel's tabs: MIDI's lines on their own, everything else General. */
-type Page = 'general' | 'midi';
-const PAGES: { page: Page; name: string }[] = [
-  { page: 'general', name: 'General' },
-  { page: 'midi', name: 'MIDI' },
-];
-const pageOf = (line: Line): Page => (line.group === 'MIDI' ? 'midi' : 'general');
+/** How long a touch on a name is held to put it back to its default, in ms. */
+export const LONG_PRESS_MS = 550;
 
-/** The lines, in order; each one a setting. */
-function lines(): Line[] {
-  const setting = <K extends ChoiceSetting>(
-    group: string,
-    name: string,
-    key: K,
-    labels: Record<Settings[K], string>,
-  ): Line => ({
-    group,
-    name,
-    choices: () => (Object.keys(labels) as `${Settings[K]}`[]).map(value => choice(value, labels[value as Settings[K]])),
-    get: () => String(settings.get()[key]),
-    // A choice of numbers (Bend range) is set as its number.
-    set: value =>
-      settings.set({ [key]: (SETTING_CHOICES[key] as readonly unknown[]).find(c => String(c) === value) } as Partial<Settings>),
-  });
-  // MIDI's (Jeremy, 2026-10-23): the input, by name, from those connected,
-  // and the one chosen even while it is not; the channel, all or 1 to 16.
-  const input: Line = {
-    group: 'MIDI',
-    name: 'Input',
-    choices: () => {
-      const names = [...new Set(midiInputs.get().names)];
-      const chosen = settings.get().midiInput;
-      const gone = chosen !== '' && !names.includes(chosen) ? [choice(chosen, `${chosen} (not connected)`)] : [];
-      return [choice('', 'All inputs'), ...names.map(name => choice(name, name)), ...gone];
-    },
-    get: () => settings.get().midiInput,
-    set: value => settings.set({ midiInput: value }),
-  };
-  const channel: Line = {
-    group: 'MIDI',
-    name: 'Channel',
-    choices: () => Array.from({ length: 17 }, (_, n) => choice(String(n), n === 0 ? 'All' : String(n))),
-    get: () => String(settings.get().midiChannel),
-    set: value => settings.set({ midiChannel: Number(value) }),
-  };
-  return [
-    setting('Screens', 'Screen glitch', 'screenGlitch', { on: 'On', off: 'Off' }),
-    setting('Screens', 'Motion', 'motion', { system: 'System', still: 'Still' }),
-    setting('Help', 'Tips on hover', 'tips', { on: 'On', off: 'Off' }),
-    setting('Help', 'Z X hint', 'zxHint', { hover: 'Hover', always: 'Always', off: 'Off' }),
-    setting('Keyboard', 'Note names', 'noteNames', { c: 'C only', all: 'All', off: 'Off' }),
-    setting('Keyboard', 'Computer keys', 'computerKeys', { off: 'Off', on: 'On' }),
-    setting('Keyboard', 'Key velocity', 'keyVelocity', { 64: '64', 100: '100', 127: '127' }),
-    setting('Controls', 'Wheel', 'wheel', { page: 'Page', reverse: 'Reverse' }),
-    input,
-    channel,
-    setting('MIDI', 'Bend range', 'bendRange', {
-      1: '±1 st',
-      2: '±2 st',
-      3: '±3 st',
-      5: '±5 st',
-      7: '±7 st',
-      12: '±12 st',
-    }),
-    setting('MIDI', 'Velocity curve', 'velocityCurve', {
-      lightest: 'Lightest',
-      light: 'Light',
-      normal: 'Normal',
-      heavy: 'Heavy',
-      heaviest: 'Heaviest',
-    }),
-    {
-      group: 'MIDI',
-      name: 'Last velocity',
-      choices: () => [],
-      get: () => '',
-      set: () => {},
-      readout: () => formatLastVelocity(midiLast.get()),
-    },
-  ];
-}
+/** Each choice setting's name and labels, in the order its line steps. */
+const CHOICE_LINES: { [K in ChoiceSetting]?: { name: string; labels: Record<Settings[K], string>; description?: string } } = {
+  theme: {
+    name: 'Guide theme',
+    labels: { auto: 'Auto', light: 'Light', dark: 'Dark' },
+    description: 'The guide’s pages; the synth is always dark',
+  },
+  motion: { name: 'Motion', labels: { system: 'System', still: 'Still' } },
+  tips: { name: 'Tips on hover', labels: { on: 'On', off: 'Off' } },
+  screenGlitch: { name: 'Screen glitch', labels: { on: 'On', off: 'Off' } },
+  zxHint: { name: 'Z X hint', labels: { hover: 'Hover', always: 'Always', off: 'Off' } },
+  noteNames: { name: 'Note names', labels: { c: 'C only', all: 'All', off: 'Off' } },
+  computerKeys: { name: 'Computer keys', labels: { off: 'Off', on: 'On' } },
+  keyVelocity: { name: 'Key velocity', labels: { 64: '64', 100: '100', 127: '127' } },
+  wheel: { name: 'Wheel', labels: { page: 'Page', reverse: 'Reverse' } },
+  midi: { name: 'MIDI in', labels: { off: 'Off', on: 'On' } },
+  bendRange: {
+    name: 'Bend range',
+    labels: { 1: '±1 st', 2: '±2 st', 3: '±3 st', 5: '±5 st', 7: '±7 st', 12: '±12 st' },
+  },
+  velocityCurve: {
+    name: 'Velocity curve',
+    labels: { lightest: 'Lightest', light: 'Light', normal: 'Normal', heavy: 'Heavy', heaviest: 'Heaviest' },
+  },
+};
 
 /** The index `steps` along from `at` among `count`, round the ends. */
 const round = (at: number, steps: number, count: number) => (((at + steps) % count) + count) % count;
 
+const element = <K extends keyof HTMLElementTagNameMap>(tag: K, className: string, text?: string) => {
+  const made = document.createElement(tag);
+  made.className = className;
+  if (text !== undefined) made.textContent = text;
+  return made;
+};
+
 const button = (className: string, text: string) => {
-  const element = document.createElement('button');
-  element.type = 'button';
-  element.className = className;
-  element.textContent = text;
-  return element;
+  const made = element('button', className, text);
+  made.type = 'button';
+  return made;
 };
 
 /** Sets the html element's data attributes the settings' CSS keys off. */
@@ -132,121 +97,254 @@ export function applySettings(now: Settings): void {
 }
 
 /**
- * Tips off: the sandbox's native titles are put away (kept in
- * `data-tip-off`) while the setting is Off and the sandbox showing, and
- * given back otherwise, whenever any is set.
+ * Tips off: the page's native titles are put away (kept in
+ * `data-tip-off`) while the setting is Off, on every page (Jeremy,
+ * 2026-10-29: app-wide), and given back when it is On.
  */
 function governTips(): void {
-  const off = () => settings.get().tips === 'off' && inSandbox();
+  const off = () => settings.get().tips === 'off';
   const sync = () => {
     if (off()) {
-      for (const element of document.querySelectorAll('[title]')) {
-        element.setAttribute('data-tip-off', element.getAttribute('title') ?? '');
-        element.removeAttribute('title');
+      for (const tipped of document.querySelectorAll('[title]')) {
+        tipped.setAttribute('data-tip-off', tipped.getAttribute('title') ?? '');
+        tipped.removeAttribute('title');
       }
     } else {
-      for (const element of document.querySelectorAll('[data-tip-off]')) {
-        element.setAttribute('title', element.getAttribute('data-tip-off') ?? '');
-        element.removeAttribute('data-tip-off');
+      for (const tipped of document.querySelectorAll('[data-tip-off]')) {
+        tipped.setAttribute('title', tipped.getAttribute('data-tip-off') ?? '');
+        tipped.removeAttribute('data-tip-off');
       }
     }
   };
   new MutationObserver(records => {
-    if (records.some(record => record.attributeName === 'data-view' || (off() && record.attributeName === 'title'))) sync();
-  }).observe(document.body, { subtree: true, attributes: true, attributeFilter: ['title', 'data-view'] });
+    if (off() && records.some(record => record.attributeName === 'title')) sync();
+  }).observe(document.body, { subtree: true, attributes: true, attributeFilter: ['title'] });
   settings.subscribe((state, previous) => {
     if (state.tips !== previous.tips) sync();
   });
   sync();
 }
 
-/** Builds the Settings key, beside the glossary link, and its panel. */
+/** A gear, for the chapters' masthead: ink, as the theme switch's icons. */
+const GEAR =
+  '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round">' +
+  '<path d="M10.3 2.5h3.4l.5 2.6 1.9.8 2.2-1.5 2.4 2.4-1.5 2.2.8 1.9 2.5.5v3.4l-2.5.5-.8 1.9 1.5 2.2-2.4 2.4-2.2-1.5-1.9.8-.5 2.6h-3.4l-.5-2.6-1.9-.8-2.2 1.5-2.4-2.4 1.5-2.2-.8-1.9-2.6-.5v-3.4l2.6-.5.8-1.9-1.5-2.2 2.4-2.4 2.2 1.5 1.9-.8z"/>' +
+  '<circle cx="12" cy="12" r="3.2"/></svg>';
+
+/** Builds the synth's Settings key, the chapters' gear and the dialog both open. */
 export function mountSettings(): void {
-  const glossary = document.querySelector('.guide-link');
-  if (!glossary) return;
+  const learn = document.querySelector('.inst-learn');
+  if (!learn) return;
   applySettings(settings.get());
   // Saved by the settings themselves (model/settings.ts).
   settings.subscribe(applySettings);
   governTips();
 
-  const all = lines();
+  const tree = shownTree();
+  /** What the dialog shows and edits: the saved settings, then staged changes. */
+  let draft: Settings = { ...settings.get() };
+  const stage = (patch: Partial<Settings>) => {
+    draft = { ...draft, ...patch };
+    show();
+  };
+
+  // The lines, every section's, in order.
+  const sectionLines = (section: TreeSection): Line[] =>
+    section.fields.flatMap((key): Line[] => {
+      if (key === 'midiInput') {
+        // The input, by name, from those connected, and the one chosen even
+        // while it is not (Jeremy, 2026-10-23).
+        return [
+          {
+            section,
+            key,
+            name: 'Input',
+            choices: () => {
+              const names = [...new Set(midiInputs.get().names)];
+              const chosen = draft.midiInput;
+              const gone = chosen !== '' && !names.includes(chosen) ? [choice(chosen, `${chosen} (not connected)`)] : [];
+              return [choice('', 'All inputs'), ...names.map(name => choice(name, name)), ...gone];
+            },
+            get: () => draft.midiInput,
+            set: value => stage({ midiInput: value }),
+          },
+        ];
+      }
+      if (key === 'midiChannel') {
+        return [
+          {
+            section,
+            key,
+            name: 'Channel',
+            choices: () => Array.from({ length: 17 }, (_, n) => choice(String(n), n === 0 ? 'All' : String(n))),
+            get: () => String(draft.midiChannel),
+            set: value => stage({ midiChannel: Number(value) }),
+          },
+        ];
+      }
+      const spec = CHOICE_LINES[key as ChoiceSetting];
+      if (!spec) return [];
+      const labels = spec.labels as Record<string, string>;
+      const line: Line = {
+        section,
+        key,
+        name: spec.name,
+        description: spec.description,
+        choices: () => Object.keys(labels).map(value => choice(value, labels[value])),
+        get: () => String(draft[key]),
+        // A choice of numbers (Bend range) is set as its number.
+        set: value =>
+          stage({
+            [key]: (SETTING_CHOICES[key as ChoiceSetting] as readonly unknown[]).find(c => String(c) === value),
+          } as Partial<Settings>),
+      };
+      // MIDI's Last velocity (Jeremy, 2026-10-25), read only, after the curve.
+      if (key === 'velocityCurve') {
+        return [
+          line,
+          {
+            section,
+            name: 'Last velocity',
+            choices: () => [],
+            get: () => '',
+            set: () => {},
+            readout: () => formatLastVelocity(midiLast.get()),
+          },
+        ];
+      }
+      return [line];
+    });
+  const all: Line[] = tree.flatMap(group => group.sections.flatMap(sectionLines));
+
   let selected = 0;
+  let group: TreeGroup = tree[0];
+  let section: TreeSection = group.sections[0];
+  const expanded = new Set<string>();
 
-  // The key: one lamp key in its own bezel, as Key sync, lit while open.
-  const bezel = document.createElement('span');
-  bezel.className = 'lamp-keys inst-settings';
-  const key = document.createElement('button');
-  key.type = 'button';
-  key.className = 'lamp-key';
-  key.textContent = 'Settings';
-  key.setAttribute('aria-haspopup', 'dialog');
-  key.setAttribute('aria-controls', 'settings-panel');
-  key.setAttribute('aria-expanded', 'false');
-  key.setAttribute('aria-pressed', 'false');
+  // The synth's key: one lamp key in its own bezel, lit while open, right
+  // of the Learn key, the last of the title bar's keys (Jeremy, 2026-10-29).
+  const bezel = element('span', 'lamp-keys inst-settings');
+  const key = button('lamp-key', 'Settings');
   bezel.append(key);
-  // Left of the Learn key, at the title bar's right end.
-  (document.querySelector('.inst-learn') ?? glossary).before(bezel);
+  learn.after(bezel);
+  // The chapters' gear, the last of their masthead's actions, after the theme.
+  const gear = button('theme-switch settings-gear', '');
+  gear.innerHTML = GEAR;
+  gear.setAttribute('aria-label', 'Settings');
+  gear.title = 'Settings';
+  document.querySelector('#theme')?.after(gear);
+  for (const opener of [key, gear]) {
+    opener.setAttribute('aria-haspopup', 'dialog');
+    opener.setAttribute('aria-controls', 'settings-panel');
+    opener.setAttribute('aria-expanded', 'false');
+  }
+  key.setAttribute('aria-pressed', 'false');
 
-  // The panel: a modal console.
-  const dialog = document.createElement('dialog');
+  // The dialog: a console of the synth's, the same on every page (its
+  // keys' styles are the synth's, so it carries its view).
+  const dialog = element('dialog', 'settings-panel settings-dialog');
   dialog.id = 'settings-panel';
-  dialog.className = 'settings-panel';
+  dialog.dataset.view = 'instrument';
   dialog.setAttribute('aria-label', 'Settings');
-  const head = document.createElement('div');
-  head.className = 'settings-head';
-  const title = document.createElement('span');
-  title.className = 'settings-title silk-plate';
-  title.textContent = 'Settings';
+  const head = element('div', 'settings-head');
+  const title = element('span', 'settings-title silk-plate', 'Settings');
   title.setAttribute('aria-hidden', 'true');
-  const closeBezel = document.createElement('span');
-  closeBezel.className = 'lamp-keys';
-  const close = document.createElement('button');
-  close.type = 'button';
-  close.className = 'lamp-key settings-close';
-  close.textContent = 'Close';
+  const closeBezel = element('span', 'lamp-keys');
+  const close = button('lamp-key settings-close', 'Close');
+  close.setAttribute('aria-label', 'Close without saving');
   closeBezel.append(close);
-  const tabs = document.createElement('div');
-  tabs.className = 'pill-tabs settings-tabs';
-  tabs.setAttribute('role', 'tablist');
-  tabs.setAttribute('aria-label', 'Settings');
-  const tabKeys = PAGES.map(({ page, name }, i) => {
-    const tab = document.createElement('button');
-    tab.type = 'button';
-    tab.id = `settings-tab-${page}`;
-    tab.className = 'pill-tab';
-    tab.setAttribute('role', 'tab');
-    tab.setAttribute('aria-controls', `settings-page-${page}`);
-    tab.textContent = name;
-    // Chosen on the press, as the Voice tabs are; the click after finds it open.
-    tab.addEventListener('pointerdown', event => {
-      if (event.button === 0) choosePage(page);
-    });
-    tab.addEventListener('click', () => choosePage(page));
-    tab.addEventListener('keydown', event => {
-      const to = { ArrowLeft: i - 1, ArrowRight: i + 1, Home: 0, End: PAGES.length - 1 }[event.key];
-      if (to === undefined) return;
-      event.preventDefault();
-      event.stopPropagation();
-      const next = (to + PAGES.length) % PAGES.length;
-      choosePage(PAGES[next].page);
-      tabKeys[next].focus();
-    });
-    return tab;
-  });
-  tabs.append(...tabKeys);
-  head.append(title, tabs, closeBezel);
+  head.append(title, closeBezel);
 
-  // The screen: the open tab's lines, each one control: its group and
-  // name, then ‹ value ›. Up and Down move between them, Left and Right
-  // (or ‹ ›) step the value, held at the ends, and its value, Enter or
-  // Space open the drop-down of its choices.
-  const screen = document.createElement('div');
-  screen.className = 'screen-bezel settings-screen';
-  const glass = document.createElement('div');
-  glass.className = 'settings-glass';
+  // The tree: each group's head (▸ closed, ▾ open) and its sections under it.
+  const treeNav = element('nav', 'settings-tree');
+  treeNav.setAttribute('aria-label', 'Settings sections');
+  const groupHeads = new Map<string, HTMLButtonElement>();
+  const sectionKeys = new Map<TreeSection, HTMLButtonElement>();
+  const groupLists = new Map<string, HTMLElement>();
+  for (const g of tree) {
+    const head = button('settings-tree-group', '');
+    head.dataset.group = g.id;
+    head.append(element('span', 'settings-tree-mark'), element('span', 'settings-tree-name', g.name));
+    head.addEventListener('click', () => {
+      if (expanded.has(g.id)) expanded.delete(g.id);
+      else expanded.add(g.id);
+      showTree();
+    });
+    const list = element('div', 'settings-tree-sections');
+    list.id = `settings-tree-${g.id}`;
+    head.setAttribute('aria-controls', list.id);
+    for (const s of g.sections) {
+      const item = button('settings-tree-section', s.name);
+      item.addEventListener('click', () => chooseSection(g, s));
+      sectionKeys.set(s, item);
+      list.append(item);
+    }
+    groupHeads.set(g.id, head);
+    groupLists.set(g.id, list);
+    treeNav.append(head, list);
+  }
+  // Up and Down between the tree's items shown; Right opens a group, Left
+  // closes it (or goes up to it from a section).
+  treeNav.addEventListener('keydown', event => {
+    if (event.altKey || event.ctrlKey || event.metaKey) return;
+    const items = [...treeNav.querySelectorAll<HTMLButtonElement>('button')].filter(item => item.offsetParent !== null);
+    const at = items.indexOf(document.activeElement as HTMLButtonElement);
+    if (at < 0) return;
+    const item = items[at];
+    const groupId = item.dataset.group ?? tree.find(g => g.sections.some(s => sectionKeys.get(s) === item))?.id;
+    const moves: Record<string, () => void> = {
+      ArrowUp: () => items[Math.max(0, at - 1)].focus(),
+      ArrowDown: () => items[Math.min(items.length - 1, at + 1)].focus(),
+      Home: () => items[0].focus(),
+      End: () => items.at(-1)?.focus(),
+      ArrowRight: () => {
+        if (item.dataset.group && !expanded.has(item.dataset.group)) {
+          expanded.add(item.dataset.group);
+          showTree();
+        } else if (item.dataset.group) {
+          items[at + 1]?.focus();
+        }
+      },
+      ArrowLeft: () => {
+        if (item.dataset.group) {
+          expanded.delete(item.dataset.group);
+          showTree();
+        } else if (groupId) {
+          groupHeads.get(groupId)?.focus();
+        }
+      },
+    };
+    const act = moves[event.key];
+    if (!act) return;
+    event.preventDefault();
+    // The dialog's, not the page's.
+    event.stopPropagation();
+    act();
+  });
+
+  // On a phone the tree is two rows over the pane: a group picker, then
+  // that group's sections in a strip that scrolls sideways.
+  const narrow = element('div', 'settings-narrow');
+  const picker = element('select', 'settings-group-picker');
+  picker.setAttribute('aria-label', 'Settings group');
+  for (const g of tree) picker.append(new Option(g.name, g.id));
+  picker.addEventListener('change', () => {
+    const to = tree.find(g => g.id === picker.value);
+    if (to) chooseSection(to, to.sections[0]);
+  });
+  const strip = element('div', 'settings-strip');
+  strip.setAttribute('aria-label', 'Sections');
+  narrow.append(picker, strip);
+
+  // The pane: its heading, then the glass with the section's lines.
+  const pane = element('section', 'settings-pane');
+  const heading = element('h2', 'settings-pane-heading');
+  heading.id = 'settings-pane-heading';
+  pane.setAttribute('aria-labelledby', heading.id);
+  const screen = element('div', 'screen-bezel settings-screen');
+  const glass = element('div', 'settings-glass');
   const rows = all.map((line, i) => {
-    const row = document.createElement('div');
-    row.className = 'settings-line';
+    const row = element('div', 'settings-line');
     row.id = `settings-line-${i}`;
     row.tabIndex = -1;
     if (line.readout) {
@@ -254,26 +352,39 @@ export function mountSettings(): void {
       row.classList.add('is-readout');
     } else {
       row.setAttribute('role', 'spinbutton');
-      row.setAttribute('aria-label', `${line.group} ${line.name}`);
+      row.setAttribute('aria-label', line.name);
       row.setAttribute('aria-haspopup', 'listbox');
       row.setAttribute('aria-expanded', 'false');
-      row.setAttribute('aria-description', 'Left and Right change it; Enter opens its list');
+      const help = 'Left and Right change it; Enter opens its list; Delete puts it back to its default';
+      row.setAttribute('aria-description', line.description ? `${line.description}. ${help}` : help);
     }
-    const group = document.createElement('span');
-    group.className = 'settings-group';
-    group.textContent = line.group;
-    group.setAttribute('aria-hidden', 'true');
-    const name = document.createElement('span');
-    name.className = 'settings-name';
-    name.textContent = line.name;
+    const name = element('span', 'settings-name', line.name);
     name.setAttribute('aria-hidden', 'true');
-    const edit = document.createElement('span');
-    edit.className = 'settings-edit';
+    if (line.key) {
+      // The label resets its field (the settings philosophy): a double
+      // click, or on a touch screen a long press; staged as any change.
+      name.title = 'Double-click to reset';
+      name.classList.add('is-resettable');
+      const reset = () => {
+        select(i);
+        draft = resetField(draft, line.key!);
+        show();
+      };
+      name.addEventListener('dblclick', reset);
+      let timer: number | undefined;
+      name.addEventListener('pointerdown', event => {
+        if (event.pointerType !== 'touch') return;
+        timer = window.setTimeout(reset, LONG_PRESS_MS);
+      });
+      for (const type of ['pointerup', 'pointercancel', 'pointerleave']) {
+        name.addEventListener(type, () => window.clearTimeout(timer));
+      }
+    }
+    const edit = element('span', 'settings-edit');
     edit.setAttribute('aria-hidden', 'true');
     const back = button('settings-arrow', '‹');
     const on = button('settings-arrow', '›');
-    const value = document.createElement('span');
-    value.className = 'settings-value';
+    const value = element('span', 'settings-value');
     for (const [arrow, by] of [
       [back, -1],
       [on, 1],
@@ -289,7 +400,7 @@ export function mountSettings(): void {
       });
     }
     edit.append(back, value, on);
-    row.append(group, name, edit);
+    row.append(name, edit);
     row.addEventListener('click', event => {
       if (line.readout) return;
       if (event.target instanceof Element && event.target.closest('.settings-arrow')) return;
@@ -299,55 +410,95 @@ export function mountSettings(): void {
     });
     return { row, value, back, on };
   });
-  // One page of lines a tab, both in the glass's one cell, the closed one
-  // unseen: the glass keeps the longer one's size whichever is open.
+  // One page of lines a section, all in the glass's one cell, the others
+  // unseen: the glass keeps the longest one's size whichever is shown.
   const pages = new Map(
-    PAGES.map(({ page, name }) => {
-      const element = document.createElement('div');
-      element.className = 'settings-page';
-      element.id = `settings-page-${page}`;
-      element.dataset.page = page;
-      element.setAttribute('role', 'tabpanel');
-      element.setAttribute('aria-labelledby', `settings-tab-${page}`);
-      element.setAttribute('aria-label', name);
-      element.append(...rows.filter((_, i) => pageOf(all[i]) === page).map(r => r.row));
-      return [page, element];
-    }),
+    tree.flatMap(g =>
+      g.sections.map(s => {
+        const page = element('div', 'settings-page');
+        page.setAttribute('role', 'group');
+        page.setAttribute('aria-labelledby', heading.id);
+        page.append(...rows.filter((_, i) => all[i].section === s).map(r => r.row));
+        return [s, page] as const;
+      }),
+    ),
   );
   glass.append(...pages.values());
   screen.append(glass);
+  pane.append(heading, screen);
 
-  dialog.append(head, screen);
+  // The foot: a failed save said once, quietly; then OK, Apply, Cancel.
+  const foot = element('div', 'settings-foot');
+  const notice = element('p', 'settings-notice', 'Settings could not be saved on this browser: they last for this visit.');
+  notice.setAttribute('role', 'status');
+  notice.hidden = true;
+  const actions = element('span', 'lamp-keys settings-actions');
+  const ok = button('lamp-key settings-ok', 'OK');
+  const apply = button('lamp-key settings-apply', 'Apply');
+  const cancel = button('lamp-key settings-cancel', 'Cancel');
+  actions.append(ok, apply, cancel);
+  foot.append(notice, actions);
+
+  const body = element('div', 'settings-body');
+  body.append(treeNav, narrow, pane);
+  dialog.append(head, body, foot);
   document.body.append(dialog);
 
-  let page: Page = 'general';
-  /** The lines of the open tab that can be set, by index. */
-  const shown = () => all.flatMap((line, i) => (pageOf(line) === page && !line.readout ? [i] : []));
-  /** The line `by` along from the selected one in the open tab, round its ends. */
+  /** The lines of the shown section that can be set, by index. */
+  const shown = () => all.flatMap((line, i) => (line.section === section && !line.readout ? [i] : []));
+  /** The line `by` along from the selected one in the section, round its ends. */
   const along = (by: number) => {
     const lines = shown();
     return lines[round(lines.indexOf(selected), by, lines.length)];
   };
-  const showPage = () => {
-    tabKeys.forEach((tab, i) => {
-      const on = PAGES[i].page === page;
-      tab.setAttribute('aria-selected', String(on));
-      tab.tabIndex = on ? 0 : -1;
-    });
-    for (const [name, element] of pages) {
-      const on = name === page;
-      element.classList.toggle('is-closed', !on);
-      element.inert = !on;
+
+  function showTree(): void {
+    for (const g of tree) {
+      const open = expanded.has(g.id);
+      const head = groupHeads.get(g.id)!;
+      head.setAttribute('aria-expanded', String(open));
+      head.querySelector('.settings-tree-mark')!.textContent = open ? '▾' : '▸';
+      groupLists.get(g.id)!.hidden = !open;
+      for (const s of g.sections) {
+        const item = sectionKeys.get(s)!;
+        const current = s === section;
+        item.classList.toggle('is-current', current);
+        if (current) item.setAttribute('aria-current', 'true');
+        else item.removeAttribute('aria-current');
+      }
     }
-  };
-  /** Opens a tab, its first line selected; the glass glitches over the change. */
-  function choosePage(to: Page): void {
-    if (to === page) return;
-    page = to;
+    picker.value = group.id;
+    strip.replaceChildren(
+      ...group.sections.map(s => {
+        const item = button('settings-strip-section', s.name);
+        item.classList.toggle('is-current', s === section);
+        if (s === section) item.setAttribute('aria-current', 'true');
+        item.addEventListener('click', () => chooseSection(group, s));
+        return item;
+      }),
+    );
+  }
+
+  function showSection(): void {
+    heading.textContent = paneHeading(group, section);
+    for (const [s, page] of pages) {
+      const on = s === section;
+      page.classList.toggle('is-closed', !on);
+      page.inert = !on;
+    }
+  }
+
+  /** Shows a section, its group opened, its first line selected; the glass glitches over the change. */
+  function chooseSection(to: TreeGroup, s: TreeSection, glitch = true): void {
+    const changed = s !== section;
+    group = to;
+    section = s;
+    expanded.add(to.id);
     closeMenu(false);
-    showPage();
+    showTree();
+    showSection();
     select(shown()[0]);
-    glitchScreens([glass]);
+    if (changed && glitch) glitchScreens([glass]);
   }
 
   const at = (line: Line) => line.choices().findIndex(c => c.value === line.get());
@@ -361,13 +512,13 @@ export function mountSettings(): void {
     if (to !== from) line.set(choices[to].value);
   };
 
-  const show = () => {
+  function show(): void {
     rows.forEach(({ row, value, back, on }, i) => {
       const line = all[i];
       if (line.readout) {
         const text = line.readout();
         value.textContent = text;
-        row.setAttribute('aria-label', `${line.group} ${line.name}: ${text}`);
+        row.setAttribute('aria-label', `${line.name}: ${text}`);
         return;
       }
       const label = labelOf(line);
@@ -377,6 +528,8 @@ export function mountSettings(): void {
       // The whole of a long one (an input's name), cut short on the line.
       value.title = label;
       row.classList.toggle('is-selected', i === selected);
+      // Changed and not yet saved: marked, as REAPER does not, but the glass can.
+      row.classList.toggle('is-staged', line.key !== undefined && draft[line.key] !== settings.get()[line.key]);
       row.tabIndex = i === selected ? 0 : -1;
       row.setAttribute('aria-valuetext', label);
       row.setAttribute('aria-valuenow', String(Math.max(0, index)));
@@ -385,7 +538,8 @@ export function mountSettings(): void {
       back.classList.toggle('is-end', index <= 0);
       on.classList.toggle('is-end', index >= count - 1);
     });
-  };
+    apply.disabled = !draftDiffers(draft, settings.get());
+  }
   const select = (i: number) => {
     if (i !== selected) closeMenu(false);
     selected = i;
@@ -396,6 +550,7 @@ export function mountSettings(): void {
 
   glass.addEventListener('keydown', event => {
     if (event.altKey || event.ctrlKey || event.metaKey) return;
+    const line = all[selected];
     const handled: Record<string, () => void> = {
       ArrowUp: () => select(along(-1)),
       ArrowDown: () => select(along(1)),
@@ -405,24 +560,26 @@ export function mountSettings(): void {
       End: () => select(shown().at(-1) ?? selected),
       Enter: () => openMenu(),
       ' ': () => openMenu(),
+      // The label's reset from the keyboard.
+      Delete: () => {
+        if (line.key) stage(resetField(draft, line.key));
+      },
     };
     const act = handled[event.key];
     if (!act) return;
     event.preventDefault();
-    // The panel's, not the page's: the space bar does not play here.
+    // The dialog's, not the page's: the space bar does not play here.
     event.stopPropagation();
     act();
     if (!menuOpen()) focusLine();
   });
 
-  // The drop-down (Jeremy, 2026-10-23: "way too many MIDI devices" to
-  // step through; then every line's): a list on VFD glass under the line,
-  // over the screen, scrolling inside itself, never past the case or the
-  // window. Up, Down, Home, End, Page Up and Down move; Enter, Space or a
-  // click choose and close it; Esc, Tab or a press elsewhere close it as
-  // it was. Focus goes back to the line; the note keys still play.
-  const menu = document.createElement('div');
-  menu.className = 'settings-menu';
+  // The drop-down (Jeremy, 2026-10-23): a list on VFD glass under the
+  // line, over the screen, scrolling inside itself, never past the case
+  // or the window. Up, Down, Home, End, Page Up and Down move; Enter,
+  // Space or a click choose and close it; Esc, Tab or a press elsewhere
+  // close it as it was. Focus goes back to the line; the note keys still play.
+  const menu = element('div', 'settings-menu');
   menu.id = 'settings-menu';
   menu.tabIndex = -1;
   menu.setAttribute('role', 'listbox');
@@ -449,11 +606,9 @@ export function mountSettings(): void {
     menu.setAttribute('aria-label', line.name);
     menu.replaceChildren(
       ...line.choices().map((c, i) => {
-        const option = document.createElement('div');
-        option.className = 'settings-menu-option';
+        const option = element('div', 'settings-menu-option', c.label);
         option.id = `settings-menu-${i}`;
         option.setAttribute('role', 'option');
-        option.textContent = c.label;
         // The whole name, cut short on the glass.
         option.title = c.label;
         option.setAttribute('aria-label', c.label);
@@ -475,7 +630,7 @@ export function mountSettings(): void {
     menu.style.maxHeight = `${Math.max(48, floor - row.bottom)}px`;
   };
   function openMenu(): void {
-    if (menuOpen()) return;
+    if (menuOpen() || all[selected].readout) return;
     fillMenu();
     menuAt = Math.max(0, at(all[selected]));
     menu.hidden = false;
@@ -540,38 +695,78 @@ export function mountSettings(): void {
     if (menuOpen()) placeMenu();
   });
 
+  /** A failed save, said on the dialog once a visit. */
+  let told = false;
+  const tellSaveFailed = () => {
+    if (told || !settingsSaveFailed()) return;
+    notice.hidden = false;
+  };
+
+  /** Saves what is staged; the page follows at once. */
+  const save = () => {
+    if (draftDiffers(draft, settings.get())) settings.set({ ...draft });
+    tellSaveFailed();
+    show();
+  };
+
+  let opener: HTMLButtonElement = key;
   const isOpen = () => dialog.open;
-  const open = () => {
+  /** Opens at `at`'s group, expanded, its first section; the other groups closed. */
+  const open = (at: TreeGroup['id'], from: HTMLButtonElement) => {
     if (isOpen()) return;
-    // Always on General: the open tab is not kept.
-    page = 'general';
-    showPage();
-    select(0);
+    opener = from;
+    draft = { ...settings.get() };
+    const to = tree.find(g => g.id === at) ?? tree[0];
+    expanded.clear();
+    chooseSection(to, to.sections[0], false);
+    tellSaveFailed();
     dialog.showModal();
-    key.setAttribute('aria-pressed', 'true');
-    key.setAttribute('aria-expanded', 'true');
+    for (const one of [key, gear]) one.setAttribute('aria-expanded', String(one === from));
+    key.setAttribute('aria-pressed', String(from === key));
     focusLine();
   };
+  /** Closes, throwing away what is staged (Cancel, Esc, Close), or after OK saved it. */
   const shut = () => {
     if (isOpen()) dialog.close();
   };
   dialog.addEventListener('close', () => {
     closeMenu(false);
+    draft = { ...settings.get() };
+    if (!notice.hidden) told = true;
+    notice.hidden = true;
+    for (const one of [key, gear]) one.setAttribute('aria-expanded', 'false');
     key.setAttribute('aria-pressed', 'false');
-    key.setAttribute('aria-expanded', 'false');
-    key.focus({ preventScroll: true });
+    opener.focus({ preventScroll: true });
+  });
+  // Esc is Cancel: the dialog's own cancel, unless a drop-down takes it first.
+  dialog.addEventListener('cancel', event => {
+    if (menuOpen()) {
+      event.preventDefault();
+      closeMenu();
+    }
   });
   key.addEventListener('pointerdown', event => {
     if (event.button !== 0) return;
     // Not the press's own focusing, which would take focus from the screen.
     event.preventDefault();
-    (isOpen() ? shut : open)();
+    if (isOpen()) shut();
+    else open('synth', key);
   });
   key.addEventListener('click', event => {
-    if (event.detail === 0) (isOpen() ? shut : open)();
+    if (event.detail === 0) {
+      if (isOpen()) shut();
+      else open('synth', key);
+    }
   });
+  gear.addEventListener('click', () => open('general', gear));
+  ok.addEventListener('click', () => {
+    save();
+    shut();
+  });
+  apply.addEventListener('click', save);
+  cancel.addEventListener('click', shut);
   close.addEventListener('click', shut);
-  // A click on the dimmed page round the case closes it.
+  // A click on the dimmed page round the case is Cancel.
   dialog.addEventListener('click', event => {
     if (event.target !== dialog) return;
     const box = dialog.getBoundingClientRect();
@@ -579,24 +774,27 @@ export function mountSettings(): void {
       event.clientX >= box.left && event.clientX <= box.right && event.clientY >= box.top && event.clientY <= box.bottom;
     if (!inside) shut();
   });
-  // Leaving the sandbox shuts it.
+  // Opened from the synth, leaving it shuts it (the other way, too).
+  let wasSandbox = inSandbox();
   new MutationObserver(() => {
-    if (!inSandbox()) shut();
+    if (inSandbox() !== wasSandbox) shut();
+    wasSandbox = inSandbox();
   }).observe(document.body, { attributes: true, attributeFilter: ['data-view'] });
 
-  // The Input line's choices come and go with the inputs.
+  // The Input line's choices come and go with the inputs; Last velocity
+  // with each MIDI note.
   const refresh = () => {
     if (!isOpen()) return;
-    // The inputs came or went, or the choice changed: the open list follows.
     if (menuOpen()) {
       fillMenu();
       markMenu();
     }
     show();
   };
-  settings.subscribe(refresh);
   midiInputs.subscribe(refresh);
   midiLast.subscribe(refresh);
-  showPage();
+  settings.subscribe(refresh);
+  showTree();
+  showSection();
   show();
 }

@@ -867,12 +867,13 @@ right then move by 16), the bank keys under the title if they must wrap.
 
 After the preset group, Volume, its name silkscreened on the chassis in
 the thicker weight (`--font-tape` 500 capitals in `--chassis-legend`, as
-the operators' roles; Jeremy, 2026-10-22: no plate), the Settings key,
-then at the bar's right end the Learn key (Jeremy, 2026-10-25;
-`#learn` in `index.html`, `mountLearnKey` in `ui/instrument.ts`): a
-link to `#/learn` drawn as Settings' push key in a bezel of its own,
-with no lamp, going on the press (Enter follows the link); on a phone
-after Settings on its line; no glossary link (Jeremy, 2026-10-21: the chapters keep
+the operators' roles; Jeremy, 2026-10-22: no plate), the Learn key
+(Jeremy, 2026-10-25; `#learn` in `index.html`, `mountLearnKey` in
+`ui/instrument.ts`): a link to `#/learn` drawn as Settings' push key in
+a bezel of its own, with no lamp, going on the press (Enter follows the
+link); then at the bar's right end the Settings key, the last of the
+page-level actions (Jeremy, 2026-10-29); on a phone the two on their
+line; no glossary link (Jeremy, 2026-10-21: the chapters keep
 theirs) and no theme switch: the sandbox is dark only (Jeremy,
 2026-10-22). Whatever is saved or the system says, `applyTheme(choice,
 sandbox)` sets `data-theme="dark"` while the sandbox shows (set where
@@ -880,62 +881,81 @@ sandbox)` sets `data-theme="dark"` while the sandbox shows (set where
 choice back on leaving it; the boot script in `index.html` does the same
 for an address of `#/` or none (with or without a link's sound), so the
 first paint is dark. The light
-sandbox rules still in the CSS are unused. The Settings key
-(`ui/settingsPanel.ts`, `mountSettings`; Jeremy, 2026-10-21, "the
-function panel, named SETTINGS") is one lamp key in its own bezel, lit
-while its panel is open (`aria-pressed`, `aria-expanded`), worked on
-the press; the panel a modal `<dialog>` named Settings, a console of
-the chassis's black plastic the same in either theme over a page dimmed
-35 %: "Settings" on a silkscreen plate, two tabs, General and MIDI (Jeremy,
-2026-10-23; `.pill-tabs`, the Voice tabs' keys, the arrows between them,
-on a line of their own under the title on a phone; always opening on
-General, the tab not kept; a change glitches the glass) and a Close key
-(a push key with no lamp: it has no state to show), a VFD screen in a
-molded bezel listing the open tab's settings one line each (both tabs'
-lines in the glass's one cell, the closed one unseen, so the glass is
-the longer list's size on either, kept as tall as it was with the
-control row that used to be under it). Every line is edited in place
-(Jeremy, 2026-10-23): group dim (none on the MIDI tab), name, and at its
-right ‹ value ›, the arrows glowing dimmer, dimmest at an end, the value
-cut short with an ellipsis, its whole in its tip; the selected line lit
-behind with a bar at its left. Each line is one control (a
-`spinbutton`, named by group and setting, its value `aria-valuetext`,
-focus roving, a ring only from the keyboard): Up and Down, Home and End
-move between the tab's lines; Left and Right (or the arrows, on the
-press) step the value, held at the ends; its value, Enter or Space open
-its drop-down: a listbox on the same VFD glass under the line, over the
-screen, scrolling inside itself within the case and the window, the
-option the keys are on lit, the chosen one barred, a long name cut short
-with its whole in the tip; Up, Down, Home, End, Page Up and Down move,
-Enter, Space or a click choose and close it, Esc (the list first, then
-the case), Tab or a press elsewhere close it as it was, focus back on
-the line; the note keys still play.
-Changes apply and are saved as they are made; Esc, Close, the key or a
-click round the case closes it, focus going back to the key; the note
-keys and Z / X still play while it is open. The settings, General's: Screen glitch
-(On, Off), Motion (System, Still), Tips on hover (On, Off: the
-sandbox's native titles put away in `data-tip-off` and the terms' tips
-hidden, names and descriptions kept), Z X hint (Hover, Always, Off),
-Note names (C only, All: every white key, Off), Computer keys (Off, On:
-the computer key that plays each piano key, small at its foot), Key
-velocity (64, 100, 127: what the computer's and the screen's keys strike
-at; Jeremy, 2026-10-24), Wheel (Page, Reverse); MIDI's: Input (All inputs, then each connected input
-by name in the browser's order, `midiInputs`; a chosen input not
+sandbox rules still in the CSS are unused.
+
+Settings (`ui/settingsPanel.ts`, `mountSettings`; Jeremy, 2026-10-21,
+"the function panel, named SETTINGS", and since 2026-10-29 the settings
+philosophy, `docs/specs/2026-10-29-settings-philosophy.md`) is one
+modal `<dialog>` holding every preference, shaped like REAPER's
+Preferences. The synth's Settings key (one lamp key in its own bezel,
+lit while the dialog is open, `aria-pressed`, `aria-expanded`, worked on
+the press) opens it at Synth; the chapters' gear (`.settings-gear`, the
+theme switch's square, after it in the masthead) at General: that
+group expanded, its first section shown, the others collapsed. It is a
+console of the chassis's black plastic on every page and in either theme
+(it carries `data-view="instrument"` so the synth's key styles reach
+it), over a page dimmed 35 %: "Settings" on a silkscreen plate and a
+Close key (no lamp), then the tree (`model/settingsTree.ts`,
+`SETTINGS_TREE`, `shownTree`): General (Appearance) and Synth (Display,
+Keyboard, MIDI), each group's head ▸ or ▾ opening and closing it, the
+shown section filled as a plate; Learn has no section yet and is not
+shown, nor is any section with nothing to choose. Up and Down move in
+the tree, Right opens a group, Left closes it. At the right, the pane:
+its heading, "Synth › MIDI" (`paneHeading`), over a VFD screen in a
+molded bezel listing the section's settings one line each (every
+section's lines in the glass's one cell, the others unseen, so the glass
+is the longest list's size; the glass glitches when the section
+changes). Every line is edited in place (Jeremy, 2026-10-23): its name,
+and at its right ‹ value ›, the arrows glowing dimmer, dimmest at an
+end, the value cut short with an ellipsis, its whole in its tip; the
+selected line lit behind with a bar at its left, a staged change marked
+with a dot after the name. Each line is one control (a `spinbutton`,
+named by its setting, its value `aria-valuetext`, focus roving, a ring
+only from the keyboard): Up and Down, Home and End move between the
+section's lines; Left and Right (or the arrows, on the press) step the
+value, held at the ends; its value, Enter or Space open its drop-down: a
+listbox on the same VFD glass under the line, over the screen, scrolling
+inside itself within the case and the window, the option the keys are on
+lit, the chosen one barred, a long name cut short with its whole in the
+tip; Up, Down, Home, End, Page Up and Down move, Enter, Space or a click
+choose and close it, Esc (the list first, then the case), Tab or a press
+elsewhere close it as it was, focus back on the line; the note keys
+still play. A double click on a line's name, a long press on a touch
+screen (`LONG_PRESS_MS`) or Delete puts that setting back to its default
+(`resetField`); its tip says "Double-click to reset"; there is no reset
+all. Changes are staged: OK saves them and closes, Apply saves them and
+stays (disabled until something staged differs from what is saved,
+`draftDiffers`), Cancel, Close, Esc or a click round the case throw them
+away without asking; saving updates the page at once. A failed save is
+said once a visit, quietly, on a line beside OK (`settingsSaveFailed`).
+Focus goes back to the key or gear that opened it; the note keys and
+Z / X still play while it is open. On a phone the tree is two rows over
+the pane: a group picker (a select) and that group's sections in a strip
+that scrolls sideways; the heading stays. The settings: General ›
+Appearance: Guide theme (Auto, Light, Dark: the chapters' theme, which
+their theme switch also sets; the synth is always dark), Motion (System,
+Still) and Tips on hover (On, Off: the page's native titles put away in
+`data-tip-off` and the terms' tips hidden, names and descriptions kept),
+both on every page (Jeremy, 2026-10-29). Synth › Display: Screen glitch
+(On, Off), Z X hint (Hover, Always, Off), Note names (C only, All: every
+white key, Off), Computer keys (Off, On: the computer key that plays
+each piano key, small at its foot). Synth › Keyboard: Key velocity (64,
+100, 127: what the computer's and the screen's keys strike at; Jeremy,
+2026-10-24), Wheel (Page, Reverse). Synth › MIDI: MIDI in (Off, On, as
+the keyboard's MIDI key sets it), Input (All inputs, then each connected
+input by name in the browser's order, `midiInputs`; a chosen input not
 connected stays, "(not connected)", until another is chosen), Channel
-(All, 1 to 16), Bend range (±1, ±2, ±3, ±5,
-±7, ±12 st) and Velocity curve (Lightest, Light, Normal, Heavy,
-Heaviest: a MIDI key's velocity raised to 0.4, 0.6, 1, 1.6 or 2.5 across
-1 to 127, `curveVelocity`, which keeps 1 and 127; Jeremy, 2026-10-24:
-five, so the softest touch can be soft enough) and Last velocity
-(Jeremy, 2026-10-25), a line only read
+(All, 1 to 16), Bend range (±1, ±2, ±3, ±5, ±7, ±12 st), Velocity curve
+(Lightest, Light, Normal, Heavy, Heaviest: a MIDI key's velocity raised
+to 0.4, 0.6, 1, 1.6 or 2.5 across 1 to 127, `curveVelocity`, which keeps
+1 and 127; Jeremy, 2026-10-24: five, so the softest touch can be soft
+enough) and Last velocity (Jeremy, 2026-10-25), a line only read
 (`readout`, passed by Up and Down): the last MIDI note's velocity as sent
-and as played, "38 → 9" (`midiLast`), also in the MIDI key's tip (the
-reverb's are on the Voice section's Reverb tab, Jeremy, 2026-10-22);
+and as played, "38 → 9" (`midiLast`), also in the MIDI key's tip.
 `applySettings` sets them on `<html>` (`data-motion`, `data-tips`,
 `data-zx`, `data-note-names`, `data-computer-keys`) for the CSS. On a
-phone the key has the line under Volume's (beside it the fader would
-be too short to use). Chapters have neither the key nor
-the settings. Their containers
+phone the Settings key has the line under Volume's (beside it the fader
+would be too short to use). The presets' and Volume's containers
 (`#inst-dx7-presets` in a group named Presets, `#inst-tools`) are in the
 masthead's markup and shown on the sandbox only; `PLACES` moves the
 lab's nodes into them. The masthead keeps every page's height, with no
@@ -1268,7 +1288,7 @@ any element): one of phosphor
   two screens never alike (`nextGlitch`, `nextGlitches`), 120 to 190 ms
   (Jeremy, 2026-10-21); on the glass only, cyan only, never moving the
   layout or redrawing a plot; none under reduced motion, and its own
-  setting turns it off. In the sandbox the Motion setting on Still acts
+  setting turns it off. On every page the Motion setting on Still acts
   as `prefers-reduced-motion` does (no glitch, no reel easing, no
   playheads or moving views, no CSS transitions): everything that moves
   asks `motionReduced()` (`ui/motion.ts`), the media query or the

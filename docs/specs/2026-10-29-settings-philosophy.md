@@ -1,7 +1,7 @@
 # Bringing fmlab's settings in line with the settings philosophy
 
-Status: tracking plan (2026-10-29). Nothing here is built yet; this file
-and its PR track the work.
+Status: built (2026-10-29), in PR:fmlab:#105 (the reverb), PR:fmlab:#106
+(storage) and the dialog's PR.
 
 The philosophy is the one written for Frets (frets#195) and meant for all
 of Jeremy's apps: the work and preferences kept apart, one Settings dialog
@@ -88,31 +88,31 @@ Learn
       (`settingName`).
 
 ### Dialog
-- [ ] Replace the two tabs with a tree on the left (▸/▾ group heads,
+- [x] Replace the two tabs with a tree on the left (▸/▾ group heads,
       sections under them, selected section filled) and a framed pane on
       the right headed `Group › Section`, each field a row, label left,
       control right. Keep the synth's look (chassis plastic, VFD glass,
       push keys, silkscreen).
-- [ ] Phone width: a group picker and a sideways-scrolling strip of that
+- [x] Phone width: a group picker and a sideways-scrolling strip of that
       group's sections above the pane; the heading stays.
-- [ ] Full-word labels; reuse the app's own controls (the line's ‹ value ›
+- [x] Full-word labels; reuse the app's own controls (the line's ‹ value ›
       and its drop-down, knobs, push keys).
-- [ ] Hide sections with nothing to choose.
+- [x] Hide sections with nothing to choose.
 
 ### Staging
-- [ ] Changes inside the dialog are staged; OK saves and closes, Apply
+- [x] Changes inside the dialog are staged; OK saves and closes, Apply
       saves and stays, Cancel discards. Esc and Close are Cancel, with no
       prompt.
-- [ ] Apply disabled until a staged value differs from the saved one, and
+- [x] Apply disabled until a staged value differs from the saved one, and
       again after pressing it.
-- [ ] Saving updates the page at once (settings store set on OK / Apply
+- [x] Saving updates the page at once (settings store set on OK / Apply
       only).
-- [ ] The dialog stays modal: nothing behind it changes while it is open.
+- [x] The dialog stays modal: nothing behind it changes while it is open.
       Check the note keys still playing while it is open: they do not
       change a setting, so they can stay.
 
 ### Reset
-- [ ] Double click on a field's label resets it to its default (staged);
+- [x] Double click on a field's label resets it to its default (staged);
       a long press does the same on touch; the label's tip says
       "Double-click to reset". The control itself never resets on double
       click. No reset-all button.
@@ -122,17 +122,17 @@ Learn
       dialog shows; no second copy.
 
 ### Entry points
-- [ ] Synth: the Settings key opens the dialog at Synth, expanded, first
+- [x] Synth: the Settings key opens the dialog at Synth, expanded, first
       section selected; other groups collapsed.
-- [ ] The gear is the last page-level action: move the Learn key left of
+- [x] The gear is the last page-level action: move the Learn key left of
       Settings.
-- [ ] Chapters: add a gear to the masthead that opens the dialog at
+- [x] Chapters: add a gear to the masthead that opens the dialog at
       General.
-- [ ] Make Motion and Tips on hover act on the chapters as well as the
+- [x] Make Motion and Tips on hover act on the chapters as well as the
       synth (`motionReduced()`, the terms' tips).
 
 ### Docs
-- [ ] Update `CLAUDE.md` (settings.ts, the Settings panel, storage keys)
+- [x] Update `CLAUDE.md` (settings.ts, the Settings panel, storage keys)
       and the design spec.
 
 ## Decisions (Jeremy, 2026-10-29)

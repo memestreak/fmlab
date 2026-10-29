@@ -13,9 +13,9 @@ export interface Settings {
   theme: ThemeChoice;
   /** The top screens' glitch on a tab or preset change (ui/screenGlitch.ts). */
   screenGlitch: 'on' | 'off';
-  /** Still acts as prefers-reduced-motion across the sandbox; System follows the OS. */
+  /** Still acts as prefers-reduced-motion across the app; System follows the OS. */
   motion: 'system' | 'still';
-  /** Off drops the sandbox's hover tips (native titles, terms' tips). */
+  /** Off drops the app's hover tips (native titles, terms' tips). */
   tips: 'on' | 'off';
   /** The keyboard's Z X hint: on hover or focus, always, or never. */
   zxHint: 'hover' | 'always' | 'off';
