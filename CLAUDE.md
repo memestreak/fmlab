@@ -83,9 +83,9 @@ figures subscribe to it. Nothing else passes values around.
   (`createStore`: get, set, subscribe; listeners run synchronously inside
   `set` and get the previous state too), `lab.ts` (`LabState`; the ranges
   and defaults; the log scales of the carrier and modulator sliders),
-  `theme.ts` (the choice, its storage key, `applyTheme`) and
-  `settings.ts`, the sandbox's settings (its Settings panel), outside
-  the lab's store, the link and the sound: `Settings` (Screen glitch, Motion, Tips on hover, Z X hint, Note
+  `theme.ts` (the choice, `nextTheme`, `applyTheme`) and
+  `settings.ts`, the player's preferences (the Settings panel), outside
+  the lab's store, the link and the sound: `Settings` (Theme, Screen glitch, Motion, Tips on hover, Z X hint, Note
   names, Computer keys, Wheel; MIDI In's `midi` (off, on: set by the MIDI key),
   `midiInput` (an input's name, '' for all, at most `MAX_TEXT_SETTING`, 100,
   characters, the one text setting), `midiChannel` (0 for all, or 1 to 16)
@@ -93,14 +93,22 @@ figures subscribe to it. Nothing else passes values around.
   (today's behaviour; MIDI off,
   every input and channel, the bend ±2), the choice
   settings' `SETTING_CHOICES` and the number settings' `SETTING_RANGES`
-  (min, max, step; `inRange`), `parseSettings` (anything
-  missing, unknown or unreadable its default; a number held in range
-  and rounded to its step), `loadSettings` and
-  `saveSettings`, all together as JSON under
-  `localStorage["fmlab.settings"]`, and `settings`, a store of their own
-  that whatever they govern subscribes to. The theme is not among them:
-  the sandbox is dark only, and the chapters' theme keeps its own key and
-  `theme.ts`.
+  (min, max, step; `inRange`), saved a section to a key
+  (Jeremy, 2026-10-29, the settings philosophy; `SETTING_SECTIONS`):
+  `fmlab.general.appearance` (theme, motion, tips), `fmlab.synth.display`
+  (screen glitch, Z X hint, note names, computer keys),
+  `fmlab.synth.keyboard` (key velocity, wheel) and `fmlab.synth.midi`
+  (MIDI on, input, channel, bend range, velocity curve), each as JSON; a
+  setting's full name is `fmlab.<page>.<section>.<setting>`
+  (`settingName`). `parseSection` reads a section's own fields only
+  (anything missing, unknown or unreadable its default; a number held in
+  range and rounded to its step); `loadSettings` reads every section,
+  `saveSettings` writes the sections that changed, and a failed save is
+  said once, quietly, in the console (`settingsSaveFailed`). `settings`
+  is a store of their own that whatever they govern subscribes to, and
+  that saves itself as it changes. The theme is among them: the chapters'
+  theme switch sets the same value (the lab's `theme` follows it, for the
+  drawings), and the sandbox is dark only whatever it says.
   The URL holds
   the section; for one with `sharesSound` (the sandbox), a link's sound
   is read on opening (see `sandbox.ts` below), but with `SOUND_IN_URL`
@@ -1221,9 +1229,10 @@ The look is a 1973 paper: paper, ink, and three pens for the plots.
 - The theme switch is a small icon button, as frets has it: a half-filled
   circle for Auto, a sun, a moon, in ink with no border; it is named
   "Theme: Auto" and its tip says what a click does. It cycles Auto,
-  Light, Dark and saves the bare word under
-  `localStorage["fmlab.theme"]`. The boot script in `index.html` reads the
-  same key; keep it in step with `src/model/theme.ts`. It is on every page
+  Light, Dark and sets the theme setting, saved in
+  `localStorage["fmlab.general.appearance"]` as `{"theme": …}`. The boot
+  script in `index.html` reads the same key; keep it in step with
+  `src/model/settings.ts`. It is on every page
   but the sandbox, which is dark only.
 - Focus rings are for the keyboard: every focus style is on
   `:focus-visible`, never `:focus`, so a click, a tap or a drag leaves

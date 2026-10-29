@@ -13,10 +13,11 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <title>fmlab</title>
     <!-- Before the first paint, so a saved Light or Dark never flashes the
-         other. The key and values are those of src/model/theme.ts. -->
+         other. The key and values are those of src/model/settings.ts
+         (General's Appearance, SETTING_SECTIONS). -->
     <script>
       try {
-        var theme = localStorage.getItem('fmlab.theme');
+        var theme = (JSON.parse(localStorage.getItem('fmlab.general.appearance')) || {}).theme;
         // The synth (#/, or no hash) is dark only, whatever the saved choice.
         if (/^(#\/?)?(\?|$)/.test(location.hash)) theme = 'dark';
         if (theme === 'light' || theme === 'dark') {

@@ -74,17 +74,18 @@ Learn
       and all: there is one plate for every note.
 
 ### Model and storage
-- [ ] Split `fmlab.settings` into one key per section:
+- [x] Split `fmlab.settings` into one key per section:
       `fmlab.general.appearance`, `fmlab.synth.display`,
       `fmlab.synth.keyboard`, `fmlab.synth.midi`.
-- [ ] Move the theme into `fmlab.general.appearance`; update the boot
+- [x] Move the theme into `fmlab.general.appearance`; update the boot
       script in `index.html` to read it there.
-- [ ] One parser per section, every field checked, defaults on anything
+- [x] One parser per section, every field checked, defaults on anything
       missing or invalid. No migration of the old keys (no users yet).
-- [ ] Report a failed save once, quietly (for example a console warning
-      and a one-off line on the dialog), never blocking the dialog from
-      closing.
-- [ ] Name settings `fmlab.<page>.<section>.<setting>` in code and docs.
+- [x] Report a failed save once, quietly: a console warning
+      (`settingsSaveFailed` for the dialog's one-off line, in the dialog
+      PR), never blocking the dialog from closing.
+- [x] Name settings `fmlab.<page>.<section>.<setting>` in code and docs
+      (`settingName`).
 
 ### Dialog
 - [ ] Replace the two tabs with a tree on the left (▸/▾ group heads,
@@ -117,7 +118,7 @@ Learn
       click. No reset-all button.
 
 ### Shortcuts write the same value
-- [ ] The MIDI key and the chapters' theme switch read and write the same saved values the
+- [x] The MIDI key and the chapters' theme switch read and write the same saved values the
       dialog shows; no second copy.
 
 ### Entry points
